@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import tempfile
 from pathlib import Path
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 
 ROOT = Path(__file__).resolve().parent
@@ -43,6 +43,46 @@ def prepare_frontend() -> str:
     return str(DIST)
 
 
+@st.cache_data(show_spinner=False)
+def load_frontend_html(frontend_path: str) -> str:
+    """Inline the Vite output so Streamlit does not expect component handshakes."""
+    assets = Path(frontend_path) / "assets"
+    javascript_files = sorted(assets.glob("*.js"))
+    css_files = sorted(assets.glob("*.css"))
+    if len(javascript_files) != 1 or len(css_files) != 1:
+        raise RuntimeError("Expected one bundled JavaScript file and one CSS file in dist/assets")
+
+    html = (Path(frontend_path) / "index.html").read_text(encoding="utf-8")
+    javascript = javascript_files[0].read_text(encoding="utf-8")
+    stylesheet = css_files[0].read_text(encoding="utf-8")
+
+    # Prevent a literal closing script tag in the bundle from ending the HTML script element.
+    javascript = re.sub(
+        r"</script",
+        lambda _: "<\\/script",
+        javascript,
+        flags=re.IGNORECASE,
+    )
+    html, script_count = re.subn(
+        r"<script\b[^>]*\bsrc=[\"'][^\"']+\.js(?:\?[^\"']*)?[\"'][^>]*>\s*</script>",
+        lambda _: f'<script type="module">{javascript}</script>',
+        html,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    html, stylesheet_count = re.subn(
+        r"<link\b[^>]*\bhref=[\"'][^\"']+\.css(?:\?[^\"']*)?[\"'][^>]*>",
+        lambda _: f"<style>{stylesheet}</style>",
+        html,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    if script_count != 1 or stylesheet_count != 1:
+        raise RuntimeError("Could not inline the JavaScript and CSS references in dist/index.html")
+
+    return html
+
+
 st.markdown(
     """
     <style>
@@ -57,10 +97,10 @@ st.markdown(
 
 try:
     frontend_path = prepare_frontend()
-except (FileNotFoundError, subprocess.CalledProcessError) as exc:
+    frontend_html = load_frontend_html(frontend_path)
+except (FileNotFoundError, RuntimeError, subprocess.CalledProcessError) as exc:
     st.error("NutriAI could not prepare its web files. Check the app logs and try again.")
     st.exception(exc)
     st.stop()
 
-nutriai = components.declare_component("nutriai_web_preview", path=frontend_path)
-nutriai(key="nutriai-web-preview", height=900, scrolling=True)
+st.iframe(frontend_html, height=900, alt="NutriAI mobile app preview")
