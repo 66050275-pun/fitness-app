@@ -1,0 +1,1067 @@
+{
+  "package": "@bryllim/workout-guide",
+  "version": "1.0.0",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "changes": "Images are used unchanged. CSS scales them against a contrasting background. See the variant note for Dumbbell Incline Fly.",
+  "exercises": [
+    {
+      "appExercise": "Barbell Squat",
+      "libraryExercise": "Squat",
+      "slug": "squat",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/squat/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0122-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/squat/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Bench Press",
+      "libraryExercise": "Bench Press",
+      "slug": "bench-press",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/bench-press/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0042-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/bench-press/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Barbell Bench Press",
+      "libraryExercise": "Bench Press",
+      "slug": "bench-press",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/bench-press/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0042-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/bench-press/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Lat Pulldown",
+      "libraryExercise": "Lat Pulldown",
+      "slug": "lat-pulldown",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/lat-pulldown/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0093-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/lat-pulldown/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Romanian Deadlift",
+      "libraryExercise": "Romanian Deadlift",
+      "slug": "romanian-deadlift",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/romanian-deadlift/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0118-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/romanian-deadlift/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Plank",
+      "libraryExercise": "Plank",
+      "slug": "plank",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/plank/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/plank/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Incline Dumbbell Press",
+      "libraryExercise": "Incline Dumbbell Press",
+      "slug": "incline-dumbbell-press",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/incline-dumbbell-press/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0061-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/incline-dumbbell-press/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Overhead Press",
+      "libraryExercise": "Overhead Press",
+      "slug": "overhead-press",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/overhead-press/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/overhead-press/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Lateral Raise",
+      "libraryExercise": "Lateral Raise",
+      "slug": "lateral-raise",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/lateral-raise/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0018-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/lateral-raise/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Triceps Pushdown",
+      "libraryExercise": "Tricep Pushdown",
+      "slug": "tricep-pushdown",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/tricep-pushdown/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0205-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/tricep-pushdown/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Barbell Row",
+      "libraryExercise": "Barbell Row",
+      "slug": "barbell-row",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/barbell-row/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0026-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/barbell-row/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Seated Cable Row",
+      "libraryExercise": "Seated Cable Row",
+      "slug": "seated-row",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/seated-row/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0025-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/seated-row/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Face Pull",
+      "libraryExercise": "Face Pull",
+      "slug": "face-pull",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/face-pull/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/face-pull/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Dumbbell Curl",
+      "libraryExercise": "Bicep Curl",
+      "slug": "bicep-curl",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/bicep-curl/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0224-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/bicep-curl/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Leg Press",
+      "libraryExercise": "Leg Press",
+      "slug": "leg-press",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/leg-press/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0127-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/leg-press/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Leg Curl",
+      "libraryExercise": "Leg Curl",
+      "slug": "leg-curl",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/leg-curl/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0117-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/leg-curl/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Standing Calf Raise",
+      "libraryExercise": "Standing Calf Raise",
+      "slug": "standing-calf-raise",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/standing-calf-raise/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0282-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/standing-calf-raise/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Dumbbell Incline Fly",
+      "libraryExercise": "Dumbbell Fly",
+      "slug": "dumbbell-fly",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/dumbbell-fly/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0056-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/dumbbell-fly/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": "Incline bench variation of the dumbbell fly illustration."
+    },
+    {
+      "appExercise": "Dips (Chest / Triceps)",
+      "libraryExercise": "Dip",
+      "slug": "dip",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/dip/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0172-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/dip/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Cable Lateral Raise",
+      "libraryExercise": "Cable Lateral Raise",
+      "slug": "cable-lateral-raise",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/cable-lateral-raise/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/cable-lateral-raise/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Hammer Curl",
+      "libraryExercise": "Hammer Curl",
+      "slug": "hammer-curl",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/hammer-curl/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0227-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/hammer-curl/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Preacher Curl",
+      "libraryExercise": "Preacher Curl",
+      "slug": "preacher-curl",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/preacher-curl/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0236-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/preacher-curl/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Skull Crushers",
+      "libraryExercise": "Skull Crusher",
+      "slug": "skull-crusher",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/skull-crusher/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0183-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/skull-crusher/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Bulgarian Split Squat",
+      "libraryExercise": "Bulgarian Split Squat",
+      "slug": "bulgarian-split-squat",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/bulgarian-split-squat/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/bulgarian-split-squat/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Hanging Leg Raise",
+      "libraryExercise": "Hanging Leg Raise",
+      "slug": "hanging-leg-raise",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/hanging-leg-raise/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/hanging-leg-raise/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Cable Woodchopper",
+      "libraryExercise": "Cable Woodchop",
+      "slug": "cable-woodchop",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/cable-woodchop/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/cable-woodchop/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    },
+    {
+      "appExercise": "Seated Calf Raise",
+      "libraryExercise": "Seated Calf Raise",
+      "slug": "seated-calf-raise",
+      "frames": [
+        {
+          "index": 1,
+          "path": "assets/seated-calf-raise/frame-1.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "source": {
+              "name": "Everkinetic",
+              "url": "https://github.com/everkinetic/data/blob/main/dist/svg/0279-tension.svg",
+              "license": "CC BY-SA 4.0",
+              "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "changes": "Rasterized on a transparent 512 \u00d7 512 canvas and recolored for monochrome display."
+            }
+          }
+        },
+        {
+          "index": 3,
+          "path": "assets/seated-calf-raise/frame-3.png",
+          "width": 512,
+          "height": 512,
+          "format": "png",
+          "attribution": {
+            "creator": "Bryl Lim",
+            "creatorUrl": "https://bryllim.com",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+          }
+        }
+      ],
+      "note": null
+    }
+  ]
+}

@@ -43,3 +43,7 @@ npm run test:privacy
 ```
 
 The browser checks require Python with `requirements.txt` installed and Playwright Chromium (`npx playwright install chromium`). An existing Chromium executable can be selected with `FITNESS_CHROMIUM_PATH`. The browser script builds the app and creates an ignored fixture from the actual Streamlit iframe. All checks use synthetic data.
+
+## Exercise illustrations
+
+Fitness routine setup, the exercise catalog and the active workout screen include locally bundled illustrations from `@bryllim/workout-guide@1.0.0`. Artwork is CC BY-SA 4.0 by Bryl Lim, with Everkinetic credit where applicable. The code license is separate from the artwork license. Per-image upstream credits and exact source URLs are retained in [the attribution manifest](docs/exercise-art/ATTRIBUTION.json), with the original artwork license and attribution notice alongside it. Images are unchanged and do not make external image requests. The catalog's Dumbbell Incline Fly uses the dumbbell-fly reference, explicitly labelled as an incline-bench variation.

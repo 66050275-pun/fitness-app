@@ -140,3 +140,7 @@ The table below lists every screen/component source and its input controls. All 
 | `index.html`, `src/index.css`, `vite.config.ts` | UI shell, locally bundled styles/fonts and production network restrictions |
 | `streamlit_app.py` | Build and inline static frontend only; no personal input widgets or user-data storage |
 | `capacitor.config.ts`, `android/` | Native wrapper scaffold; HTTPS local scheme, Internet permission, no application backend configured |
+
+### Exercise illustration update — 2026-10-10
+
+`src/components/Fitness/ExerciseIllustration.ts` and `src/data/exerciseArtwork.ts` now render 52 locally bundled frames for 27 exercise names (26 distinct illustrations), covering all presets and catalog entries. The CC BY-SA 4.0 source credits and license are preserved under `docs/exercise-art/`. The setup, catalog and active session render data URLs, including in the Streamlit srcdoc iframe, without new external image requests. A browser review decoded all frames in all four presets and all ten catalog thumbnails, checked active-session images, and found no page errors or external requests. This adds a pinned asset package and approximately 1.7 MB to the uncompressed JavaScript bundle; initial loading on slow connections may take longer.

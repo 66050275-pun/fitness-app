@@ -13,6 +13,7 @@
     "test:privacy": "npm run build && python scripts/prepare_privacy_preview.py && playwright test"
   },
   "dependencies": {
+    "@bryllim/workout-guide": "1.0.0",
     "@capacitor/android": "^7.0.1",
     "@capacitor/core": "^7.0.1",
     "@fontsource-variable/material-symbols-outlined": "^5.3.8",

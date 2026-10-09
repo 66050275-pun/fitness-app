@@ -1,3 +1,4 @@
+import { renderExerciseIllustration } from '../components/Fitness/ExerciseIllustration';
 import { store } from '../store/appState';
 import { WORKOUT_PRESETS, AVAILABLE_EXERCISE_POOL } from '../data/workoutPresets';
 import type { WorkoutPreset, WorkoutExercise, ActiveWorkoutSessionState, WorkoutHistoryEntry, AppState } from '../types/index.ts';
@@ -359,6 +360,8 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
                 </button>
               </div>
 
+              ${renderExerciseIllustration(ex.name)}
+
               <!-- Sets and Reps Counter Controls -->
               <div class="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant/20">
                 
@@ -394,8 +397,10 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
             <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1">Select from Exercise Catalog</h4>
             <div class="max-h-48 overflow-y-auto flex flex-col gap-1.5 pr-1">
               ${AVAILABLE_EXERCISE_POOL.map(poolEx => `
-                <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high hover:bg-surface-container transition-colors">
-                  <div>
+                <div class="p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high">
+                  <div class="flex items-center gap-2.5">
+                    ${renderExerciseIllustration(poolEx.name, true)}
+                    <div class="flex-1 min-w-0">
                     <span class="font-heading font-bold text-xs text-on-surface dark:text-white block">${escapeHtml(poolEx.name)}</span>
                     <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${escapeHtml(poolEx.muscleGroup)}</span>
                   </div>
@@ -405,6 +410,11 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
                   >
                     + Add
                   </button>
+                  </div>
+                  <details class="mt-2">
+                    <summary class="text-[11px] font-semibold text-primary dark:text-primary-container cursor-pointer">View exercise / ดูภาพท่า</summary>
+                    <div class="mt-2">${renderExerciseIllustration(poolEx.name)}</div>
+                  </details>
                 </div>
               `).join('')}
             </div>
@@ -528,6 +538,8 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
               <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">${escapeHtml(currentEx.muscleGroup)} &bull; Rest ${currentEx.restSeconds}s</p>
             </div>
           </div>
+
+          ${renderExerciseIllustration(currentEx.name)}
 
           <!-- Sets Logging Table -->
           <div class="flex flex-col gap-2">
