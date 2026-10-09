@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
 import { store } from '../../store/appState';
 
 export function renderDeleteWorkoutModal(): string {
@@ -30,7 +31,7 @@ export function renderDeleteWorkoutModal(): string {
         </div>
 
         <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-          ${message}
+          ${escapeHtml(message)}
         </p>
 
         <div class="flex items-center gap-2 pt-1">

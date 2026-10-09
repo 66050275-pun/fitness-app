@@ -1,8 +1,9 @@
+import { privateStorage } from './privateStorage.ts';
 /**
  * Storage Persistence & Data Migration Service
  * 
  * Rules:
- * 1. Schema versioning in localStorage ('nutriai_app_data_v2').
+ * 1. Schema versioning in privateStorage ('nutriai_app_data_v2').
  * 2. Automatic migration of legacy MealItems without portion to legacy '1 serving'.
  * 3. Migration of legacy calories/macros into nutritionSnapshot while preserving micronutrients.
  * 4. Item-by-item sanitization so partial corruption never wipes the entire database.
@@ -149,8 +150,8 @@ export function migrateLegacyMealItem(raw: any): MealItem | null {
       imageUrl: typeof raw.imageUrl === 'string' ? raw.imageUrl : undefined,
       micronutrients: nutritionSnapshot.micronutrients
     };
-  } catch (err) {
-    console.warn('Failed to migrate individual meal item, skipping:', err);
+  } catch {
+    console.warn('Invalid meal record was skipped.');
     return null;
   }
 }
@@ -562,7 +563,7 @@ export function sanitizeScheduledWorkoutsMap(raw: unknown): Record<string, Sched
  */
 export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): PersistedAppData {
   try {
-    if (typeof localStorage === 'undefined') {
+    if (typeof privateStorage === 'undefined') {
       return {
         schemaVersion: CURRENT_SCHEMA_VERSION,
         customFoods: [],
@@ -580,7 +581,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
       };
     }
 
-    const raw = localStorage.getItem(APP_STORAGE_KEY);
+    const raw = privateStorage.getItem(APP_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') {
@@ -610,7 +611,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
         let workoutHistory: WorkoutHistoryEntry[] | undefined = Array.isArray(parsed.workoutHistory) ? parsed.workoutHistory : undefined;
         if (!workoutHistory) {
           try {
-            const rawWorkouts = localStorage.getItem('nutriai_workout_history');
+            const rawWorkouts = privateStorage.getItem('nutriai_workout_history');
             if (rawWorkouts) {
               const parsedWorkouts = JSON.parse(rawWorkouts);
               if (Array.isArray(parsedWorkouts)) {
@@ -642,7 +643,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
     }
 
     // Fallback: Check for legacy meals key
-    const rawLegacy = localStorage.getItem(LEGACY_MEALS_KEY);
+    const rawLegacy = privateStorage.getItem(LEGACY_MEALS_KEY);
     let legacyMeals: MealItem[] = [];
     if (rawLegacy) {
       try {
@@ -676,8 +677,8 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
     savePersistedAppData(initialData);
     return initialData;
 
-  } catch (err) {
-    console.warn('Error loading persisted app data, returning safe defaults:', err);
+  } catch {
+    console.warn('App data could not be loaded.');
     return {
       schemaVersion: CURRENT_SCHEMA_VERSION,
       customFoods: [],
@@ -699,14 +700,14 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
 }
 
 /**
- * Saves persisted app data safely to localStorage.
+ * Saves persisted app data safely to privateStorage.
  */
 export function savePersistedAppData(data: PersistedAppData): void {
   try {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(data));
-  } catch (err) {
-    console.warn('Failed to save persisted app data to localStorage:', err);
+    if (typeof privateStorage === 'undefined') return;
+    privateStorage.setItem(APP_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    console.warn('Private app data could not be saved.');
   }
 }
 
@@ -715,21 +716,21 @@ export function savePersistedAppData(data: PersistedAppData): void {
  */
 export function deleteNutriAILocalData(target: 'meals' | 'workouts' | 'weights' | 'all'): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof privateStorage === 'undefined') return;
 
     if (target === 'all') {
-      localStorage.removeItem(APP_STORAGE_KEY);
-      localStorage.removeItem(LEGACY_MEALS_KEY);
-      localStorage.removeItem('nutriai_workout_history');
-      localStorage.removeItem('nutriai_recent_food_searches');
-      localStorage.removeItem('nutriai_insight_range');
-      localStorage.removeItem('nutriai_dashboard_layout');
-      localStorage.removeItem('nutriai_feedback_draft');
+      privateStorage.removeItem(APP_STORAGE_KEY);
+      privateStorage.removeItem(LEGACY_MEALS_KEY);
+      privateStorage.removeItem('nutriai_workout_history');
+      privateStorage.removeItem('nutriai_recent_food_searches');
+      privateStorage.removeItem('nutriai_insight_range');
+      privateStorage.removeItem('nutriai_dashboard_layout');
+      privateStorage.removeItem('nutriai_feedback_draft');
       // Note: IndexedDB profile image deletion is handled by the caller (Store)
       return;
     }
 
-    const raw = localStorage.getItem(APP_STORAGE_KEY);
+    const raw = privateStorage.getItem(APP_STORAGE_KEY);
     if (!raw) return;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return;
@@ -737,20 +738,20 @@ export function deleteNutriAILocalData(target: 'meals' | 'workouts' | 'weights' 
     if (target === 'meals') {
       parsed.meals = [];
       parsed.recentFoods = [];
-      localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(parsed));
-      localStorage.removeItem(LEGACY_MEALS_KEY);
-      localStorage.removeItem('nutriai_recent_food_searches');
+      privateStorage.setItem(APP_STORAGE_KEY, JSON.stringify(parsed));
+      privateStorage.removeItem(LEGACY_MEALS_KEY);
+      privateStorage.removeItem('nutriai_recent_food_searches');
     } else if (target === 'workouts') {
       parsed.workoutHistory = [];
       parsed.scheduledWorkouts = {};
       parsed.weeklyFitnessTemplate = null;
-      localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(parsed));
-      localStorage.removeItem('nutriai_workout_history');
+      privateStorage.setItem(APP_STORAGE_KEY, JSON.stringify(parsed));
+      privateStorage.removeItem('nutriai_workout_history');
     } else if (target === 'weights') {
       parsed.weightHistory = [];
-      localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(parsed));
+      privateStorage.setItem(APP_STORAGE_KEY, JSON.stringify(parsed));
     }
-  } catch (err) {
-    console.warn('Failed to delete specific local data:', err);
+  } catch {
+    console.warn('Private app data could not be deleted.');
   }
 }

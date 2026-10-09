@@ -11,7 +11,7 @@
  */
 
 import { store } from '../../store/appState';
-import { escapeHtml } from '../../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../../utils/sanitize';
 import { getAvailableUnitsForFood } from '../../utils/portionCalculations';
 import type { MealType } from '../../types/index.ts';
 
@@ -111,7 +111,7 @@ export function renderSetPortionModal(): string {
                   step="any" 
                   inputmode="decimal" 
                   id="set-portion-qty-input"
-                  value="${qty}" 
+                  value="${escapeHtml(qty)}"
                   oninput="window.setPortionQuantity(parseFloat(this.value) || 0)"
                   placeholder="Quantity"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-sm font-bold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -126,7 +126,7 @@ export function renderSetPortionModal(): string {
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-sm font-bold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary capitalize appearance-none pr-8"
                 >
                   ${availableUnits.map(u => `
-                    <option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>
+                    <option value="${escapeHtml(u)}" ${u === unit ? 'selected' : ''}>${u}</option>
                   `).join('')}
                 </select>
                 <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">
@@ -145,7 +145,7 @@ export function renderSetPortionModal(): string {
                   ${food.portionOptions.map(opt => `
                     <button 
                       type="button" 
-                      onclick="window.setPortionQuickOption(${opt.quantity}, '${opt.unit}')"
+                      onclick="window.setPortionQuickOption(${opt.quantity}, ${htmlJsArg(opt.unit)})"
                       class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all active:scale-95 ${
                         qty === opt.quantity && unit === opt.unit
                           ? 'bg-primary text-white border-primary shadow-xs'
@@ -177,7 +177,7 @@ export function renderSetPortionModal(): string {
               ${hasMicronutrients ? `
                 <button 
                   type="button" 
-                  onclick="window.openNutrientsFromCatalog('${food.id}')"
+                  onclick="window.openNutrientsFromCatalog(${htmlJsArg(food.id)})"
                   class="text-[10px] font-bold text-primary hover:underline flex items-center gap-0.5"
                 >
                   <span>All Nutrients</span>
@@ -226,7 +226,7 @@ export function renderSetPortionModal(): string {
               ${(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(type => `
                 <button 
                   type="button" 
-                  onclick="window.setPortionMealType('${type}')"
+                  onclick="window.setPortionMealType(${htmlJsArg(type)})"
                   class="py-2 rounded-xl text-xs font-bold capitalize transition-all border ${
                     mealType === type 
                       ? 'bg-primary text-white border-primary shadow-xs' 
@@ -247,7 +247,7 @@ export function renderSetPortionModal(): string {
                 <input 
                   type="date" 
                   id="set-portion-date"
-                  value="${dateVal}"
+                  value="${escapeHtml(dateVal)}"
                   onchange="window.setPortionDate(this.value)"
                   class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 />
@@ -259,7 +259,7 @@ export function renderSetPortionModal(): string {
                 <input 
                   type="time" 
                   id="set-portion-time"
-                  value="${timeVal}"
+                  value="${escapeHtml(timeVal)}"
                   onchange="window.setPortionTime(this.value)"
                   class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 />

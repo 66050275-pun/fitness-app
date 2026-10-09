@@ -1,5 +1,5 @@
 import { store } from '../store/appState';
-import { escapeHtml } from '../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 
 export function renderWorkoutDetailScreen(): string {
   const state = store.getState();
@@ -61,7 +61,7 @@ export function renderWorkoutDetailScreen(): string {
         </div>
 
         <button 
-          onclick="window.openDeleteModal('${workout.id}')" 
+          onclick="window.openDeleteModal(${htmlJsArg(workout.id)})"
           aria-label="Delete this workout" 
           class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-error active:scale-95 transition-all"
         >
@@ -200,7 +200,7 @@ export function renderWorkoutDetailScreen(): string {
         <div class="flex flex-col gap-2.5 pt-2">
           <!-- Repeat Workout Button -->
           <button 
-            onclick="window.repeatWorkout('${workout.id}')" 
+            onclick="window.repeatWorkout(${htmlJsArg(workout.id)})"
             class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-white font-heading text-xs font-extrabold shadow-glow-primary active:scale-[0.99] transition-all flex items-center justify-center gap-2"
           >
             <span class="material-symbols-outlined text-[18px]">replay</span>
@@ -209,7 +209,7 @@ export function renderWorkoutDetailScreen(): string {
 
           <!-- Delete Button -->
           <button 
-            onclick="window.openDeleteModal('${workout.id}')" 
+            onclick="window.openDeleteModal(${htmlJsArg(workout.id)})"
             class="w-full py-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-xs font-bold text-error active:scale-95 transition-all flex items-center justify-center gap-1.5 hover:bg-red-500/10"
           >
             <span class="material-symbols-outlined text-[18px]">delete</span>

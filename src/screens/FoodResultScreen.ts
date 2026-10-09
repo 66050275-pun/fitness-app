@@ -1,3 +1,6 @@
+import { demoFoodImage } from '../data/demoImage.ts';
+import { escapeHtml } from '../utils/sanitize.ts';
+import { htmlJsArg } from '../utils/sanitize.ts';
 import { store } from '../store/appState';
 import { MealType } from '../types/index.ts';
 import { selectNutrientHighlights } from '../utils/nutrientCalculations';
@@ -27,9 +30,9 @@ export function renderFoodResultScreen(): string {
       <!-- Top Image Hero Banner -->
       <div class="relative w-full h-64 overflow-hidden bg-black">
         <img 
-          src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" 
+          src="${demoFoodImage}"
           class="w-full h-full object-cover" 
-          alt="${food.name}"
+          alt="${escapeHtml(food.name)}"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
 
@@ -53,11 +56,11 @@ export function renderFoodResultScreen(): string {
               ${Math.round(food.confidence * 100)}% AI Confidence
             </span>
             <span class="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-semibold">
-              Glycemic: ${food.glycemicIndex}
+              Glycemic: ${escapeHtml(food.glycemicIndex)}
             </span>
           </div>
-          <h1 class="font-heading font-bold text-xl leading-tight text-white">${food.name}</h1>
-          <p class="text-xs text-white/80 mt-0.5">${food.subtitle}</p>
+          <h1 class="font-heading font-bold text-xl leading-tight text-white">${escapeHtml(food.name)}</h1>
+          <p class="text-xs text-white/80 mt-0.5">${escapeHtml(food.subtitle)}</p>
         </div>
       </div>
 
@@ -113,7 +116,7 @@ export function renderFoodResultScreen(): string {
           <div class="flex flex-wrap gap-1.5">
             ${food.ingredients.map(ing => `
               <span class="px-2.5 py-1 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface dark:text-gray-200 font-medium">
-                ${ing}
+                ${escapeHtml(ing)}
               </span>
             `).join('')}
           </div>
@@ -149,7 +152,7 @@ export function renderFoodResultScreen(): string {
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1.5">
                   <div class="flex items-start justify-between">
                     <div>
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${n.name}</span>
+                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${escapeHtml(n.name)}</span>
                       <span class="text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${n.amount} ${n.unit}</span>
                     </div>
                     ${dv !== null && dv !== undefined ? `
@@ -166,14 +169,14 @@ export function renderFoodResultScreen(): string {
                       aria-valuenow="${dv}"
                       aria-valuemin="0"
                       aria-valuemax="100"
-                      aria-label="${n.name} ${dv} percent daily value"
+                      aria-label="${escapeHtml(n.name)} ${dv} percent daily value"
                     >
                       <div class="h-full rounded-full bg-primary" style="width: ${progressWidth}%;"></div>
                     </div>
                   ` : ''}
 
                   <div class="flex items-center justify-between text-[9px] text-on-surface-variant dark:text-gray-400 pt-0.5">
-                    <span class="uppercase tracking-wider font-semibold">${n.source || 'estimate'}</span>
+                    <span class="uppercase tracking-wider font-semibold">${escapeHtml(n.source || 'estimate')}</span>
                     ${n.confidence ? `<span>${Math.round(n.confidence * 100)}% conf</span>` : ''}
                   </div>
                 </div>
@@ -196,7 +199,7 @@ export function renderFoodResultScreen(): string {
             ${(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(type => `
               <button 
                 id="meal-btn-${type}" 
-                onclick="window.selectedMealType = '${type}'; document.querySelectorAll('[id^=meal-btn-]').forEach(b => b.classList.replace('bg-primary', 'bg-surface-container-low')); this.classList.replace('bg-surface-container-low', 'bg-primary');" 
+                onclick="window.selectedMealType = ${htmlJsArg(type)}; document.querySelectorAll('[id^=meal-btn-]').forEach(b => b.classList.replace('bg-primary', 'bg-surface-container-low')); this.classList.replace('bg-surface-container-low', 'bg-primary');"
                 class="py-2 px-1 text-center rounded-xl text-xs font-bold capitalize transition-all border border-outline-variant/30 ${type === food.suggestedMealType ? 'bg-primary text-white' : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface dark:text-gray-300'}"
               >
                 ${type}

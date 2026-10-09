@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
 /**
  * Profile Menu Row Component
  * 
@@ -25,12 +26,12 @@ export function renderProfileMenuRow(item: ProfileMenuItem): string {
   } = item;
 
   const chevronIcon = external ? 'north_east' : 'chevron_right';
-  const ariaLabel = `${label}${status ? ` (${status})` : ''}${disabled ? ' (Disabled)' : ''}${external ? ' (Opens external link)' : ''}`;
+  const ariaLabel = `${escapeHtml(label)}${status ? ` (${status})` : ''}${disabled ? ' (Disabled)' : ''}${external ? ' (Opens external link)' : ''}`;
 
   return `
     <button
       type="button"
-      id="profile-row-${id}"
+      id="profile-row-${escapeHtml(id)}"
       ${disabled ? 'disabled' : `onclick="${action}"`}
       aria-label="${ariaLabel}"
       class="w-full min-h-[52px] px-4 py-3 flex items-center justify-between text-left transition-colors group ${
@@ -47,11 +48,11 @@ export function renderProfileMenuRow(item: ProfileMenuItem): string {
         
         <div class="flex flex-col min-w-0">
           <span class="font-heading font-bold text-xs text-on-surface dark:text-white leading-snug truncate">
-            ${label}
+            ${escapeHtml(label)}
           </span>
           ${description ? `
             <span class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5 truncate leading-tight">
-              ${description}
+              ${escapeHtml(description)}
             </span>
           ` : ''}
         </div>

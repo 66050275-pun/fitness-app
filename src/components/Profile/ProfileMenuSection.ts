@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
 /**
  * Profile Menu Section Component
  * 
@@ -15,15 +16,15 @@ export function renderProfileMenuSection(options: ProfileMenuSectionOptions): st
   const { id, title, rowsHtml, description } = options;
 
   return `
-    <section ${id ? `id="${id}"` : ''} class="flex flex-col gap-2">
+    <section ${id ? `id="${escapeHtml(id)}"` : ''} class="flex flex-col gap-2">
       <!-- Section Heading -->
       <div class="px-1 flex flex-col">
         <h2 class="font-heading text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-          ${title}
+          ${escapeHtml(title)}
         </h2>
         ${description ? `
           <p class="text-[11px] text-on-surface-variant/80 dark:text-gray-500 mt-0.5">
-            ${description}
+            ${escapeHtml(description)}
           </p>
         ` : ''}
       </div>

@@ -10,7 +10,7 @@ import {
   calculateWeeklyTemplateSummary 
 } from '../../utils/fitnessPlannerCalculations.ts';
 import { WORKOUT_PRESETS } from '../../data/workoutPresets.ts';
-import { escapeHtml } from '../../utils/sanitize.ts';
+import { htmlJsArg, escapeHtml } from '../../utils/sanitize.ts';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -157,7 +157,7 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
             return `
               <button 
                 type="button"
-                onclick="window.openPlannerDateDetail('${cell.dateKey}')"
+                onclick="window.openPlannerDateDetail(${htmlJsArg(cell.dateKey)})"
                 aria-label="${friendly}: ${statusDesc}"
                 class="min-h-[56px] p-1 rounded-xl flex flex-col items-center justify-between border transition-all text-left group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${cellBg} ${isDimmed ? 'opacity-35' : 'opacity-100'} ${isToday ? 'ring-2 ring-primary ring-offset-1 dark:ring-offset-dark-surface' : 'border-outline-variant/20'}"
               >

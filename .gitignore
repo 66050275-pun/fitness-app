@@ -10,3 +10,9 @@ android/app/build/
 android/local.properties
 *.keystore
 *.jks
+
+# Python preview and test artifacts
+__pycache__/
+*.pyc
+test-results/
+playwright-report/

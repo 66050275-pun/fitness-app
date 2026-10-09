@@ -1,3 +1,4 @@
+import { privateStorage } from '../src/services/privateStorage.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateAge, calculateFullGoals, estimateBasalEnergy, estimateGoalCalories, resolveCalculationSex } from '../src/utils/goalCalculations.ts';
@@ -55,7 +56,7 @@ test('age calculation rejects future dates', () => {
 });
 
 test('an explicitly empty diary stays empty and daily values remain separated by date', () => {
-  const previousLocalStorage = globalThis.localStorage;
+  const previousGetItem = privateStorage.getItem;
   const values = new Map<string, string>();
   values.set(APP_STORAGE_KEY, JSON.stringify({
     schemaVersion: 4,
@@ -66,14 +67,7 @@ test('an explicitly empty diary stays empty and daily values remain separated by
     recentFoods: []
   }));
 
-  Object.defineProperty(globalThis, 'localStorage', {
-    configurable: true,
-    value: {
-      getItem: (key: string) => values.get(key) ?? null,
-      setItem: (key: string, value: string) => values.set(key, value),
-      removeItem: (key: string) => values.delete(key)
-    }
-  });
+  privateStorage.getItem = (key: string) => values.get(key) ?? null;
 
   try {
     const loaded = loadPersistedAppData([]);
@@ -83,15 +77,12 @@ test('an explicitly empty diary stays empty and daily values remain separated by
     assert.equal(loaded.waterByDate?.['2026-09-12'] ?? 0, 0);
     assert.equal(loaded.burnedByDate?.['2026-09-12'] ?? 0, 0);
   } finally {
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      value: previousLocalStorage
-    });
+    privateStorage.getItem = previousGetItem;
   }
 });
 
 test('legacy sample meals are removed during migration', () => {
-  const previousLocalStorage = globalThis.localStorage;
+  const previousGetItem = privateStorage.getItem;
   const values = new Map<string, string>();
   values.set(APP_STORAGE_KEY, JSON.stringify({
     schemaVersion: 4,
@@ -106,21 +97,11 @@ test('legacy sample meals are removed during migration', () => {
     recentFoods: []
   }));
 
-  Object.defineProperty(globalThis, 'localStorage', {
-    configurable: true,
-    value: {
-      getItem: (key: string) => values.get(key) ?? null,
-      setItem: (key: string, value: string) => values.set(key, value),
-      removeItem: (key: string) => values.delete(key)
-    }
-  });
+  privateStorage.getItem = (key: string) => values.get(key) ?? null;
 
   try {
     assert.deepEqual(loadPersistedAppData([]).meals, []);
   } finally {
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      value: previousLocalStorage
-    });
+    privateStorage.getItem = previousGetItem;
   }
 });

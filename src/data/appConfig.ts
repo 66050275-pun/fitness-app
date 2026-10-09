@@ -89,7 +89,7 @@ export const HELP_CENTER_FAQS: FaqItem[] = [
     id: 'faq-local-data',
     category: 'Data & Privacy',
     question: 'Where is my data stored?',
-    answer: 'All your logs, foods, workouts, weights, and personal settings are stored exclusively in your device\'s local storage. No data is transmitted to external servers or sold to third parties. You can export your full backup as a JSON file anytime from Data & Privacy.'
+    answer: 'Your logs, profile, feedback drafts and photo are saved in a passphrase protected encrypted browser vault. They are not sent to an application user database. Hosting services still receive page requests and network metadata. Export an encrypted backup from Data & Privacy; there is no passphrase recovery or automatic device sync.'
   },
   {
     id: 'faq-scanner-estimates',
@@ -116,7 +116,7 @@ export const TERMS_OF_USE_DOC: LegalDocument = {
     },
     {
       title: '3. Local Storage & Responsibility',
-      content: 'Because your data resides solely on your physical device, you are responsible for maintaining backups using the built-in JSON Export feature in Data & Privacy.'
+      content: 'Because your data resides solely on your physical device, you are responsible for maintaining backups using the built-in encrypted backup feature in Data & Privacy.'
     }
   ]
 };
@@ -126,15 +126,15 @@ export const PRIVACY_POLICY_DOC: LegalDocument = {
   title: 'Privacy Policy',
   status: 'draft',
   lastUpdated: 'September 2026',
-  summary: 'Draft privacy policy detailing 100% on-device storage.',
+  summary: 'Draft privacy notice for the current public test build.',
   sections: [
     {
       title: '1. On-Device Data Storage',
-      content: 'NutriAI does not operate a remote user database or authentication cloud in this version. All personal information, weights, meals, and workout logs remain strictly inside your device\'s local storage.'
+      content: 'NutriAI does not operate a remote user database or authentication cloud in this version. Personal fields and the profile photo are encrypted in browser IndexedDB with a passphrase that is not persisted or sent to the host. Data is decrypted in memory while the app is unlocked.'
     },
     {
       title: '2. Zero Telemetry & Tracking',
-      content: 'We do not employ third-party behavioral trackers, advertising pixels, or telemetry SDKs. Your health data is entirely private to your device.'
+      content: 'We do not employ third-party behavioral trackers, advertising pixels, or telemetry SDKs. The app frontend makes no analytics or personal-data API requests in this build. Hosting services handle page requests and network metadata. Public source code does not publish the browser vault. This does not protect against a compromised device, malicious browser extension, or malicious future app update while unlocked.'
     },
     {
       title: '3. User Rights & Data Deletion',

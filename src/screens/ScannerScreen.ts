@@ -1,3 +1,5 @@
+import { demoFoodImage } from '../data/demoImage.ts';
+import { escapeHtml } from '../utils/sanitize.ts';
 import { store } from '../store/appState';
 
 export function renderScannerScreen(): string {
@@ -24,11 +26,9 @@ export function renderScannerScreen(): string {
       <div class="absolute inset-0 z-0 overflow-hidden">
         <!-- High-res realistic background simulating camera sensor -->
         <img 
-          src="${isBarcode 
-            ? 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80' 
-            : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80'}" 
+          src="${demoFoodImage}"
           class="w-full h-full object-cover filter brightness-85 contrast-105 transform scale-105 transition-transform duration-700" 
-          alt="Camera viewfinder stream"
+          alt="Local demo illustration — no live camera feed"
         />
         <!-- Vignette & Camera Scan Grid Overlay -->
         <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
@@ -114,7 +114,7 @@ export function renderScannerScreen(): string {
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5">
-                <span class="font-heading font-bold text-xs truncate text-on-surface">${food.name}</span>
+                <span class="font-heading font-bold text-xs truncate text-on-surface">${escapeHtml(food.name)}</span>
                 <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary text-[9px] font-extrabold">${Math.round(food.confidence * 100)}% Match</span>
               </div>
               <p class="text-[11px] text-on-surface-variant mt-0.5">${food.calories} kcal &bull; ${food.protein}g Protein &bull; Tap for Details &rarr;</p>

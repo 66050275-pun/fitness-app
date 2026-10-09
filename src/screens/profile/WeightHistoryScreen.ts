@@ -11,7 +11,7 @@
 
 import { store } from '../../store/appState';
 import { formatWeight, kgToLb } from '../../utils/unitConversions';
-import { escapeHtml } from '../../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../../utils/sanitize';
 
 export function renderWeightHistoryScreen(): string {
   const state = store.getState();
@@ -188,9 +188,9 @@ export function renderWeightHistoryScreen(): string {
                           </span>
                         </div>
                         <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
-                          <span>${entry.date}</span>
+                          <span>${escapeHtml(entry.date)}</span>
                           <span>&bull;</span>
-                          <span>${entry.time}</span>
+                          <span>${escapeHtml(entry.time)}</span>
                           ${entry.note ? `<span>&bull;</span> <span class="italic truncate max-w-[120px]">${escapeHtml(entry.note)}</span>` : ''}
                         </div>
                       </div>
@@ -200,7 +200,7 @@ export function renderWeightHistoryScreen(): string {
                     <div class="flex items-center gap-1">
                       <button 
                         type="button" 
-                        onclick="window.editWeightEntry('${entry.id}')"
+                        onclick="window.editWeightEntry(${htmlJsArg(entry.id)})"
                         aria-label="Edit entry"
                         class="w-8 h-8 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container flex items-center justify-center transition-colors"
                       >
@@ -208,7 +208,7 @@ export function renderWeightHistoryScreen(): string {
                       </button>
                       <button 
                         type="button" 
-                        onclick="window.confirmDeleteWeightEntry('${entry.id}')"
+                        onclick="window.confirmDeleteWeightEntry(${htmlJsArg(entry.id)})"
                         aria-label="Delete entry"
                         class="w-8 h-8 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors"
                       >

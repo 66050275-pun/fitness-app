@@ -1,3 +1,4 @@
+import { privateStorage } from '../services/privateStorage.ts';
 import type { 
   AppState, 
   MealItem, 
@@ -88,7 +89,7 @@ const DEFAULT_DASHBOARD_WIDGET_ORDER: DashboardWidgetId[] = ['energy', 'macros',
 
 function loadDashboardWidgetLayout(): { order: DashboardWidgetId[]; hidden: DashboardWidgetId[] } {
   try {
-    const raw = localStorage.getItem(DASHBOARD_LAYOUT_STORAGE_KEY);
+    const raw = privateStorage.getItem(DASHBOARD_LAYOUT_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       const valid = new Set<DashboardWidgetId>(DEFAULT_DASHBOARD_WIDGET_ORDER);
@@ -110,7 +111,7 @@ function loadDashboardWidgetLayout(): { order: DashboardWidgetId[]; hidden: Dash
 
 function loadRecentFoodSearches(): string[] {
   try {
-    const raw = localStorage.getItem(RECENT_SEARCHES_STORAGE_KEY);
+    const raw = privateStorage.getItem(RECENT_SEARCHES_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed.slice(0, 10);
@@ -121,7 +122,7 @@ function loadRecentFoodSearches(): string[] {
 
 function loadSavedInsightRange(): 7 | 30 | 90 {
   try {
-    const raw = localStorage.getItem(INSIGHT_RANGE_STORAGE_KEY);
+    const raw = privateStorage.getItem(INSIGHT_RANGE_STORAGE_KEY);
     if (raw === '7' || raw === '30' || raw === '90') {
       return parseInt(raw, 10) as 7 | 30 | 90;
     }
@@ -279,7 +280,7 @@ function getDefaultWorkoutHistory(): WorkoutHistoryEntry[] {
 
 function loadSavedWorkoutHistory(): WorkoutHistoryEntry[] {
   try {
-    const raw = localStorage.getItem(WORKOUT_HISTORY_STORAGE_KEY);
+    const raw = privateStorage.getItem(WORKOUT_HISTORY_STORAGE_KEY);
   if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
@@ -434,10 +435,13 @@ export function foodDefinitionToDraft(food: FoodDefinition): CustomFoodDraft {
 
 class Store {
   private state: AppState;
+  private disposed = false;
   private lastDeviceDateKey = getTodayKey();
   private listeners: Set<() => void> = new Set();
   private workoutTimerInterval: ReturnType<typeof setInterval> | null = null;
   private restTimerInterval: ReturnType<typeof setInterval> | null = null;
+
+  dispose() { this.disposed = true; this.listeners.clear(); this.stopWorkoutTimers(); this.setProfileImageUrl(null); this.state = null!; }
 
   constructor() {
     const persisted = loadPersistedAppData(INITIAL_MEALS);
@@ -578,6 +582,7 @@ class Store {
   }
 
   private notify() {
+    if (this.disposed) return;
     this.listeners.forEach(cb => cb());
   }
 
@@ -784,7 +789,7 @@ class Store {
   private async loadProfileImageAsync() {
     try {
       const blob = await loadProfileImageBlob();
-      if (blob) {
+      if (blob && !this.disposed) {
         // Revoke any previous URL to prevent leaks
         if (this.state.profileImageUrl) {
           URL.revokeObjectURL(this.state.profileImageUrl);
@@ -984,46 +989,6 @@ class Store {
     this.notify();
   }
 
-  public exportLocalData(): string {
-    const backup = {
-      appName: 'NutriAI',
-      schemaVersion: CURRENT_SCHEMA_VERSION,
-      exportedAt: new Date().toISOString(),
-      userProfile: this.state.userProfile,
-      userPreferences: this.state.userPreferences,
-      nutritionGoals: this.state.nutritionGoals,
-      weightHistory: this.state.weightHistory,
-      eatingSchedule: this.state.eatingSchedule,
-      meals: this.state.meals,
-      waterByDate: this.state.waterByDate,
-      burnedByDate: this.state.burnedByDate,
-      customFoods: this.state.customFoods,
-      recentFoods: this.state.recentFoods,
-      workoutHistory: this.state.workoutHistory,
-      onboardingState: this.state.onboardingState
-    };
-
-    const json = JSON.stringify(backup, null, 2);
-
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      try {
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        const dateStr = new Date().toISOString().split('T')[0];
-        a.href = url;
-        a.download = `nutriai-backup-${dateStr}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } catch (err) {
-        console.warn('Browser download failed:', err);
-      }
-    }
-    return json;
-  }
-
   public deleteSelectedLocalData(target: 'meals' | 'workouts' | 'weights' | 'all') {
     deleteNutriAILocalData(target);
     if (target === 'meals') {
@@ -1055,7 +1020,7 @@ class Store {
         URL.revokeObjectURL(this.state.profileImageUrl);
         this.state.profileImageUrl = null;
       }
-      void deleteProfileImageDB();
+      void deleteProfileImageDB().catch(() => { /* Save-status banner reports persistence errors. */ });
     }
     this.persistState();
     this.notify();
@@ -1338,6 +1303,7 @@ class Store {
     this.notify();
 
     setTimeout(() => {
+      if (this.disposed) return;
       let reply = "Keep focus on progressive overload and adequate post-workout nutrition.";
       const lower = text.toLowerCase();
       if (lower.includes('protein') || lower.includes('dinner')) {
@@ -1389,7 +1355,7 @@ class Store {
 
   private persistDashboardWidgetLayout() {
     try {
-      localStorage.setItem(DASHBOARD_LAYOUT_STORAGE_KEY, JSON.stringify({
+      privateStorage.setItem(DASHBOARD_LAYOUT_STORAGE_KEY, JSON.stringify({
         order: this.state.dashboardWidgetOrder,
         hidden: this.state.hiddenDashboardWidgets
       }));
@@ -1413,7 +1379,7 @@ class Store {
   public setInsightRange(range: 7 | 30 | 90) {
     this.state.selectedInsightRange = range;
     try {
-      localStorage.setItem(INSIGHT_RANGE_STORAGE_KEY, String(range));
+      privateStorage.setItem(INSIGHT_RANGE_STORAGE_KEY, String(range));
     } catch {}
     this.notify();
   }
@@ -1437,7 +1403,7 @@ class Store {
     const existing = this.state.recentFoodSearches.filter(q => q.toLowerCase() !== trimmed.toLowerCase());
     this.state.recentFoodSearches = [trimmed, ...existing].slice(0, 10);
     try {
-      localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(this.state.recentFoodSearches));
+      privateStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(this.state.recentFoodSearches));
     } catch {}
     this.notify();
   }
@@ -1445,7 +1411,7 @@ class Store {
   public clearRecentFoodSearches() {
     this.state.recentFoodSearches = [];
     try {
-      localStorage.removeItem(RECENT_SEARCHES_STORAGE_KEY);
+      privateStorage.removeItem(RECENT_SEARCHES_STORAGE_KEY);
     } catch {}
     this.notify();
   }
@@ -1664,6 +1630,7 @@ class Store {
     this.state.plannerToastMessage = message;
     this.notify();
     setTimeout(() => {
+      if (this.disposed) return;
       if (this.state.plannerToastMessage === message) {
         this.state.plannerToastMessage = null;
         this.notify();
@@ -1951,7 +1918,7 @@ class Store {
     const summary = this.state.lastWorkoutSummary;
     this.state.workoutHistory.unshift(summary);
 
-    // Save to localStorage safely
+    // Save to privateStorage safely
     this.persistWorkoutHistory();
 
     // Re-calculate PRs based on newly added workout
@@ -1999,7 +1966,7 @@ class Store {
 
   private persistWorkoutHistory() {
     try {
-      localStorage.setItem(WORKOUT_HISTORY_STORAGE_KEY, JSON.stringify(this.state.workoutHistory));
+      privateStorage.setItem(WORKOUT_HISTORY_STORAGE_KEY, JSON.stringify(this.state.workoutHistory));
     } catch {
       // Ignore storage quota
     }
@@ -3272,4 +3239,6 @@ class Store {
   }
 }
 
-export const store = new Store();
+export let store: Store;
+export function initializeStore() { store = new Store(); }
+export function disposeStore() { store.dispose(); }

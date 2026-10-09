@@ -9,15 +9,21 @@
     "preview": "vite preview",
     "test": "node --test tests/*.test.ts",
     "cap:add": "cap add android",
-    "cap:sync": "cap sync android"
+    "cap:sync": "cap sync android",
+    "test:privacy": "npm run build && python scripts/prepare_privacy_preview.py && playwright test"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.1",
-    "@capacitor/core": "^7.0.1"
+    "@capacitor/core": "^7.0.1",
+    "@fontsource-variable/material-symbols-outlined": "^5.3.8",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/plus-jakarta-sans": "^5.3.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.1",
+    "@playwright/test": "^1.64.0",
     "autoprefixer": "^10.4.20",
+    "fake-indexeddb": "^6.2.5",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",

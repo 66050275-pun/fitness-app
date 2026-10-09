@@ -1,5 +1,16 @@
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/inter/latin-700.css';
+import '@fontsource/plus-jakarta-sans/latin-500.css';
+import '@fontsource/plus-jakarta-sans/latin-600.css';
+import '@fontsource/plus-jakarta-sans/latin-700.css';
+import '@fontsource/plus-jakarta-sans/latin-800.css';
+import '@fontsource-variable/material-symbols-outlined';
+import { startPrivateApp, downloadEncryptedBackup } from './security/vaultUI.ts';
+import { privateStorage, isVaultUnlocked } from './services/privateStorage.ts';
 import './index.css';
-import { store } from './store/appState';
+import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';
 import { renderQuickActionModal } from './components/Modals/QuickActionModal';
@@ -725,7 +736,7 @@ window.showDayDetailToast = (title: string, text: string) => {
   const toast = document.getElementById('day-detail-toast');
   const toastText = document.getElementById('day-detail-toast-text');
   if (toast && toastText) {
-    toastText.innerHTML = `<strong>${title}:</strong> ${text}`;
+    toastText.innerHTML = `<strong>${escapeHtml(title)}:</strong> ${escapeHtml(text)}`;
     toast.classList.remove('hidden');
   }
 };
@@ -824,7 +835,7 @@ window.openSetPortion = (foodOrId: string | FoodDefinition, initialPortion?: Par
   }
 
   if (!food) {
-    console.warn('Food not found for set portion:', foodOrId);
+    console.warn('Selected food was not found.');
     return;
   }
 
@@ -1693,7 +1704,7 @@ window.saveFeedbackDraft = () => {
   };
 
   try {
-    localStorage.setItem('nutriai_feedback_draft', JSON.stringify(draft));
+    privateStorage.setItem('nutriai_feedback_draft', JSON.stringify(draft));
   } catch {}
 };
 
@@ -1725,7 +1736,7 @@ window.copyFeedbackText = async () => {
 
 window.clearFeedbackDraft = () => {
   try {
-    localStorage.removeItem('nutriai_feedback_draft');
+    privateStorage.removeItem('nutriai_feedback_draft');
   } catch {}
   renderApp();
 };
@@ -1757,7 +1768,7 @@ window.toggleMarketingConsent = () => {
 
 // --- Data & Privacy / Export / Granular Deletions ---
 window.exportAppData = () => {
-  store.exportLocalData();
+  void downloadEncryptedBackup().catch(() => alert('Backup failed. Please retry saving before exporting.'));
 };
 
 window.confirmDeleteFoodHistory = () => {
@@ -1952,6 +1963,7 @@ window.restartGoalSetup = () => store.restartGoalSetup();
 // HARDWARE BACK BUTTON & KEYBOARD ESCAPE
 // ==========================================
 window.addEventListener('keydown', (e) => {
+  if (!isVaultUnlocked()) return;
   if (e.key === 'Escape') {
     const state = store.getState();
     if (state.profileConfirmModal) {
@@ -1987,6 +1999,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 document.addEventListener('backbutton', (e) => {
+  if (!isVaultUnlocked()) return;
   const state = store.getState();
   if (state.profileConfirmModal) {
     e.preventDefault();
@@ -2196,13 +2209,9 @@ function renderApp() {
   }
 }
 
-// Subscribe to store updates
-store.subscribe(renderApp);
-
-// If the app remains open overnight, resume on the new device-local date.
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') store.syncToCurrentDate();
-});
-
-// Initial render
-renderApp();
+// Initialize health/profile state only after the local vault is unlocked.
+void startPrivateApp(() => {
+  initializeStore();
+  store.subscribe(renderApp);
+  renderApp();
+}, () => disposeStore());

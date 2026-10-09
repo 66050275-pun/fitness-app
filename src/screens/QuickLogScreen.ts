@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/sanitize.ts';
 import { store } from '../store/appState';
 import type { MealType } from '../types/index.ts';
 
@@ -63,7 +64,7 @@ export function renderQuickLogScreen(): string {
             <div class="grid grid-cols-4 gap-1.5">
               ${(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map((type, idx) => `
                 <label class="cursor-pointer">
-                  <input type="radio" name="ql-meal-type" value="${type}" ${idx === 1 ? 'checked' : ''} class="peer sr-only" />
+                  <input type="radio" name="ql-meal-type" value="${escapeHtml(type)}" ${idx === 1 ? 'checked' : ''} class="peer sr-only" />
                   <div class="py-2 text-center rounded-xl text-xs font-bold capitalize border border-outline-variant/30 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary peer-checked:shadow-sm bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant transition-all">
                     ${type}
                   </div>
@@ -218,7 +219,7 @@ export function renderQuickLogScreen(): string {
               <input 
                 type="date" 
                 id="ql-date" 
-                value="${activeDate}"
+                value="${escapeHtml(activeDate)}"
                 class="px-2.5 py-1.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs font-medium text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
@@ -227,7 +228,7 @@ export function renderQuickLogScreen(): string {
               <input 
                 type="text" 
                 id="ql-time" 
-                value="${nowTime}"
+                value="${escapeHtml(nowTime)}"
                 placeholder="12:30 PM"
                 class="px-2.5 py-1.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs font-medium text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
               />

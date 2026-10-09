@@ -13,7 +13,7 @@ import {
   type MetricDelta 
 } from '../utils/insightCalculations';
 import { calculateMicronutrientTrends } from '../utils/nutrientCalculations';
-import { escapeHtml } from '../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 
 export function renderInsightsScreen(): string {
@@ -210,7 +210,7 @@ export function renderInsightsScreen(): string {
                 ${curWorkoutTotals.workouts.map(w => `
                   <button 
                     type="button"
-                    onclick="window.openWorkoutDetail('${w.id}')"
+                    onclick="window.openWorkoutDetail(${htmlJsArg(w.id)})"
                     class="w-full text-left p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 hover:border-primary/40 active:scale-[0.99] transition-all flex items-center justify-between group cursor-pointer"
                   >
                     <div class="flex items-center gap-2">
@@ -306,7 +306,7 @@ export function renderInsightsScreen(): string {
               ${prs.slice(0, 4).map(pr => `
                 <button 
                   type="button"
-                  onclick="window.openPersonalRecordDetail('${pr.id}')"
+                  onclick="window.openPersonalRecordDetail(${htmlJsArg(pr.id)})"
                   class="w-full text-left p-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 hover:border-primary/40 active:scale-[0.99] transition-all flex items-center justify-between group cursor-pointer"
                 >
                   <div>
@@ -365,7 +365,7 @@ export function renderInsightsScreen(): string {
               return `
                 <button 
                   type="button"
-                  onclick="window.setInsightNutrientCategory('${cat}')"
+                  onclick="window.setInsightNutrientCategory(${htmlJsArg(cat)})"
                   class="px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border ${
                     isActive 
                       ? 'bg-primary text-white border-primary shadow-xs' 
@@ -398,7 +398,7 @@ export function renderInsightsScreen(): string {
                 <div class="p-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1.5">
                   <div class="flex items-start justify-between">
                     <div>
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${n.name}</span>
+                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${escapeHtml(n.name)}</span>
                       <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
                         ${n.referenceValue !== null ? `Ref: ${n.referenceValue} ${n.unit} (${n.direction === 'maximum_limit' ? 'max' : 'target'})` : 'Informational'}
                       </span>
@@ -423,7 +423,7 @@ export function renderInsightsScreen(): string {
                   </div>
 
                   <p class="text-[10px] text-on-surface-variant dark:text-gray-400 italic pt-0.5">
-                    ${n.guidanceText}
+                    ${escapeHtml(n.guidanceText)}
                   </p>
                 </div>
               `;
@@ -557,7 +557,7 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
           return `
             <div 
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast('${day.fullDateLabel}', '${day.calories} kcal logged across ${day.mealCount} meals')"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, '${day.calories} kcal logged across ${day.mealCount} meals')"
             >
               <!-- Tooltip on hover/touch -->
               <div class="hidden group-hover:flex absolute -top-8 bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-nowrap z-20">
@@ -636,7 +636,7 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
           return `
             <div 
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast('${day.fullDateLabel}', '${day.protein}g P &bull; ${day.carbs}g C &bull; ${day.fat}g F')"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, '${day.protein}g P &bull; ${day.carbs}g C &bull; ${day.fat}g F')"
             >
               <!-- Tooltip on hover/touch -->
               <div class="hidden group-hover:flex absolute -top-8 bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-nowrap z-20">

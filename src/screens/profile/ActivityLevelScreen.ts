@@ -1,3 +1,4 @@
+import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Activity Level Sub-Screen
  * 
@@ -106,7 +107,7 @@ export function renderActivityLevelScreen(): string {
             return `
               <div 
                 id="activity-card-${opt.level}"
-                onclick="window.selectActivityTier('${opt.level}', ${suggestedTdee})"
+                onclick="window.selectActivityTier(${htmlJsArg(opt.level)}, ${suggestedTdee})"
                 class="p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 ${
                   isSelected 
                     ? 'bg-primary/5 dark:bg-primary/10 border-primary ring-1 ring-primary/40 shadow-ambient' 

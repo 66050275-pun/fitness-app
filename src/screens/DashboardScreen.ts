@@ -1,3 +1,5 @@
+import { escapeHtml } from '../utils/sanitize.ts';
+import { htmlJsArg } from '../utils/sanitize.ts';
 import { store } from '../store/appState';
 import { formatFriendlyDate, getTodayKey } from '../utils/dateUtils';
 import { clampProgressRatio, formatRemainingCalories, safeRatio } from '../utils/safeNumbers';
@@ -236,10 +238,10 @@ export function renderDashboardScreen(): string {
           </div>
 
           <div class="flex items-center gap-1.5">
-            <button onclick="window.removeWater('${selectedDate}')" class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all">
+            <button onclick="window.removeWater(${htmlJsArg(selectedDate)})" class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all">
               <span class="material-symbols-outlined text-[16px]">remove</span>
             </button>
-            <button onclick="window.addWater('${selectedDate}')" class="w-8 h-8 rounded-full bg-blue-500 text-white shadow-sm flex items-center justify-center active:scale-95 transition-all">
+            <button onclick="window.addWater(${htmlJsArg(selectedDate)})" class="w-8 h-8 rounded-full bg-blue-500 text-white shadow-sm flex items-center justify-center active:scale-95 transition-all">
               <span class="material-symbols-outlined text-[16px]">add</span>
             </button>
           </div>
@@ -293,12 +295,12 @@ export function renderDashboardScreen(): string {
                 <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex items-center justify-between hover:border-primary/40 transition-all">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-primary dark:text-primary-container">
-                      <span class="material-symbols-outlined text-[22px]">${meal.icon}</span>
+                      <span class="material-symbols-outlined text-[22px]">${escapeHtml(meal.icon)}</span>
                     </div>
                     <div>
-                      <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white">${meal.name}</h4>
+                      <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white">${escapeHtml(meal.name)}</h4>
                       <div class="flex items-center gap-2 mt-0.5">
-                        <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase tracking-wider">${meal.mealType} &bull; ${meal.time}</span>
+                        <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase tracking-wider">${meal.mealType} &bull; ${escapeHtml(meal.time)}</span>
                         <span class="text-[10px] text-primary dark:text-primary-container font-semibold">${meal.protein}g P &bull; ${meal.carbs}g C</span>
                       </div>
                     </div>
@@ -306,7 +308,7 @@ export function renderDashboardScreen(): string {
 
                   <div class="flex items-center gap-2">
                     <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${meal.calories} <span class="text-[10px] font-normal text-on-surface-variant dark:text-gray-400">kcal</span></span>
-                    <button onclick="window.deleteMeal('${meal.id}')" class="text-on-surface-variant hover:text-error p-1 transition-colors">
+                    <button onclick="window.deleteMeal(${htmlJsArg(meal.id)})" class="text-on-surface-variant hover:text-error p-1 transition-colors">
                       <span class="material-symbols-outlined text-[16px]">delete_outline</span>
                     </button>
                   </div>
@@ -341,13 +343,13 @@ export function renderDashboardScreen(): string {
                     <span class="material-symbols-outlined text-[19px] text-primary dark:text-primary-container">${widget.icon}</span>
                     <span class="flex-1 font-heading text-xs font-bold text-on-surface dark:text-white">${widget.label}</span>
                     <div class="flex items-center gap-1">
-                      <button onclick="window.moveDashboardWidget('${id}', -1)" ${index === 0 ? 'disabled' : ''} class="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant disabled:opacity-25" aria-label="Move ${widget.label} up">
+                      <button onclick="window.moveDashboardWidget(${htmlJsArg(id)}, -1)" ${index === 0 ? 'disabled' : ''} class="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant disabled:opacity-25" aria-label="Move ${widget.label} up">
                         <span class="material-symbols-outlined text-[17px]">keyboard_arrow_up</span>
                       </button>
-                      <button onclick="window.moveDashboardWidget('${id}', 1)" ${index === state.dashboardWidgetOrder.length - 1 ? 'disabled' : ''} class="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant disabled:opacity-25" aria-label="Move ${widget.label} down">
+                      <button onclick="window.moveDashboardWidget(${htmlJsArg(id)}, 1)" ${index === state.dashboardWidgetOrder.length - 1 ? 'disabled' : ''} class="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant disabled:opacity-25" aria-label="Move ${widget.label} down">
                         <span class="material-symbols-outlined text-[17px]">keyboard_arrow_down</span>
                       </button>
-                      <button onclick="window.toggleDashboardWidget('${id}')" class="h-8 min-w-[64px] px-2 rounded-lg text-[10px] font-bold ${hidden ? 'bg-primary text-white' : 'bg-error/10 text-error'}">
+                      <button onclick="window.toggleDashboardWidget(${htmlJsArg(id)})" class="h-8 min-w-[64px] px-2 rounded-lg text-[10px] font-bold ${hidden ? 'bg-primary text-white' : 'bg-error/10 text-error'}">
                         ${hidden ? 'Add' : 'Remove'}
                       </button>
                     </div>

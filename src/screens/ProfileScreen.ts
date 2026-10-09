@@ -240,7 +240,7 @@ export function renderProfileScreen(): string {
         <section class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex items-center justify-between gap-3">
           <div class="flex items-center gap-3.5 min-w-0">
             <button type="button" onclick="document.getElementById('profile-photo-input')?.click()" aria-label="Change profile photo" class="relative w-14 h-14 overflow-hidden rounded-full bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center shadow-md border-2 border-surface dark:border-dark-surface shrink-0 cursor-pointer hover:scale-105 transition-transform">
-              ${profileImageUrl ? `<img src="${profileImageUrl}" class="w-full h-full object-cover" alt="Profile photo">` : `<span class="font-heading font-extrabold text-base tracking-wider select-none">${initials}</span>`}
+              ${profileImageUrl ? `<img src="${escapeHtml(profileImageUrl)}" class="w-full h-full object-cover" alt="Profile photo">` : `<span class="font-heading font-extrabold text-base tracking-wider select-none">${escapeHtml(initials)}</span>`}
               <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-primary ring-2 ring-surface dark:ring-dark-surface flex items-center justify-center">
                 <span class="material-symbols-outlined text-[10px] text-white">edit</span>
               </span>

@@ -80,7 +80,7 @@ export function renderWeightEntryModal(): string {
         <form id="weight-entry-form" onsubmit="event.preventDefault(); window.submitWeightEntry();" class="p-5 flex flex-col gap-4 overflow-y-auto">
           
           <!-- Hidden editing ID -->
-          <input type="hidden" id="weight-entry-id" value="${editing?.id || ''}" />
+          <input type="hidden" id="weight-entry-id" value="${escapeHtml(editing?.id || '')}" />
 
           <!-- Weight Input + Unit Toggle -->
           <div>
@@ -96,7 +96,7 @@ export function renderWeightEntryModal(): string {
                   max="500" 
                   id="weight-input-value"
                   required
-                  value="${initialDisplayWeight}"
+                  value="${escapeHtml(initialDisplayWeight)}"
                   placeholder="e.g. 70.5"
                   class="w-full px-4 py-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-base font-heading font-extrabold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
@@ -121,7 +121,7 @@ export function renderWeightEntryModal(): string {
                   lb
                 </button>
               </div>
-              <input type="hidden" id="weight-input-unit" value="${userUnit}" />
+              <input type="hidden" id="weight-input-unit" value="${escapeHtml(userUnit)}" />
             </div>
           </div>
 
@@ -135,7 +135,7 @@ export function renderWeightEntryModal(): string {
                 type="date" 
                 id="weight-input-date"
                 required
-                value="${initialDate}"
+                value="${escapeHtml(initialDate)}"
                 class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
               />
             </div>
@@ -148,7 +148,7 @@ export function renderWeightEntryModal(): string {
                 type="time" 
                 id="weight-input-time"
                 required
-                value="${initialTime}"
+                value="${escapeHtml(initialTime)}"
                 class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
               />
             </div>

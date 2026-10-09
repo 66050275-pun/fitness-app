@@ -16,7 +16,7 @@
  */
 
 import { store } from '../../store/appState';
-import { escapeHtml } from '../../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../../utils/sanitize';
 import { FOOD_CATEGORIES, getCategoryLabel } from '../../data/foodCategories';
 import { 
   calculateCaloriesFromMacros, 
@@ -259,7 +259,7 @@ function renderStep1(
           <div class="flex items-center gap-2 pt-1">
             <button 
               type="button" 
-              onclick="window.useExistingFoodFromDuplicate('${dupWarning.duplicateFood.id}')"
+              onclick="window.useExistingFoodFromDuplicate(${htmlJsArg(dupWarning.duplicateFood.id)})"
               class="px-3 py-1.5 rounded-xl bg-primary text-white text-[11px] font-bold shadow-xs hover:brightness-105 transition-all"
             >
               Use Existing Food
@@ -331,7 +331,7 @@ function renderStep1(
           >
             <option value="" disabled ${!draft.category ? 'selected' : ''}>Select category...</option>
             ${FOOD_CATEGORIES.map(cat => `
-              <option value="${cat.value}" ${draft.category === cat.value ? 'selected' : ''}>
+              <option value="${escapeHtml(cat.value)}" ${draft.category === cat.value ? 'selected' : ''}>
                 ${cat.label}
               </option>
             `).join('')}
@@ -474,7 +474,7 @@ function renderStep2(
                 inputmode="decimal"
                 id="cf-serving-qty"
                 required
-                value="${draft.servingQuantity}"
+                value="${escapeHtml(draft.servingQuantity)}"
                 oninput="window.updateCustomFoodDraftNumeric('servingQuantity', this.value)"
                 class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border ${errors.servingQuantity ? 'border-error ring-1 ring-error' : 'border-outline-variant/40'} text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
               />
@@ -493,7 +493,7 @@ function renderStep2(
                 class="w-full px-3 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary capitalize"
               >
                 ${['serving', 'slice', 'scoop', 'piece', 'bowl', 'cup', 'tbsp', 'tsp', 'pack', 'bar', 'g', 'ml'].map(u => `
-                  <option value="${u}" ${draft.servingUnit === u ? 'selected' : ''}>${u}</option>
+                  <option value="${escapeHtml(u)}" ${draft.servingUnit === u ? 'selected' : ''}>${u}</option>
                 `).join('')}
               </select>
             </div>
@@ -510,7 +510,7 @@ function renderStep2(
                 step="any"
                 inputmode="decimal"
                 id="cf-serving-equiv"
-                value="${draft.servingEquivalentAmount !== null ? draft.servingEquivalentAmount : ''}"
+                value="${escapeHtml(draft.servingEquivalentAmount !== null ? draft.servingEquivalentAmount : '')}"
                 placeholder="e.g. 35"
                 oninput="window.updateCustomFoodDraftNumeric('servingEquivalentAmount', this.value)"
                 class="flex-1 px-3.5 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -570,7 +570,7 @@ function renderStep3(
     <!-- Basis indicator reminder -->
     <div class="px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between text-xs">
       <span class="text-primary dark:text-primary-container font-bold">Nutrition Basis:</span>
-      <span class="font-extrabold text-on-surface dark:text-white capitalize">${basisSummary}</span>
+      <span class="font-extrabold text-on-surface dark:text-white capitalize">${escapeHtml(basisSummary)}</span>
     </div>
 
     <!-- Macronutrients & Calories Section -->
@@ -597,7 +597,7 @@ function renderStep3(
             inputmode="decimal"
             id="cf-protein"
             required
-            value="${draft.protein !== null ? draft.protein : ''}"
+            value="${escapeHtml(draft.protein !== null ? draft.protein : '')}"
             placeholder="0"
             oninput="window.updateCustomFoodDraftNumeric('protein', this.value)"
             class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border ${errors.protein ? 'border-error ring-1 ring-error' : 'border-outline-variant/40'} text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -621,7 +621,7 @@ function renderStep3(
             inputmode="decimal"
             id="cf-carbs"
             required
-            value="${draft.carbs !== null ? draft.carbs : ''}"
+            value="${escapeHtml(draft.carbs !== null ? draft.carbs : '')}"
             placeholder="0"
             oninput="window.updateCustomFoodDraftNumeric('carbs', this.value)"
             class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border ${errors.carbs ? 'border-error ring-1 ring-error' : 'border-outline-variant/40'} text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -645,7 +645,7 @@ function renderStep3(
             inputmode="decimal"
             id="cf-fat"
             required
-            value="${draft.fat !== null ? draft.fat : ''}"
+            value="${escapeHtml(draft.fat !== null ? draft.fat : '')}"
             placeholder="0"
             oninput="window.updateCustomFoodDraftNumeric('fat', this.value)"
             class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border ${errors.fat ? 'border-error ring-1 ring-error' : 'border-outline-variant/40'} text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -718,7 +718,7 @@ function renderStep3(
           inputmode="decimal"
           id="cf-calories"
           required
-          value="${draft.calories !== null ? draft.calories : ''}"
+          value="${escapeHtml(draft.calories !== null ? draft.calories : '')}"
           placeholder="0"
           oninput="window.updateCustomFoodDraftNumeric('calories', this.value)"
           class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border ${errors.calories ? 'border-error ring-1 ring-error' : 'border-outline-variant/40'} text-base font-extrabold text-primary dark:text-primary-container focus:outline-none focus:ring-2 focus:ring-primary"
@@ -868,7 +868,7 @@ function renderStep3(
               step="any"
               inputmode="decimal"
               id="cf-fiber"
-              value="${draft.fiber !== null ? draft.fiber : ''}"
+              value="${escapeHtml(draft.fiber !== null ? draft.fiber : '')}"
               placeholder="0"
               oninput="window.updateCustomFoodDraftNumeric('fiber', this.value)"
               class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -885,7 +885,7 @@ function renderStep3(
               step="any"
               inputmode="decimal"
               id="cf-sugar"
-              value="${draft.sugar !== null ? draft.sugar : ''}"
+              value="${escapeHtml(draft.sugar !== null ? draft.sugar : '')}"
               placeholder="0"
               oninput="window.updateCustomFoodDraftNumeric('sugar', this.value)"
               class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -902,7 +902,7 @@ function renderStep3(
               step="any"
               inputmode="decimal"
               id="cf-sodium"
-              value="${draft.sodium !== null ? draft.sodium : ''}"
+              value="${escapeHtml(draft.sodium !== null ? draft.sodium : '')}"
               placeholder="0"
               oninput="window.updateCustomFoodDraftNumeric('sodium', this.value)"
               class="w-full px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
@@ -948,7 +948,7 @@ function renderStep3(
               step="any" 
               inputmode="decimal"
               id="cf-vit-c" 
-              value="${draft.vitaminC !== null ? draft.vitaminC : ''}"
+              value="${escapeHtml(draft.vitaminC !== null ? draft.vitaminC : '')}"
               placeholder="0" 
               oninput="window.updateCustomFoodDraftNumeric('vitaminC', this.value)"
               class="w-full px-2.5 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white" 
@@ -962,7 +962,7 @@ function renderStep3(
               step="any" 
               inputmode="decimal"
               id="cf-vit-d" 
-              value="${draft.vitaminD !== null ? draft.vitaminD : ''}"
+              value="${escapeHtml(draft.vitaminD !== null ? draft.vitaminD : '')}"
               placeholder="0" 
               oninput="window.updateCustomFoodDraftNumeric('vitaminD', this.value)"
               class="w-full px-2.5 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white" 
@@ -976,7 +976,7 @@ function renderStep3(
               step="any" 
               inputmode="decimal"
               id="cf-calcium" 
-              value="${draft.calcium !== null ? draft.calcium : ''}"
+              value="${escapeHtml(draft.calcium !== null ? draft.calcium : '')}"
               placeholder="0" 
               oninput="window.updateCustomFoodDraftNumeric('calcium', this.value)"
               class="w-full px-2.5 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white" 
@@ -990,7 +990,7 @@ function renderStep3(
               step="any" 
               inputmode="decimal"
               id="cf-iron" 
-              value="${draft.iron !== null ? draft.iron : ''}"
+              value="${escapeHtml(draft.iron !== null ? draft.iron : '')}"
               placeholder="0" 
               oninput="window.updateCustomFoodDraftNumeric('iron', this.value)"
               class="w-full px-2.5 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white" 
@@ -1004,7 +1004,7 @@ function renderStep3(
               step="any" 
               inputmode="decimal"
               id="cf-potassium" 
-              value="${draft.potassium !== null ? draft.potassium : ''}"
+              value="${escapeHtml(draft.potassium !== null ? draft.potassium : '')}"
               placeholder="0" 
               oninput="window.updateCustomFoodDraftNumeric('potassium', this.value)"
               class="w-full px-2.5 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white" 
@@ -1018,7 +1018,7 @@ function renderStep3(
               step="any" 
               inputmode="decimal"
               id="cf-magnesium" 
-              value="${draft.magnesium !== null ? draft.magnesium : ''}"
+              value="${escapeHtml(draft.magnesium !== null ? draft.magnesium : '')}"
               placeholder="0" 
               oninput="window.updateCustomFoodDraftNumeric('magnesium', this.value)"
               class="w-full px-2.5 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white" 
@@ -1267,7 +1267,7 @@ function renderStep4(
         </span>
         <button 
           type="button" 
-          onclick="window.confirmDeleteCustomFood('${draft.name ? escapeHtml(draft.name) : ''}')"
+          onclick="window.confirmDeleteCustomFood(${htmlJsArg(draft.name ? draft.name : '')})"
           class="px-3 py-1.5 rounded-xl bg-error/10 text-error font-bold text-xs hover:bg-error/20 transition-colors flex items-center gap-1"
         >
           <span class="material-symbols-outlined text-[16px]">delete</span>

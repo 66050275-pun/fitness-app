@@ -4,7 +4,7 @@ import {
   getCompletedWorkoutForDate 
 } from '../../utils/fitnessPlannerCalculations.ts';
 import { WORKOUT_PRESETS } from '../../data/workoutPresets.ts';
-import { escapeHtml } from '../../utils/sanitize.ts';
+import { htmlJsArg, escapeHtml } from '../../utils/sanitize.ts';
 import type { ScheduledWorkout, WorkoutHistoryEntry, WorkoutPreset } from '../../types/index.ts';
 
 export interface TodaysWorkoutCardState {
@@ -96,7 +96,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           ${workoutId ? `
             <button 
               type="button"
-              onclick="window.openWorkoutHistoryDetail('${workoutId}')"
+              onclick="window.openWorkoutHistoryDetail(${htmlJsArg(workoutId)})"
               class="flex-1 py-2.5 px-3 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
             >
               <span class="material-symbols-outlined text-[16px]">visibility</span>
@@ -105,7 +105,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           ` : ''}
           <button 
             type="button"
-            onclick="window.openPlannerDateDetail('${todayKey}')"
+            onclick="window.openPlannerDateDetail(${htmlJsArg(todayKey)})"
             class="py-2.5 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1 shrink-0"
           >
             <span class="material-symbols-outlined text-[16px]">calendar_today</span>
@@ -169,7 +169,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
         <div class="flex items-center gap-2 pt-1">
           <button 
             type="button"
-            onclick="window.startScheduledWorkout('${todayKey}', '${presetId}')"
+            onclick="window.startScheduledWorkout(${htmlJsArg(todayKey)}, ${htmlJsArg(presetId)})"
             class="flex-1 py-2.5 px-4 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-extrabold flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[18px]">play_arrow</span>
@@ -177,7 +177,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           </button>
           <button 
             type="button"
-            onclick="window.openPlannerDateDetail('${todayKey}')"
+            onclick="window.openPlannerDateDetail(${htmlJsArg(todayKey)})"
             class="py-2.5 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1"
             aria-label="View or customize today's workout"
           >
@@ -215,7 +215,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
         <div class="flex items-center justify-end gap-2 pt-1 border-t border-outline-variant/15">
           <button 
             type="button"
-            onclick="window.openPlannerDateDetail('${todayKey}')"
+            onclick="window.openPlannerDateDetail(${htmlJsArg(todayKey)})"
             class="py-2 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">edit_calendar</span>
@@ -256,7 +256,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
         <div class="flex items-center gap-2 pt-1">
           <button 
             type="button"
-            onclick="window.startScheduledWorkout('${todayKey}', '${presetId}')"
+            onclick="window.startScheduledWorkout(${htmlJsArg(todayKey)}, ${htmlJsArg(presetId)})"
             class="flex-1 py-2.5 px-3 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[16px]">play_arrow</span>
@@ -264,7 +264,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           </button>
           <button 
             type="button"
-            onclick="window.openPlannerDateDetail('${todayKey}')"
+            onclick="window.openPlannerDateDetail(${htmlJsArg(todayKey)})"
             class="py-2.5 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">event_repeat</span>
@@ -303,7 +303,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
         <div class="flex items-center gap-2 pt-1">
           <button 
             type="button"
-            onclick="window.openPlannerDateDetail('${todayKey}')"
+            onclick="window.openPlannerDateDetail(${htmlJsArg(todayKey)})"
             class="flex-1 py-2.5 px-3 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[16px]">add_circle</span>

@@ -1,6 +1,6 @@
 import { store } from '../store/appState';
 import type { FoodDefinition, RecentFoodEntry } from '../types/index.ts';
-import { escapeHtml } from '../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 
 function formatRelativeTime(isoString: string): string {
   try {
@@ -222,7 +222,7 @@ function renderRecentFoodsTab(
                     </span>
                     <button 
                       type="button" 
-                      onclick="window.openSetPortion('${entry.foodId}')"
+                      onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})"
                       class="px-2.5 py-1 rounded-lg bg-primary text-white text-[10px] font-bold shadow-xs active:scale-95 transition-all"
                     >
                       Add Again
@@ -278,7 +278,7 @@ function renderRecentFoodCard(entry: RecentFoodEntry): string {
     <div class="p-3.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex items-center justify-between gap-3 hover:border-primary/40 transition-all group">
       
       <div 
-        onclick="window.openSetPortion('${entry.foodId}')" 
+        onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})"
         class="flex-1 min-w-0 cursor-pointer"
         role="button"
         tabindex="0"
@@ -320,7 +320,7 @@ function renderRecentFoodCard(entry: RecentFoodEntry): string {
       <div class="flex items-center gap-1.5 shrink-0">
         <button 
           type="button" 
-          onclick="window.openSetPortion('${entry.foodId}')"
+          onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})"
           class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
           aria-label="Add ${escapeHtml(foodName)} again"
         >
@@ -329,7 +329,7 @@ function renderRecentFoodCard(entry: RecentFoodEntry): string {
 
         <button 
           type="button" 
-          onclick="window.removeRecentFood('${entry.foodId}')"
+          onclick="window.removeRecentFood(${htmlJsArg(entry.foodId)})"
           class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-error transition-colors"
           aria-label="Remove from recents"
         >
@@ -434,7 +434,7 @@ function renderCustomFoodCard(food: FoodDefinition): string {
         <div class="flex items-center gap-1 shrink-0">
           <button 
             type="button" 
-            onclick="window.openCreateCustomFood('${food.id}')"
+            onclick="window.openCreateCustomFood(${htmlJsArg(food.id)})"
             class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
             aria-label="Edit ${escapeHtml(food.name)}"
           >
@@ -443,7 +443,7 @@ function renderCustomFoodCard(food: FoodDefinition): string {
 
           <button 
             type="button" 
-            onclick="window.confirmDeleteCustomFood('${food.id}')"
+            onclick="window.confirmDeleteCustomFood(${htmlJsArg(food.id)})"
             class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-error transition-colors"
             aria-label="Delete ${escapeHtml(food.name)}"
           >
@@ -487,7 +487,7 @@ function renderCustomFoodCard(food: FoodDefinition): string {
       <!-- Set Portion Action Button -->
       <button 
         type="button" 
-        onclick="window.openSetPortion('${food.id}')"
+        onclick="window.openSetPortion(${htmlJsArg(food.id)})"
         class="w-full py-2.5 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-[0.99]"
       >
         <span class="material-symbols-outlined text-[16px]">tune</span>
@@ -535,7 +535,7 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
   return `
     <button 
       type="button" 
-      onclick="window.openSetPortion('${food.id}')"
+      onclick="window.openSetPortion(${htmlJsArg(food.id)})"
       aria-label="Configure portion for ${escapeHtml(food.name)}"
       class="w-full text-left bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-xs hover:border-primary/50 active:scale-[0.99] transition-all flex items-center justify-between group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary min-h-[64px]"
     >
@@ -543,7 +543,7 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
         <div class="w-10 h-10 rounded-xl ${
           isCustom ? 'bg-tertiary/10 text-tertiary dark:text-tertiary-fixed' : 'bg-primary/10 text-primary dark:text-primary-container'
         } flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-          <span class="material-symbols-outlined text-[20px]">${food.icon || (isCustom ? 'restaurant_menu' : 'nutrition')}</span>
+          <span class="material-symbols-outlined text-[20px]">${escapeHtml(food.icon || (isCustom ? 'restaurant_menu' : 'nutrition'))}</span>
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5">

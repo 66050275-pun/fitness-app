@@ -1,3 +1,5 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
+import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Weight Goal Sub-Screen
  * 
@@ -104,7 +106,7 @@ export function renderWeightGoalScreen(): string {
               ].map(opt => `
                 <button
                   type="button"
-                  onclick="window.selectWeightGoalType('${opt.type}')"
+                  onclick="window.selectWeightGoalType(${htmlJsArg(opt.type)})"
                   class="p-3 rounded-xl border flex flex-col items-center justify-center text-center gap-1.5 transition-all ${
                     goalType === opt.type 
                       ? 'bg-primary/10 border-primary text-primary dark:text-primary-container shadow-xs font-bold' 
@@ -116,7 +118,7 @@ export function renderWeightGoalScreen(): string {
                 </button>
               `).join('')}
             </div>
-            <input type="hidden" id="weight-goal-type-input" value="${goalType}" />
+            <input type="hidden" id="weight-goal-type-input" value="${escapeHtml(goalType)}" />
           </div>
 
           <!-- Target Weight & Date -->
@@ -137,7 +139,7 @@ export function renderWeightGoalScreen(): string {
                   min="20"
                   max="500"
                   id="weight-target-input"
-                  value="${targetDisplay}"
+                  value="${escapeHtml(targetDisplay)}"
                   placeholder="${currentKg ? (unit === 'lb' ? String(kgToLb(currentKg)) : String(currentKg)) : 'e.g. 68.0'}"
                   oninput="window.updateWeightGoalPreview()"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-sm font-heading font-extrabold text-on-surface dark:text-white focus:border-primary focus:outline-none"
@@ -157,7 +159,7 @@ export function renderWeightGoalScreen(): string {
               <input 
                 type="date" 
                 id="weight-target-date-input"
-                value="${targetDate}"
+                value="${escapeHtml(targetDate)}"
                 min="${new Date().toISOString().split('T')[0]}"
                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
               />
@@ -188,7 +190,7 @@ export function renderWeightGoalScreen(): string {
                     </button>
                   `).join('')}
                 </div>
-                <input type="hidden" id="weekly-rate-input" value="${weeklyRateKg}" />
+                <input type="hidden" id="weekly-rate-input" value="${escapeHtml(weeklyRateKg)}" />
               </div>
             ` : ''}
 

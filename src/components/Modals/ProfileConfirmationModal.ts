@@ -1,3 +1,5 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
+import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Profile Confirmation Modal Component
  * 
@@ -40,10 +42,10 @@ export function renderProfileConfirmationModal(): string {
           </div>
           <div>
             <h3 id="confirm-modal-title" class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">
-              ${title}
+              ${escapeHtml(title)}
             </h3>
             <p class="text-xs text-on-surface-variant dark:text-gray-300 mt-1 leading-relaxed">
-              ${message}
+              ${escapeHtml(message)}
             </p>
           </div>
         </div>
@@ -52,14 +54,14 @@ export function renderProfileConfirmationModal(): string {
         ${requireTypingText ? `
           <div class="flex flex-col gap-1.5 pt-1">
             <label for="confirm-typing-input" class="text-[11px] font-semibold text-on-surface-variant dark:text-gray-400">
-              Type <strong class="text-error font-extrabold uppercase">${requireTypingText}</strong> to confirm:
+              Type <strong class="text-error font-extrabold uppercase">${escapeHtml(requireTypingText)}</strong> to confirm:
             </label>
             <input 
               type="text"
               id="confirm-typing-input"
-              oninput="document.getElementById('confirm-action-button').disabled = (this.value.trim() !== '${requireTypingText}')"
+              oninput="document.getElementById('confirm-action-button').disabled = (this.value.trim() !== ${htmlJsArg(requireTypingText)})"
               class="w-full px-3 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-mono text-on-surface dark:text-white uppercase focus:border-error focus:outline-none"
-              placeholder="${requireTypingText}"
+              placeholder="${escapeHtml(requireTypingText)}"
             />
           </div>
         ` : ''}
@@ -81,7 +83,7 @@ export function renderProfileConfirmationModal(): string {
             onclick="window.executeProfileConfirmModalAction()"
             class="px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${confirmColorClass}"
           >
-            ${confirmLabel}
+            ${escapeHtml(confirmLabel)}
           </button>
         </div>
 

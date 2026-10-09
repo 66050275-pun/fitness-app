@@ -95,7 +95,7 @@ test('renderAppHeader handles dashboard subtitle with Show Today button when sel
     selectedDate: pastDate
   });
   assert.ok(html.includes('(Show Today)'));
-  assert.ok(html.includes(`window.selectDate('${todayKey}')`));
+  assert.ok(html.includes(`window.selectDate(&quot;${todayKey}&quot;)`));
 });
 
 test('renderAppHeader customizes quickAddAriaLabel when specified', () => {

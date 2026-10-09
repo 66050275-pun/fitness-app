@@ -1,3 +1,4 @@
+import { privateStorage } from '../../services/privateStorage.ts';
 /**
  * Send Feedback & Suggest a Feature Sub-Screen
  * 
@@ -6,7 +7,7 @@
  * - Subject, Description, Contact email
  * - Diagnostic info consent
  * - Honest unconnected status (no fake submission)
- * - Local draft persistence in localStorage
+ * - Local draft persistence in privateStorage
  */
 
 import { escapeHtml } from '../../utils/sanitize';
@@ -14,7 +15,7 @@ import { escapeHtml } from '../../utils/sanitize';
 export function renderFeedbackScreen(defaultCategory: string = 'Bug'): string {
   let savedDraft = { category: defaultCategory, subject: '', description: '', email: '', diagnostics: false };
   try {
-    const raw = localStorage.getItem('nutriai_feedback_draft');
+    const raw = privateStorage.getItem('nutriai_feedback_draft');
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') {
@@ -81,7 +82,7 @@ export function renderFeedbackScreen(defaultCategory: string = 'Bug'): string {
               class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
             >
               ${categories.map(cat => `
-                <option value="${cat}" ${savedDraft.category === cat ? 'selected' : ''}>${cat}</option>
+                <option value="${escapeHtml(cat)}" ${savedDraft.category === cat ? 'selected' : ''}>${cat}</option>
               `).join('')}
             </select>
           </div>
@@ -148,7 +149,7 @@ export function renderFeedbackScreen(defaultCategory: string = 'Bug'): string {
             >
               <div class="w-5 h-5 rounded-full bg-white shadow-sm"></div>
             </button>
-            <input type="hidden" id="feedback-diagnostics-input" value="${savedDraft.diagnostics ? 'true' : 'false'}" />
+            <input type="hidden" id="feedback-diagnostics-input" value="${escapeHtml(savedDraft.diagnostics ? 'true' : 'false')}" />
           </div>
 
         </div>

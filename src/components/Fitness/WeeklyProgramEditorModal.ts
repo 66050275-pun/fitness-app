@@ -152,7 +152,7 @@ export function renderWeeklyProgramEditorModal(passedState?: any): string {
                     <option value="rest" ${selectedType === 'rest' ? 'selected' : ''}>😴 Rest Day</option>
                     <optgroup label="Workout Presets">
                       ${WORKOUT_PRESETS.map(p => `
-                        <option value="${p.id}" ${selectedType === p.id ? 'selected' : ''}>
+                        <option value="${escapeHtml(p.id)}" ${selectedType === p.id ? 'selected' : ''}>
                           🏋️ ${escapeHtml(p.title)} (${p.estimatedMinutes}m)
                         </option>
                       `).join('')}

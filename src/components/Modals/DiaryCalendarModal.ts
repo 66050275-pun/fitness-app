@@ -1,3 +1,4 @@
+import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Diary Calendar Date Picker Modal (Bottom Sheet)
  * 
@@ -103,7 +104,7 @@ export function renderDiaryCalendarModal(): string {
           <!-- Clickable Month/Year title toggles picker mode -->
           <button 
             type="button" 
-            onclick="window.setCalendarPickerMode('${mode === 'days' ? 'monthYear' : 'days'}')"
+            onclick="window.setCalendarPickerMode(${htmlJsArg(mode === 'days' ? 'monthYear' : 'days')})"
             class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-xs font-bold text-on-surface dark:text-white hover:border-primary transition-all"
             aria-label="${mode === 'days' ? 'Switch to month and year picker' : 'Switch to days view'}"
           >
@@ -227,7 +228,7 @@ export function renderDiaryCalendarModal(): string {
                     return `
                       <button 
                         type="button" 
-                        onclick="window.setDiaryCalendarDraftDate('${cell.dateKey}')"
+                        onclick="window.setDiaryCalendarDraftDate(${htmlJsArg(cell.dateKey)})"
                         ondblclick="window.applyDiaryCalendarDate('${cell.dateKey}')"
                         aria-label="${cellReadable}${isCellToday ? ' (Today)' : ''}${isDraftSelected ? ' (Selected)' : ''}"
                         class="h-10 rounded-xl flex flex-col items-center justify-center relative transition-all text-xs font-semibold ${btnClass}"

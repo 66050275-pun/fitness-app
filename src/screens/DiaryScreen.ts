@@ -1,3 +1,5 @@
+import { escapeHtml } from '../utils/sanitize.ts';
+import { htmlJsArg } from '../utils/sanitize.ts';
 /**
  * Daily Nutrition Diary Screen
  * 
@@ -73,7 +75,7 @@ export function renderDiaryScreen(): string {
             return `
               <button 
                 type="button" 
-                onclick="window.selectDate('${day.dateKey}')" 
+                onclick="window.selectDate(${htmlJsArg(day.dateKey)})"
                 aria-label="${dayAriaLabel}"
                 class="flex flex-col items-center py-1.5 px-1 rounded-2xl min-w-[42px] transition-all relative ${
                   isSelected 
@@ -226,7 +228,7 @@ export function renderDiaryScreen(): string {
                   <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1">
                     <div class="flex items-start justify-between">
                       <div>
-                        <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${n.shortName || n.name}</span>
+                        <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${escapeHtml(n.shortName || n.name)}</span>
                         <span class="text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${n.totalAmount} ${n.unit}</span>
                       </div>
                       ${dv !== null && dv !== undefined ? `
@@ -294,7 +296,7 @@ export function renderDiaryScreen(): string {
               <div class="flex items-center gap-2 mt-4">
                 <button 
                   type="button" 
-                  onclick="window.openQuickLog('${selectedDate}')" 
+                  onclick="window.openQuickLog(${htmlJsArg(selectedDate)})"
                   class="px-3.5 py-2 rounded-xl bg-primary text-white font-heading text-xs font-bold shadow-sm hover:opacity-95 active:scale-95 transition-all flex items-center gap-1"
                 >
                   <span class="material-symbols-outlined text-[16px]">edit_note</span>
@@ -316,17 +318,17 @@ export function renderDiaryScreen(): string {
                 const hasMicro = !!meal.micronutrients;
                 return `
                 <div 
-                  onclick="window.openMealDetail('${meal.id}')"
+                  onclick="window.openMealDetail(${htmlJsArg(meal.id)})"
                   class="bg-surface-container-lowest dark:bg-dark-surface-card p-4 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col gap-2.5 hover:border-primary/40 active:scale-[0.99] transition-all cursor-pointer group"
                 >
                   <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-primary dark:text-primary-container group-hover:scale-105 transition-transform">
-                        <span class="material-symbols-outlined text-[22px]">${meal.icon}</span>
+                        <span class="material-symbols-outlined text-[22px]">${escapeHtml(meal.icon)}</span>
                       </div>
                       <div>
-                        <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white leading-tight group-hover:text-primary transition-colors">${meal.name}</h4>
-                        <p class="text-[10px] text-on-surface-variant dark:text-gray-400 capitalize">${meal.category || meal.mealType} &bull; ${meal.time}</p>
+                        <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white leading-tight group-hover:text-primary transition-colors">${escapeHtml(meal.name)}</h4>
+                        <p class="text-[10px] text-on-surface-variant dark:text-gray-400 capitalize">${escapeHtml(meal.category || meal.mealType)} &bull; ${escapeHtml(meal.time)}</p>
                       </div>
                     </div>
 
@@ -334,7 +336,7 @@ export function renderDiaryScreen(): string {
                       <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${meal.calories} kcal</span>
                       <button 
                         type="button"
-                        onclick="event.stopPropagation(); window.deleteMeal('${meal.id}')" 
+                        onclick="event.stopPropagation(); window.deleteMeal(${htmlJsArg(meal.id)})"
                         class="block ml-auto text-on-surface-variant hover:text-error transition-colors mt-0.5 p-1 -mr-1"
                         aria-label="Delete meal"
                       >
@@ -348,7 +350,7 @@ export function renderDiaryScreen(): string {
                     <div class="flex items-center gap-1.5 flex-wrap">
                       ${meal.portion?.servingDescription ? `
                         <span class="px-2 py-0.5 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high font-bold text-on-surface dark:text-gray-200">
-                          ${meal.portion.servingDescription}
+                          ${escapeHtml(meal.portion.servingDescription)}
                         </span>
                       ` : ''}
                       <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container font-semibold">${meal.protein}g Protein</span>
@@ -366,9 +368,9 @@ export function renderDiaryScreen(): string {
 
                       <button 
                         type="button" 
-                        onclick="event.stopPropagation(); window.addAgainMeal('${meal.id}')"
+                        onclick="event.stopPropagation(); window.addAgainMeal(${htmlJsArg(meal.id)})"
                         class="px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary dark:text-primary-container font-bold text-[10px] active:scale-95 transition-all flex items-center gap-0.5"
-                        aria-label="Add ${meal.name} again"
+                        aria-label="Add ${escapeHtml(meal.name)} again"
                       >
                         <span class="material-symbols-outlined text-[12px]">replay</span>
                         <span>Add Again</span>

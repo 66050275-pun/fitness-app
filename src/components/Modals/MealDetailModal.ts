@@ -1,3 +1,5 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
+import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Meal Detail Modal
  * 
@@ -17,14 +19,7 @@ import { formatFriendlyDate } from '../../utils/dateUtils';
 import { getNutrientReference } from '../../data/nutrientReferenceValues';
 import type { NutrientValue } from '../../types/index.ts';
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+
 
 export function renderMealDetailModal(): string {
   const meal = store.getSelectedMealDetail();
@@ -57,7 +52,7 @@ export function renderMealDetailModal(): string {
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary dark:text-primary-container flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-[24px]">${meal.icon || 'restaurant'}</span>
+                <span class="material-symbols-outlined text-[24px]">${escapeHtml(meal.icon || 'restaurant')}</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -73,7 +68,7 @@ export function renderMealDetailModal(): string {
                   </span>
                 </div>
                 <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5 capitalize">
-                  ${meal.category || meal.mealType} &bull; ${formatFriendlyDate(meal.date)} at ${meal.time}
+                  ${escapeHtml(meal.category || meal.mealType)} &bull; ${formatFriendlyDate(meal.date)} at ${escapeHtml(meal.time)}
                 </p>
               </div>
             </div>
@@ -145,7 +140,7 @@ export function renderMealDetailModal(): string {
               ${profile ? `
                 <button 
                   type="button"
-                  onclick="window.openNutrientsFromMeal('${meal.id}')" 
+                  onclick="window.openNutrientsFromMeal(${htmlJsArg(meal.id)})"
                   class="text-[11px] font-bold text-primary hover:underline flex items-center gap-0.5"
                 >
                   <span>Full Table</span>
@@ -182,7 +177,7 @@ export function renderMealDetailModal(): string {
         <div class="p-4 border-t border-outline-variant/20 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md flex items-center gap-2">
           <button 
             type="button" 
-            onclick="window.deleteMeal('${meal.id}'); window.closeMealDetail();"
+            onclick="window.deleteMeal(${htmlJsArg(meal.id)}); window.closeMealDetail();"
             class="px-4 py-2.5 rounded-xl bg-error/10 text-error font-heading font-bold text-xs hover:bg-error/20 active:scale-95 transition-all flex items-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">delete</span>

@@ -1,5 +1,5 @@
 import { store } from '../store/appState';
-import { escapeHtml } from '../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 
 export function renderPersonalRecordDetailScreen(): string {
   const state = store.getState();
@@ -67,7 +67,7 @@ export function renderPersonalRecordDetailScreen(): string {
           </div>
 
           <p class="text-xs text-on-surface-variant dark:text-gray-300">
-            Achieved on <strong>${pr.achievedAt}</strong> in <em>${escapeHtml(pr.workoutName)}</em>
+            Achieved on <strong>${escapeHtml(pr.achievedAt)}</strong> in <em>${escapeHtml(pr.workoutName)}</em>
           </p>
         </section>
 
@@ -109,7 +109,7 @@ export function renderPersonalRecordDetailScreen(): string {
           </div>
 
           <!-- Latest Workout Occurrence -->
-          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col cursor-pointer hover:border-primary/40 transition-all" onclick="window.openWorkoutDetail('${pr.workoutId}')">
+          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col cursor-pointer hover:border-primary/40 transition-all" onclick="window.openWorkoutDetail(${htmlJsArg(pr.workoutId)})">
             <div class="flex items-center justify-between text-on-surface-variant dark:text-gray-400 mb-1">
               <span class="text-[10px] font-bold uppercase">Latest Session</span>
               <span class="material-symbols-outlined text-[14px] text-primary">chevron_right</span>
@@ -127,7 +127,7 @@ export function renderPersonalRecordDetailScreen(): string {
           <div class="flex flex-col gap-2.5">
             ${occurrences.map(occ => `
               <div 
-                onclick="window.openWorkoutDetail('${occ.workoutId}')" 
+                onclick="window.openWorkoutDetail(${htmlJsArg(occ.workoutId)})"
                 class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm hover:border-primary/40 cursor-pointer active:scale-[0.99] transition-all flex flex-col gap-2 group"
               >
                 <div class="flex items-start justify-between">
@@ -141,7 +141,7 @@ export function renderPersonalRecordDetailScreen(): string {
                         </span>
                       ` : ''}
                     </div>
-                    <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${occ.date}</span>
+                    <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${escapeHtml(occ.date)}</span>
                   </div>
 
                   <div class="text-right">

@@ -1,3 +1,4 @@
+import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Full-height / Slide-up Sheet: View All Nutrients Modal
  * 
@@ -64,7 +65,7 @@ export function renderNutrientDetailModal(): string {
                     ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30' 
                     : 'bg-primary/10 text-primary dark:text-primary-container border-primary/20'
                 }">
-                  ${modalData.sourceBadge}
+                  ${escapeHtml(modalData.sourceBadge)}
                 </span>
               </div>
               <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
@@ -117,7 +118,7 @@ export function renderNutrientDetailModal(): string {
               return `
                 <button 
                   type="button"
-                  onclick="window.setNutrientCategoryFilter('${cat}')"
+                  onclick="window.setNutrientCategoryFilter(${htmlJsArg(cat)})"
                   class="px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border ${
                     isActive 
                       ? 'bg-primary text-white border-primary shadow-xs' 

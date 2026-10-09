@@ -1,0 +1,123 @@
+import { createPrivateVault, unlockPrivateVault, vaultExists, lockPrivateStorage,
+  onSaveStatus, retryPrivateStorage, encryptedBackup, restoreEncryptedBackup } from '../services/privateStorage.ts';
+import { escapeHtml } from '../utils/sanitize.ts';
+
+function download(text: string) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  const anchor = document.createElement('a');
+  anchor.href = url; anchor.download = `nutriai-encrypted-${new Date().toISOString().slice(0, 10)}.json`;
+  anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+export async function downloadEncryptedBackup() { download(await encryptedBackup()); }
+
+/** The store is created only after decryption; recreated from durable data after every lock. */
+export async function startPrivateApp(activate: () => void, deactivate: () => void) {
+  const app = document.getElementById('app')!;
+  const bar = document.createElement('div');
+  bar.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,430px);z-index:9998;background:#effdf4;color:#14532d;padding:8px 12px;font:12px system-ui;display:none;justify-content:space-between;align-items:center;border-bottom:1px solid #bbf7d0';
+  bar.innerHTML = '<span id="vault-save-state" role="status" aria-live="polite"></span><button type="button" id="vault-retry" hidden>Retry save</button><button type="button" id="vault-lock">Lock / ล็อก</button>';
+  document.body.append(bar);
+  const shield = document.createElement('div');
+  shield.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#effdf4;display:none;place-items:center;padding:24px;font:16px system-ui;color:#14532d;text-align:center';
+  shield.textContent = 'ข้อมูลถูกซ่อนไว้ / Private screen hidden';
+  document.body.append(shield);
+  let active = false;
+  let lastActivity = Date.now();
+  let hiddenAt = 0;
+  let locking = false;
+  const inactivityMs = 5 * 60 * 1000;
+  const saveLabel = bar.querySelector<HTMLElement>('#vault-save-state')!;
+  const retry = bar.querySelector<HTMLButtonElement>('#vault-retry')!;
+  onSaveStatus(status => {
+    saveLabel.textContent = status === 'saved' ? 'Encrypted · Saved on this browser' : status === 'saving' ? 'Encrypting · Saving…' : status === 'error' ? 'NOT SAVED — retry before closing' : 'Locked';
+    retry.hidden = status !== 'error';
+    saveLabel.style.color = status === 'error' ? '#b91c1c' : '#14532d';
+  });
+  retry.onclick = () => { void retryPrivateStorage().catch(() => alert('ยังบันทึกไม่ได้ กรุณาสำรองข้อมูลก่อนปิดแท็บ / Save failed. Export before closing.')); };
+  const lock = async () => {
+    if (!active || locking) return;
+    locking = true; shield.style.display = 'grid';
+    try {
+      await lockPrivateStorage();
+      deactivate(); active = false; app.replaceChildren(); bar.style.display = 'none'; app.style.paddingTop = '';
+      shield.style.display = 'none'; await gate();
+    } catch {
+      shield.replaceChildren();
+      const message = document.createElement('div');
+      message.textContent = 'ยังล็อกไม่ได้ เพราะมีข้อมูลที่ยังบันทึกไม่สำเร็จ / Lock pending: unsaved changes.';
+      const retryLock = document.createElement('button'); retryLock.textContent = 'Retry save and lock';
+      retryLock.onclick = async () => { try { await retryPrivateStorage(); shield.style.display = 'none'; await lock(); } catch { /* Keep protected screen and recovery buttons. */ } };
+      const exportButton = document.createElement('button'); exportButton.textContent = 'Export encrypted backup';
+      exportButton.onclick = () => { void downloadEncryptedBackup().catch(() => alert('Backup failed. Keep this tab open.')); };
+      const backup = document.createElement('button'); backup.textContent = 'Return to app to recover';
+      backup.onclick = () => { shield.style.display = 'none'; lastActivity = Date.now(); };
+      shield.append(message, retryLock, exportButton, backup);
+    } finally { locking = false; }
+  };
+  bar.querySelector<HTMLButtonElement>('#vault-lock')!.onclick = () => { void lock(); };
+  for (const event of ['pointerdown', 'keydown', 'input', 'touchstart']) {
+    document.addEventListener(event, () => { if (active && !hiddenAt) lastActivity = Date.now(); }, { passive: true });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!active) return;
+    if (document.hidden) { hiddenAt = Date.now(); shield.textContent = 'ข้อมูลถูกซ่อนไว้ / Private screen hidden'; shield.style.display = 'grid'; }
+    else {
+      if (hiddenAt && Date.now() - hiddenAt >= inactivityMs) void lock();
+      else if (!locking) shield.style.display = 'none';
+      hiddenAt = 0;
+    }
+  });
+  setInterval(() => { if (active && Date.now() - (hiddenAt || lastActivity) >= inactivityMs) void lock(); }, 1000);
+  window.addEventListener('beforeunload', event => {
+    if (saveLabel.textContent?.includes('Saving') || saveLabel.textContent?.includes('NOT SAVED')) { event.preventDefault(); event.returnValue = ''; }
+  });
+
+  async function gate() {
+    let exists: boolean;
+    try { exists = await vaultExists(); }
+    catch (error) {
+      app.innerHTML = `<main class="p-6"><h1 class="font-bold text-xl">Private storage unavailable</h1><p class="mt-3">${escapeHtml((error as Error).message)}</p><p class="mt-3">แอปจะไม่บันทึกข้อมูลส่วนตัวแบบไม่เข้ารหัส กรุณาเปิดผ่าน HTTPS และอนุญาต browser storage</p></main>`;
+      return;
+    }
+    app.innerHTML = `<main class="p-6 flex flex-col gap-4"><h1 class="font-bold text-2xl">${exists ? 'Unlock NutriAI' : 'Protect your NutriAI data'}</h1>
+      <p>ข้อมูลส่วนตัวเก็บแบบเข้ารหัสใน browser นี้ ไม่มีบัญชีหรือฐานข้อมูลผู้ใช้บนเซิร์ฟเวอร์</p>
+      <p class="text-sm">${exists ? 'กรอกรหัสผ่านที่คุณตั้งไว้ใน browser นี้ / Enter your local passphrase.' : 'ตั้งรหัสผ่านเฉพาะอย่างน้อย 12 ตัวอักษร เช่น วลียาวที่คุณจำได้ ข้อมูลเดิมใน browser นี้จะย้ายไปเก็บแบบเข้ารหัส / Use a unique passphrase of 12+ characters.'}</p>
+      <form id="vault-form" class="flex flex-col gap-3"><label>Passphrase / รหัสผ่าน<input id="vault-password" type="password" autocomplete="${exists ? 'current-password' : 'new-password'}" required ${exists ? '' : 'minlength="12"'} class="block w-full mt-2 p-3 border rounded-xl"></label>
+      ${exists ? '' : '<label>Confirm / ยืนยันรหัสผ่าน<input id="vault-confirm" type="password" autocomplete="new-password" required class="block w-full mt-2 p-3 border rounded-xl"></label>'}
+      <p id="vault-error" role="alert" class="text-red-700 text-sm"></p><button class="bg-primary text-white rounded-xl p-3 font-bold" type="submit">${exists ? 'Unlock / ปลดล็อก' : 'Create encrypted vault / เริ่มใช้งาน'}</button></form>
+      <p class="text-sm">ไม่มีบริการกู้รหัสผ่าน ลืมรหัส = เปิดข้อมูลไม่ได้ สำรองไฟล์เข้ารหัสจาก Data &amp; Privacy ก่อนล้าง browser เปลี่ยน URL หรือเปลี่ยนโทรศัพท์ ข้อมูลไม่ซิงก์ข้ามเครื่องโดยอัตโนมัติ</p>
+      <p class="text-sm">ขณะปลดล็อก ผู้ที่ใช้เครื่องนี้และสคริปต์ของแอปเข้าถึงข้อมูลได้ กด Lock เมื่อใช้เสร็จ แอปล็อกหลังไม่มีการใช้งาน 5 นาที การล็อกจะยกเลิกงานที่ยังไม่ได้กดบันทึก</p>
+      ${exists ? '' : '<label class="text-sm">Restore encrypted backup / กู้จากไฟล์สำรอง<input id="vault-restore" type="file" accept="application/json,.json" class="block mt-2"></label>'}
+      <p class="text-xs">Public repo contains application code, not your browser vault. Hosting services still receive normal page requests and network metadata.</p></main>`;
+    const form = document.getElementById('vault-form') as HTMLFormElement;
+    form.onsubmit = async event => {
+      event.preventDefault();
+      const input = document.getElementById('vault-password') as HTMLInputElement;
+      const confirm = document.getElementById('vault-confirm') as HTMLInputElement | null;
+      const button = form.querySelector<HTMLButtonElement>('button')!;
+      const error = document.getElementById('vault-error')!;
+      if (confirm && confirm.value !== input.value) { error.textContent = 'รหัสผ่านไม่ตรงกัน / Passphrases do not match.'; return; }
+      button.disabled = true; button.textContent = 'Opening…'; error.textContent = '';
+      try {
+        if (exists) await unlockPrivateVault(input.value); else await createPrivateVault(input.value);
+        input.value = ''; if (confirm) confirm.value = '';
+        active = true; lastActivity = Date.now(); hiddenAt = 0;
+        app.style.paddingTop = '40px'; bar.style.display = 'flex'; activate();
+      } catch (err) {
+        error.textContent = (err as Error).message;
+        // Migration may already be encrypted and durable; next attempt must unlock it.
+        exists = await vaultExists().catch(() => exists);
+        button.disabled = false; button.textContent = exists ? 'Unlock / ปลดล็อก' : 'Create vault';
+      }
+    };
+    const restore = document.getElementById('vault-restore') as HTMLInputElement | null;
+    if (restore) restore.onchange = async () => {
+      const file = restore.files?.[0]; if (!file) return;
+      try {
+        if (file.size > 30 * 1024 * 1024) throw new Error('Backup file is too large.');
+        await restoreEncryptedBackup(await file.text()); await gate();
+      } catch (err) { document.getElementById('vault-error')!.textContent = (err as Error).message; }
+    };
+  }
+  await gate();
+}

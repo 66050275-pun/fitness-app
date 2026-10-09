@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
 /**
  * Eating Schedule Sub-Screen
  * 
@@ -102,7 +103,7 @@ export function renderEatingScheduleScreen(): string {
             >
               <div class="w-5 h-5 rounded-full bg-white shadow-sm"></div>
             </button>
-            <input type="hidden" id="eating-schedule-enabled" value="${schedule.enabled ? 'true' : 'false'}" />
+            <input type="hidden" id="eating-schedule-enabled" value="${escapeHtml(schedule.enabled ? 'true' : 'false')}" />
           </div>
 
           <!-- Window Configuration (Visible if enabled) -->
@@ -137,7 +138,7 @@ export function renderEatingScheduleScreen(): string {
                   <input 
                     type="time" 
                     id="schedule-start-time"
-                    value="${schedule.startTime}"
+                    value="${escapeHtml(schedule.startTime)}"
                     class="w-full px-3 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
                   />
                 </div>
@@ -149,7 +150,7 @@ export function renderEatingScheduleScreen(): string {
                   <input 
                     type="time" 
                     id="schedule-end-time"
-                    value="${schedule.endTime}"
+                    value="${escapeHtml(schedule.endTime)}"
                     class="w-full px-3 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
                   />
                 </div>

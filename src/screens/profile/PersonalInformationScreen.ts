@@ -119,7 +119,7 @@ export function renderPersonalInformationScreen(): string {
               <input 
                 type="date" 
                 id="profile-dob-input"
-                value="${dob}"
+                value="${escapeHtml(dob)}"
                 max="${new Date().toISOString().split('T')[0]}"
                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
               />
@@ -148,7 +148,7 @@ export function renderPersonalInformationScreen(): string {
                     <input 
                       type="radio" 
                       name="profile-sex" 
-                      value="${opt.value}" 
+                      value="${escapeHtml(opt.value)}"
                       ${sex === opt.value ? 'checked' : ''}
                       class="accent-primary"
                     />
@@ -192,7 +192,7 @@ export function renderPersonalInformationScreen(): string {
                   <input 
                     type="number" 
                     id="profile-height-cm"
-                    value="${heightDisplayCm}"
+                    value="${escapeHtml(heightDisplayCm)}"
                     min="50" 
                     max="280"
                     placeholder="e.g. 175"
@@ -206,7 +206,7 @@ export function renderPersonalInformationScreen(): string {
                     <input 
                       type="number" 
                       id="profile-height-ft"
-                      value="${heightFeet}"
+                      value="${escapeHtml(heightFeet)}"
                       min="2" 
                       max="8"
                       placeholder="5"
@@ -218,7 +218,7 @@ export function renderPersonalInformationScreen(): string {
                     <input 
                       type="number" 
                       id="profile-height-in"
-                      value="${heightInches}"
+                      value="${escapeHtml(heightInches)}"
                       min="0" 
                       max="11"
                       placeholder="9"
@@ -261,7 +261,7 @@ export function renderPersonalInformationScreen(): string {
                   min="20"
                   max="500"
                   id="profile-weight-input"
-                  value="${weightDisplay}"
+                  value="${escapeHtml(weightDisplay)}"
                   placeholder="e.g. 70.0"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
@@ -275,7 +275,7 @@ export function renderPersonalInformationScreen(): string {
                 Device Timezone
               </label>
               <div class="px-3.5 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface-variant dark:text-gray-400 font-mono flex items-center justify-between">
-                <span>${timezone}</span>
+                <span>${escapeHtml(timezone)}</span>
                 <span class="text-[10px] text-primary dark:text-primary-container font-semibold">Auto-detected</span>
               </div>
             </div>

@@ -5,7 +5,7 @@ import {
   getCompletedWorkoutForDate 
 } from '../../utils/fitnessPlannerCalculations.ts';
 import { WORKOUT_PRESETS } from '../../data/workoutPresets.ts';
-import { escapeHtml } from '../../utils/sanitize.ts';
+import { htmlJsArg, escapeHtml } from '../../utils/sanitize.ts';
 
 export function renderPlannerDateDetailModal(passedState?: any): string {
   const state = passedState || store.getState();
@@ -159,7 +159,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
               <!-- Action: View Workout Details -->
               <button 
                 type="button" 
-                onclick="window.openWorkoutHistoryDetail('${completedWorkout.id}')"
+                onclick="window.openWorkoutHistoryDetail(${htmlJsArg(completedWorkout.id)})"
                 class="w-full py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold flex items-center justify-center gap-1.5 hover:border-primary/50 transition-all"
               >
                 <span class="material-symbols-outlined text-[16px]">visibility</span>
@@ -204,7 +204,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
               <!-- Primary Start Workout Action -->
               <button 
                 type="button" 
-                onclick="window.startScheduledWorkout('${dateKey}', '${scheduledPreset.id}')"
+                onclick="window.startScheduledWorkout(${htmlJsArg(dateKey)}, ${htmlJsArg(scheduledPreset.id)})"
                 class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-heading text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all"
               >
                 <span class="material-symbols-outlined text-[18px]">play_arrow</span>
@@ -253,7 +253,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
                 Assign Routine:
               </span>
               <select 
-                onchange="if(this.value) window.handleDateWorkoutOverride('${dateKey}', this.value)"
+                onchange="if(this.value) window.handleDateWorkoutOverride(${htmlJsArg(dateKey)}, this.value)"
                 aria-label="Change routine for this date"
                 class="text-xs font-semibold py-1.5 px-2.5 rounded-lg bg-surface dark:bg-dark-surface border border-outline-variant/40 text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer max-w-[180px]"
               >
@@ -261,7 +261,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
                 <option value="rest">😴 Set as Rest Day</option>
                 <optgroup label="Presets">
                   ${WORKOUT_PRESETS.map(p => `
-                    <option value="${p.id}" ${scheduledPreset?.id === p.id ? 'selected' : ''}>
+                    <option value="${escapeHtml(p.id)}" ${scheduledPreset?.id === p.id ? 'selected' : ''}>
                       🏋️ ${escapeHtml(p.title)}
                     </option>
                   `).join('')}
@@ -273,7 +273,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
               ${scheduled && scheduled.workout.type !== 'rest' ? `
                 <button 
                   type="button" 
-                  onclick="window.handleDateWorkoutOverride('${dateKey}', 'rest')"
+                  onclick="window.handleDateWorkoutOverride(${htmlJsArg(dateKey)}, 'rest')"
                   class="flex-1 py-2 px-3 rounded-xl border border-outline-variant/30 text-xs font-bold text-on-surface-variant dark:text-gray-300 hover:text-amber-500 hover:border-amber-500/40 transition-all flex items-center justify-center gap-1"
                 >
                   <span class="material-symbols-outlined text-[16px]">spa</span>
@@ -284,7 +284,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
               ${scheduled ? `
                 <button 
                   type="button" 
-                  onclick="window.removeScheduledWorkout('${dateKey}')"
+                  onclick="window.removeScheduledWorkout(${htmlJsArg(dateKey)})"
                   class="flex-1 py-2 px-3 rounded-xl border border-outline-variant/30 text-xs font-bold text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/40 transition-all flex items-center justify-center gap-1"
                 >
                   <span class="material-symbols-outlined text-[16px]">delete_outline</span>

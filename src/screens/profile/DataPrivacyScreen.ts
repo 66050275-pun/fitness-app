@@ -59,16 +59,16 @@ export function renderDataPrivacyScreen(): string {
             </div>
             <div>
               <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white">
-                100% On-Device Storage
+                Encrypted Browser Vault
               </h2>
               <span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-0.5">
-                Zero cloud transmissions &bull; Offline first
+                Passphrase protected &bull; No user cloud database
               </span>
             </div>
           </div>
 
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed pt-1 border-t border-outline-variant/20">
-            All your logged meals, workouts, custom recipes, weight records, and profile preferences reside strictly inside your device's browser/Capacitor sandbox.
+            Your profile, health records, feedback drafts and photo are encrypted before they are saved in this browser. The passphrase is not saved or sent to a server. While unlocked, this app and anyone using your device can access your data. Use Lock when finished. Hosting providers still receive normal page requests and network metadata.
           </p>
 
           <!-- Storage Statistics Matrix -->
@@ -100,7 +100,7 @@ export function renderDataPrivacyScreen(): string {
                 Export Local Backup
               </h2>
               <span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-0.5">
-                Download a clean JSON archive of all your data
+                Download a passphrase protected archive, including your photo
               </span>
             </div>
             <div class="w-9 h-9 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-primary flex items-center justify-center">
@@ -109,7 +109,7 @@ export function renderDataPrivacyScreen(): string {
           </div>
 
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-            Your export contains all meals, custom foods, weight measurements, and settings. No secrets or tokens are included.
+            The backup stays encrypted with your current passphrase. Keep the passphrase separately: there is no password recovery. Restore from the unlock screen on a browser without an existing vault. Clearing browser storage, private browsing or changing the app URL can make local data unavailable.
           </p>
 
           <button 
@@ -118,7 +118,7 @@ export function renderDataPrivacyScreen(): string {
             class="w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all text-center flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">file_download</span>
-            <span>Export JSON Archive</span>
+            <span>Export Encrypted Backup</span>
           </button>
         </div>
 
@@ -132,7 +132,7 @@ export function renderDataPrivacyScreen(): string {
           </div>
 
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-            Selectively clear specific historical records while preserving your profile, or reset all local application data. Deletions cannot be undone.
+            Selectively clear specific historical records while preserving your profile, or reset all local application data. Your vault passphrase remains in use. Deletions cannot be undone; downloaded backups are not erased.
           </p>
 
           <!-- Granular Delete Buttons -->

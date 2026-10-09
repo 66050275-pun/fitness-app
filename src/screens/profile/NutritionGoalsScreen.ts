@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/sanitize.ts';
 /**
  * Nutrition Goals Sub-Screen
  * 
@@ -85,7 +86,7 @@ export function renderNutritionGoalsScreen(): string {
                 required
                 min="500"
                 max="10000"
-                value="${goals.calorieTarget}"
+                value="${escapeHtml(goals.calorieTarget)}"
                 class="w-full px-4 py-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-lg font-heading font-extrabold text-primary dark:text-primary-container focus:border-primary focus:outline-none"
               />
               <span class="absolute right-4 top-3 text-xs text-on-surface-variant dark:text-gray-400 font-bold">kcal / day</span>
@@ -114,7 +115,7 @@ export function renderNutritionGoalsScreen(): string {
                   required
                   min="0"
                   max="1000"
-                  value="${goals.proteinTarget}"
+                  value="${escapeHtml(goals.proteinTarget)}"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
                 <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">g</span>
@@ -137,7 +138,7 @@ export function renderNutritionGoalsScreen(): string {
                   required
                   min="0"
                   max="1000"
-                  value="${goals.carbsTarget}"
+                  value="${escapeHtml(goals.carbsTarget)}"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
                 <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">g</span>
@@ -160,7 +161,7 @@ export function renderNutritionGoalsScreen(): string {
                   required
                   min="0"
                   max="1000"
-                  value="${goals.fatTarget}"
+                  value="${escapeHtml(goals.fatTarget)}"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
                 <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">g</span>
@@ -192,7 +193,7 @@ export function renderNutritionGoalsScreen(): string {
                   min="500"
                   max="10000"
                   step="50"
-                  value="${goals.waterTarget}"
+                  value="${escapeHtml(goals.waterTarget)}"
                   oninput="document.getElementById('water-glasses-preview').textContent = '~' + Math.round(Number(this.value)/250) + ' standard glasses'"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />

@@ -1,5 +1,5 @@
 import { formatFriendlyDate, getTodayKey } from '../../utils/dateUtils.ts';
-import { escapeHtml } from '../../utils/sanitize.ts';
+import { htmlJsArg, escapeHtml } from '../../utils/sanitize.ts';
 
 export interface AppHeaderState {
   userProfile?: { displayName?: string | null } | null;
@@ -77,7 +77,7 @@ export function renderAppHeader(options: AppHeaderOptions): string {
         <p class="text-xs text-on-surface-variant dark:text-gray-400 flex items-center gap-1.5">
           <span>${formatFriendlyDate(selectedDate)}</span>
           ${!isToday ? `
-            <button onclick="window.selectDate('${todayKey}')" class="text-primary font-bold hover:underline">
+            <button onclick="window.selectDate(${htmlJsArg(todayKey)})" class="text-primary font-bold hover:underline">
               (Show Today)
             </button>
           ` : ''}
@@ -112,7 +112,7 @@ export function renderAppHeader(options: AppHeaderOptions): string {
           <!-- Leading Avatar with Streak Badge -->
           <div class="relative cursor-pointer" onclick="window.navigateApp('profile')" aria-label="Open Profile">
             <div class="w-11 h-11 overflow-hidden rounded-full border-2 border-primary/40 shadow-sm bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center font-heading font-extrabold text-xs">
-              ${state.profileImageUrl ? `<img src="${state.profileImageUrl}" class="w-full h-full object-cover" alt="Profile photo">` : `<span>${initials}</span>`}
+              ${state.profileImageUrl ? `<img src="${escapeHtml(state.profileImageUrl)}" class="w-full h-full object-cover" alt="Profile photo">` : `<span>${escapeHtml(initials)}</span>`}
             </div>
             <!-- Streak Flame Badge -->
             <div class="absolute -bottom-1 -right-1 bg-surface-container-lowest dark:bg-dark-surface-card px-1.5 py-0.5 rounded-full border border-outline-variant/30 shadow-sm flex items-center gap-0.5">

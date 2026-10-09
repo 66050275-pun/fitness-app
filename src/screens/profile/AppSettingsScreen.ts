@@ -1,3 +1,4 @@
+import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * App Settings Sub-Screen
  * 
@@ -67,7 +68,7 @@ export function renderAppSettingsScreen(): string {
             ].map(t => `
               <button 
                 type="button"
-                onclick="window.setAppTheme('${t.id}')"
+                onclick="window.setAppTheme(${htmlJsArg(t.id)})"
                 class="p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all ${
                   prefs.theme === t.id 
                     ? 'bg-primary text-white border-primary shadow-xs font-bold' 

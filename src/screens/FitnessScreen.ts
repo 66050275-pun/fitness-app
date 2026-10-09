@@ -1,7 +1,7 @@
 import { store } from '../store/appState';
 import { WORKOUT_PRESETS, AVAILABLE_EXERCISE_POOL } from '../data/workoutPresets';
 import type { WorkoutPreset, WorkoutExercise, ActiveWorkoutSessionState, WorkoutHistoryEntry, AppState } from '../types/index.ts';
-import { escapeHtml } from '../utils/sanitize';
+import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 import { renderMonthlyFitnessCalendar } from '../components/Fitness/MonthlyFitnessCalendar';
 import { renderWeeklyProgramEditorModal } from '../components/Fitness/WeeklyProgramEditorModal';
@@ -131,7 +131,7 @@ function renderWorkoutHomeView(state: AppState): string {
                 return `
                   <button 
                     type="button"
-                    onclick="window.openPersonalRecordDetail('${pr.id}')"
+                    onclick="window.openPersonalRecordDetail(${htmlJsArg(pr.id)})"
                     aria-label="View ${safeName} personal record"
                     class="w-full text-left bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl border border-outline-variant/20 hover:border-primary/40 active:scale-[0.97] transition-all min-h-[88px] flex flex-col justify-between group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
                   >
@@ -193,7 +193,7 @@ function renderWorkoutHomeView(state: AppState): string {
                 return `
                   <button 
                     type="button"
-                    onclick="window.openWorkoutDetail('${item.id}')"
+                    onclick="window.openWorkoutDetail(${htmlJsArg(item.id)})"
                     aria-label="View ${safeName} workout from ${fullDate}"
                     class="w-full text-left bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm hover:border-primary/40 active:scale-[0.99] transition-all flex items-center justify-between group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary min-h-[64px]"
                   >
@@ -258,7 +258,7 @@ function renderPresetCard(preset: WorkoutPreset): string {
 
   return `
     <div 
-      onclick="window.selectWorkoutType('${preset.id}')" 
+      onclick="window.selectWorkoutType(${htmlJsArg(preset.id)})"
       class="bg-surface-container-lowest dark:bg-dark-surface-card p-4 rounded-2xl border border-outline-variant/30 shadow-sm hover:border-primary/50 cursor-pointer active:scale-[0.99] transition-all group"
     >
       <div class="flex items-start justify-between">
@@ -400,7 +400,7 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
                     <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${escapeHtml(poolEx.muscleGroup)}</span>
                   </div>
                   <button 
-                    onclick="window.addExerciseToDraft('${escapeHtml(poolEx.name)}', '${escapeHtml(poolEx.muscleGroup)}', ${poolEx.defaultSets}, ${poolEx.defaultReps}, ${poolEx.restSeconds})"
+                    onclick="window.addExerciseToDraft(${htmlJsArg(poolEx.name)}, ${htmlJsArg(poolEx.muscleGroup)}, ${poolEx.defaultSets}, ${poolEx.defaultReps}, ${poolEx.restSeconds})"
                     class="px-2.5 py-1 rounded-lg bg-primary text-white text-[11px] font-bold active:scale-95 transition-all"
                   >
                     + Add
@@ -557,7 +557,7 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
                     type="number" 
                     min="0" 
                     step="0.5" 
-                    value="${set.weightKg === 0 ? '' : set.weightKg}" 
+                    value="${escapeHtml(set.weightKg === 0 ? '' : set.weightKg)}"
                     placeholder="0"
                     onchange="window.updateActiveSetInput(${currentExerciseIndex}, ${sIdx}, this.value, null)"
                     class="w-16 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
@@ -569,7 +569,7 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
                   <input 
                     type="number" 
                     min="0" 
-                    value="${set.actualReps}" 
+                    value="${escapeHtml(set.actualReps)}"
                     onchange="window.updateActiveSetInput(${currentExerciseIndex}, ${sIdx}, null, this.value)"
                     class="w-16 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
                   />
