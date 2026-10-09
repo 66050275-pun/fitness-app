@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+scratch/
+
+# Android build outputs & local config
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.keystore
+*.jks

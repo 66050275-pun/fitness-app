@@ -1,0 +1,26 @@
+{
+  "name": "nutriai-android",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/*.test.ts",
+    "cap:add": "cap add android",
+    "cap:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.1",
+    "@capacitor/core": "^7.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
+  }
+}
