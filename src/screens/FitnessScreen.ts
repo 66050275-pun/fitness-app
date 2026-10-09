@@ -1,3 +1,4 @@
+import { renderWorkoutMuscleMap } from '../components/Fitness/WorkoutMuscleMap';
 import { renderExerciseIllustration } from '../components/Fitness/ExerciseIllustration';
 import { store } from '../store/appState';
 import { WORKOUT_PRESETS, AVAILABLE_EXERCISE_POOL } from '../data/workoutPresets';
@@ -333,6 +334,8 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
           <span class="material-symbols-outlined text-primary text-[18px]">info</span>
           <span>Adjust your sets & target reps below, or add exercises before starting.</span>
         </div>
+
+        ${renderWorkoutMuscleMap(exercises)}
 
         <!-- Exercise Routine List -->
         <div class="flex flex-col gap-2.5">

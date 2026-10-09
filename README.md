@@ -47,3 +47,7 @@ The browser checks require Python with `requirements.txt` installed and Playwrig
 ## Exercise illustrations
 
 Fitness routine setup, the exercise catalog and the active workout screen include locally bundled illustrations from `@bryllim/workout-guide@1.0.0`. Artwork is CC BY-SA 4.0 by Bryl Lim, with Everkinetic credit where applicable. The code license is separate from the artwork license. Per-image upstream credits and exact source URLs are retained in [the attribution manifest](docs/exercise-art/ATTRIBUTION.json), with the original artwork license and attribution notice alongside it. Images are unchanged and do not make external image requests. The catalog's Dumbbell Incline Fly uses the dumbbell-fly reference, explicitly labelled as an incline-bench variation.
+
+### Workout muscle overview
+
+The setup screen shows an original, bundled front/back SVG schematic with 19 muscle groups. Red regions combine major movers and common assisting muscles from the current draft exercises, including catalog additions; removing an exercise recalculates the union. Expand the exercise list to see the mapping per movement. Unknown names are explicitly excluded rather than guessed. This educational schematic is not an intensity map, an exhaustive stabilizer list, or an individualized biomechanical assessment. Mapping lives in `src/data/exerciseMuscles.ts`; the original SVG lives in `src/components/Fitness/WorkoutMuscleMap.ts`. It needs no external service, image request, or personal information.

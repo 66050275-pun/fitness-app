@@ -144,3 +144,7 @@ The table below lists every screen/component source and its input controls. All 
 ### Exercise illustration update — 2026-10-10
 
 `src/components/Fitness/ExerciseIllustration.ts` and `src/data/exerciseArtwork.ts` now render 52 locally bundled frames for 27 exercise names (26 distinct illustrations), covering all presets and catalog entries. The CC BY-SA 4.0 source credits and license are preserved under `docs/exercise-art/`. The setup, catalog and active session render data URLs, including in the Streamlit srcdoc iframe, without new external image requests. A browser review decoded all frames in all four presets and all ten catalog thumbnails, checked active-session images, and found no page errors or external requests. This adds a pinned asset package and approximately 1.7 MB to the uncompressed JavaScript bundle; initial loading on slow connections may take longer.
+
+### 2026-10-10 — Workout muscle overview
+
+Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG and a static exercise-to-muscle mapping. Highlights derive only from the local draft exercise names and update with additions/removals. No remote assets, API requests, analytics, or new storage are introduced. All dynamic exercise names are HTML escaped, including unknown-name notices. Red denotes listed movers/assistants, not measured activation or intensity; the UI explains the schematic limitation.
