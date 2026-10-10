@@ -1,3 +1,4 @@
+import { ScreenTransitions } from './ui/screenTransitions';
 import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-500.css';
 import '@fontsource/inter/latin-600.css';
@@ -319,7 +320,6 @@ window.selectedMealType = 'dinner';
 
 window.navigateApp = (screen: ActiveScreen) => {
   store.setScreen(screen);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.toggleTheme = () => {
@@ -477,12 +477,10 @@ window.clearChat = () => {
 // ==========================================
 window.selectWorkoutType = (presetId: string) => {
   store.selectWorkoutType(presetId);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.cancelWorkoutSetup = () => {
   store.cancelWorkoutSetup();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.updateDraftSets = (exerciseIndex: number, delta: number) => {
@@ -505,7 +503,6 @@ window.addExerciseToDraft = (name: string, muscleGroup: string, sets?: number, r
 
 window.startWorkout = () => {
   store.startWorkout();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.togglePauseWorkout = () => {
@@ -533,32 +530,26 @@ window.skipRestTimer = () => {
 
 window.nextActiveExercise = () => {
   store.nextActiveExercise();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.prevActiveExercise = () => {
   store.prevActiveExercise();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.finishActiveWorkout = () => {
   store.finishActiveWorkout();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.saveWorkoutSummary = () => {
   store.saveWorkoutSummary();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.discardWorkoutSummary = () => {
   store.discardWorkoutSummary();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.cancelActiveWorkout = (force?: boolean) => {
   store.cancelActiveWorkout(force);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 // ==========================================
@@ -566,27 +557,22 @@ window.cancelActiveWorkout = (force?: boolean) => {
 // ==========================================
 window.openWorkoutDetail = (workoutId: string) => {
   store.openWorkoutDetail(workoutId);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.closeWorkoutDetail = () => {
   store.closeWorkoutDetail();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.openPersonalRecordDetail = (exerciseIdOrName: string) => {
   store.openPersonalRecordDetail(exerciseIdOrName);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.closePersonalRecordDetail = () => {
   store.closePersonalRecordDetail();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.repeatWorkout = (workoutId: string) => {
   store.repeatWorkout(workoutId);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.openDeleteModal = (workoutId: string) => {
@@ -672,7 +658,6 @@ window.saveWeeklyRoutineOnly = () => {
 
 window.startScheduledWorkout = (dateKey: string, presetId: string) => {
   store.startWorkoutFromPlan(dateKey, presetId);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.handleDateWorkoutOverride = (dateKey: string, value: string) => {
@@ -690,7 +675,6 @@ window.removeScheduledWorkout = (dateKey: string) => {
 window.openWorkoutHistoryDetail = (workoutId: string) => {
   store.closePlannerDateDetail();
   store.openWorkoutDetail(workoutId);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.confirmResetAllFitnessPrograms = () => {
@@ -743,7 +727,6 @@ window.showDayDetailToast = (title: string, text: string) => {
 
 window.openScannerMode = (mode: 'food' | 'barcode') => {
   store.openScannerMode(mode);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 // ==========================================
@@ -1257,17 +1240,14 @@ window.openProfileSubpage = (subpage: ProfileSubpage, param?: string) => {
     activeFeedbackCategory = 'Bug Report';
   }
   store.setProfileSubpage(subpage);
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.goBackFromProfileSubpage = () => {
   store.goBackFromProfileSubpage();
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.showAvatarInfoModal = () => {
   store.setProfileSubpage('personal_info');
-  window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 };
 
 window.shareNutriAI = async () => {
@@ -1962,6 +1942,23 @@ window.restartGoalSetup = () => store.restartGoalSetup();
 // ==========================================
 // HARDWARE BACK BUTTON & KEYBOARD ESCAPE
 // ==========================================
+function goBackFromScreen(): boolean {
+  const state = store.getState();
+  if (state.currentScreen === 'workoutDetail') { store.closeWorkoutDetail(); return true; }
+  if (state.currentScreen === 'personalRecordDetail') { store.closePersonalRecordDetail(); return true; }
+  if (state.currentScreen === 'fitness') {
+    if (state.fitnessSubView === 'setup') store.cancelWorkoutSetup();
+    else if (state.fitnessSubView === 'active') store.cancelActiveWorkout();
+    else if (state.fitnessSubView === 'summary') return true; // Keep the unsaved summary until Save/Discard is chosen.
+    else store.setScreen('dashboard');
+    return true;
+  }
+  if (['foodSearch', 'quickLog', 'scanner', 'foodResult'].includes(state.currentScreen)) {
+    store.setScreen('dashboard'); return true;
+  }
+  return false;
+}
+
 window.addEventListener('keydown', (e) => {
   if (!isVaultUnlocked()) return;
   if (e.key === 'Escape') {
@@ -1994,6 +1991,8 @@ window.addEventListener('keydown', (e) => {
       store.closeDiaryCalendar();
     } else if (state.deleteConfirmationWorkoutId) {
       store.closeDeleteModal();
+    } else if (goBackFromScreen()) {
+      e.preventDefault();
     }
   }
 });
@@ -2065,18 +2064,18 @@ document.addEventListener('backbutton', (e) => {
     store.closeDeleteModal();
     return;
   }
-  if (['foodSearch', 'quickLog', 'workoutDetail', 'personalRecordDetail'].includes(state.currentScreen)) {
-    e.preventDefault();
-    store.setScreen('dashboard');
-    return;
-  }
+  if (goBackFromScreen()) e.preventDefault();
 });
+
+const screenTransitions = new ScreenTransitions();
 
 function renderApp() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const { currentScreen, fitnessSubView } = store.getState();
+  const state = store.getState();
+  const { currentScreen, fitnessSubView } = state;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', state.theme === 'dark' ? '#121e19' : '#effdf4');
 
   let screenHtml = '';
   switch (currentScreen) {
@@ -2186,9 +2185,7 @@ function renderApp() {
   const isProfileSubpage = currentScreen === 'profile' && !!store.getState().profileSubpage;
   const showBottomNav = !isWorkoutActive && !isProfileSubpage && ['dashboard', 'diary', 'insights', 'coach', 'profile'].includes(currentScreen);
 
-  app.innerHTML = `
-    ${screenHtml}
-    ${showBottomNav ? renderBottomNav() : ''}
+  screenTransitions.render(app, state, screenHtml, showBottomNav ? renderBottomNav() : '', `
     ${renderQuickActionModal()}
     ${renderQuickAddBottomSheet()}
     ${renderDeleteWorkoutModal()}
@@ -2199,7 +2196,7 @@ function renderApp() {
     ${renderDiaryCalendarModal()}
     ${renderProfileConfirmationModal()}
     ${renderWeightEntryModal()}
-  `;
+  `);
 
   if (currentScreen === 'coach') {
     const container = document.getElementById('chat-messages-container');
@@ -2214,4 +2211,4 @@ void startPrivateApp(() => {
   initializeStore();
   store.subscribe(renderApp);
   renderApp();
-}, () => disposeStore());
+}, () => { screenTransitions.reset(); disposeStore(); });

@@ -18,6 +18,7 @@ export function renderBottomNav(): string {
         data-tab="dashboard"
         onclick="window.navigateApp('dashboard')" 
         aria-label="Home"
+        aria-current="${isHome ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isHome ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
         <div class="relative flex items-center justify-center">
@@ -34,6 +35,7 @@ export function renderBottomNav(): string {
         data-tab="diary"
         onclick="window.navigateApp('diary')" 
         aria-label="Diary"
+        aria-current="${isDiary ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isDiary ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
         <div class="relative flex items-center justify-center">
@@ -65,6 +67,7 @@ export function renderBottomNav(): string {
         data-tab="insights"
         onclick="window.navigateApp('insights')" 
         aria-label="Insights"
+        aria-current="${isInsights ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isInsights ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
         <div class="relative flex items-center justify-center">
@@ -81,6 +84,7 @@ export function renderBottomNav(): string {
         data-tab="coach"
         onclick="window.navigateApp('coach')" 
         aria-label="AI Coach"
+        aria-current="${isCoach ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isCoach ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
         <div class="relative flex items-center justify-center">

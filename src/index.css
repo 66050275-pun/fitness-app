@@ -63,63 +63,157 @@
   animation: scan-laser 2.4s ease-in-out infinite;
 }
 
+/* Shared NutriAI palette: used by privacy, navigation and fitness components. */
+:root {
+  --ui-surface: #effdf4;
+  --ui-card: #ffffff;
+  --ui-panel: #e9f7ee;
+  --ui-panel-high: #e3f1e8;
+  --ui-text: #121e19;
+  --ui-muted: #3d4a3e;
+  --ui-border: #bccabb;
+  --ui-primary: #006d36;
+  --ui-primary-soft: #e3f8e9;
+  --ui-primary-label: #004d24;
+  --ui-error: #ba1a1a;
+  --ui-error-soft: #ffdad6;
+  --ui-muscle-active: #ef4444;
+  --ui-muscle-rest: #bdcec4;
+  --ui-body-fill: #deebe3;
+  --ui-body-outline: #8b9e90;
+  --ui-art-background: #164e43;
+  --ui-radius: 24px;
+  --ui-shadow: 0 4px 20px -2px rgba(23,32,27,0.04);
+  --ui-motion-duration: 180ms;
+  --ui-motion-easing: cubic-bezier(0.2,0.8,0.2,1);
+  --vault-bar-height: calc(44px + env(safe-area-inset-top, 0px));
+  color-scheme: light;
+}
+:root.dark {
+  --ui-surface: #121e19;
+  --ui-card: #1a2c24;
+  --ui-panel: #233930;
+  --ui-panel-high: #2e483d;
+  --ui-text: #effdf4;
+  --ui-muted: #b5c8bc;
+  --ui-border: #2e483d;
+  --ui-primary: #72fd9e;
+  --ui-primary-soft: #233930;
+  --ui-primary-label: #b2f6c7;
+  --ui-error: #ffb4ab;
+  --ui-error-soft: #44241f;
+  --ui-muscle-active: #fb6767;
+  --ui-muscle-rest: #586f62;
+  --ui-body-fill: #30473c;
+  --ui-body-outline: #829b8b;
+  --ui-art-background: #164e43;
+  --ui-shadow: 0 4px 20px -2px rgba(0,0,0,0.15);
+  color-scheme: dark;
+}
+body { background: var(--ui-panel); color: var(--ui-text); }
+#app { background: var(--ui-surface); border-color: var(--ui-border); overflow-x: clip; overflow-y: visible; }
+:where(input, textarea, select) { font: inherit; color: inherit; user-select: text; }
+:where(button, a, summary, input, textarea, select):focus-visible {
+  outline: 2px solid var(--ui-primary); outline-offset: 3px;
+}
+:where(button, a, summary) { transition-duration: var(--ui-motion-duration); transition-timing-function: var(--ui-motion-easing); }
+:where(button):disabled { cursor: wait; opacity: 0.6; }
+.dark :where(.text-on-surface-variant) { color: var(--ui-muted); }
+.dark :where(.text-primary) { color: var(--ui-primary); }
+.app-screen { flex: 1; min-width: 0; }
+.app-screen :where(h1, h2)[tabindex="-1"] { outline: none; }
+.vault-open { padding-top: var(--vault-bar-height); }
+.vault-open .app-screen > .min-h-screen { min-height: calc(100svh - var(--vault-bar-height)); }
+.vault-open .app-screen :where(header.sticky) { top: var(--vault-bar-height); }
+#app-navigation nav { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+:where(button[aria-label="Go Back"], button[onclick*="goBackFromProfileSubpage"], button[onclick*="closeWorkoutDetail"], button[onclick*="closePersonalRecordDetail"]) { min-width: 40px; min-height: 40px; }
+
+.ui-primary-button {
+  min-height: 52px; width: 100%; padding: 12px 20px; border-radius: 16px;
+  color: #fff; background: #006d36; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px; font-weight: 700; box-shadow: 0 8px 24px -2px rgba(53,199,111,0.2);
+  transition: background var(--ui-motion-duration), box-shadow var(--ui-motion-duration), transform var(--ui-motion-duration);
+}
+.ui-primary-button:hover { background: #005c2d; }
+.ui-primary-button:active { transform: scale(0.99); }
+.vault-gate { padding: max(28px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
+.vault-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; color: var(--ui-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 22px; }
+.vault-brand-mark { width: 52px; height: 52px; border-radius: 18px; background: linear-gradient(135deg,#006d36,#35c76f); color: #fff; display: grid; place-items: center; font-size: 30px; }
+.vault-brand div { display: flex; flex-direction: column; gap: 2px; }
+.vault-brand div > span { color: var(--ui-muted); font: 500 11px Inter,sans-serif; letter-spacing: 0.02em; }
+.vault-card, .vault-help-card, .vault-restore-card, .workout-muscle-map { background: var(--ui-card); border: 1px solid var(--ui-border); border-radius: var(--ui-radius); box-shadow: var(--ui-shadow); }
+.vault-card { padding: 22px 20px; }
+.vault-heading-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; }
+.vault-feature-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--ui-primary-soft); color: var(--ui-primary); display: grid; place-items: center; }
+.vault-badge { color: var(--ui-primary-label); background: var(--ui-primary-soft); padding: 5px 10px; border-radius: 999px; font-size: 10px; font-weight: 600; }
+.vault-card h1 { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 22px; line-height: 1.4; font-weight: 800; }
+.vault-card p { margin-top: 10px; font-size: 12px; line-height: 1.7; color: var(--ui-muted); }
+.vault-card .vault-subtitle { margin: 3px 0 12px; font-size: 11px; font-weight: 600; color: var(--ui-primary); }
+.vault-form { display: flex; flex-direction: column; gap: 8px; margin-top: 22px; }
+.vault-form > label { font-size: 12px; font-weight: 600; }
+.vault-input { width: 100%; min-height: 48px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-panel); font-size: 16px; }
+.vault-card .vault-field-help { font-size: 10px; margin: 0 0 8px; }
+.vault-password-toggle { display: flex; align-items: center; gap: 8px; min-height: 36px; color: var(--ui-muted); }
+.vault-password-toggle input { width: 16px; height: 16px; accent-color: #006d36; }
+.vault-card .vault-error { margin: 0; color: var(--ui-error); font-size: 11px; }
+.vault-error:empty { display: none; }
+.vault-security-note { display: flex; align-items: flex-start; gap: 8px; background: var(--ui-panel); border-radius: 14px; padding: 12px; margin-top: 16px; color: var(--ui-muted); font-size: 10px; line-height: 1.7; }
+.vault-security-note .material-symbols-outlined { color: var(--ui-primary); font-size: 18px; }
+.vault-help-card { padding: 14px 16px; }
+.vault-help-card summary { cursor: pointer; font-size: 12px; font-weight: 600; min-height: 24px; }
+.vault-help-card p { font-size: 11px; line-height: 1.7; margin-top: 10px; color: var(--ui-muted); user-select: text; }
+.vault-restore-card { display: grid; grid-template-columns: 24px 1fr; align-items: center; gap: 10px; padding: 16px; font-size: 12px; }
+.vault-restore-card .material-symbols-outlined { color: var(--ui-primary); }
+.vault-restore-card input { grid-column: 1/-1; width: 100%; font-size: 11px; }
+.vault-restore-card input::file-selector-button { border: 0; border-radius: 10px; background: var(--ui-panel); color: var(--ui-text); padding: 10px; margin-right: 8px; }
+.vault-status-bar { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: min(100%,430px); min-height: var(--vault-bar-height); padding: calc(4px + env(safe-area-inset-top,0px)) 12px 4px; z-index: 9998; background: var(--ui-surface); color: var(--ui-primary); border-bottom: 1px solid var(--ui-border); align-items: center; gap: 6px; }
+.vault-status-icon { font-size: 16px; flex-shrink: 0; }
+#vault-save-state { flex: 1; min-width: 0; font-size: 10px; line-height: 1.4; }
+.vault-status-bar[data-save-status="error"] #vault-save-state { color: var(--ui-error); }
+.vault-status-bar button { align-items: center; justify-content: center; gap: 4px; border-radius: 10px; padding: 6px 8px; font-size: 11px; font-weight: 600; min-height: 34px; white-space: nowrap; background: var(--ui-primary-soft); color: var(--ui-primary-label); }
+#vault-lock { display: inline-flex; }
+#vault-lock .material-symbols-outlined { font-size: 16px; }
+.vault-shield { position: fixed; inset: 0; z-index: 9999; background: var(--ui-surface); color: var(--ui-text); align-content: center; justify-items: center; gap: 16px; padding: 24px; font: 600 15px/1.7 Inter,sans-serif; text-align: center; }
+.vault-shield button { width: min(100%,360px); border: 1px solid var(--ui-border); border-radius: 16px; min-height: 48px; background: var(--ui-card); padding: 12px 16px; color: var(--ui-primary); }
+
 /* Locally bundled, unmodified CC BY-SA exercise illustrations. */
-.exercise-art-frames {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-.exercise-art-frames > div {
-  background: #164e43;
-  border-radius: 12px;
-  overflow: hidden;
-  text-align: center;
-  color: #d1fae5;
-  font-size: 10px;
-  padding-bottom: 5px;
-}
-.exercise-art-frames img {
-  display: block;
-  width: 100%;
-  height: 130px;
-  object-fit: contain;
-}
-.exercise-art-credit {
-  margin-top: 6px;
-  font-size: 9px;
-  line-height: 1.5;
-  color: #64748b;
-}
+.exercise-art-frames { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.exercise-art-frames > div { background: var(--ui-art-background); border-radius: 14px; overflow: hidden; text-align: center; color: #d1fae5; font-size: 10px; padding-bottom: 6px; }
+.exercise-art-frames img { display: block; width: 100%; height: 130px; object-fit: contain; }
+.exercise-art-credit { margin-top: 6px; font-size: 9px; line-height: 1.6; color: var(--ui-muted); }
 .exercise-art-credit a { text-decoration: underline; }
-.dark .exercise-art-credit { color: #a1a1aa; }
-.exercise-art-thumbnail {
-  display: block;
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  background: #164e43;
-  border-radius: 10px;
-}
+.exercise-art-thumbnail { display: block; width: 56px; height: 56px; flex-shrink: 0; background: var(--ui-art-background); border-radius: 12px; }
 .exercise-art-thumbnail img { width: 100%; height: 100%; object-fit: contain; }
 
-.workout-muscle-map { padding:16px; border:1px solid #cbd5e1; border-radius:20px; background:#fff; color:#334155; }
-.workout-muscle-map h2 { font-size:15px; font-weight:700; }
-.muscle-map-description { font-size:11px; margin-top:5px; color:#64748b; }
-.muscle-map-bodies { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; }
-.muscle-map-bodies figure { margin:0; text-align:center; background:#f8fafc; border-radius:14px; padding:8px 4px; }
-.muscle-map-bodies svg { width:100%; height:auto; max-height:330px; }
-.muscle-map-bodies figcaption { font-size:11px; font-weight:600; }
-.muscle-map-legend { display:flex; flex-wrap:wrap; gap:12px; font-size:10px; }
-.muscle-map-legend span { display:flex; align-items:center; gap:5px; }
-.muscle-map-legend i { width:10px; height:10px; border-radius:3px; }
-.muscle-map-red { background:#ef4444; } .muscle-map-gray { background:#cbd5e1; }
-.muscle-map-tags { display:flex; flex-wrap:wrap; gap:5px; margin:12px 0; }
-.muscle-map-tags span { font-size:10px; background:#fef2f2; color:#b91c1c; border-radius:20px; padding:4px 8px; }
-.workout-muscle-map summary { font-size:12px; cursor:pointer; padding:6px 0; }
-.workout-muscle-map ul { list-style:none; padding:0; }
-.workout-muscle-map li { display:flex; flex-direction:column; gap:3px; font-size:11px; padding:8px 0; border-bottom:1px solid #e2e8f0; }
-.muscle-map-note { margin-top:10px; font-size:10px; line-height:1.6; color:#64748b; }
-.dark .workout-muscle-map { background:#1e293b; border-color:#475569; color:#e2e8f0; }
-.dark .muscle-map-description, .dark .muscle-map-note { color:#94a3b8; }
-.dark .muscle-map-bodies figure { background:#f1f5f9; color:#334155; }
-.dark .workout-muscle-map li { border-color:#475569; }
+.workout-muscle-map { padding: 16px; color: var(--ui-text); }
+.workout-muscle-map h2 { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 15px; font-weight: 700; }
+.muscle-map-heading { display: flex; align-items: center; gap: 10px; }
+.muscle-map-heading .material-symbols-outlined { width: 36px; height: 36px; display: grid; place-items: center; font-size: 20px; background: var(--ui-primary-soft); color: var(--ui-primary); border-radius: 12px; }
+.muscle-map-description { font-size: 11px; margin-top: 5px; line-height: 1.6; color: var(--ui-muted); }
+.muscle-map-bodies { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+.muscle-map-bodies figure { margin: 0; text-align: center; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 8px 4px; }
+.muscle-map-bodies svg { width: 100%; height: auto; max-height: 330px; }
+.muscle-map-bodies figcaption { font-size: 11px; font-weight: 600; padding-bottom: 4px; }
+.muscle-map-outline { fill: var(--ui-body-fill); stroke: var(--ui-body-outline); }
+.muscle-map-region { fill: var(--ui-muscle-rest); stroke: var(--ui-panel); }
+.muscle-map-region.is-active { fill: var(--ui-muscle-active); }
+.muscle-map-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 10px; color: var(--ui-muted); }
+.muscle-map-legend span { display: flex; align-items: center; gap: 5px; }
+.muscle-map-legend i { width: 10px; height: 10px; border-radius: 3px; }
+.muscle-map-red { background: var(--ui-muscle-active); } .muscle-map-gray { background: var(--ui-muscle-rest); }
+.muscle-map-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 12px 0; }
+.muscle-map-tags span { font-size: 10px; background: var(--ui-primary-soft); color: var(--ui-primary-label); border-radius: 999px; padding: 5px 9px; }
+.workout-muscle-map summary { font-size: 12px; font-weight: 600; cursor: pointer; padding: 10px 0; color: var(--ui-primary); }
+.workout-muscle-map ul { list-style: none; padding: 0; }
+.workout-muscle-map li { display: flex; flex-direction: column; gap: 3px; font-size: 11px; padding: 10px 0; border-bottom: 1px solid var(--ui-border); }
+.workout-muscle-map li > span { color: var(--ui-muted); }
+.muscle-map-note { margin-top: 10px; font-size: 10px; line-height: 1.7; color: var(--ui-muted); }
+
+/* Apply accessibility preferences to CSS effects as well as page transitions. */
+:root.reduce-motion *, :root.reduce-motion *::before, :root.reduce-motion *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+@keyframes ui-surface-entry { from { opacity: 0.4; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.vault-card { animation: ui-surface-entry 180ms var(--ui-motion-easing); }

@@ -51,3 +51,9 @@ Fitness routine setup, the exercise catalog and the active workout screen includ
 ### Workout muscle overview
 
 The setup screen shows an original, bundled front/back SVG schematic with 19 muscle groups. Red regions combine major movers and common assisting muscles from the current draft exercises, including catalog additions; removing an exercise recalculates the union. Expand the exercise list to see the mapping per movement. Unknown names are explicitly excluded rather than guessed. This educational schematic is not an intensity map, an exhaustive stabilizer list, or an individualized biomechanical assessment. Mapping lives in `src/data/exerciseMuscles.ts`; the original SVG lives in `src/components/Fitness/WorkoutMuscleMap.ts`. It needs no external service, image request, or personal information.
+
+### Navigation and visual theme
+
+NutriAI uses short directional fade/slide transitions for screen changes, profile subpages, onboarding steps and workout setup/session views. Back navigation restores the previous scroll position; ordinary data edits and workout timer ticks do not restart the page transition. Bottom navigation and overlays mount separately, and expanded exercise details remain open during edits. The transition controller clears its private view strings, route history and animations when the vault locks; it does not keep screenshots or previous page DOM.
+
+The lock screen, encryption status bar, recovery shield, exercise illustrations and muscle map share the app's green palette, typography, card shapes and light/dark theme. Locked startup follows the device theme, and locking an active session retains its current theme. The app's Reduce Motion setting and the device's accessibility preference both disable animation. Mobile zoom remains available, focus is visible, and navigation moves keyboard focus to the incoming page heading. The status bar and bottom navigation account for safe areas on mobile displays.

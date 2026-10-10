@@ -148,3 +148,11 @@ The table below lists every screen/component source and its input controls. All 
 ### 2026-10-10 — Workout muscle overview
 
 Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG and a static exercise-to-muscle mapping. Highlights derive only from the local draft exercise names and update with additions/removals. No remote assets, API requests, analytics, or new storage are introduced. All dynamic exercise names are HTML escaped, including unknown-name notices. Red denotes listed movers/assistants, not measured activation or intensity; the UI explains the schematic limitation.
+
+### 2026-10-10 — Navigation transitions and shared theme
+
+- Added `ScreenTransitions` to coordinate navigation without retaining outgoing DOM or taking view-transition screenshots. Cached current-view markup, animations and navigation/scroll history are cleared on successful vault lock before the private screen is removed.
+- Vault gate/status/shield and fitness artwork/muscle map now share light/dark design variables. Shield activation and lock content clearing remain immediate; encryption and storage behavior are unchanged.
+- Back navigation returns workout detail views to Fitness, and supports setup/session back actions using the existing cancellation flow. Unsaved workout summaries remain until the explicit Save/Discard action.
+- App and device Reduce Motion preferences disable page and CSS animations. Zoom, keyboard focus indicators, safe-area spacing and active-navigation semantics are supported.
+- Verification: TypeScript/Vite production build; existing two Playwright privacy scenarios (mobile and actual Streamlit srcdoc); direct mobile/iframe checks of forward/back transitions, onboarding, hardware back, theme consistency, open-details preservation, reduced motion and lock/unlock. Only synthetic data was used. No external dependencies or new personal-data requests were added.
