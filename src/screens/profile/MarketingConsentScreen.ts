@@ -1,3 +1,4 @@
+import { tr, trHtml, getLocale } from '../../i18n/index.ts';
 /**
  * Marketing Consent Sub-Screen
  * 
@@ -14,10 +15,10 @@ export function renderMarketingConsentScreen(): string {
   const consent = state.userPreferences?.marketingConsent || false;
   const updatedAt = state.userPreferences?.marketingConsentUpdatedAt;
 
-  let formattedDate = 'Never updated';
+  let formattedDate = tr("Never updated");
   if (updatedAt) {
     try {
-      formattedDate = new Date(updatedAt).toLocaleString('en-US', {
+      formattedDate = new Date(updatedAt).toLocaleString(getLocale(), {
         dateStyle: 'medium',
         timeStyle: 'short'
       });
@@ -33,12 +34,12 @@ export function renderMarketingConsentScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Marketing Consent</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Marketing Consent")}</h1>
         </div>
       </header>
 
@@ -55,10 +56,10 @@ export function renderMarketingConsentScreen(): string {
               </div>
               <div>
                 <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white leading-tight">
-                  Promotional Communications
+                  ${trHtml("Promotional Communications")}
                 </h2>
                 <span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-0.5">
-                  Optional product updates and announcements
+                  ${trHtml("Optional product updates and announcements")}
                 </span>
               </div>
             </div>
@@ -76,23 +77,23 @@ export function renderMarketingConsentScreen(): string {
           <!-- Explanation -->
           <div class="pt-3 border-t border-outline-variant/20 text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed flex flex-col gap-2">
             <p>
-              By default, NutriAI operates on strict explicit opt-in. We do not transmit marketing messages, promotional offers, or partner bulletins unless you voluntarily activate this setting.
+              ${trHtml("By default, NutriAI operates on strict explicit opt-in. We do not transmit marketing messages, promotional offers, or partner bulletins unless you voluntarily activate this setting.")}
             </p>
             <p>
-              You can toggle this permission on or off at any time. Your preference timestamp is recorded locally on this device.
+              ${trHtml("You can toggle this permission on or off at any time. Your preference timestamp is recorded locally on this device.")}
             </p>
           </div>
 
           <!-- Timestamp status -->
           <div class="p-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-between text-[11px]">
-            <span class="text-on-surface-variant dark:text-gray-400">Consent Status:</span>
+            <span class="text-on-surface-variant dark:text-gray-400">${trHtml("Consent Status:")}</span>
             <span class="font-bold ${consent ? 'text-primary' : 'text-on-surface dark:text-gray-300'}">
-              ${consent ? 'Opted In' : 'Opted Out'}
+              ${consent ? tr("Opted In") : tr("Opted Out")}
             </span>
           </div>
 
           <div class="text-[10px] text-on-surface-variant/70 dark:text-gray-500 text-right">
-            Last modified: ${formattedDate}
+            ${trHtml("Last modified:")} ${formattedDate}
           </div>
 
         </div>

@@ -1,3 +1,5 @@
+import { foodLabel } from '../../i18n/foodLabels.ts';
+import { tr, trHtml } from '../../i18n/index.ts';
 /**
  * Set Portion Bottom Sheet Modal
  * 
@@ -34,13 +36,13 @@ export function renderSetPortionModal(): string {
   const nutrition = calcResult?.nutrition;
 
   const calDisplay = nutrition?.calories !== null && nutrition?.calories !== undefined ? `${nutrition.calories}` : '—';
-  const proDisplay = nutrition?.protein !== null && nutrition?.protein !== undefined ? `${nutrition.protein}g` : '—';
-  const carbDisplay = nutrition?.carbs !== null && nutrition?.carbs !== undefined ? `${nutrition.carbs}g` : '—';
-  const fatDisplay = nutrition?.fat !== null && nutrition?.fat !== undefined ? `${nutrition.fat}g` : '—';
+  const proDisplay = nutrition?.protein !== null && nutrition?.protein !== undefined ? `${nutrition.protein} ${trHtml("g")}` : '—';
+  const carbDisplay = nutrition?.carbs !== null && nutrition?.carbs !== undefined ? `${nutrition.carbs} ${trHtml("g")}` : '—';
+  const fatDisplay = nutrition?.fat !== null && nutrition?.fat !== undefined ? `${nutrition.fat} ${trHtml("g")}` : '—';
 
   const basisText = food.nutritionBasis.servingDescription 
     ? food.nutritionBasis.servingDescription 
-    : `per ${food.nutritionBasis.amount} ${food.nutritionBasis.unit}`;
+    : tr("per {0} {1}", food.nutritionBasis.amount, food.nutritionBasis.unit);
 
   const hasMicronutrients = food.nutrition.micronutrients && (
     food.nutrition.micronutrients.vitamins.length > 0 || 
@@ -65,26 +67,26 @@ export function renderSetPortionModal(): string {
           <div class="flex-1 pr-3">
             <div class="flex items-center gap-2">
               <span class="text-[10px] font-extrabold uppercase tracking-widest text-primary dark:text-primary-container">
-                Set Portion
+                ${trHtml("Set Portion")}
               </span>
               ${food.brand ? `
                 <span class="px-2 py-0.2 rounded-md bg-surface-container-low dark:bg-dark-surface-card-high text-[10px] font-semibold text-on-surface-variant dark:text-gray-300">
-                  ${escapeHtml(food.brand)}
+                  ${escapeHtml(foodLabel(food, food.brand))}
                 </span>
               ` : ''}
             </div>
             <h2 id="set-portion-title" class="font-heading font-extrabold text-base text-on-surface dark:text-white mt-0.5 leading-tight">
-              ${escapeHtml(food.name)}
+              ${escapeHtml(foodLabel(food, food.name))}
             </h2>
             <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
-              Nutrition basis: <span class="font-semibold text-on-surface dark:text-gray-200">${escapeHtml(basisText)}</span>
+              ${trHtml("Nutrition basis:")} <span class="font-semibold text-on-surface dark:text-gray-200">${escapeHtml(foodLabel(food, basisText))}</span>
             </p>
           </div>
 
           <button 
             type="button" 
             onclick="window.closeSetPortionModal()" 
-            aria-label="Close" 
+            aria-label="${trHtml("Close")}"
             class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
           >
             <span class="material-symbols-outlined text-[18px]">close</span>
@@ -98,9 +100,9 @@ export function renderSetPortionModal(): string {
           <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <label for="set-portion-qty-input" class="text-xs font-bold text-on-surface dark:text-white">
-                Portion Size
+                ${trHtml("Portion Size")}
               </label>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Decimal supported</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Decimal supported")}</span>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -113,7 +115,7 @@ export function renderSetPortionModal(): string {
                   id="set-portion-qty-input"
                   value="${escapeHtml(qty)}"
                   oninput="window.setPortionQuantity(parseFloat(this.value) || 0)"
-                  placeholder="Quantity"
+                  placeholder="${trHtml("Quantity")}"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-sm font-bold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -126,7 +128,7 @@ export function renderSetPortionModal(): string {
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-sm font-bold text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary capitalize appearance-none pr-8"
                 >
                   ${availableUnits.map(u => `
-                    <option value="${escapeHtml(u)}" ${u === unit ? 'selected' : ''}>${u}</option>
+                    <option value="${escapeHtml(u)}" ${u === unit ? 'selected' : ''}>${trHtml(u)}</option>
                   `).join('')}
                 </select>
                 <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">
@@ -139,7 +141,7 @@ export function renderSetPortionModal(): string {
             ${food.portionOptions.length > 0 ? `
               <div class="flex flex-col gap-1.5 pt-1">
                 <span class="text-[10px] font-semibold text-on-surface-variant dark:text-gray-400 uppercase tracking-wider">
-                  Quick Portions
+                  ${trHtml("Quick Portions")}
                 </span>
                 <div class="flex flex-wrap gap-1.5">
                   ${food.portionOptions.map(opt => `
@@ -152,7 +154,7 @@ export function renderSetPortionModal(): string {
                           : 'bg-surface-container-lowest dark:bg-dark-surface-card text-on-surface dark:text-gray-300 border-outline-variant/40 hover:border-primary/50'
                       }"
                     >
-                      ${escapeHtml(opt.label)}
+                      ${escapeHtml(foodLabel(food, opt.label))}
                     </button>
                   `).join('')}
                 </div>
@@ -163,7 +165,7 @@ export function renderSetPortionModal(): string {
             ${errorMsg ? `
               <div class="p-2.5 rounded-xl bg-error/10 border border-error/30 text-error flex items-center gap-2 text-xs">
                 <span class="material-symbols-outlined text-[18px]">error</span>
-                <span>${escapeHtml(errorMsg)}</span>
+                <span>${trHtml(errorMsg)}</span>
               </div>
             ` : ''}
           </div>
@@ -172,7 +174,7 @@ export function renderSetPortionModal(): string {
           <div class="p-4 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex flex-col gap-2">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-                Nutrition for this portion
+                ${trHtml("Nutrition for this portion")}
               </span>
               ${hasMicronutrients ? `
                 <button 
@@ -180,7 +182,7 @@ export function renderSetPortionModal(): string {
                   onclick="window.openNutrientsFromCatalog(${htmlJsArg(food.id)})"
                   class="text-[10px] font-bold text-primary hover:underline flex items-center gap-0.5"
                 >
-                  <span>All Nutrients</span>
+                  <span>${trHtml("All Nutrients")}</span>
                   <span class="material-symbols-outlined text-[14px]">chevron_right</span>
                 </button>
               ` : ''}
@@ -188,26 +190,26 @@ export function renderSetPortionModal(): string {
 
             <div class="grid grid-cols-4 gap-2 text-center pt-1">
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
-                <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">Calories</span>
+                <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Calories")}</span>
                 <span class="font-heading font-extrabold text-base text-primary dark:text-primary-container block mt-0.5">
                   ${calDisplay}
                 </span>
-                <span class="text-[9px] text-on-surface-variant dark:text-gray-400">kcal</span>
+                <span class="text-[9px] text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
-                <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">Protein</span>
+                <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">${trHtml("Protein")}</span>
                 <span class="font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
                   ${proDisplay}
                 </span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
-                <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">Carbs</span>
+                <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">${trHtml("Carbs")}</span>
                 <span class="font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
                   ${carbDisplay}
                 </span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
-                <span class="text-[10px] font-bold text-amber-500 block uppercase">Fat</span>
+                <span class="text-[10px] font-bold text-amber-500 block uppercase">${trHtml("Fat")}</span>
                 <span class="font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
                   ${fatDisplay}
                 </span>
@@ -218,7 +220,7 @@ export function renderSetPortionModal(): string {
           <!-- Meal Type & Date / Time Configuration -->
           <div class="p-4 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex flex-col gap-3">
             <span class="text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              Log Details
+              ${trHtml("Log Details")}
             </span>
 
             <!-- Meal Type Chips -->
@@ -233,7 +235,7 @@ export function renderSetPortionModal(): string {
                       : 'bg-surface-container-lowest dark:bg-dark-surface-card text-on-surface dark:text-gray-300 border-outline-variant/40 hover:border-primary/50'
                   }"
                 >
-                  ${type}
+                  ${trHtml(type)}
                 </button>
               `).join('')}
             </div>
@@ -242,7 +244,7 @@ export function renderSetPortionModal(): string {
             <div class="grid grid-cols-2 gap-2.5 pt-1">
               <div>
                 <label for="set-portion-date" class="text-[10px] font-semibold text-on-surface-variant dark:text-gray-400 block mb-1">
-                  Date
+                  ${trHtml("Date")}
                 </label>
                 <input 
                   type="date" 
@@ -254,7 +256,7 @@ export function renderSetPortionModal(): string {
               </div>
               <div>
                 <label for="set-portion-time" class="text-[10px] font-semibold text-on-surface-variant dark:text-gray-400 block mb-1">
-                  Time
+                  ${trHtml("Time")}
                 </label>
                 <input 
                   type="time" 
@@ -276,7 +278,7 @@ export function renderSetPortionModal(): string {
             onclick="window.closeSetPortionModal()" 
             class="px-4 py-3 rounded-xl border border-outline-variant/40 text-xs font-bold text-on-surface dark:text-white hover:bg-surface-container-low transition-colors"
           >
-            Cancel
+            ${trHtml("Cancel")}
           </button>
           <button 
             type="button" 
@@ -286,7 +288,7 @@ export function renderSetPortionModal(): string {
             class="flex-1 py-3 px-4 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-ambient hover:brightness-105 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
             <span class="material-symbols-outlined text-[18px]">add_circle</span>
-            <span>Add to Diary</span>
+            <span>${trHtml("Add to Diary")}</span>
           </button>
         </div>
 

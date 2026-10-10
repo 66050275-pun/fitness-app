@@ -1,5 +1,5 @@
+import { tr, trHtml } from '../i18n/index.ts';
 import { demoFoodImage } from '../data/demoImage.ts';
-import { escapeHtml } from '../utils/sanitize.ts';
 import { store } from '../store/appState';
 
 export function renderScannerScreen(): string {
@@ -8,7 +8,7 @@ export function renderScannerScreen(): string {
 
   const food = lastScannedFood || {
     name: 'Mediterranean Salmon Bowl',
-    subtitle: 'Wild Salmon, Quinoa & Greens',
+    subtitle: tr("Wild Salmon, Quinoa & Greens"),
     calories: 540,
     protein: 42,
     carbs: 48,
@@ -28,7 +28,7 @@ export function renderScannerScreen(): string {
         <img 
           src="${demoFoodImage}"
           class="w-full h-full object-cover filter brightness-85 contrast-105 transform scale-105 transition-transform duration-700" 
-          alt="Local demo illustration — no live camera feed"
+          alt="${trHtml("Local demo illustration — no live camera feed")}"
         />
         <!-- Vignette & Camera Scan Grid Overlay -->
         <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
@@ -39,7 +39,7 @@ export function renderScannerScreen(): string {
       <header class="relative z-20 px-screen-gutter pt-5 pb-3 flex justify-between items-center">
         <button 
           onclick="window.navigateApp('dashboard')" 
-          aria-label="Back" 
+          aria-label="${trHtml("Back")}"
           class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-95 transition-all"
         >
           <span class="material-symbols-outlined text-[22px]">arrow_back</span>
@@ -50,20 +50,16 @@ export function renderScannerScreen(): string {
           <button 
             type="button"
             onclick="window.openScannerMode('food')" 
-            class="px-3 py-1 rounded-full font-heading text-xs font-bold transition-all ${
-              !isBarcode ? 'bg-primary text-white shadow-sm' : 'text-white/70 hover:text-white'
-            }"
+            class="px-3 py-1 rounded-full font-heading text-xs font-bold transition-all ${!isBarcode ? 'bg-primary text-white shadow-sm' : 'text-white/70 hover:text-white'}"
           >
-            AI Lens
+            ${trHtml("AI Lens")}
           </button>
           <button 
             type="button"
             onclick="window.openScannerMode('barcode')" 
-            class="px-3 py-1 rounded-full font-heading text-xs font-bold transition-all ${
-              isBarcode ? 'bg-primary text-white shadow-sm' : 'text-white/70 hover:text-white'
-            }"
+            class="px-3 py-1 rounded-full font-heading text-xs font-bold transition-all ${isBarcode ? 'bg-primary text-white shadow-sm' : 'text-white/70 hover:text-white'}"
           >
-            Barcode
+            ${trHtml("Barcode")}
           </button>
         </div>
 
@@ -71,7 +67,7 @@ export function renderScannerScreen(): string {
         <button 
           id="flash-toggle-btn"
           onclick="this.classList.toggle('text-amber-400'); this.classList.toggle('text-white');" 
-          aria-label="Toggle Flash"
+          aria-label="${trHtml("Toggle Flash")}"
           class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-95 transition-all"
         >
           <span class="material-symbols-outlined text-[20px]">flash_on</span>
@@ -84,7 +80,7 @@ export function renderScannerScreen(): string {
         <!-- Prototype Notice Pill -->
         <div class="mb-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1 text-[10px] font-semibold text-white/80">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-          <span>Camera Prototype Mode &bull; Simulated Feed</span>
+          <span>${trHtml("Camera Prototype Mode • Simulated Feed")}</span>
         </div>
 
         ${!isBarcode ? `
@@ -114,10 +110,10 @@ export function renderScannerScreen(): string {
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5">
-                <span class="font-heading font-bold text-xs truncate text-on-surface">${escapeHtml(food.name)}</span>
-                <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary text-[9px] font-extrabold">${Math.round(food.confidence * 100)}% Match</span>
+                <span class="font-heading font-bold text-xs truncate text-on-surface">${trHtml(food.name)}</span>
+                <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary text-[9px] font-extrabold">${Math.round(food.confidence * 100)}${trHtml("% Match")}</span>
               </div>
-              <p class="text-[11px] text-on-surface-variant mt-0.5">${food.calories} kcal &bull; ${food.protein}g Protein &bull; Tap for Details &rarr;</p>
+              <p class="text-[11px] text-on-surface-variant mt-0.5">${food.calories} ${trHtml("kcal •")} ${food.protein}${trHtml("g Protein • Tap for Details &rarr;")}</p>
             </div>
           </div>
         ` : `
@@ -129,28 +125,28 @@ export function renderScannerScreen(): string {
 
             <div class="text-center px-4">
               <span class="material-symbols-outlined text-3xl text-white/70 mb-1">barcode_scanner</span>
-              <p class="text-[11px] text-white/90 font-medium">Align packaged barcode within box</p>
+              <p class="text-[11px] text-white/90 font-medium">${trHtml("Align packaged barcode within box")}</p>
             </div>
           </div>
 
           <!-- Barcode Prototype Notice Card -->
           <div class="mt-6 bg-surface/95 backdrop-blur-xl text-on-surface p-4 rounded-2xl border border-outline-variant/30 shadow-lg max-w-[320px] flex flex-col gap-2 text-center">
-            <span class="font-heading font-bold text-xs text-on-surface">Barcode Scanning Prototype</span>
+            <span class="font-heading font-bold text-xs text-on-surface">${trHtml("Barcode Scanning Prototype")}</span>
             <p class="text-[11px] text-on-surface-variant leading-relaxed">
-              Hardware camera barcode decoding is currently in prototype integration. Search our verified offline catalog or use manual quick log:
+              ${trHtml("Hardware camera barcode decoding is currently in prototype integration. Search our verified offline catalog or use manual quick log:")}
             </p>
             <div class="flex items-center gap-2 mt-1">
               <button 
                 onclick="window.navigateApp('foodSearch')" 
                 class="flex-1 py-2 rounded-xl bg-primary text-white text-xs font-bold active:scale-95 transition-all"
               >
-                Search Catalog
+                ${trHtml("Search Catalog")}
               </button>
               <button 
                 onclick="window.navigateApp('quickLog')" 
                 class="flex-1 py-2 rounded-xl bg-surface-container text-xs font-bold text-on-surface active:scale-95 transition-all"
               >
-                Quick Log
+                ${trHtml("Quick Log")}
               </button>
             </div>
           </div>
@@ -164,7 +160,7 @@ export function renderScannerScreen(): string {
         <!-- Gallery Upload Button -->
         <button 
           onclick="window.navigateApp('foodResult')" 
-          aria-label="Upload photo"
+          aria-label="${trHtml("Upload photo")}"
           class="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center text-white/90 active:scale-95 transition-all"
         >
           <span class="material-symbols-outlined text-[22px]">photo_library</span>
@@ -173,7 +169,7 @@ export function renderScannerScreen(): string {
         <!-- Main Shutter Button -->
         <button 
           onclick="window.navigateApp('foodResult')" 
-          aria-label="Capture Food"
+          aria-label="${trHtml("Capture Food")}"
           class="w-20 h-20 rounded-full border-4 border-white/80 p-1 flex items-center justify-center scan-fab-glow active:scale-90 transition-transform"
         >
           <div class="w-full h-full rounded-full bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-lg">
@@ -184,7 +180,7 @@ export function renderScannerScreen(): string {
         <!-- Search Database Button -->
         <button 
           onclick="window.navigateApp('foodSearch')" 
-          aria-label="Search Database"
+          aria-label="${trHtml("Search Database")}"
           class="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center text-white/90 active:scale-95 transition-all"
         >
           <span class="material-symbols-outlined text-[22px]">search</span>

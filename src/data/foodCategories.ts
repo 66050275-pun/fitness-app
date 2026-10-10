@@ -1,3 +1,4 @@
+import { tr } from '../i18n/index.ts';
 /**
  * Food Categories configuration with stable keys and display labels.
  */
@@ -8,25 +9,25 @@ export interface FoodCategoryOption {
 }
 
 export const FOOD_CATEGORIES: FoodCategoryOption[] = [
-  { value: 'grains_cereals', label: 'Grains & Cereals' },
-  { value: 'bread_bakery', label: 'Bread & Bakery' },
-  { value: 'fruits', label: 'Fruits' },
-  { value: 'vegetables', label: 'Vegetables' },
-  { value: 'meat', label: 'Meat' },
-  { value: 'poultry', label: 'Poultry' },
-  { value: 'seafood', label: 'Seafood' },
-  { value: 'eggs', label: 'Eggs' },
-  { value: 'dairy', label: 'Dairy' },
-  { value: 'legumes', label: 'Legumes' },
-  { value: 'nuts_seeds', label: 'Nuts & Seeds' },
-  { value: 'oils_fats', label: 'Oils & Fats' },
-  { value: 'snacks', label: 'Snacks' },
-  { value: 'desserts_sweets', label: 'Desserts & Sweets' },
-  { value: 'beverages', label: 'Beverages' },
-  { value: 'supplements', label: 'Supplements' },
-  { value: 'prepared_meals', label: 'Prepared Meals' },
-  { value: 'sauces_condiments', label: 'Sauces & Condiments' },
-  { value: 'other', label: 'Other' }
+  { value: 'grains_cereals', get label() { return tr("Grains & Cereals"); } },
+  { value: 'bread_bakery', get label() { return tr("Bread & Bakery"); } },
+  { value: 'fruits', get label() { return tr("Fruits"); } },
+  { value: 'vegetables', get label() { return tr("Vegetables"); } },
+  { value: 'meat', get label() { return tr("Meat"); } },
+  { value: 'poultry', get label() { return tr("Poultry"); } },
+  { value: 'seafood', get label() { return tr("Seafood"); } },
+  { value: 'eggs', get label() { return tr("Eggs"); } },
+  { value: 'dairy', get label() { return tr("Dairy"); } },
+  { value: 'legumes', get label() { return tr("Legumes"); } },
+  { value: 'nuts_seeds', get label() { return tr("Nuts & Seeds"); } },
+  { value: 'oils_fats', get label() { return tr("Oils & Fats"); } },
+  { value: 'snacks', get label() { return tr("Snacks"); } },
+  { value: 'desserts_sweets', get label() { return tr("Desserts & Sweets"); } },
+  { value: 'beverages', get label() { return tr("Beverages"); } },
+  { value: 'supplements', get label() { return tr("Supplements"); } },
+  { value: 'prepared_meals', get label() { return tr("Prepared Meals"); } },
+  { value: 'sauces_condiments', get label() { return tr("Sauces & Condiments"); } },
+  { value: 'other', get label() { return tr("Other"); } }
 ];
 
 /**

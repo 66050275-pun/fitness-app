@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 import { store } from '../../store/appState';
 
 export function renderQuickActionModal(): string {
@@ -14,8 +15,8 @@ export function renderQuickActionModal(): string {
         <!-- Header -->
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="font-heading text-lg font-bold text-on-surface dark:text-white">Quick Actions</h3>
-            <p class="text-xs text-on-surface-variant dark:text-gray-400">Capture nutrition and biometrics instantly</p>
+            <h3 class="font-heading text-lg font-bold text-on-surface dark:text-white">${trHtml("Quick Actions")}</h3>
+            <p class="text-xs text-on-surface-variant dark:text-gray-400">${trHtml("Capture nutrition and biometrics instantly")}</p>
           </div>
           <button onclick="window.toggleQuickActions(false)" class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-on-surface">
             <span class="material-symbols-outlined text-[20px]">close</span>
@@ -32,10 +33,10 @@ export function renderQuickActionModal(): string {
             </div>
             <div class="flex-1">
               <div class="flex items-center gap-1.5">
-                <span class="font-heading font-bold text-sm text-on-surface dark:text-white">AI Food Lens</span>
-                <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded-full bg-tertiary-container/30 text-tertiary dark:text-tertiary-fixed">Smart</span>
+                <span class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("AI Food Lens")}</span>
+                <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded-full bg-tertiary-container/30 text-tertiary dark:text-tertiary-fixed">${trHtml("Smart")}</span>
               </div>
-              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">Instant meal detection & macro breakdown</p>
+              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Instant meal detection & macro breakdown")}</p>
             </div>
             <span class="material-symbols-outlined text-outline text-[20px]">chevron_right</span>
           </button>
@@ -46,8 +47,8 @@ export function renderQuickActionModal(): string {
               <span class="material-symbols-outlined text-[24px]">barcode_scanner</span>
             </div>
             <div class="flex-1">
-              <span class="font-heading font-bold text-sm text-on-surface dark:text-white">Scan Barcode</span>
-              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">Search 2M+ packaged nutrition labels</p>
+              <span class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Scan Barcode")}</span>
+              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Search 2M+ packaged nutrition labels")}</p>
             </div>
             <span class="material-symbols-outlined text-outline text-[20px]">chevron_right</span>
           </button>
@@ -58,8 +59,8 @@ export function renderQuickActionModal(): string {
               <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">water_drop</span>
             </div>
             <div class="flex-1">
-              <span class="font-heading font-bold text-sm text-on-surface dark:text-white">Log Water (+250 ml)</span>
-              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">Quickly track hydration progress</p>
+              <span class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Log Water (+250 ml)")}</span>
+              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Quickly track hydration progress")}</p>
             </div>
             <span class="material-symbols-outlined text-outline text-[20px]">add</span>
           </button>
@@ -70,8 +71,8 @@ export function renderQuickActionModal(): string {
               <span class="material-symbols-outlined text-[24px]">fitness_center</span>
             </div>
             <div class="flex-1">
-              <span class="font-heading font-bold text-sm text-on-surface dark:text-white">Record Workout</span>
-              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">Sync active calorie burn & heart rate</p>
+              <span class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Record Workout")}</span>
+              <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Sync active calorie burn & heart rate")}</p>
             </div>
             <span class="material-symbols-outlined text-outline text-[20px]">chevron_right</span>
           </button>

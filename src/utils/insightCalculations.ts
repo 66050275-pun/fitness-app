@@ -1,3 +1,4 @@
+import { tr, getLocale } from '../i18n/index.ts';
 /**
  * Pure Calculation Functions for Insights & Analytics
  * 
@@ -113,8 +114,8 @@ export function calculateDailyNutritionTotals(meals: MealItem[], dateKeys: strin
     });
 
     const dateObj = parseDateKey(key);
-    const dayLabel = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-    const fullDateLabel = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const dayLabel = dateObj.toLocaleDateString(getLocale(), { weekday: 'short' });
+    const fullDateLabel = dateObj.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
 
     return {
       dateKey: key,
@@ -382,8 +383,8 @@ export function generateInsightMessages(
       {
         id: 'msg-start-logging',
         category: 'consistency',
-        title: 'Begin Logging to Unlock Insights',
-        text: 'Record meals and complete workouts to view automated trend analysis and personalized adherence tracking.',
+        title: tr("Begin Logging to Unlock Insights"),
+        text: tr("Record meals and complete workouts to view automated trend analysis and personalized adherence tracking."),
         icon: 'analytics',
         status: 'neutral'
       }
@@ -397,7 +398,7 @@ export function generateInsightMessages(
       id: 'msg-protein-target',
       category: 'nutrition',
       title: isHigh ? 'Consistent Protein Adherence' : 'Protein Goal Progress',
-      text: `You met your protein target on ${adherence.proteinGoalMetDays} of the last ${rangeDays} days (${Math.round((adherence.proteinGoalMetDays / rangeDays) * 100)}% adherence).`,
+      text: tr("You met your protein target on {0} of the last {1} days ({2}% adherence).", adherence.proteinGoalMetDays, rangeDays, Math.round((adherence.proteinGoalMetDays / rangeDays) * 100)),
       icon: 'egg_alt',
       status: isHigh ? 'positive' : 'neutral'
     });
@@ -405,8 +406,8 @@ export function generateInsightMessages(
     messages.push({
       id: 'msg-protein-gap',
       category: 'nutrition',
-      title: 'Protein Intake Below Target',
-      text: `Daily protein averaged ${nutritionAvg.avgProtein}g this period. Consider adding high-protein sources like Greek yogurt, eggs, or chicken to reach your goal.`,
+      title: tr("Protein Intake Below Target"),
+      text: tr("Daily protein averaged {0}g this period. Consider adding high-protein sources like Greek yogurt, eggs, or chicken to reach your goal.", nutritionAvg.avgProtein),
       icon: 'info',
       status: 'attention'
     });
@@ -418,8 +419,8 @@ export function generateInsightMessages(
       messages.push({
         id: 'msg-training-volume-up',
         category: 'fitness',
-        title: 'Progressive Overload Tracking',
-        text: `Your training volume increased by ${deltaVol.percent}% compared to the previous period (${workoutSummary.totalVolumeKg.toLocaleString()} kg total volume).`,
+        title: tr("Progressive Overload Tracking"),
+        text: tr("Your training volume increased by {0}% compared to the previous period ({1} kg total volume).", deltaVol.percent, workoutSummary.totalVolumeKg.toLocaleString(getLocale())),
         icon: 'trending_up',
         status: 'positive'
       });
@@ -427,8 +428,8 @@ export function generateInsightMessages(
       messages.push({
         id: 'msg-training-summary',
         category: 'fitness',
-        title: 'Training Activity Logged',
-        text: `Completed ${workoutSummary.completedWorkoutCount} workout sessions with ${workoutSummary.totalCompletedSets} verified sets over ${workoutSummary.totalDurationMinutes} total minutes.`,
+        title: tr("Training Activity Logged"),
+        text: tr("Completed {0} workout sessions with {1} verified sets over {2} total minutes.", workoutSummary.completedWorkoutCount, workoutSummary.totalCompletedSets, workoutSummary.totalDurationMinutes),
         icon: 'fitness_center',
         status: 'positive'
       });
@@ -440,8 +441,8 @@ export function generateInsightMessages(
     messages.push({
       id: 'msg-hydration-optimal',
       category: 'hydration',
-      title: 'Hydration Target Met Consistently',
-      text: `You maintained your daily water goal on ${adherence.hydrationGoalMetDays} of ${rangeDays} days, supporting cellular recovery and metabolic balance.`,
+      title: tr("Hydration Target Met Consistently"),
+      text: tr("You maintained your daily water goal on {0} of {1} days, supporting cellular recovery and metabolic balance.", adherence.hydrationGoalMetDays, rangeDays),
       icon: 'water_drop',
       status: 'positive'
     });
@@ -449,8 +450,8 @@ export function generateInsightMessages(
     messages.push({
       id: 'msg-hydration-low',
       category: 'hydration',
-      title: 'Hydration Tracking Inconsistent',
-      text: `Daily water target was met on ${adherence.hydrationGoalMetDays} days this week. Regular hydration assists physical recovery and digestion.`,
+      title: tr("Hydration Tracking Inconsistent"),
+      text: tr("Daily water target was met on {0} days this week. Regular hydration assists physical recovery and digestion.", adherence.hydrationGoalMetDays),
       icon: 'water_bottle',
       status: 'attention'
     });
@@ -467,7 +468,7 @@ export function generateInsightMessages(
     messages.push({
       id: 'msg-calorie-delta',
       category: 'nutrition',
-      title: 'Energy Balance Trend',
+      title: tr("Energy Balance Trend"),
       text,
       icon: 'balance',
       status: 'neutral'

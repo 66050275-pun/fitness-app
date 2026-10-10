@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 import { store } from '../../store/appState';
 
 export function renderBottomNav(): string {
@@ -17,7 +18,7 @@ export function renderBottomNav(): string {
         id="nav-tab-dashboard"
         data-tab="dashboard"
         onclick="window.navigateApp('dashboard')" 
-        aria-label="Home"
+        aria-label="${trHtml("Home")}"
         aria-current="${isHome ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isHome ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
@@ -25,7 +26,7 @@ export function renderBottomNav(): string {
           <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' ${isHome ? 1 : 0};">home</span>
           ${isHome ? '<span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary dark:bg-primary-container"></span>' : ''}
         </div>
-        <span class="text-[11px] font-semibold tracking-tight">Home</span>
+        <span class="text-[11px] font-semibold tracking-tight">${trHtml("Home")}</span>
       </button>
 
       <!-- 2. Diary Tab -->
@@ -34,7 +35,7 @@ export function renderBottomNav(): string {
         id="nav-tab-diary"
         data-tab="diary"
         onclick="window.navigateApp('diary')" 
-        aria-label="Diary"
+        aria-label="${trHtml("Diary")}"
         aria-current="${isDiary ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isDiary ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
@@ -42,7 +43,7 @@ export function renderBottomNav(): string {
           <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' ${isDiary ? 1 : 0};">calendar_today</span>
           ${isDiary ? '<span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary dark:bg-primary-container"></span>' : ''}
         </div>
-        <span class="text-[11px] font-semibold tracking-tight">Diary</span>
+        <span class="text-[11px] font-semibold tracking-tight">${trHtml("Diary")}</span>
       </button>
 
       <!-- 3. Center Add (+) FAB Button (Opens Quick Add Bottom Sheet) -->
@@ -52,12 +53,12 @@ export function renderBottomNav(): string {
           id="nav-fab-quick-add"
           data-action="quick-add"
           onclick="window.toggleQuickAdd()" 
-          aria-label="${quickAddOpen ? 'Close Quick Add' : 'Open Quick Add'}"
+          aria-label="${quickAddOpen ? tr("Close Quick Add") : tr("Open Quick Add")}"
           class="w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center scan-fab-glow hover:scale-105 active:scale-95 transition-transform border-4 border-surface dark:border-dark-surface shadow-xl"
         >
           <span class="material-symbols-outlined text-[30px] transition-transform duration-200 ${quickAddOpen ? 'rotate-45' : ''}">add</span>
         </button>
-        <span class="text-[10px] font-bold text-primary dark:text-primary-container tracking-wider uppercase mt-1">Add</span>
+        <span class="text-[10px] font-bold text-primary dark:text-primary-container tracking-wider uppercase mt-1">${trHtml("Add")}</span>
       </div>
 
       <!-- 4. Insights Tab -->
@@ -66,7 +67,7 @@ export function renderBottomNav(): string {
         id="nav-tab-insights"
         data-tab="insights"
         onclick="window.navigateApp('insights')" 
-        aria-label="Insights"
+        aria-label="${trHtml("Insights")}"
         aria-current="${isInsights ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isInsights ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
@@ -74,7 +75,7 @@ export function renderBottomNav(): string {
           <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' ${isInsights ? 1 : 0};">insights</span>
           ${isInsights ? '<span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary dark:bg-primary-container"></span>' : ''}
         </div>
-        <span class="text-[11px] font-semibold tracking-tight">Insights</span>
+        <span class="text-[11px] font-semibold tracking-tight">${trHtml("Insights")}</span>
       </button>
 
       <!-- 5. AI Coach Tab -->
@@ -83,7 +84,7 @@ export function renderBottomNav(): string {
         id="nav-tab-coach"
         data-tab="coach"
         onclick="window.navigateApp('coach')" 
-        aria-label="AI Coach"
+        aria-label="${trHtml("AI Coach")}"
         aria-current="${isCoach ? 'page' : 'false'}"
         class="justify-self-center flex flex-col items-center gap-1 transition-all group ${isCoach ? 'text-primary dark:text-primary-container scale-105' : 'text-on-surface-variant hover:text-primary'}"
       >
@@ -91,7 +92,7 @@ export function renderBottomNav(): string {
           <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' ${isCoach ? 1 : 0};">smart_toy</span>
           ${isCoach ? '<span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary dark:bg-primary-container"></span>' : ''}
         </div>
-        <span class="text-[11px] font-semibold tracking-tight">AI Coach</span>
+        <span class="text-[11px] font-semibold tracking-tight">${trHtml("AI Coach")}</span>
       </button>
       
     </nav>

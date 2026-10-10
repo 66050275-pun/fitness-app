@@ -27,6 +27,7 @@ There is no application user database, login service, real food-recognition endp
 
 | Data | Before | Now |
 | --- | --- | --- |
+| Lock-screen language choice (`en` / `th` only) | Not previously available | Non-sensitive `nutriai_ui_language` localStorage flag |
 | Name, birth date, sex, height, current/target weight, weight goal, activity level | Plaintext localStorage | Encrypted vault |
 | Onboarding answers and draft, nutrition targets, eating schedule, preferences, consent | Plaintext localStorage | Encrypted vault |
 | Meal diary, custom foods, portions, water and burned calories by date | Plaintext localStorage | Encrypted vault |
@@ -156,3 +157,12 @@ Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG a
 - Back navigation returns workout detail views to Fitness, and supports setup/session back actions using the existing cancellation flow. Unsaved workout summaries remain until the explicit Save/Discard action.
 - App and device Reduce Motion preferences disable page and CSS animations. Zoom, keyboard focus indicators, safe-area spacing and active-navigation semantics are supported.
 - Verification: TypeScript/Vite production build; existing two Playwright privacy scenarios (mobile and actual Streamlit srcdoc); direct mobile/iframe checks of forward/back transitions, onboarding, hardware back, theme consistency, open-details preservation, reduced motion and lock/unlock. Only synthetic data was used. No external dependencies or new personal-data requests were added.
+
+### 2026-10-10 — Consistent English and Thai
+
+- Enabled both language choices and synchronized the interface, HTML language, encrypted app preference and passphrase-screen choice. Bundled translations cover navigation, onboarding, profile pages, food and nutrient views, fitness and muscle maps, dialogs, errors, dates and canned demo replies.
+- User-entered text stays intact; canonical exercise IDs, food IDs, date keys, units used for calculations and stored numerical values are unchanged. Built-in food labels are translated only at display/search boundaries. There is no translation API or new personal-data network request.
+- Only the non-sensitive two-value language flag is readable before unlocking. Private data remain encrypted. Unsaved-change protection checks the save-status enum, independently of displayed language. Language selection is disabled during vault opening, and status refreshes retain recovery controls.
+- Verification: TypeScript/Vite production build; 121 mobile views/states across both languages; 16 checks in the actual Streamlit srcdoc, including language selection, red muscle highlights, lock/reload, localized password errors, safely escaped unchanged user text and the plaintext language flag. The frontend made no external requests and logged no runtime errors in these checks. Only synthetic data was used.
+
+- Streamlit now fingerprints frontend sources (including translation JSON) and dependency files. Changed sources rebuild once, and the HTML cache uses the same signature so a previous language bundle is not reused. Unchanged dependencies and builds remain cached.

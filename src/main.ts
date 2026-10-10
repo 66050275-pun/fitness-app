@@ -1,3 +1,5 @@
+import { ACTIVITY_MULTIPLIERS } from './utils/goalCalculations.ts';
+import { tr, trHtml } from './i18n/index.ts';
 import { ScreenTransitions } from './ui/screenTransitions';
 import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-500.css';
@@ -364,9 +366,9 @@ window.logCurrentFood = () => {
       micronutrients: lastScannedFood.micronutrients
     },
     portionOptions: [
-      { id: 'scanned-1s', label: '1 serving', unit: 'serving', dimension: 'serving', quantity: 1, equivalentBaseAmount: 1, equivalentBaseUnit: 'g' },
-      { id: 'scanned-half', label: '0.5 serving', unit: 'serving', dimension: 'serving', quantity: 0.5, equivalentBaseAmount: 0.5, equivalentBaseUnit: 'g' },
-      { id: 'scanned-double', label: '2 servings', unit: 'serving', dimension: 'serving', quantity: 2, equivalentBaseAmount: 2, equivalentBaseUnit: 'g' }
+      { id: 'scanned-1s', label: tr("1 serving"), unit: 'serving', dimension: 'serving', quantity: 1, equivalentBaseAmount: 1, equivalentBaseUnit: 'g' },
+      { id: 'scanned-half', label: tr("0.5 serving"), unit: 'serving', dimension: 'serving', quantity: 0.5, equivalentBaseAmount: 0.5, equivalentBaseUnit: 'g' },
+      { id: 'scanned-double', label: tr("2 servings"), unit: 'serving', dimension: 'serving', quantity: 2, equivalentBaseAmount: 2, equivalentBaseUnit: 'g' }
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -679,9 +681,9 @@ window.openWorkoutHistoryDetail = (workoutId: string) => {
 
 window.confirmResetAllFitnessPrograms = () => {
   store.openProfileConfirmModal({
-    title: 'Reset All Programs?',
-    message: 'This will remove your weekly routine and every scheduled workout from the calendar. Completed workout history and personal records will remain available.',
-    confirmLabel: 'Reset Program',
+    title: tr("Reset All Programs?"),
+    message: tr("This will remove your weekly routine and every scheduled workout from the calendar. Completed workout history and personal records will remain available."),
+    confirmLabel: tr("Reset Program"),
     confirmColorClass: 'bg-rose-600 hover:bg-rose-700 text-white',
     onConfirm: () => {
       store.resetAllFitnessPrograms();
@@ -781,10 +783,10 @@ window.handleFoodSearchInput = (query: string) => {
     container.innerHTML = `
       <div class="p-8 text-center bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-dashed border-outline-variant/40">
         <span class="material-symbols-outlined text-3xl text-on-surface-variant dark:text-gray-400 mb-1">search_off</span>
-        <h4 class="font-heading font-bold text-sm text-on-surface dark:text-white">No Matching Foods Found</h4>
-        <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">No foods match "${escapeHtml(q)}".</p>
+        <h4 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("No Matching Foods Found")}</h4>
+        <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">${trHtml("No foods match \"")}${escapeHtml(q)}".</p>
         <button onclick="window.openCreateCustomFood()" class="mt-3 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-xs">
-          + Create Custom Food
+          ${trHtml("+ Create Custom Food")}
         </button>
       </div>
     `;
@@ -795,9 +797,9 @@ window.handleFoodSearchInput = (query: string) => {
     <div class="flex flex-col gap-2.5">
       <div class="flex items-center justify-between">
         <span class="text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-          Search Matches (${allMatched.length})
+          ${trHtml("Search Matches (")}${allMatched.length})
         </span>
-        <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Tap to set portion</span>
+        <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Tap to set portion")}</span>
       </div>
       <div class="flex flex-col gap-2">
         ${allMatched.map(f => renderFoodDefinitionCard(f)).join('')}
@@ -818,7 +820,7 @@ window.openSetPortion = (foodOrId: string | FoodDefinition, initialPortion?: Par
   }
 
   if (!food) {
-    console.warn('Selected food was not found.');
+    console.warn(tr("Selected food was not found."));
     return;
   }
 
@@ -866,7 +868,7 @@ window.removeRecentFood = (foodId: string) => {
 };
 
 window.clearRecentFoods = () => {
-  const confirmed = window.confirm('Are you sure you want to clear your recent foods list?');
+  const confirmed = window.confirm(tr("Are you sure you want to clear your recent foods list?"));
   if (confirmed) {
     store.clearRecentFoods();
   }
@@ -886,7 +888,7 @@ window.addAgainMeal = (mealId: string) => {
       nutritionBasis: {
         amount: meal.portion?.quantity || 1,
         unit: (meal.portion?.unit === 'g' || meal.portion?.unit === 'ml' ? meal.portion.unit : 'serving') as 'g' | 'ml' | 'serving',
-        servingDescription: meal.portion?.servingDescription || '1 serving'
+        servingDescription: meal.portion?.servingDescription || tr("1 serving")
       },
       nutrition: {
         calories: meal.calories,
@@ -898,7 +900,7 @@ window.addAgainMeal = (mealId: string) => {
       portionOptions: [
         {
           id: `opt-${meal.id}`,
-          label: meal.portion?.servingDescription || '1 serving',
+          label: meal.portion?.servingDescription || tr("1 serving"),
           unit: meal.portion?.unit || 'serving',
           dimension: 'serving',
           quantity: meal.portion?.quantity || 1,
@@ -1035,8 +1037,8 @@ window.useExistingFoodFromDuplicate = (foodId: string) => {
 window.confirmDeleteCustomFood = (foodName?: string) => {
   const editId = store.getState().editingCustomFoodId;
   if (!editId) return;
-  const name = foodName || 'this custom food';
-  const confirmed = window.confirm(`Are you sure you want to delete "${name}"?\n\nHistorical diary entries will NOT be modified.`);
+  const name = foodName || tr("this custom food");
+  const confirmed = window.confirm(tr("Are you sure you want to delete \"{0}\"? Historical diary entries will NOT be modified.", name));
   if (confirmed) {
     store.deleteCustomFood(editId);
     store.closeCreateCustomFoodModal(true);
@@ -1079,7 +1081,7 @@ window.submitQuickLog = () => {
 
   if (!foodName) {
     if (errorBanner && errorMsg) {
-      errorMsg.innerText = 'Please provide a food or recipe name.';
+      errorMsg.innerText = tr("Please provide a food or recipe name.");
       errorBanner.classList.remove('hidden');
     }
     return;
@@ -1087,7 +1089,7 @@ window.submitQuickLog = () => {
 
   if (isNaN(calories) || calories < 0) {
     if (errorBanner && errorMsg) {
-      errorMsg.innerText = 'Please enter a valid non-negative calorie amount.';
+      errorMsg.innerText = tr("Please enter a valid non-negative calorie amount.");
       errorBanner.classList.remove('hidden');
     }
     return;
@@ -1095,7 +1097,7 @@ window.submitQuickLog = () => {
 
   if (isNaN(protein) || protein < 0 || isNaN(carbs) || carbs < 0 || isNaN(fat) || fat < 0) {
     if (errorBanner && errorMsg) {
-      errorMsg.innerText = 'Macronutrient values cannot be negative numbers.';
+      errorMsg.innerText = tr("Macronutrient values cannot be negative numbers.");
       errorBanner.classList.remove('hidden');
     }
     return;
@@ -1215,7 +1217,7 @@ window.filterNutrientList = (query: string) => {
   rows.forEach(row => {
     const name = row.getAttribute('data-nutrient-name')?.toLowerCase() || '';
     const cat = row.getAttribute('data-nutrient-category')?.toLowerCase() || '';
-    const match = !q || name.includes(q) || cat.includes(q);
+    const match = !q || name.includes(q) || cat.includes(q) || tr(name).toLowerCase().includes(q) || (row.textContent || '').toLowerCase().includes(q);
     if (match) {
       row.style.display = '';
       visibleCount++;
@@ -1225,7 +1227,7 @@ window.filterNutrientList = (query: string) => {
   });
   const counter = document.getElementById('nutrient-active-count');
   if (counter) {
-    counter.innerText = `${visibleCount} visible`;
+    counter.innerText = tr("{0} visible", visibleCount);
   }
 };
 // ==========================================
@@ -1237,7 +1239,7 @@ window.openProfileSubpage = (subpage: ProfileSubpage, param?: string) => {
   if (subpage === 'feedback' && param) {
     activeFeedbackCategory = param;
   } else if (subpage === 'feedback') {
-    activeFeedbackCategory = 'Bug Report';
+    activeFeedbackCategory = tr("Bug Report");
   }
   store.setProfileSubpage(subpage);
 };
@@ -1255,16 +1257,16 @@ window.shareNutriAI = async () => {
     try {
       await navigator.share({
         title: 'NutriAI',
-        text: 'Track your nutrition, calories, and fitness with NutriAI.',
+        text: tr("Track your nutrition, calories, and fitness with NutriAI."),
         url: window.location.href
       });
     } catch {}
   } else {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      alert('NutriAI link copied to clipboard!');
+      alert(tr("NutriAI link copied to clipboard!"));
     } catch {
-      alert('NutriAI: Your personal nutrition assistant.');
+      alert(tr("NutriAI: Your personal nutrition assistant."));
     }
   }
 };
@@ -1419,9 +1421,9 @@ window.submitNutritionGoals = () => {
 
 window.confirmResetNutritionGoals = () => {
   store.openProfileConfirmModal({
-    title: 'Reset Nutrition Targets?',
-    message: 'This will reset your daily nutrition targets to default standard values (2,100 kcal, 145g protein, 220g carbs, 70g fat, 2,000ml water).',
-    confirmLabel: 'Reset Defaults',
+    title: tr("Reset Nutrition Targets?"),
+    message: tr("This will reset your daily nutrition targets to default standard values (2,100 kcal, 145g protein, 220g carbs, 70g fat, 2,000ml water)."),
+    confirmLabel: tr("Reset Defaults"),
     confirmColorClass: 'bg-primary text-white',
     onConfirm: () => {
       store.updateNutritionGoals({
@@ -1458,7 +1460,7 @@ window.selectActivityTier = (level: ActivityLevel, suggestedTdee: number) => {
   const suggestionText = document.getElementById('activity-suggestion-text');
   if (suggestionCard && suggestionText) {
     const currentCal = store.getState().calorieTarget;
-    suggestionText.innerHTML = `Your current daily target is <strong>${currentCal} kcal</strong>. Based on ${level.replace('_', ' ')} activity, your suggested target is <strong>${suggestedTdee} kcal</strong>. Would you like to recalibrate?`;
+    suggestionText.innerHTML = `${trHtml("Your current daily target is")} <strong>${currentCal} ${trHtml("kcal")}</strong>${trHtml(". Based on")} ${trHtml(ACTIVITY_MULTIPLIERS[level].label)} ${trHtml("activity, your suggested target is")} <strong>${suggestedTdee} ${trHtml("kcal")}</strong>${trHtml(". Would you like to recalibrate?")}`;
     suggestionCard.classList.remove('hidden');
   }
 };
@@ -1562,9 +1564,9 @@ window.submitWeightEntry = () => {
 
 window.confirmDeleteWeightEntry = (id: string) => {
   store.openProfileConfirmModal({
-    title: 'Delete Weight Record?',
-    message: 'Are you sure you want to permanently delete this recorded body weight entry?',
-    confirmLabel: 'Delete Entry',
+    title: tr("Delete Weight Record?"),
+    message: tr("Are you sure you want to permanently delete this recorded body weight entry?"),
+    confirmLabel: tr("Delete Entry"),
     confirmColorClass: 'bg-error text-white',
     onConfirm: () => {
       store.deleteWeightEntry(id);
@@ -1646,9 +1648,9 @@ window.toggleAppHapticFeedback = () => {
 
 window.confirmResetPreferences = () => {
   store.openProfileConfirmModal({
-    title: 'Reset Preferences?',
-    message: 'This will reset your theme, unit preferences, and accessibility settings back to their default values.',
-    confirmLabel: 'Reset Preferences',
+    title: tr("Reset Preferences?"),
+    message: tr("This will reset your theme, unit preferences, and accessibility settings back to their default values."),
+    confirmLabel: tr("Reset Preferences"),
     confirmColorClass: 'bg-error text-white',
     onConfirm: () => {
       store.updateUserPreferences({
@@ -1676,7 +1678,7 @@ window.saveFeedbackDraft = () => {
   const diagInput = document.getElementById('feedback-diagnostics-input') as HTMLInputElement | null;
 
   const draft = {
-    category: catInput?.value || 'Bug Report',
+    category: catInput?.value || tr("Bug Report"),
     subject: subInput?.value || '',
     description: descInput?.value || '',
     email: emailInput?.value || '',
@@ -1698,19 +1700,19 @@ window.toggleFeedbackDiagnostics = () => {
 
 window.copyFeedbackText = async () => {
   window.saveFeedbackDraft();
-  const sub = (document.getElementById('feedback-subject-input') as HTMLInputElement | null)?.value || 'Feedback';
-  const cat = (document.getElementById('feedback-category-input') as HTMLSelectElement | null)?.value || 'General';
+  const sub = (document.getElementById('feedback-subject-input') as HTMLInputElement | null)?.value || tr("Feedback");
+  const cat = (document.getElementById('feedback-category-input') as HTMLSelectElement | null)?.value || tr("General");
   const desc = (document.getElementById('feedback-description-input') as HTMLTextAreaElement | null)?.value || '';
-  const email = (document.getElementById('feedback-email-input') as HTMLInputElement | null)?.value || 'Not provided';
+  const email = (document.getElementById('feedback-email-input') as HTMLInputElement | null)?.value || tr("Not provided");
   const diagInput = document.getElementById('feedback-diagnostics-input') as HTMLInputElement | null;
 
-  const textToCopy = `[NutriAI v${APP_METADATA.version} Feedback]\nCategory: ${cat}\nSubject: ${sub}\nDetails: ${desc}\nContact: ${email}${diagInput?.value === 'true' ? `\nPlatform: ${navigator.userAgent}` : ''}`;
+  const textToCopy = tr("[NutriAI v{0} Feedback] Category: {1} Subject: {2} Details: {3} Contact: {4}{5}", APP_METADATA.version, cat, sub, desc, email, diagInput?.value === 'true' ? tr("Platform: {0}", navigator.userAgent) : '');
 
   try {
     await navigator.clipboard.writeText(textToCopy);
-    alert('Feedback text copied to clipboard! You can paste it into an email or support message.');
+    alert(tr("Feedback text copied to clipboard! You can paste it into an email or support message."));
   } catch {
-    alert('Please copy your message directly from the form.');
+    alert(tr("Please copy your message directly from the form."));
   }
 };
 
@@ -1748,15 +1750,15 @@ window.toggleMarketingConsent = () => {
 
 // --- Data & Privacy / Export / Granular Deletions ---
 window.exportAppData = () => {
-  void downloadEncryptedBackup().catch(() => alert('Backup failed. Please retry saving before exporting.'));
+  void downloadEncryptedBackup().catch(() => alert(tr("Backup failed. Please retry saving before exporting.")));
 };
 
 window.confirmDeleteFoodHistory = () => {
   const count = store.getState().meals.length;
   store.openProfileConfirmModal({
-    title: 'Delete Food & Diary History?',
-    message: `Are you sure you want to permanently delete all ${count} food diary entries? Your profile, goals, and weight records will NOT be deleted.`,
-    confirmLabel: 'Delete Food History',
+    title: tr("Delete Food & Diary History?"),
+    message: tr("Are you sure you want to permanently delete all {0} food diary entries? Your profile, goals, and weight records will NOT be deleted.", count),
+    confirmLabel: tr("Delete Food History"),
     confirmColorClass: 'bg-error text-white',
     onConfirm: () => {
       store.deleteSelectedLocalData('meals');
@@ -1768,9 +1770,9 @@ window.confirmDeleteFoodHistory = () => {
 window.confirmDeleteWorkoutHistory = () => {
   const count = store.getState().workoutHistory.length;
   store.openProfileConfirmModal({
-    title: 'Delete Workout History?',
-    message: `Are you sure you want to delete all ${count} finished workouts and personal records? Your nutrition and weight data will remain intact.`,
-    confirmLabel: 'Delete Workouts',
+    title: tr("Delete Workout History?"),
+    message: tr("Are you sure you want to delete all {0} finished workouts and personal records? Your nutrition and weight data will remain intact.", count),
+    confirmLabel: tr("Delete Workouts"),
     confirmColorClass: 'bg-error text-white',
     onConfirm: () => {
       store.deleteSelectedLocalData('workouts');
@@ -1782,9 +1784,9 @@ window.confirmDeleteWorkoutHistory = () => {
 window.confirmDeleteWeightHistory = () => {
   const count = store.getState().weightHistory.length;
   store.openProfileConfirmModal({
-    title: 'Delete Weight History?',
-    message: `Are you sure you want to delete all ${count} weight measurements?`,
-    confirmLabel: 'Delete Weight History',
+    title: tr("Delete Weight History?"),
+    message: tr("Are you sure you want to delete all {0} weight measurements?", count),
+    confirmLabel: tr("Delete Weight History"),
     confirmColorClass: 'bg-error text-white',
     onConfirm: () => {
       store.deleteSelectedLocalData('weights');
@@ -1795,9 +1797,9 @@ window.confirmDeleteWeightHistory = () => {
 
 window.confirmDeleteAllLocalData = () => {
   store.openProfileConfirmModal({
-    title: 'Delete All Local Data?',
-    message: 'This will completely reset NutriAI on this device. All logged meals, workouts, custom foods, weight entries, and preferences will be permanently wiped. Type DELETE to confirm.',
-    confirmLabel: 'Delete Everything',
+    title: tr("Delete All Local Data?"),
+    message: tr("This will completely reset NutriAI on this device. All logged meals, workouts, custom foods, weight entries, and preferences will be permanently wiped. Type DELETE to confirm."),
+    confirmLabel: tr("Delete Everything"),
     confirmColorClass: 'bg-error text-white',
     requireTypingText: 'DELETE',
     onConfirm: () => {
@@ -1845,12 +1847,12 @@ function capturePersonalDetails(validate: boolean = true): boolean {
   const rawTarget = Number((document.getElementById('onboarding-target-weight') as HTMLInputElement | null)?.value);
   const currentWeightKg = Number.isFinite(rawWeight) && rawWeight > 0 ? (draft.weightUnit === 'lb' ? lbToKg(rawWeight) : Math.round(rawWeight * 10) / 10) : null;
   const targetWeightKg = Number.isFinite(rawTarget) && rawTarget > 0 ? (draft.weightUnit === 'lb' ? lbToKg(rawTarget) : Math.round(rawTarget * 10) / 10) : null;
-  if (validate && !sex) { showOnboardingError('Choose a calculation profile or Prefer not to say.'); return false; }
-  if (validate && (!heightCm || heightCm < 50 || heightCm > 300)) { showOnboardingError('Enter a valid height between 50 and 300 cm.'); return false; }
-  if (validate && (!currentWeightKg || currentWeightKg < 15 || currentWeightKg > 500)) { showOnboardingError('Enter a valid current weight.'); return false; }
+  if (validate && !sex) { showOnboardingError(tr("Choose a calculation profile or Prefer not to say.")); return false; }
+  if (validate && (!heightCm || heightCm < 50 || heightCm > 300)) { showOnboardingError(tr("Enter a valid height between 50 and 300 cm.")); return false; }
+  if (validate && (!currentWeightKg || currentWeightKg < 15 || currentWeightKg > 500)) { showOnboardingError(tr("Enter a valid current weight.")); return false; }
   if (validate && draft.weightDirection !== null && targetWeightKg && currentWeightKg) {
-    if (draft.weightDirection < 0 && targetWeightKg >= currentWeightKg) { showOnboardingError('For a loss goal, target weight should be below current weight.'); return false; }
-    if (draft.weightDirection > 0 && targetWeightKg <= currentWeightKg) { showOnboardingError('For a gain goal, target weight should be above current weight.'); return false; }
+    if (draft.weightDirection < 0 && targetWeightKg >= currentWeightKg) { showOnboardingError(tr("For a loss goal, target weight should be below current weight.")); return false; }
+    if (draft.weightDirection > 0 && targetWeightKg <= currentWeightKg) { showOnboardingError(tr("For a gain goal, target weight should be above current weight.")); return false; }
   }
   store.updateOnboardingDraft({ displayName: name, dateOfBirth: dob, biologicalSex: sex, heightCm, currentWeightKg, targetWeightKg });
   return true;
@@ -1880,7 +1882,7 @@ window.onboardingNext = () => {
   const step = state.onboardingState.currentStep;
   if (step === 1) { store.setOnboardingStep(2); return; }
   if (step === 2) {
-    if (state.onboardingDraft.weightDirection === null) { showOnboardingError('Choose a weight goal to continue.'); return; }
+    if (state.onboardingDraft.weightDirection === null) { showOnboardingError(tr("Choose a weight goal to continue.")); return; }
     store.setOnboardingStep(3); return;
   }
   if (step === 3) {
@@ -1888,7 +1890,7 @@ window.onboardingNext = () => {
     store.setOnboardingStep(4); return;
   }
   if (step === 4) {
-    if (!state.onboardingDraft.activityLevel) { showOnboardingError('Choose your usual activity level.'); return; }
+    if (!state.onboardingDraft.activityLevel) { showOnboardingError(tr("Choose your usual activity level.")); return; }
     store.setOnboardingStep(5); return;
   }
   if (step === 5) { store.setOnboardingStep(6); return; }
@@ -1917,7 +1919,7 @@ window.handleProfilePhotoSelected = async (input: HTMLInputElement) => {
   if (!file) return;
   const validation = validateProfileImage(file);
   const errorEl = document.getElementById('profile-photo-error');
-  if (!validation.valid) { if (errorEl) errorEl.textContent = validation.error || 'Invalid image.'; input.value = ''; return; }
+  if (!validation.valid) { if (errorEl) errorEl.textContent = validation.error || tr("Invalid image."); input.value = ''; return; }
   try {
     const blob = await resizeProfileImage(file);
     const ref = await saveProfileImage(blob);
@@ -1925,7 +1927,7 @@ window.handleProfilePhotoSelected = async (input: HTMLInputElement) => {
     store.setProfileImageUrl(url);
     if (store.getState().currentScreen === 'onboarding') store.updateOnboardingDraft({ profileImageRef: ref });
   } catch {
-    if (errorEl) errorEl.textContent = 'The photo could not be saved on this device.';
+    if (errorEl) errorEl.textContent = tr("The photo could not be saved on this device.");
   } finally {
     input.value = '';
   }

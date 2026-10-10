@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
@@ -53,12 +54,12 @@ export function renderWeightGoalScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Weight Goal</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Weight Goal")}</h1>
         </div>
 
         <button 
@@ -66,7 +67,7 @@ export function renderWeightGoalScreen(): string {
           form="weight-goal-form"
           class="text-xs font-bold text-white px-4 py-1.5 rounded-full bg-primary hover:brightness-105 active:scale-95 transition-all shadow-xs"
         >
-          Save
+          ${trHtml("Save")}
         </button>
       </header>
 
@@ -76,7 +77,7 @@ export function renderWeightGoalScreen(): string {
         <!-- Current Status Banner -->
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex items-center justify-between">
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 block">Current Weight</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 block">${trHtml("Current Weight")}</span>
             <span class="font-heading font-extrabold text-xl text-on-surface dark:text-white block mt-0.5">
               ${formatWeight(currentKg, unit)}
             </span>
@@ -86,7 +87,7 @@ export function renderWeightGoalScreen(): string {
             onclick="window.openWeightModal()"
             class="px-3 py-1.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs font-bold text-primary dark:text-primary-container hover:bg-surface-container transition-all"
           >
-            Update Weight
+            ${trHtml("Update Weight")}
           </button>
         </div>
 
@@ -95,14 +96,14 @@ export function renderWeightGoalScreen(): string {
           <!-- Goal Type Selection -->
           <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
             <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              Primary Objective
+              ${trHtml("Primary Objective")}
             </span>
 
             <div class="grid grid-cols-3 gap-2">
               ${[
-                { type: 'lose', icon: 'trending_down', label: 'Lose Weight' },
-                { type: 'maintain', icon: 'horizontal_rule', label: 'Maintain' },
-                { type: 'gain', icon: 'trending_up', label: 'Gain Weight' }
+                { type: 'lose', icon: 'trending_down', label: tr("Lose Weight") },
+                { type: 'maintain', icon: 'horizontal_rule', label: tr("Maintain") },
+                { type: 'gain', icon: 'trending_up', label: tr("Gain Weight") }
               ].map(opt => `
                 <button
                   type="button"
@@ -124,13 +125,13 @@ export function renderWeightGoalScreen(): string {
           <!-- Target Weight & Date -->
           <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
             <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              Target Details
+              ${trHtml("Target Details")}
             </span>
 
             <!-- Target Weight Input -->
             <div>
               <label for="weight-target-input" class="block text-[11px] font-semibold text-on-surface-variant dark:text-gray-400 mb-1">
-                Target Weight (${unit})
+                ${trHtml("Target Weight (")}${trHtml(unit)})
               </label>
               <div class="relative">
                 <input 
@@ -144,7 +145,7 @@ export function renderWeightGoalScreen(): string {
                   oninput="window.updateWeightGoalPreview()"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-sm font-heading font-extrabold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
-                <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">${unit}</span>
+                <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">${trHtml(unit)}</span>
               </div>
             </div>
 
@@ -152,9 +153,9 @@ export function renderWeightGoalScreen(): string {
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label for="weight-target-date-input" class="text-[11px] font-semibold text-on-surface-variant dark:text-gray-400">
-                  Target Date
+                  ${trHtml("Target Date")}
                 </label>
-                <span class="text-[10px] text-on-surface-variant/70 dark:text-gray-500">Optional</span>
+                <span class="text-[10px] text-on-surface-variant/70 dark:text-gray-500">${trHtml("Optional")}</span>
               </div>
               <input 
                 type="date" 
@@ -169,24 +170,22 @@ export function renderWeightGoalScreen(): string {
             ${goalType !== 'maintain' ? `
               <div>
                 <label class="block text-[11px] font-semibold text-on-surface-variant dark:text-gray-400 mb-1.5">
-                  Preferred Weekly Pace
+                  ${trHtml("Preferred Weekly Pace")}
                 </label>
                 <div class="grid grid-cols-3 gap-1.5">
                   ${[
-                    { rate: 0.25, label: unit === 'lb' ? '0.5 lb' : '0.25 kg' },
-                    { rate: 0.5, label: unit === 'lb' ? '1.1 lb' : '0.5 kg' },
-                    { rate: 0.75, label: unit === 'lb' ? '1.6 lb' : '0.75 kg' }
+                    { rate: 0.25, label: unit === 'lb' ? tr("0.5 lb") : tr("0.25 kg") },
+                    { rate: 0.5, label: unit === 'lb' ? tr("1.1 lb") : tr("0.5 kg") },
+                    { rate: 0.75, label: unit === 'lb' ? tr("1.6 lb") : tr("0.75 kg") }
                   ].map(opt => `
                     <button 
                       type="button"
                       onclick="window.selectWeeklyRate(${goalType === 'lose' ? -1 : 1} * ${opt.rate})"
-                      class="py-2 px-1 rounded-xl text-xs text-center border transition-all ${
-                        weeklyRateMagnitude === opt.rate
+                      class="py-2 px-1 rounded-xl text-xs text-center border transition-all ${weeklyRateMagnitude === opt.rate
                           ? 'bg-primary text-white border-primary font-bold shadow-xs'
-                          : 'bg-surface-container-low dark:bg-dark-surface-card-high border-outline-variant/30 text-on-surface dark:text-gray-300'
-                      }"
+                          : 'bg-surface-container-low dark:bg-dark-surface-card-high border-outline-variant/30 text-on-surface dark:text-gray-300'}"
                     >
-                      ${opt.label}/wk
+                      ${opt.label}${trHtml("/wk")}
                     </button>
                   `).join('')}
                 </div>
@@ -201,7 +200,7 @@ export function renderWeightGoalScreen(): string {
             <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-2.5">
               <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[20px] shrink-0 mt-0.5">warning</span>
               <p class="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
-                Pacing greater than 1.0 kg (2.2 lb) per week is aggressive and may be difficult to sustain. We advise consulting a healthcare professional before pursuing rapid weight changes.
+                ${trHtml("Pacing greater than 1.0 kg (2.2 lb) per week is aggressive and may be difficult to sustain. We advise consulting a healthcare professional before pursuing rapid weight changes.")}
               </p>
             </div>
           ` : ''}
@@ -210,17 +209,17 @@ export function renderWeightGoalScreen(): string {
           ${hasDiff ? `
             <div class="p-4 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex flex-col gap-2">
               <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-                Progress Preview
+                ${trHtml("Progress Preview")}
               </span>
               <div class="flex items-center justify-between text-xs">
-                <span class="text-on-surface dark:text-gray-300">Total Change Required:</span>
+                <span class="text-on-surface dark:text-gray-300">${trHtml("Total Change Required:")}</span>
                 <span class="font-heading font-extrabold ${diffKg > 0 ? 'text-blue-500' : 'text-primary'}">${formatWeightChange(diffKg, unit)}</span>
               </div>
               ${weeklyRateMagnitude > 0 && Math.abs(diffKg) > 0 ? `
                 <div class="flex items-center justify-between text-xs">
-                  <span class="text-on-surface dark:text-gray-300">Estimated Timeline:</span>
+                  <span class="text-on-surface dark:text-gray-300">${trHtml("Estimated Timeline:")}</span>
                   <span class="font-bold text-on-surface dark:text-white">
-                    ~${Math.ceil(Math.abs(diffKg) / weeklyRateMagnitude)} weeks at this pace
+                    ~${Math.ceil(Math.abs(diffKg) / weeklyRateMagnitude)} ${trHtml("weeks at this pace")}
                   </span>
                 </div>
               ` : ''}
@@ -229,7 +228,7 @@ export function renderWeightGoalScreen(): string {
 
           <!-- Non-Guarantee Disclaimer -->
           <p class="text-[11px] text-on-surface-variant/80 dark:text-gray-400 leading-relaxed px-1">
-            NutriAI provides general nutritional tracking tools. Weight progression varies based on individual metabolism, body composition, and genetics. No specific outcome is guaranteed.
+            ${trHtml("NutriAI provides general nutritional tracking tools. Weight progression varies based on individual metabolism, body composition, and genetics. No specific outcome is guaranteed.")}
           </p>
 
           <!-- Save Button -->
@@ -237,7 +236,7 @@ export function renderWeightGoalScreen(): string {
             type="submit" 
             class="w-full py-3 rounded-xl bg-primary text-white text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all text-center mt-1"
           >
-            Save Weight Goal
+            ${trHtml("Save Weight Goal")}
           </button>
 
         </form>

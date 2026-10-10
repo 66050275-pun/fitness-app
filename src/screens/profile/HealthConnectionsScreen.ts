@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 /**
  * Health Connections Sub-Screen
  * 
@@ -18,12 +19,12 @@ export function renderHealthConnectionsScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Connected Health Apps</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Connected Health Apps")}</h1>
         </div>
       </header>
 
@@ -34,7 +35,7 @@ export function renderHealthConnectionsScreen(): string {
         <div class="p-3.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex items-start gap-3 shadow-ambient">
           <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">sync_alt</span>
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-            NutriAI is architected to exchange health measurements via Android’s standardized Health Connect platform. External sync is disabled until native certification is completed.
+            ${trHtml("NutriAI is architected to exchange health measurements via Android’s standardized Health Connect platform. External sync is disabled until native certification is completed.")}
           </p>
         </div>
 
@@ -48,55 +49,55 @@ export function renderHealthConnectionsScreen(): string {
               </div>
               <div>
                 <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white">
-                  Google Health Connect
+                  ${trHtml("Google Health Connect")}
                 </h2>
                 <span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-0.5">
-                  Unified Android health data layer
+                  ${trHtml("Unified Android health data layer")}
                 </span>
               </div>
             </div>
 
             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border border-outline-variant/30 shrink-0">
-              Not Connected
+              ${trHtml("Not Connected")}
             </span>
           </div>
 
           <!-- Planned Sync Data Matrix -->
           <div class="pt-3 border-t border-outline-variant/20 flex flex-col gap-2">
             <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              Planned Data Sync Capabilities
+              ${trHtml("Planned Data Sync Capabilities")}
             </span>
 
             <div class="grid grid-cols-2 gap-2">
               <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-primary">directions_walk</span>
                 <div class="flex flex-col">
-                  <span class="text-xs font-semibold text-on-surface dark:text-white">Daily Steps</span>
-                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Read from sensors</span>
+                  <span class="text-xs font-semibold text-on-surface dark:text-white">${trHtml("Daily Steps")}</span>
+                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Read from sensors")}</span>
                 </div>
               </div>
 
               <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-orange-500">fitness_center</span>
                 <div class="flex flex-col">
-                  <span class="text-xs font-semibold text-on-surface dark:text-white">Workouts</span>
-                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Two-way sync</span>
+                  <span class="text-xs font-semibold text-on-surface dark:text-white">${trHtml("Workouts")}</span>
+                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Two-way sync")}</span>
                 </div>
               </div>
 
               <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-red-500">local_fire_department</span>
                 <div class="flex flex-col">
-                  <span class="text-xs font-semibold text-on-surface dark:text-white">Active Energy</span>
-                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Burned calories</span>
+                  <span class="text-xs font-semibold text-on-surface dark:text-white">${trHtml("Active Energy")}</span>
+                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Burned calories")}</span>
                 </div>
               </div>
 
               <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-blue-500">monitor_weight</span>
                 <div class="flex flex-col">
-                  <span class="text-xs font-semibold text-on-surface dark:text-white">Body Weight</span>
-                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Smart scale sync</span>
+                  <span class="text-xs font-semibold text-on-surface dark:text-white">${trHtml("Body Weight")}</span>
+                  <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Smart scale sync")}</span>
                 </div>
               </div>
             </div>
@@ -110,10 +111,10 @@ export function renderHealthConnectionsScreen(): string {
               class="w-full py-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant/50 dark:text-gray-500 border border-outline-variant/30 text-xs font-bold cursor-not-allowed flex items-center justify-center gap-2"
             >
               <span class="material-symbols-outlined text-[18px]">lock</span>
-              <span>Connect to Health Connect (Coming Soon)</span>
+              <span>${trHtml("Connect to Health Connect (Coming Soon)")}</span>
             </button>
             <p class="text-[11px] text-on-surface-variant/80 dark:text-gray-500 text-center leading-normal">
-              Native Capacitor Health Connect plugin integration will be activated upon official store deployment.
+              ${trHtml("Native Capacitor Health Connect plugin integration will be activated upon official store deployment.")}
             </p>
           </div>
 

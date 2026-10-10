@@ -8,7 +8,7 @@ This repository is a Vite and TypeScript web app with a Capacitor Android projec
 2. In Streamlit Community Cloud, create an app from `66050275-pun/fitness-app`, branch `main`, with `streamlit_app.py` as the main file.
 3. Wait for the first build to finish, then open the generated `*.streamlit.app` URL on a phone.
 
-Streamlit installs Node.js and npm from `packages.txt`. On the first app start, `streamlit_app.py` runs `npm ci` and `npm run build`; later reruns reuse the built files. The initial start can take longer while dependencies install.
+Streamlit installs Node.js and npm from `packages.txt`. The entry point fingerprints the frontend sources, including the translation files. It runs `npm ci` when the dependency files change and `npm run build` when the frontend changes; reruns with the same source reuse the built files. The initial start can take longer while dependencies install.
 
 The preview uses the same browser-based app and its passphrase protected encrypted browser vault. Capacitor native features are not available in the Streamlit page. Food scanning and AI screens are currently preview flows; the scanner does not use a live camera or call a food-recognition backend.
 
@@ -57,3 +57,9 @@ The setup screen shows an original, bundled front/back SVG schematic with 19 mus
 NutriAI uses short directional fade/slide transitions for screen changes, profile subpages, onboarding steps and workout setup/session views. Back navigation restores the previous scroll position; ordinary data edits and workout timer ticks do not restart the page transition. Bottom navigation and overlays mount separately, and expanded exercise details remain open during edits. The transition controller clears its private view strings, route history and animations when the vault locks; it does not keep screenshots or previous page DOM.
 
 The lock screen, encryption status bar, recovery shield, exercise illustrations and muscle map share the app's green palette, typography, card shapes and light/dark theme. Locked startup follows the device theme, and locking an active session retains its current theme. The app's Reduce Motion setting and the device's accessibility preference both disable animation. Mobile zoom remains available, focus is visible, and navigation moves keyboard focus to the incoming page heading. The status bar and bottom navigation account for safe areas on mobile displays.
+
+## English and Thai
+
+Select English or Thai at the passphrase screen or **Profile → App Settings → Language**. All app interface text, calendars, exercise and muscle labels, built-in food examples, validation messages and local demo coach replies follow that selection. User-entered names, notes, custom food descriptions and chat messages are preserved. Brand names, source credits and scientific abbreviations keep their original spelling. Translations are bundled locally and make no translation-service requests.
+
+The harmless `nutriai_ui_language` preference contains only `en` or `th` in localStorage so the lock screen can use the same language after a reload. The saved app preference also remains in the encrypted vault. No profile or health data is added to plaintext storage. Display dates use the chosen locale with the Gregorian calendar; internal date keys, exercise identifiers and measurement values are unchanged.

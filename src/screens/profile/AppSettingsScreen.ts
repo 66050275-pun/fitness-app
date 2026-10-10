@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * App Settings Sub-Screen
@@ -37,12 +38,12 @@ export function renderAppSettingsScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">App Settings</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("App Settings")}</h1>
         </div>
       </header>
 
@@ -53,18 +54,18 @@ export function renderAppSettingsScreen(): string {
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <span class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              Appearance Theme
+              ${trHtml("Appearance Theme")}
             </span>
             <span class="text-[11px] font-semibold text-primary capitalize">
-              ${prefs.theme} Mode
+              ${trHtml(prefs.theme.charAt(0).toUpperCase() + prefs.theme.slice(1))} ${trHtml("Mode")}
             </span>
           </div>
 
           <div class="grid grid-cols-3 gap-2">
             ${[
-              { id: 'system', label: 'System', icon: 'brightness_auto' },
-              { id: 'light', label: 'Light', icon: 'light_mode' },
-              { id: 'dark', label: 'Dark', icon: 'dark_mode' }
+              { id: 'system', label: tr("System"), icon: 'brightness_auto' },
+              { id: 'light', label: tr("Light"), icon: 'light_mode' },
+              { id: 'dark', label: tr("Dark"), icon: 'dark_mode' }
             ].map(t => `
               <button 
                 type="button"
@@ -85,14 +86,14 @@ export function renderAppSettingsScreen(): string {
         <!-- Preferred Measurement Units Card -->
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3.5">
           <span class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-            Preferred Units
+            ${trHtml("Preferred Units")}
           </span>
 
           <!-- Weight Unit -->
           <div class="flex items-center justify-between py-1">
             <div>
-              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">Body Weight</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Diary, history & goals</span>
+              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Body Weight")}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Diary, history & goals")}</span>
             </div>
 
             <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
@@ -101,14 +102,14 @@ export function renderAppSettingsScreen(): string {
                 onclick="window.setAppWeightUnit('kg')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weightUnit === 'kg' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Kilograms (kg)
+                ${trHtml("Kilograms (kg)")}
               </button>
               <button 
                 type="button"
                 onclick="window.setAppWeightUnit('lb')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weightUnit === 'lb' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Pounds (lb)
+                ${trHtml("Pounds (lb)")}
               </button>
             </div>
           </div>
@@ -116,8 +117,8 @@ export function renderAppSettingsScreen(): string {
           <!-- Food Mass Unit -->
           <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
-              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">Food Portion Mass</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Grams vs Ounces</span>
+              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Food Portion Mass")}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Grams vs Ounces")}</span>
             </div>
 
             <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
@@ -126,14 +127,14 @@ export function renderAppSettingsScreen(): string {
                 onclick="window.setAppMassUnit('g')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredMassUnit === 'g' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Grams (g)
+                ${trHtml("Grams (g)")}
               </button>
               <button 
                 type="button"
                 onclick="window.setAppMassUnit('oz')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredMassUnit === 'oz' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Ounces (oz)
+                ${trHtml("Ounces (oz)")}
               </button>
             </div>
           </div>
@@ -141,8 +142,8 @@ export function renderAppSettingsScreen(): string {
           <!-- Food Volume Unit -->
           <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
-              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">Food Portion Volume</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Milliliters vs Cups</span>
+              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Food Portion Volume")}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Milliliters vs Cups")}</span>
             </div>
 
             <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
@@ -151,14 +152,14 @@ export function renderAppSettingsScreen(): string {
                 onclick="window.setAppVolumeUnit('ml')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredVolumeUnit === 'ml' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Milliliters (ml)
+                ${trHtml("Milliliters (ml)")}
               </button>
               <button 
                 type="button"
                 onclick="window.setAppVolumeUnit('cup')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredVolumeUnit === 'cup' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Cups
+                ${trHtml("Cups")}
               </button>
             </div>
           </div>
@@ -168,14 +169,14 @@ export function renderAppSettingsScreen(): string {
         <!-- Regional & Calendar Settings Card -->
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3.5">
           <span class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-            Regional &amp; Calendar
+            ${trHtml("Regional & Calendar")}
           </span>
 
           <!-- Week Starts On -->
           <div class="flex items-center justify-between py-1">
             <div>
-              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">Week Starts On</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Diary weekly strip anchor</span>
+              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Week Starts On")}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Diary weekly strip anchor")}</span>
             </div>
 
             <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
@@ -184,14 +185,14 @@ export function renderAppSettingsScreen(): string {
                 onclick="window.setAppWeekStart('monday')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weekStart === 'monday' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Monday
+                ${trHtml("Monday")}
               </button>
               <button 
                 type="button"
                 onclick="window.setAppWeekStart('sunday')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weekStart === 'sunday' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
-                Sunday
+                ${trHtml("Sunday")}
               </button>
             </div>
           </div>
@@ -199,8 +200,8 @@ export function renderAppSettingsScreen(): string {
           <!-- Language Selector -->
           <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
-              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">Interface Language</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Current active language</span>
+              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Interface Language")}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Current active language")}</span>
             </div>
 
             <select 
@@ -208,8 +209,8 @@ export function renderAppSettingsScreen(): string {
               onchange="window.setAppLanguage(this.value)"
               class="px-3 py-1.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs font-bold text-on-surface dark:text-white focus:outline-none"
             >
-              <option value="en" ${prefs.language === 'en' ? 'selected' : ''}>English (Active)</option>
-              <option value="th" disabled>ภาษาไทย (Coming soon)</option>
+              <option value="en" ${prefs.language === 'en' ? 'selected' : ''}>${trHtml("English")}</option>
+              <option value="th" ${prefs.language === 'th' ? 'selected' : ''}>${trHtml("Thai")}</option>
             </select>
           </div>
 
@@ -218,14 +219,14 @@ export function renderAppSettingsScreen(): string {
         <!-- Accessibility & System Behavior Card -->
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3.5">
           <span class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-            Accessibility &amp; Device
+            ${trHtml("Accessibility & Device")}
           </span>
 
           <!-- Reduce Motion -->
           <div class="flex items-center justify-between py-1">
             <div>
-              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">Reduce Motion</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Minimize transitional animations</span>
+              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Reduce Motion")}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Minimize transitional animations")}</span>
             </div>
 
             <button 
@@ -240,8 +241,8 @@ export function renderAppSettingsScreen(): string {
           <!-- Haptic Feedback -->
           <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
-              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">Haptic Feedback</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Tactile response on button actions</span>
+              <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Haptic Feedback")}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Tactile response on button actions")}</span>
             </div>
 
             <button 
@@ -262,7 +263,7 @@ export function renderAppSettingsScreen(): string {
             onclick="window.confirmResetPreferences()"
             class="w-full py-2.5 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:text-error dark:text-gray-400 text-xs font-bold hover:bg-error/5 transition-colors text-center"
           >
-            Reset Preferences to Default
+            ${trHtml("Reset Preferences to Default")}
           </button>
         </div>
 

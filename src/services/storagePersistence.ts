@@ -316,7 +316,7 @@ export function sanitizeUserPreferences(raw: any): UserPreferences {
     preferredMassUnit: ['g', 'oz'].includes(raw.preferredMassUnit) ? raw.preferredMassUnit : 'g',
     preferredVolumeUnit: ['ml', 'cup'].includes(raw.preferredVolumeUnit) ? raw.preferredVolumeUnit : 'ml',
     weekStart: ['monday', 'sunday'].includes(raw.weekStart) ? raw.weekStart : 'monday',
-    language: typeof raw.language === 'string' ? raw.language : 'en',
+    language: raw.language === 'th' ? 'th' : 'en',
     reduceMotion: typeof raw.reduceMotion === 'boolean' ? raw.reduceMotion : false,
     hapticFeedback: typeof raw.hapticFeedback === 'boolean' ? raw.hapticFeedback : true,
     marketingConsent: typeof raw.marketingConsent === 'boolean' ? raw.marketingConsent : false,

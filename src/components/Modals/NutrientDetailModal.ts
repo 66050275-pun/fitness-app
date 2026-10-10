@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Full-height / Slide-up Sheet: View All Nutrients Modal
@@ -60,12 +61,10 @@ export function renderNutrientDetailModal(): string {
                 <h2 id="nutrient-modal-title" class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">
                   ${escapeHtml(modalData.title)}
                 </h2>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wider uppercase border ${
-                  isDemo 
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wider uppercase border ${isDemo
                     ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30' 
-                    : 'bg-primary/10 text-primary dark:text-primary-container border-primary/20'
-                }">
-                  ${escapeHtml(modalData.sourceBadge)}
+                    : 'bg-primary/10 text-primary dark:text-primary-container border-primary/20'}">
+                  ${trHtml(modalData.sourceBadge)}
                 </span>
               </div>
               <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
@@ -76,7 +75,7 @@ export function renderNutrientDetailModal(): string {
             <button 
               type="button" 
               onclick="window.closeNutrientModal()" 
-              aria-label="Close Nutrients Sheet"
+              aria-label="${trHtml("Close Nutrients Sheet")}"
               class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
             >
               <span class="material-symbols-outlined text-[18px]">close</span>
@@ -87,7 +86,7 @@ export function renderNutrientDetailModal(): string {
           ${isDemo ? `
             <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2 text-[11px] text-amber-800 dark:text-amber-300">
               <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5">info</span>
-              <span>Sample nutrient data for UI preview. Analysis API is not connected yet.</span>
+              <span>${trHtml("Sample nutrient data for UI preview. Analysis API is not connected yet.")}</span>
             </div>
           ` : ''}
 
@@ -97,7 +96,7 @@ export function renderNutrientDetailModal(): string {
             <input 
               type="text" 
               id="nutrient-modal-search"
-              placeholder="Search vitamins, minerals, fiber..."
+              placeholder="${trHtml("Search vitamins, minerals, fiber...")}"
               oninput="window.filterNutrientList(this.value)"
               class="w-full pl-9 pr-8 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface dark:text-white placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary"
             />
@@ -114,7 +113,7 @@ export function renderNutrientDetailModal(): string {
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
             ${(['all', 'vitamins', 'minerals', 'other'] as const).map(cat => {
               const isActive = activeCategory === cat;
-              const label = cat === 'all' ? 'All' : cat === 'vitamins' ? 'Vitamins' : cat === 'minerals' ? 'Minerals' : 'Other Nutrients';
+              const label = cat === 'all' ? tr("All") : cat === 'vitamins' ? tr("Vitamins") : cat === 'minerals' ? tr("Minerals") : tr("Other Nutrients");
               return `
                 <button 
                   type="button"
@@ -140,39 +139,39 @@ export function renderNutrientDetailModal(): string {
             <section class="nutrient-section flex flex-col gap-2">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-                  Core Energy &amp; Macronutrients
+                  ${trHtml("Core Energy & Macronutrients")}
                 </span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Primary Fuel</span>
+                <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Primary Fuel")}</span>
               </div>
               <div class="grid grid-cols-4 gap-2">
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
-                  <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">Energy</span>
-                  <span class="font-heading font-extrabold text-sm text-primary dark:text-primary-container">${modalData.calories || 0} kcal</span>
+                  <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Energy")}</span>
+                  <span class="font-heading font-extrabold text-sm text-primary dark:text-primary-container">${modalData.calories || 0} ${trHtml("kcal")}</span>
                 </div>
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
-                  <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">Protein</span>
-                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.protein || 0}g</span>
+                  <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">${trHtml("Protein")}</span>
+                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.protein || 0}${trHtml("g")}</span>
                 </div>
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
-                  <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">Carbs</span>
-                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.carbs || 0}g</span>
+                  <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">${trHtml("Carbs")}</span>
+                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.carbs || 0}${trHtml("g")}</span>
                 </div>
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
-                  <span class="text-[10px] font-bold text-amber-500 block uppercase">Fat</span>
-                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.fat || 0}g</span>
+                  <span class="text-[10px] font-bold text-amber-500 block uppercase">${trHtml("Fat")}</span>
+                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.fat || 0}${trHtml("g")}</span>
                 </div>
               </div>
             </section>
           ` : ''}
 
           <!-- Vitamins Category -->
-          ${(activeCategory === 'all' || activeCategory === 'vitamins') ? renderNutrientCategoryBlock('Vitamins', vitamins) : ''}
+          ${(activeCategory === 'all' || activeCategory === 'vitamins') ? renderNutrientCategoryBlock(tr("Vitamins"), vitamins) : ''}
 
           <!-- Minerals Category -->
-          ${(activeCategory === 'all' || activeCategory === 'minerals') ? renderNutrientCategoryBlock('Minerals & Trace Elements', minerals) : ''}
+          ${(activeCategory === 'all' || activeCategory === 'minerals') ? renderNutrientCategoryBlock(tr("Minerals & Trace Elements"), minerals) : ''}
 
           <!-- Other Nutrients Category -->
-          ${(activeCategory === 'all' || activeCategory === 'other') ? renderNutrientCategoryBlock('Other Nutrients & Lipids', otherNutrients) : ''}
+          ${(activeCategory === 'all' || activeCategory === 'other') ? renderNutrientCategoryBlock(tr("Other Nutrients & Lipids"), otherNutrients) : ''}
 
           <!-- Unavailable Nutrients Collapsible -->
           ${renderUnavailableNutrientsBlock(profile)}
@@ -186,7 +185,7 @@ export function renderNutrientDetailModal(): string {
             onclick="window.closeNutrientModal()" 
             class="w-full py-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface dark:text-white font-heading font-bold text-xs border border-outline-variant/30 active:scale-95 transition-all shadow-sm"
           >
-            Done
+            ${trHtml("Done")}
           </button>
         </div>
 
@@ -205,7 +204,7 @@ function renderNutrientCategoryBlock(title: string, list: NutrientValue[]): stri
         <h3 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
           ${title} (${available.length})
         </h3>
-        <span class="text-[10px] text-on-surface-variant dark:text-gray-400">Per Serving</span>
+        <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Per Serving")}</span>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -217,8 +216,8 @@ function renderNutrientCategoryBlock(title: string, list: NutrientValue[]): stri
 
 function renderNutrientRow(item: NutrientValue): string {
   const config = getNutrientReference(item.key);
-  const safeName = escapeHtml(item.name);
-  const amountStr = item.amount !== null ? `${item.amount} ${item.unit}` : 'Not available';
+  const safeName = trHtml(item.name);
+  const amountStr = item.amount !== null ? `${item.amount} ${trHtml(item.unit)}` : tr("Not available");
   const dv = item.dailyValuePercent;
   const isMaxLimit = config?.direction === 'maximum_limit';
   const hasDV = config?.hasDailyValuePercent ?? (dv !== null && dv !== undefined);
@@ -230,9 +229,9 @@ function renderNutrientRow(item: NutrientValue): string {
   let statusBadgeHtml = '';
   if (isMaxLimit && dv !== null && dv !== undefined) {
     if (dv > 100) {
-      statusBadgeHtml = `<span class="px-1.5 py-0.2 rounded-full bg-error/10 text-error text-[9px] font-extrabold">Above Limit</span>`;
+      statusBadgeHtml = `<span class="px-1.5 py-0.2 rounded-full bg-error/10 text-error text-[9px] font-extrabold">${trHtml("Above Limit")}</span>`;
     } else if (dv >= 80) {
-      statusBadgeHtml = `<span class="px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] font-extrabold">Near Limit</span>`;
+      statusBadgeHtml = `<span class="px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] font-extrabold">${trHtml("Near Limit")}</span>`;
     }
   }
 
@@ -249,10 +248,10 @@ function renderNutrientRow(item: NutrientValue): string {
 
         <div class="text-right">
           ${hasDV && dv !== null && dv !== undefined ? `
-            <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white">${dv}% DV</span>
-            <span class="text-[9px] text-on-surface-variant dark:text-gray-400 block">${isMaxLimit ? 'Max Daily Ref' : 'Daily Value'}</span>
+            <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white">${dv}${trHtml("% DV")}</span>
+            <span class="text-[9px] text-on-surface-variant dark:text-gray-400 block">${isMaxLimit ? tr("Max Daily Ref") : tr("Daily Value")}</span>
           ` : `
-            <span class="text-[10px] text-on-surface-variant dark:text-gray-400 font-semibold italic">Informational</span>
+            <span class="text-[10px] text-on-surface-variant dark:text-gray-400 font-semibold italic">${trHtml("Informational")}</span>
           `}
         </div>
       </div>
@@ -265,18 +264,16 @@ function renderNutrientRow(item: NutrientValue): string {
           aria-valuenow="${dv}" 
           aria-valuemin="0" 
           aria-valuemax="100"
-          aria-label="${safeName} ${dv} percent of daily reference"
+          aria-label="${safeName} ${dv} ${trHtml("percent of daily reference")}"
         >
           <div 
-            class="h-full rounded-full transition-all duration-500 ${
-              isMaxLimit && dv > 100 
+            class="h-full rounded-full transition-all duration-500 ${isMaxLimit && dv > 100
                 ? 'bg-error' 
                 : isMaxLimit && dv >= 80 
                   ? 'bg-amber-500' 
                   : dv >= 100 
                     ? 'bg-gradient-to-r from-primary to-[#27C4B2]' 
-                    : 'bg-primary'
-            }"
+                    : 'bg-primary'}"
             style="width: ${progressWidth}%;"
           ></div>
         </div>
@@ -301,7 +298,7 @@ function renderUnavailableNutrientsBlock(profile: any): string {
       <summary class="p-3 cursor-pointer select-none text-[11px] font-bold text-on-surface-variant flex items-center justify-between hover:text-on-surface">
         <div class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[16px]">help_outline</span>
-          <span>Unavailable / Unreported Nutrients (${unavail.length})</span>
+          <span>${trHtml("Unavailable / Unreported Nutrients (")}${unavail.length})</span>
         </div>
         <span class="material-symbols-outlined text-[18px] group-open:rotate-180 transition-transform">expand_more</span>
       </summary>
@@ -309,7 +306,7 @@ function renderUnavailableNutrientsBlock(profile: any): string {
       <div class="px-3.5 pb-3 pt-1 flex flex-wrap gap-1.5 border-t border-outline-variant/20">
         ${unavail.map(n => `
           <span class="px-2 py-0.5 rounded-lg bg-surface-container dark:bg-dark-surface-card-high text-[10px] text-on-surface-variant font-medium">
-            ${escapeHtml(n.name)}: Not available
+            ${trHtml(n.name)}${trHtml(": Not available")}
           </span>
         `).join('')}
       </div>

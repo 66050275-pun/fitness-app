@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Activity Level Sub-Screen
@@ -70,12 +71,12 @@ export function renderActivityLevelScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Activity Level</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Activity Level")}</h1>
         </div>
 
         <button 
@@ -83,7 +84,7 @@ export function renderActivityLevelScreen(): string {
           onclick="window.saveActivityLevel()"
           class="text-xs font-bold text-white px-4 py-1.5 rounded-full bg-primary hover:brightness-105 active:scale-95 transition-all shadow-xs"
         >
-          Save
+          ${trHtml("Save")}
         </button>
       </header>
 
@@ -94,7 +95,7 @@ export function renderActivityLevelScreen(): string {
         <div class="p-3.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex items-start gap-3 shadow-ambient">
           <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">fitness_center</span>
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-            Choose the tier that best matches your typical weekly routine. Changing your activity level will calculate an estimated suggestion without altering your existing calorie target unless you choose to apply it.
+            ${trHtml("Choose the tier that best matches your typical weekly routine. Changing your activity level will calculate an estimated suggestion without altering your existing calorie target unless you choose to apply it.")}
           </p>
         </div>
 
@@ -108,33 +109,29 @@ export function renderActivityLevelScreen(): string {
               <div 
                 id="activity-card-${opt.level}"
                 onclick="window.selectActivityTier(${htmlJsArg(opt.level)}, ${suggestedTdee})"
-                class="p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 ${
-                  isSelected 
+                class="p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 ${isSelected
                     ? 'bg-primary/5 dark:bg-primary/10 border-primary ring-1 ring-primary/40 shadow-ambient' 
-                    : 'bg-surface-container-lowest dark:bg-dark-surface-card border-outline-variant/30 hover:border-primary/40'
-                }"
+                    : 'bg-surface-container-lowest dark:bg-dark-surface-card border-outline-variant/30 hover:border-primary/40'}"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${
-                      isSelected ? 'bg-primary text-white' : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant'
-                    }">
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${isSelected ? 'bg-primary text-white' : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant'}">
                       <span class="material-symbols-outlined text-[16px]">
                         ${isSelected ? 'check' : 'radio_button_unchecked'}
                       </span>
                     </div>
                     <span class="font-heading font-bold text-sm text-on-surface dark:text-white">
-                      ${opt.title}
+                      ${trHtml(opt.title)}
                     </span>
                   </div>
 
                   <span class="text-[11px] font-mono font-bold text-on-surface-variant dark:text-gray-400">
-                    ~${suggestedTdee} kcal
+                    ~${suggestedTdee} ${trHtml("kcal")}
                   </span>
                 </div>
 
                 <p class="text-xs text-on-surface-variant dark:text-gray-300 pl-9 leading-relaxed">
-                  ${opt.description}
+                  ${trHtml(opt.description)}
                 </p>
               </div>
             `;
@@ -147,10 +144,10 @@ export function renderActivityLevelScreen(): string {
             <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">lightbulb</span>
             <div>
               <span class="font-heading font-bold text-xs text-on-surface dark:text-white block">
-                Update Daily Calorie Target?
+                ${trHtml("Update Daily Calorie Target?")}
               </span>
               <p class="text-xs text-on-surface-variant dark:text-gray-300 mt-0.5 leading-relaxed" id="activity-suggestion-text">
-                Your current daily goal is <strong>${currentTarget} kcal</strong>. Would you like to recalibrate it to the suggested amount?
+                ${trHtml("Your current daily goal is")} <strong>${currentTarget} ${trHtml("kcal")}</strong>${trHtml(". Would you like to recalibrate it to the suggested amount?")}
               </p>
             </div>
           </div>
@@ -161,7 +158,7 @@ export function renderActivityLevelScreen(): string {
               onclick="window.dismissActivitySuggestion()"
               class="px-3 py-1.5 rounded-xl border border-outline-variant/30 text-xs font-semibold text-on-surface-variant hover:bg-surface-container"
             >
-              Keep Current (${currentTarget} kcal)
+              ${trHtml("Keep Current (")}${currentTarget} ${trHtml("kcal)")}
             </button>
             <button 
               type="button"
@@ -169,7 +166,7 @@ export function renderActivityLevelScreen(): string {
               onclick="window.applySuggestedCalorieTarget()"
               class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold shadow-xs active:scale-95 transition-all"
             >
-              Apply Suggestion
+              ${trHtml("Apply Suggestion")}
             </button>
           </div>
         </div>
@@ -180,7 +177,7 @@ export function renderActivityLevelScreen(): string {
           onclick="window.saveActivityLevel()"
           class="w-full py-3 rounded-xl bg-primary text-white text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all text-center mt-1"
         >
-          Confirm Activity Level
+          ${trHtml("Confirm Activity Level")}
         </button>
 
       </main>

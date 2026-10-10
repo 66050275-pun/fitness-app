@@ -1,3 +1,4 @@
+import { tr } from '../i18n/index.ts';
 /**
  * Goal Calculations — BMR, TDEE, and Macro Targets
  *
@@ -45,11 +46,11 @@ export const CALORIE_REVIEW_THRESHOLDS = {
 // ─── Activity Multipliers ─────────────────────────────────────────────────────
 // Central configuration — imported by onboarding and profile screens.
 export const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, { factor: number; label: string; description: string }> = {
-  sedentary:    { factor: 1.2,   label: 'Sedentary',        description: 'Little or no regular exercise' },
-  light:        { factor: 1.375, label: 'Lightly Active',   description: 'Light exercise 1–3 days per week' },
-  moderate:     { factor: 1.55,  label: 'Moderately Active', description: 'Moderate exercise 3–5 days per week' },
-  very_active:  { factor: 1.725, label: 'Very Active',      description: 'Hard exercise 6–7 days per week' },
-  athlete:      { factor: 1.9,   label: 'Highly Active',    description: 'Very hard exercise or physical job' }
+  sedentary:    { factor: 1.2,   get label() { return tr("Sedentary"); },        get description() { return tr("Little or no regular exercise"); } },
+  light:        { factor: 1.375, get label() { return tr("Lightly Active"); },   get description() { return tr("Light exercise 1\u20133 days per week"); } },
+  moderate:     { factor: 1.55,  get label() { return tr("Moderately Active"); }, get description() { return tr("Moderate exercise 3\u20135 days per week"); } },
+  very_active:  { factor: 1.725, get label() { return tr("Very Active"); },      get description() { return tr("Hard exercise 6\u20137 days per week"); } },
+  athlete:      { factor: 1.9,   get label() { return tr("Highly Active"); },    get description() { return tr("Very hard exercise or physical job"); } }
 } as const;
 
 // ─── Weight Rate Constants ────────────────────────────────────────────────────
@@ -101,29 +102,29 @@ export function validateGoalCalculationInput(input: Partial<GoalCalculationInput
   const errors: ValidationError[] = [];
 
   if (input.weightKg === undefined || input.weightKg === null) {
-    errors.push({ field: 'weightKg', message: 'Current weight is required' });
+    errors.push({ field: 'weightKg', message: tr("Current weight is required") });
   } else if (input.weightKg < CALORIE_REVIEW_THRESHOLDS.weightKg.min || input.weightKg > CALORIE_REVIEW_THRESHOLDS.weightKg.max) {
-    errors.push({ field: 'weightKg', message: `Weight should be between ${CALORIE_REVIEW_THRESHOLDS.weightKg.min} and ${CALORIE_REVIEW_THRESHOLDS.weightKg.max} kg` });
+    errors.push({ field: 'weightKg', message: tr("Weight should be between {0} and {1} kg", CALORIE_REVIEW_THRESHOLDS.weightKg.min, CALORIE_REVIEW_THRESHOLDS.weightKg.max) });
   }
 
   if (input.heightCm === undefined || input.heightCm === null) {
-    errors.push({ field: 'heightCm', message: 'Height is required' });
+    errors.push({ field: 'heightCm', message: tr("Height is required") });
   } else if (input.heightCm < CALORIE_REVIEW_THRESHOLDS.heightCm.min || input.heightCm > CALORIE_REVIEW_THRESHOLDS.heightCm.max) {
-    errors.push({ field: 'heightCm', message: `Height should be between ${CALORIE_REVIEW_THRESHOLDS.heightCm.min} and ${CALORIE_REVIEW_THRESHOLDS.heightCm.max} cm` });
+    errors.push({ field: 'heightCm', message: tr("Height should be between {0} and {1} cm", CALORIE_REVIEW_THRESHOLDS.heightCm.min, CALORIE_REVIEW_THRESHOLDS.heightCm.max) });
   }
 
   if (input.ageYears === undefined || input.ageYears === null) {
-    errors.push({ field: 'ageYears', message: 'Age is required for automatic calorie estimation' });
+    errors.push({ field: 'ageYears', message: tr("Age is required for automatic calorie estimation") });
   } else if (input.ageYears < CALORIE_REVIEW_THRESHOLDS.ageYears.min || input.ageYears > CALORIE_REVIEW_THRESHOLDS.ageYears.max) {
-    errors.push({ field: 'ageYears', message: `Age should be between ${CALORIE_REVIEW_THRESHOLDS.ageYears.min} and ${CALORIE_REVIEW_THRESHOLDS.ageYears.max} years` });
+    errors.push({ field: 'ageYears', message: tr("Age should be between {0} and {1} years", CALORIE_REVIEW_THRESHOLDS.ageYears.min, CALORIE_REVIEW_THRESHOLDS.ageYears.max) });
   }
 
   if (input.calculationSex === null || input.calculationSex === undefined) {
-    errors.push({ field: 'calculationSex', message: 'Biological sex is required for Mifflin–St Jeor estimation. You can set a manual calorie target instead.' });
+    errors.push({ field: 'calculationSex', message: tr("Biological sex is required for Mifflin–St Jeor estimation. You can set a manual calorie target instead.") });
   }
 
   if (!input.activityLevel) {
-    errors.push({ field: 'activityLevel', message: 'Activity level is required' });
+    errors.push({ field: 'activityLevel', message: tr("Activity level is required") });
   }
 
   return errors;

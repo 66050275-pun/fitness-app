@@ -143,6 +143,8 @@ body { background: var(--ui-panel); color: var(--ui-text); }
 .vault-brand div > span { color: var(--ui-muted); font: 500 11px Inter,sans-serif; letter-spacing: 0.02em; }
 .vault-card, .vault-help-card, .vault-restore-card, .workout-muscle-map { background: var(--ui-card); border: 1px solid var(--ui-border); border-radius: var(--ui-radius); box-shadow: var(--ui-shadow); }
 .vault-card { padding: 22px 20px; }
+.vault-language { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+.vault-language select { width: auto; min-height: 40px; padding: 7px 12px; font-size: 13px; }
 .vault-heading-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; }
 .vault-feature-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--ui-primary-soft); color: var(--ui-primary); display: grid; place-items: center; }
 .vault-badge { color: var(--ui-primary-label); background: var(--ui-primary-soft); padding: 5px 10px; border-radius: 999px; font-size: 10px; font-weight: 600; }

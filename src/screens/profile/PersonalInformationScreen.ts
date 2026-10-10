@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 /**
  * Personal Information Sub-Screen
  * 
@@ -59,12 +60,12 @@ export function renderPersonalInformationScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Personal Information</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Personal Information")}</h1>
         </div>
 
         <button 
@@ -72,7 +73,7 @@ export function renderPersonalInformationScreen(): string {
           form="personal-info-form"
           class="text-xs font-bold text-white px-4 py-1.5 rounded-full bg-primary hover:brightness-105 active:scale-95 transition-all shadow-xs"
         >
-          Save
+          ${trHtml("Save")}
         </button>
       </header>
 
@@ -83,7 +84,7 @@ export function renderPersonalInformationScreen(): string {
         <div class="p-3.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex items-start gap-3 shadow-ambient">
           <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">info</span>
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-            Height, weight, and biological sex help NutriAI compute accurate daily metabolic targets. This information is stored only on your device and is not used for medical diagnosis.
+            ${trHtml("Height, weight, and biological sex help NutriAI compute accurate daily metabolic targets. This information is stored only on your device and is not used for medical diagnosis.")}
           </p>
         </div>
 
@@ -95,13 +96,13 @@ export function renderPersonalInformationScreen(): string {
             <!-- Display Name -->
             <div>
               <label for="profile-name-input" class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1.5">
-                Display Name
+                ${trHtml("Display Name")}
               </label>
               <input 
                 type="text" 
                 id="profile-name-input"
                 value="${escapeHtml(displayName)}"
-                placeholder="e.g. Alex"
+                placeholder="${trHtml("e.g. Alex")}"
                 maxlength="50"
                 required
                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-sm font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
@@ -112,9 +113,9 @@ export function renderPersonalInformationScreen(): string {
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <label for="profile-dob-input" class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-                  Date of Birth
+                  ${trHtml("Date of Birth")}
                 </label>
-                <span class="text-[10px] text-on-surface-variant/70 dark:text-gray-500">Optional</span>
+                <span class="text-[10px] text-on-surface-variant/70 dark:text-gray-500">${trHtml("Optional")}</span>
               </div>
               <input 
                 type="date" 
@@ -129,16 +130,16 @@ export function renderPersonalInformationScreen(): string {
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <label class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-                  Biological Sex
+                  ${trHtml("Biological Sex")}
                 </label>
-                <span class="text-[10px] text-on-surface-variant/70 dark:text-gray-500">Optional</span>
+                <span class="text-[10px] text-on-surface-variant/70 dark:text-gray-500">${trHtml("Optional")}</span>
               </div>
               <div class="grid grid-cols-2 gap-2">
                 ${[
-                  { value: 'female', label: 'Female' },
-                  { value: 'male', label: 'Male' },
-                  { value: 'other', label: 'Other' },
-                  { value: 'prefer_not_to_say', label: 'Prefer not to say' }
+                  { value: 'female', label: tr("Female") },
+                  { value: 'male', label: tr("Male") },
+                  { value: 'other', label: tr("Other") },
+                  { value: 'prefer_not_to_say', label: tr("Prefer not to say") }
                 ].map(opt => `
                   <label class="flex items-center gap-2 p-2.5 rounded-xl border transition-all cursor-pointer ${
                     sex === opt.value 
@@ -167,7 +168,7 @@ export function renderPersonalInformationScreen(): string {
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <label class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-                  Height
+                  ${trHtml("Height")}
                 </label>
                 <div class="flex rounded-lg bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
                   <button 
@@ -175,14 +176,14 @@ export function renderPersonalInformationScreen(): string {
                     onclick="window.setPersonalHeightUnit('cm')"
                     class="px-2 py-1 rounded-md text-[10px] font-bold transition-all ${heightUnit === 'cm' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
                   >
-                    cm
+                    ${trHtml("cm")}
                   </button>
                   <button 
                     type="button"
                     onclick="window.setPersonalHeightUnit('ft_in')"
                     class="px-2 py-1 rounded-md text-[10px] font-bold transition-all ${heightUnit === 'ft_in' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
                   >
-                    ft / in
+                    ${trHtml("ft / in")}
                   </button>
                 </div>
               </div>
@@ -195,10 +196,10 @@ export function renderPersonalInformationScreen(): string {
                     value="${escapeHtml(heightDisplayCm)}"
                     min="50" 
                     max="280"
-                    placeholder="e.g. 175"
+                    placeholder="${trHtml("e.g. 175")}"
                     class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                   />
-                  <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">cm</span>
+                  <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">${trHtml("cm")}</span>
                 </div>
               ` : `
                 <div class="grid grid-cols-2 gap-2">
@@ -212,7 +213,7 @@ export function renderPersonalInformationScreen(): string {
                       placeholder="5"
                       class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                     />
-                    <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">ft</span>
+                    <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">${trHtml("ft")}</span>
                   </div>
                   <div class="relative">
                     <input 
@@ -224,7 +225,7 @@ export function renderPersonalInformationScreen(): string {
                       placeholder="9"
                       class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                     />
-                    <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">in</span>
+                    <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">${trHtml("in")}</span>
                   </div>
                 </div>
               `}
@@ -234,7 +235,7 @@ export function renderPersonalInformationScreen(): string {
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <label for="profile-weight-input" class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-                  Current Weight
+                  ${trHtml("Current Weight")}
                 </label>
                 <div class="flex rounded-lg bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
                   <button 
@@ -242,14 +243,14 @@ export function renderPersonalInformationScreen(): string {
                     onclick="window.setPersonalWeightUnit('kg')"
                     class="px-2 py-1 rounded-md text-[10px] font-bold transition-all ${weightUnit === 'kg' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
                   >
-                    kg
+                    ${trHtml("kg")}
                   </button>
                   <button 
                     type="button"
                     onclick="window.setPersonalWeightUnit('lb')"
                     class="px-2 py-1 rounded-md text-[10px] font-bold transition-all ${weightUnit === 'lb' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
                   >
-                    lb
+                    ${trHtml("lb")}
                   </button>
                 </div>
               </div>
@@ -262,7 +263,7 @@ export function renderPersonalInformationScreen(): string {
                   max="500"
                   id="profile-weight-input"
                   value="${escapeHtml(weightDisplay)}"
-                  placeholder="e.g. 70.0"
+                  placeholder="${trHtml("e.g. 70.0")}"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
                 <span class="absolute right-3.5 top-2.5 text-xs text-on-surface-variant dark:text-gray-400 font-bold">${weightUnit}</span>
@@ -272,11 +273,11 @@ export function renderPersonalInformationScreen(): string {
             <!-- Timezone -->
             <div class="pt-1 border-t border-outline-variant/20">
               <label class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1">
-                Device Timezone
+                ${trHtml("Device Timezone")}
               </label>
               <div class="px-3.5 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface-variant dark:text-gray-400 font-mono flex items-center justify-between">
                 <span>${escapeHtml(timezone)}</span>
-                <span class="text-[10px] text-primary dark:text-primary-container font-semibold">Auto-detected</span>
+                <span class="text-[10px] text-primary dark:text-primary-container font-semibold">${trHtml("Auto-detected")}</span>
               </div>
             </div>
 
@@ -287,7 +288,7 @@ export function renderPersonalInformationScreen(): string {
             type="submit" 
             class="w-full py-3 rounded-xl bg-primary text-white text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all text-center mt-1"
           >
-            Save Profile Information
+            ${trHtml("Save Profile Information")}
           </button>
 
         </form>

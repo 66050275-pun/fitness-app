@@ -1,3 +1,4 @@
+import { tr } from '../../i18n/index.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
 /**
  * Profile Menu Row Component
@@ -26,7 +27,7 @@ export function renderProfileMenuRow(item: ProfileMenuItem): string {
   } = item;
 
   const chevronIcon = external ? 'north_east' : 'chevron_right';
-  const ariaLabel = `${escapeHtml(label)}${status ? ` (${status})` : ''}${disabled ? ' (Disabled)' : ''}${external ? ' (Opens external link)' : ''}`;
+  const ariaLabel = `${escapeHtml(label)}${status ? ` (${status})` : ''}${disabled ? tr("(Disabled)") : ''}${external ? tr("(Opens external link)") : ''}`;
 
   return `
     <button

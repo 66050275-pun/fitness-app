@@ -1,3 +1,4 @@
+import { tr, trHtml, getLocale } from '../../i18n/index.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
  * Diary Calendar Date Picker Modal (Bottom Sheet)
@@ -41,7 +42,7 @@ export function renderDiaryCalendarModal(): string {
   const mode = state.calendarPickerMode || 'days';
   const todayKey = getTodayKey();
 
-  const monthName = MONTH_NAMES[viewMonth - 1] || 'Month';
+  const monthName = tr(MONTH_NAMES[viewMonth - 1] || "Month");
   const draftFriendly = formatDiaryDate(draftDateKey);
 
   // Generate Year range (e.g. currentYear - 10 to currentYear + 1)
@@ -73,7 +74,7 @@ export function renderDiaryCalendarModal(): string {
         <div class="px-5 py-3 flex items-center justify-between border-b border-outline-variant/20 shrink-0">
           <div>
             <h2 id="calendar-modal-title" class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight">
-              Choose Diary Date
+              ${trHtml("Choose Diary Date")}
             </h2>
             <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
               ${draftFriendly}
@@ -86,12 +87,12 @@ export function renderDiaryCalendarModal(): string {
               onclick="window.goToToday()"
               class="px-2.5 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary dark:text-primary-container text-[11px] font-bold transition-all"
             >
-              Today
+              ${trHtml("Today")}
             </button>
             <button 
               type="button" 
               onclick="window.closeDiaryCalendar()"
-              aria-label="Close calendar"
+              aria-label="${trHtml("Close calendar")}"
               class="w-8 h-8 rounded-full bg-surface-container dark:bg-dark-surface-card-high text-on-surface-variant dark:text-gray-300 hover:text-on-surface flex items-center justify-center transition-colors"
             >
               <span class="material-symbols-outlined text-[18px]">close</span>
@@ -106,7 +107,7 @@ export function renderDiaryCalendarModal(): string {
             type="button" 
             onclick="window.setCalendarPickerMode(${htmlJsArg(mode === 'days' ? 'monthYear' : 'days')})"
             class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-xs font-bold text-on-surface dark:text-white hover:border-primary transition-all"
-            aria-label="${mode === 'days' ? 'Switch to month and year picker' : 'Switch to days view'}"
+            aria-label="${mode === 'days' ? tr("Switch to month and year picker") : tr("Switch to days view")}"
           >
             <span>${monthName} ${viewYear}</span>
             <span class="material-symbols-outlined text-[16px] text-primary transition-transform duration-200 ${mode === 'monthYear' ? 'rotate-180' : ''}">
@@ -119,7 +120,7 @@ export function renderDiaryCalendarModal(): string {
             <button 
               type="button" 
               onclick="window.changeCalendarMonth(-1)"
-              aria-label="Previous month"
+              aria-label="${trHtml("Previous month")}"
               class="w-8 h-8 rounded-lg bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-on-surface dark:text-white hover:bg-surface-container flex items-center justify-center active:scale-95 transition-all"
             >
               <span class="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -127,7 +128,7 @@ export function renderDiaryCalendarModal(): string {
             <button 
               type="button" 
               onclick="window.changeCalendarMonth(1)"
-              aria-label="Next month"
+              aria-label="${trHtml("Next month")}"
               class="w-8 h-8 rounded-lg bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-on-surface dark:text-white hover:bg-surface-container flex items-center justify-center active:scale-95 transition-all"
             >
               <span class="material-symbols-outlined text-[18px]">chevron_right</span>
@@ -143,7 +144,7 @@ export function renderDiaryCalendarModal(): string {
               <!-- Year horizontal scroll pills -->
               <div>
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 block mb-1.5">
-                  Select Year
+                  ${trHtml("Select Year")}
                 </span>
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
                   ${yearsList.map(yr => `
@@ -165,7 +166,7 @@ export function renderDiaryCalendarModal(): string {
               <!-- 12 Months Grid -->
               <div>
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 block mb-1.5">
-                  Select Month
+                  ${trHtml("Select Month")}
                 </span>
                 <div class="grid grid-cols-3 gap-2">
                   ${MONTH_SHORT.map((mShort, idx) => {
@@ -181,7 +182,7 @@ export function renderDiaryCalendarModal(): string {
                             : 'bg-surface-container-low dark:bg-dark-surface-card-high border-outline-variant/30 text-on-surface dark:text-white hover:border-primary'
                         }"
                       >
-                        ${mShort}
+                        ${trHtml(mShort)}
                       </button>
                     `;
                   }).join('')}
@@ -195,7 +196,7 @@ export function renderDiaryCalendarModal(): string {
               <div class="grid grid-cols-7 gap-1 text-center mb-1">
                 ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(w => `
                   <span class="text-[10px] font-extrabold text-on-surface-variant dark:text-gray-400 uppercase tracking-wider py-1">
-                    ${w}
+                    ${trHtml(w)}
                   </span>
                 `).join('')}
               </div>
@@ -218,7 +219,7 @@ export function renderDiaryCalendarModal(): string {
 
                     // Format accessible label
                     const cellDate = parseLocalDateKey(cell.dateKey);
-                    const cellReadable = cellDate.toLocaleDateString('en-US', {
+                    const cellReadable = cellDate.toLocaleDateString(getLocale(), {
                       weekday: 'long',
                       month: 'long',
                       day: 'numeric',
@@ -230,7 +231,7 @@ export function renderDiaryCalendarModal(): string {
                         type="button" 
                         onclick="window.setDiaryCalendarDraftDate(${htmlJsArg(cell.dateKey)})"
                         ondblclick="window.applyDiaryCalendarDate('${cell.dateKey}')"
-                        aria-label="${cellReadable}${isCellToday ? ' (Today)' : ''}${isDraftSelected ? ' (Selected)' : ''}"
+                        aria-label="${cellReadable}${isCellToday ? tr("(Today)") : ''}${isDraftSelected ? tr("(Selected)") : ''}"
                         class="h-10 rounded-xl flex flex-col items-center justify-center relative transition-all text-xs font-semibold ${btnClass}"
                       >
                         <span>${cell.dayNum}</span>
@@ -259,7 +260,7 @@ export function renderDiaryCalendarModal(): string {
             onclick="window.closeDiaryCalendar()"
             class="px-4 py-2.5 rounded-xl border border-outline-variant/40 text-on-surface dark:text-gray-300 hover:bg-surface-container text-xs font-bold transition-colors"
           >
-            Cancel
+            ${trHtml("Cancel")}
           </button>
 
           <button 
@@ -267,7 +268,7 @@ export function renderDiaryCalendarModal(): string {
             onclick="window.applyDiaryCalendarDate()"
             class="flex-1 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all text-center"
           >
-            Apply Date
+            ${trHtml("Apply Date")}
           </button>
         </div>
       </div>

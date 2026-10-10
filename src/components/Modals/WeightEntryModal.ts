@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 /**
  * Weight Entry Modal (Add / Edit)
  * 
@@ -59,17 +60,17 @@ export function renderWeightEntryModal(): string {
         <div class="px-5 py-3 flex items-center justify-between border-b border-outline-variant/20 shrink-0">
           <div>
             <h2 id="weight-modal-title" class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight">
-              ${isEditing ? 'Edit Weight Entry' : 'Log Weight'}
+              ${isEditing ? tr("Edit Weight Entry") : tr("Log Weight")}
             </h2>
             <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
-              ${isEditing ? 'Update recorded measurement' : 'Record current body weight'}
+              ${isEditing ? tr("Update recorded measurement") : tr("Record current body weight")}
             </p>
           </div>
 
           <button 
             type="button" 
             onclick="window.closeWeightModal()"
-            aria-label="Close modal"
+            aria-label="${trHtml("Close modal")}"
             class="w-8 h-8 rounded-full bg-surface-container dark:bg-dark-surface-card-high text-on-surface-variant dark:text-gray-300 hover:text-on-surface flex items-center justify-center transition-colors"
           >
             <span class="material-symbols-outlined text-[18px]">close</span>
@@ -85,7 +86,7 @@ export function renderWeightEntryModal(): string {
           <!-- Weight Input + Unit Toggle -->
           <div>
             <label for="weight-input-value" class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1.5">
-              Weight
+              ${trHtml("Weight")}
             </label>
             <div class="flex items-center gap-2">
               <div class="relative flex-1">
@@ -97,7 +98,7 @@ export function renderWeightEntryModal(): string {
                   id="weight-input-value"
                   required
                   value="${escapeHtml(initialDisplayWeight)}"
-                  placeholder="e.g. 70.5"
+                  placeholder="${trHtml("e.g. 70.5")}"
                   class="w-full px-4 py-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-base font-heading font-extrabold text-on-surface dark:text-white focus:border-primary focus:outline-none"
                 />
               </div>
@@ -110,7 +111,7 @@ export function renderWeightEntryModal(): string {
                   onclick="window.setWeightModalUnit('kg')"
                   class="px-3 py-2 rounded-lg text-xs font-bold transition-all ${userUnit === 'kg' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}"
                 >
-                  kg
+                  ${trHtml("kg")}
                 </button>
                 <button 
                   type="button"
@@ -118,7 +119,7 @@ export function renderWeightEntryModal(): string {
                   onclick="window.setWeightModalUnit('lb')"
                   class="px-3 py-2 rounded-lg text-xs font-bold transition-all ${userUnit === 'lb' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}"
                 >
-                  lb
+                  ${trHtml("lb")}
                 </button>
               </div>
               <input type="hidden" id="weight-input-unit" value="${escapeHtml(userUnit)}" />
@@ -129,7 +130,7 @@ export function renderWeightEntryModal(): string {
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label for="weight-input-date" class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1">
-                Date
+                ${trHtml("Date")}
               </label>
               <input 
                 type="date" 
@@ -142,7 +143,7 @@ export function renderWeightEntryModal(): string {
 
             <div>
               <label for="weight-input-time" class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1">
-                Time
+                ${trHtml("Time")}
               </label>
               <input 
                 type="time" 
@@ -157,14 +158,14 @@ export function renderWeightEntryModal(): string {
           <!-- Optional Note -->
           <div>
             <label for="weight-input-note" class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1">
-              Note (Optional)
+              ${trHtml("Note (Optional)")}
             </label>
             <input 
               type="text" 
               id="weight-input-note"
               maxlength="100"
               value="${escapeHtml(initialNote)}"
-              placeholder="e.g. Morning fasted, post-workout"
+              placeholder="${trHtml("e.g. Morning fasted, post-workout")}"
               class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs text-on-surface dark:text-white focus:border-primary focus:outline-none"
             />
           </div>
@@ -176,14 +177,14 @@ export function renderWeightEntryModal(): string {
               onclick="window.closeWeightModal()"
               class="px-4 py-2.5 rounded-xl border border-outline-variant/40 text-xs font-bold text-on-surface dark:text-gray-300 hover:bg-surface-container transition-colors"
             >
-              Cancel
+              ${trHtml("Cancel")}
             </button>
 
             <button 
               type="submit" 
               class="flex-1 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all text-center"
             >
-              ${isEditing ? 'Save Changes' : 'Log Weight'}
+              ${isEditing ? tr("Save Changes") : tr("Log Weight")}
             </button>
           </div>
 

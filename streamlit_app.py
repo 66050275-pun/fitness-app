@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import hashlib
 import re
 import subprocess
 import tempfile
@@ -22,20 +23,35 @@ st.set_page_config(
 )
 
 
-@st.cache_resource(show_spinner="Preparing the NutriAI mobile preview…")
-def prepare_frontend() -> str:
-    """Install and build the Vite app once when Streamlit starts."""
+def fingerprint(paths: list[Path]) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(paths):
+        if path.is_file():
+            digest.update(path.relative_to(ROOT).as_posix().encode())
+            digest.update(b"\0")
+            digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+@st.cache_resource(show_spinner="NutriAI")
+def prepare_frontend(source_signature: str, dependency_signature: str) -> str:
+    """Rebuild when frontend sources change; reuse dependencies when their lockfile matches."""
     index_file = DIST / "index.html"
-    if not index_file.is_file():
+    build_stamp = DIST / ".nutriai-build-signature"
+    dependency_stamp = ROOT / "node_modules" / ".nutriai-dependency-signature"
+    if not index_file.is_file() or not build_stamp.is_file() or build_stamp.read_text() != source_signature:
         npm_env = os.environ.copy()
         npm_env["npm_config_cache"] = str(Path(tempfile.gettempdir()) / "nutriai-npm-cache")
-        subprocess.run(
-            ["npm", "ci", "--no-audit", "--no-fund"],
-            cwd=ROOT,
-            env=npm_env,
-            check=True,
-        )
+        if not dependency_stamp.is_file() or dependency_stamp.read_text() != dependency_signature:
+            subprocess.run(
+                ["npm", "ci", "--no-audit", "--no-fund"],
+                cwd=ROOT,
+                env=npm_env,
+                check=True,
+            )
+            dependency_stamp.write_text(dependency_signature)
         subprocess.run(["npm", "run", "build"], cwd=ROOT, check=True)
+        build_stamp.write_text(source_signature)
 
     if not index_file.is_file():
         raise FileNotFoundError("Vite did not create dist/index.html")
@@ -44,7 +60,7 @@ def prepare_frontend() -> str:
 
 
 @st.cache_data(show_spinner=False)
-def load_frontend_html(frontend_path: str) -> str:
+def load_frontend_html(frontend_path: str, source_signature: str) -> str:
     """Inline the Vite output so Streamlit does not expect component handshakes."""
     assets = Path(frontend_path) / "assets"
     javascript_files = sorted(assets.glob("*.js"))
@@ -96,11 +112,17 @@ st.markdown(
 )
 
 try:
-    frontend_path = prepare_frontend()
-    frontend_html = load_frontend_html(frontend_path)
+    frontend_files = [ROOT / name for name in (
+        "package.json", "package-lock.json", "index.html", "tsconfig.json",
+        "vite.config.ts", "tailwind.config.js", "postcss.config.js",
+    )] + list((ROOT / "src").rglob("*"))
+    source_signature = fingerprint(frontend_files)
+    dependency_signature = fingerprint([ROOT / "package.json", ROOT / "package-lock.json"])
+    frontend_path = prepare_frontend(source_signature, dependency_signature)
+    frontend_html = load_frontend_html(frontend_path, source_signature)
 except (FileNotFoundError, RuntimeError, subprocess.CalledProcessError) as exc:
     st.error("NutriAI could not prepare its web files. Check the app logs and try again.")
     st.exception(exc)
     st.stop()
 
-st.iframe(frontend_html, height=900, alt="NutriAI mobile app preview")
+st.iframe(frontend_html, height=900, alt="NutriAI")

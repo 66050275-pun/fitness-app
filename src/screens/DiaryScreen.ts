@@ -1,3 +1,5 @@
+import { mealLabel, mealDescription, portionLabel } from '../i18n/foodLabels.ts';
+import { tr, trHtml, getLocale } from '../i18n/index.ts';
 import { escapeHtml } from '../utils/sanitize.ts';
 import { htmlJsArg } from '../utils/sanitize.ts';
 /**
@@ -54,7 +56,7 @@ export function renderDiaryScreen(): string {
         <button 
           type="button" 
           onclick="window.goToPreviousWeek()" 
-          aria-label="Previous week"
+          aria-label="${trHtml("Previous week")}"
           class="w-7 h-12 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container dark:hover:bg-dark-surface-card-high flex items-center justify-center shrink-0 transition-colors"
         >
           <span class="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -68,9 +70,9 @@ export function renderDiaryScreen(): string {
 
             const dayAriaLabel = `${day.dayName}, ${day.monthName} ${day.dayNum}, ${day.year}. ${
               dayConsumed > 0 
-                ? `${dayConsumed.toLocaleString()} of ${calorieTarget.toLocaleString()} calories logged` 
-                : (calorieTarget > 0 ? `0 of ${calorieTarget.toLocaleString()} calories logged` : 'calorie target unavailable')
-            }${day.isToday ? '. Today' : ''}${isSelected ? '. Selected' : ''}`;
+                ? tr("{0} of {1} calories logged", dayConsumed.toLocaleString(getLocale()), calorieTarget.toLocaleString(getLocale()))
+                : (calorieTarget > 0 ? tr("0 of {0} calories logged", calorieTarget.toLocaleString(getLocale())) : tr("calorie target unavailable"))
+            }${day.isToday ? tr(". Today") : ''}${isSelected ? tr(". Selected") : ''}`;
 
             return `
               <button 
@@ -123,7 +125,7 @@ export function renderDiaryScreen(): string {
         <button 
           type="button" 
           onclick="window.goToNextWeek()" 
-          aria-label="Next week"
+          aria-label="${trHtml("Next week")}"
           class="w-7 h-12 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container dark:hover:bg-dark-surface-card-high flex items-center justify-center shrink-0 transition-colors"
         >
           <span class="material-symbols-outlined text-[18px]">chevron_right</span>
@@ -137,7 +139,7 @@ export function renderDiaryScreen(): string {
         <section class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient">
           <div class="flex items-center justify-between gap-3 mb-2">
             <div>
-              <span class="font-heading font-bold text-xs text-on-surface-variant dark:text-gray-400 uppercase tracking-wider block">Nutrition Summary</span>
+              <span class="font-heading font-bold text-xs text-on-surface-variant dark:text-gray-400 uppercase tracking-wider block">${trHtml("Nutrition Summary")}</span>
               <span class="font-heading text-sm font-bold text-on-surface dark:text-white block mt-0.5">${formatDiaryDate(selectedDate)}</span>
             </div>
 
@@ -150,14 +152,14 @@ export function renderDiaryScreen(): string {
                 innerContentHtml: `
                   <span class="material-symbols-outlined text-[18px] text-primary">local_fire_department</span>
                 `,
-                ariaLabel: `Daily calorie total: ${consumed} of ${calorieTarget} kcal`
+                ariaLabel: tr("Daily calorie total: {0} of {1} kcal", consumed, calorieTarget)
               })}
               <div class="text-right">
                 <span class="text-xs font-extrabold ${consumed > 0 ? 'text-primary dark:text-primary-container' : 'text-on-surface-variant dark:text-gray-400'} block">
-                  ${consumed.toLocaleString()} kcal
+                  ${consumed.toLocaleString(getLocale())} ${trHtml("kcal")}
                 </span>
                 <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">
-                  of ${calorieTarget.toLocaleString()} goal
+                  ${trHtml("of {0} goal", calorieTarget.toLocaleString(getLocale()))}
                 </span>
               </div>
             </div>
@@ -166,20 +168,20 @@ export function renderDiaryScreen(): string {
           <!-- Mini Macro Progress Grid -->
           <div class="grid grid-cols-4 gap-2 mt-3">
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
-              <span class="text-[10px] font-bold text-primary dark:text-primary-container block">Protein</span>
-              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.protein}g</p>
+              <span class="text-[10px] font-bold text-primary dark:text-primary-container block">${trHtml("Protein")}</span>
+              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.protein}${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
-              <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block">Carbs</span>
-              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.carbs}g</p>
+              <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block">${trHtml("Carbs")}</span>
+              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.carbs}${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
-              <span class="text-[10px] font-bold text-amber-500 block">Fat</span>
-              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.fat}g</p>
+              <span class="text-[10px] font-bold text-amber-500 block">${trHtml("Fat")}</span>
+              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.fat}${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
-              <span class="text-[10px] font-bold text-blue-500 block">Water</span>
-              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${waterGlasses * 250}ml</p>
+              <span class="text-[10px] font-bold text-blue-500 block">${trHtml("Water")}</span>
+              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${waterGlasses * 250}${trHtml("ml")}</p>
             </div>
           </div>
         </section>
@@ -189,20 +191,18 @@ export function renderDiaryScreen(): string {
           <div class="flex items-center justify-between">
             <div>
               <div class="flex items-center gap-1.5">
-                <span class="font-heading font-bold text-xs text-on-surface-variant dark:text-gray-400 uppercase tracking-wider block">Daily Micronutrient Summary</span>
-                <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[9px] font-extrabold">VITAMINS &amp; MINERALS</span>
+                <span class="font-heading font-bold text-xs text-on-surface-variant dark:text-gray-400 uppercase tracking-wider block">${trHtml("Daily Micronutrient Summary")}</span>
+                <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[9px] font-extrabold">${trHtml("VITAMINS & MINERALS")}</span>
               </div>
               <p class="text-[11px] text-on-surface dark:text-white font-semibold mt-0.5">
-                ${microSummary.mealsWithMicronutrients > 0 ? 'Aggregated nutritional trace intake' : 'No micronutrient data for this date'}
+                ${microSummary.mealsWithMicronutrients > 0 ? tr("Aggregated nutritional trace intake") : tr("No micronutrient data for this date")}
               </p>
             </div>
 
-            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
-              microSummary.mealsWithMicronutrients > 0 
+            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${microSummary.mealsWithMicronutrients > 0
                 ? 'bg-primary/10 text-primary dark:text-primary-container border-primary/20' 
-                : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border-outline-variant/30'
-            }">
-              ${microSummary.mealsWithMicronutrients}/${microSummary.totalMealsInDay} Meals with Data
+                : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border-outline-variant/30'}">
+              ${microSummary.mealsWithMicronutrients}/${microSummary.totalMealsInDay} ${trHtml("Meals with Data")}
             </span>
           </div>
 
@@ -212,7 +212,7 @@ export function renderDiaryScreen(): string {
               <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-primary">pie_chart</span>
                 <span class="text-[11px] text-on-surface dark:text-gray-200 font-medium">
-                  Micronutrient data available for <strong>${microSummary.mealsWithMicronutrients} of ${microSummary.totalMealsInDay} meals</strong> (${microSummary.coveragePercentage}%)
+                  ${trHtml("Micronutrient data available for")} <strong>${microSummary.mealsWithMicronutrients} ${trHtml("of")} ${microSummary.totalMealsInDay} ${trHtml("meals")}</strong> (${microSummary.coveragePercentage}%)
                 </span>
               </div>
             </div>
@@ -228,12 +228,12 @@ export function renderDiaryScreen(): string {
                   <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1">
                     <div class="flex items-start justify-between">
                       <div>
-                        <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${escapeHtml(n.shortName || n.name)}</span>
-                        <span class="text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${n.totalAmount} ${n.unit}</span>
+                        <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${trHtml(n.shortName || n.name)}</span>
+                        <span class="text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${n.totalAmount} ${trHtml(n.unit)}</span>
                       </div>
                       ${dv !== null && dv !== undefined ? `
                         <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-primary/10 text-primary dark:text-primary-container">
-                          ${dv}% DV
+                          ${dv}${trHtml("% DV")}
                         </span>
                       ` : ''}
                     </div>
@@ -245,7 +245,7 @@ export function renderDiaryScreen(): string {
                     ` : ''}
 
                     <div class="flex items-center justify-between text-[9px] text-on-surface-variant dark:text-gray-400">
-                      <span>${n.mealsReportingCount} meal${n.mealsReportingCount > 1 ? 's' : ''}</span>
+                      <span>${trHtml(n.mealsReportingCount === 1 ? "{0} meal" : "{0} meals", n.mealsReportingCount)}</span>
                       <span class="capitalize font-medium">${n.statusLabel}</span>
                     </div>
                   </div>
@@ -254,14 +254,14 @@ export function renderDiaryScreen(): string {
             </div>
 
             <p class="text-[10px] text-on-surface-variant dark:text-gray-400 italic leading-relaxed">
-              * Micronutrients reflect logged meals with verified data. Meals without micronutrient profiles are excluded from totals and not assumed to be zero.
+              ${trHtml("* Micronutrients reflect logged meals with verified data. Meals without micronutrient profiles are excluded from totals and not assumed to be zero.")}
             </p>
           ` : `
             <div class="p-4 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
               <p class="text-xs text-on-surface-variant dark:text-gray-400">
                 ${dayMeals.length === 0 
-                  ? 'No meals logged for this date. Log meals to view trace minerals and vitamins.' 
-                  : 'No verified micronutrient profiles recorded for meals on this date.'}
+                  ? tr("No meals logged for this date. Log meals to view trace minerals and vitamins.")
+                  : tr("No verified micronutrient profiles recorded for meals on this date.")}
               </p>
             </div>
           `}
@@ -271,7 +271,7 @@ export function renderDiaryScreen(): string {
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h3 class="font-heading text-sm font-bold text-on-surface dark:text-white">
-              Logged Items (${dayMeals.length})
+              ${trHtml("Logged Items (")}${dayMeals.length})
             </h3>
             <button 
               type="button" 
@@ -279,7 +279,7 @@ export function renderDiaryScreen(): string {
               class="text-xs font-bold text-primary dark:text-primary-container flex items-center gap-1"
             >
               <span class="material-symbols-outlined text-[16px]">photo_camera</span>
-              <span>Scan Food</span>
+              <span>${trHtml("Scan Food")}</span>
             </button>
           </div>
 
@@ -289,9 +289,9 @@ export function renderDiaryScreen(): string {
               <div class="w-14 h-14 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant flex items-center justify-center mb-3">
                 <span class="material-symbols-outlined text-[28px]">event_busy</span>
               </div>
-              <h4 class="font-heading font-bold text-sm text-on-surface dark:text-white">No meals recorded for this date</h4>
+              <h4 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("No meals recorded for this date")}</h4>
               <p class="text-xs text-on-surface-variant dark:text-gray-400 max-w-[240px] mt-1">
-                Log your meals or scan food to track calories and macros for this day.
+                ${trHtml("Log your meals or scan food to track calories and macros for this day.")}
               </p>
               <div class="flex items-center gap-2 mt-4">
                 <button 
@@ -300,7 +300,7 @@ export function renderDiaryScreen(): string {
                   class="px-3.5 py-2 rounded-xl bg-primary text-white font-heading text-xs font-bold shadow-sm hover:opacity-95 active:scale-95 transition-all flex items-center gap-1"
                 >
                   <span class="material-symbols-outlined text-[16px]">edit_note</span>
-                  <span>Quick Log</span>
+                  <span>${trHtml("Quick Log")}</span>
                 </button>
                 <button 
                   type="button" 
@@ -308,7 +308,7 @@ export function renderDiaryScreen(): string {
                   class="px-3.5 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-gray-200 font-heading text-xs font-bold hover:bg-surface-container transition-all flex items-center gap-1"
                 >
                   <span class="material-symbols-outlined text-[16px]">add</span>
-                  <span>Add Food</span>
+                  <span>${trHtml("Add Food")}</span>
                 </button>
               </div>
             </div>
@@ -327,18 +327,18 @@ export function renderDiaryScreen(): string {
                         <span class="material-symbols-outlined text-[22px]">${escapeHtml(meal.icon)}</span>
                       </div>
                       <div>
-                        <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white leading-tight group-hover:text-primary transition-colors">${escapeHtml(meal.name)}</h4>
-                        <p class="text-[10px] text-on-surface-variant dark:text-gray-400 capitalize">${escapeHtml(meal.category || meal.mealType)} &bull; ${escapeHtml(meal.time)}</p>
+                        <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white leading-tight group-hover:text-primary transition-colors">${escapeHtml(mealLabel(meal, meal.name))}</h4>
+                        <p class="text-[10px] text-on-surface-variant dark:text-gray-400 capitalize">${escapeHtml(mealDescription(meal))} &bull; ${escapeHtml(meal.time)}</p>
                       </div>
                     </div>
 
                     <div class="text-right">
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${meal.calories} kcal</span>
+                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${meal.calories} ${trHtml("kcal")}</span>
                       <button 
                         type="button"
                         onclick="event.stopPropagation(); window.deleteMeal(${htmlJsArg(meal.id)})"
                         class="block ml-auto text-on-surface-variant hover:text-error transition-colors mt-0.5 p-1 -mr-1"
-                        aria-label="Delete meal"
+                        aria-label="${trHtml("Delete meal")}"
                       >
                         <span class="material-symbols-outlined text-[16px]">delete</span>
                       </button>
@@ -350,19 +350,19 @@ export function renderDiaryScreen(): string {
                     <div class="flex items-center gap-1.5 flex-wrap">
                       ${meal.portion?.servingDescription ? `
                         <span class="px-2 py-0.5 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high font-bold text-on-surface dark:text-gray-200">
-                          ${escapeHtml(meal.portion.servingDescription)}
+                          ${escapeHtml(portionLabel(meal.portion, meal.foodSource === 'built_in' || meal.foodSource === 'demo'))}
                         </span>
                       ` : ''}
-                      <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container font-semibold">${meal.protein}g Protein</span>
-                      <span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary dark:text-tertiary-fixed font-semibold">${meal.carbs}g Carbs</span>
-                      <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">${meal.fat}g Fat</span>
+                      <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container font-semibold">${meal.protein}${trHtml("g Protein")}</span>
+                      <span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary dark:text-tertiary-fixed font-semibold">${meal.carbs}${trHtml("g Carbs")}</span>
+                      <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">${meal.fat}${trHtml("g Fat")}</span>
                     </div>
 
                     <div class="flex items-center gap-1.5 shrink-0">
                       ${hasMicro ? `
                         <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container flex items-center gap-0.5">
                           <span class="material-symbols-outlined text-[11px]">verified</span>
-                          <span>Micros</span>
+                          <span>${trHtml("Micros")}</span>
                         </span>
                       ` : ''}
 
@@ -370,10 +370,10 @@ export function renderDiaryScreen(): string {
                         type="button" 
                         onclick="event.stopPropagation(); window.addAgainMeal(${htmlJsArg(meal.id)})"
                         class="px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary dark:text-primary-container font-bold text-[10px] active:scale-95 transition-all flex items-center gap-0.5"
-                        aria-label="Add ${escapeHtml(meal.name)} again"
+                        aria-label="${trHtml("Add {0} again", mealLabel(meal, meal.name))}"
                       >
                         <span class="material-symbols-outlined text-[12px]">replay</span>
-                        <span>Add Again</span>
+                        <span>${trHtml("Add Again")}</span>
                       </button>
                     </div>
                   </div>

@@ -1,3 +1,4 @@
+import { getLocale, tr } from '../i18n/index.ts';
 /**
  * Date Utility Functions for NutriAI Android
  * 
@@ -152,12 +153,12 @@ export function getWeekDates(ref: Date | string = new Date()): DayInfo[] {
     const key = formatLocalDateKey(cur);
     days.push({
       dateKey: key,
-      dayName: cur.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayName: cur.toLocaleDateString(getLocale(), { weekday: 'short' }),
       dayNum: cur.getDate(),
-      monthName: cur.toLocaleDateString('en-US', { month: 'short' }),
+      monthName: cur.toLocaleDateString(getLocale(), { month: 'short' }),
       year: cur.getFullYear(),
       isToday: key === todayStr,
-      displayLabel: `${cur.toLocaleDateString('en-US', { weekday: 'short' })} ${cur.getDate()}`
+      displayLabel: `${cur.toLocaleDateString(getLocale(), { weekday: 'short' })} ${cur.getDate()}`
     });
   }
 
@@ -181,25 +182,14 @@ export function formatDiaryDate(dateKey: string): string {
   const yesterday = getYesterdayKey();
   const d = parseLocalDateKey(dateKey);
 
-  const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
-  const monthShort = d.toLocaleDateString('en-US', { month: 'short' });
-  const monthLong = d.toLocaleDateString('en-US', { month: 'long' });
-  const dayNum = d.getDate();
-  const year = d.getFullYear();
-  const currentYear = new Date().getFullYear();
-
-  if (dateKey === today) {
-    return `Today (${weekday}, ${monthShort} ${dayNum})`;
-  }
-  if (dateKey === yesterday) {
-    return `Yesterday (${weekday}, ${monthShort} ${dayNum})`;
-  }
-
-  // Include year if different or for full clarity
-  if (year !== currentYear) {
-    return `${weekday}, ${monthLong} ${dayNum}, ${year}`;
-  }
-  return `${weekday}, ${monthLong} ${dayNum}`;
+  const isRecent = dateKey === today || dateKey === yesterday;
+  const label = d.toLocaleDateString(getLocale(), {
+    weekday: 'long', month: isRecent ? 'short' : 'long', day: 'numeric',
+    ...(d.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' as const } : {})
+  });
+  if (dateKey === today) return tr('Today ({0})', label);
+  if (dateKey === yesterday) return tr('Yesterday ({0})', label);
+  return label;
 }
 
 /**

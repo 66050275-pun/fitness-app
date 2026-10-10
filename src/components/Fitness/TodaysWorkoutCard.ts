@@ -1,3 +1,5 @@
+import { translatedMuscles } from '../../i18n/fitnessLabels.ts';
+import { tr, trHtml, getLocale, translatedLabel } from '../../i18n/index.ts';
 import { getTodayKey } from '../../utils/dateUtils.ts';
 import { 
   resolveDayStatus, 
@@ -22,8 +24,8 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
 
   // Friendly date: e.g. "Saturday, Sep 12"
   const now = new Date();
-  const weekdayStr = now.toLocaleDateString('en-US', { weekday: 'long' });
-  const monthDayStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const weekdayStr = now.toLocaleDateString(getLocale(), { weekday: 'long' });
+  const monthDayStr = now.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
   const todayDisplayDate = `${weekdayStr}, ${monthDayStr}`;
 
   // Find preset details if scheduled
@@ -43,14 +45,14 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
       statusBadge = `
         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-extrabold uppercase tracking-wider border border-emerald-500/20">
           <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-          Completed
+          ${trHtml("Completed")}
         </span>
       `;
 
-      const workoutName = completedWorkout ? completedWorkout.name : (preset ? preset.title : 'Workout');
+      const workoutName = completedWorkout ? completedWorkout.name : (preset ? preset.title : tr("Workout"));
       const setsCount = completedWorkout?.completedSetCount ?? 0;
       const durationMins = completedWorkout?.durationSeconds ? Math.round(completedWorkout.durationSeconds / 60) : 0;
-      const volumeKg = completedWorkout?.totalVolume ? completedWorkout.totalVolume.toLocaleString() : '0';
+      const volumeKg = completedWorkout?.totalVolume ? completedWorkout.totalVolume.toLocaleString(getLocale()) : '0';
       const burnedKcal = completedWorkout?.estimatedCalories ?? 0;
       const workoutId = completedWorkout?.id || '';
 
@@ -62,10 +64,10 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             </div>
             <div class="min-w-0">
               <h3 class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight truncate">
-                ${escapeHtml(workoutName)}
+                ${escapeHtml(translatedLabel(workoutName))}
               </h3>
               <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 truncate">
-                Workout finished for today
+                ${trHtml("Workout finished for today")}
               </p>
             </div>
           </div>
@@ -74,20 +76,20 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
         <!-- Metric Stat Grid -->
         <div class="grid grid-cols-4 gap-1.5 pt-0.5 text-center">
           <div class="py-2 px-1 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col items-center justify-center min-w-0">
-            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">Sets</span>
+            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">${trHtml("Sets")}</span>
             <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white block mt-0.5 truncate w-full">${setsCount}</span>
           </div>
           <div class="py-2 px-1 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col items-center justify-center min-w-0">
-            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">Duration</span>
-            <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white block mt-0.5 truncate w-full">${durationMins}m</span>
+            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">${trHtml("Duration")}</span>
+            <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white block mt-0.5 truncate w-full">${durationMins} ${trHtml("min")}</span>
           </div>
           <div class="py-2 px-1 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col items-center justify-center min-w-0">
-            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">Volume</span>
-            <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white block mt-0.5 truncate w-full">${volumeKg} kg</span>
+            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">${trHtml("Volume")}</span>
+            <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white block mt-0.5 truncate w-full">${volumeKg} ${trHtml("kg")}</span>
           </div>
           <div class="py-2 px-1 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col items-center justify-center min-w-0">
-            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">Burned</span>
-            <span class="font-heading font-extrabold text-xs text-emerald-600 dark:text-emerald-400 block mt-0.5 truncate w-full">${burnedKcal} kcal</span>
+            <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">${trHtml("Burned")}</span>
+            <span class="font-heading font-extrabold text-xs text-emerald-600 dark:text-emerald-400 block mt-0.5 truncate w-full">${burnedKcal} ${trHtml("kcal")}</span>
           </div>
         </div>
 
@@ -100,7 +102,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
               class="flex-1 py-2.5 px-3 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
             >
               <span class="material-symbols-outlined text-[16px]">visibility</span>
-              <span>View Summary</span>
+              <span>${trHtml("View Summary")}</span>
             </button>
           ` : ''}
           <button 
@@ -109,7 +111,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             class="py-2.5 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1 shrink-0"
           >
             <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-            <span>Details</span>
+            <span>${trHtml("Details")}</span>
           </button>
         </div>
       `;
@@ -120,12 +122,12 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
       statusBadge = `
         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary dark:text-primary-container text-xs font-extrabold uppercase tracking-wider border border-primary/20">
           <span class="material-symbols-outlined text-[14px]">event</span>
-          Planned
+          ${trHtml("Planned")}
         </span>
       `;
 
-      const title = preset ? preset.title : 'Scheduled Workout';
-      const muscles = preset ? preset.primaryMuscles : 'Full Body Training';
+      const title = preset ? preset.title : tr("Scheduled Workout");
+      const muscles = preset ? preset.primaryMuscles : tr("Full Body Training");
       const exerciseCount = preset?.exercises ? preset.exercises.length : 5;
       const durationMins = preset ? preset.estimatedMinutes : 45;
       const icon = preset ? preset.icon : 'fitness_center';
@@ -139,10 +141,10 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             </div>
             <div class="min-w-0">
               <h3 class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight truncate">
-                ${escapeHtml(title)}
+                ${escapeHtml(translatedLabel(title))}
               </h3>
               <p class="text-xs text-on-surface-variant dark:text-gray-300 font-medium mt-0.5 truncate">
-                ${escapeHtml(muscles)}
+                ${escapeHtml(translatedMuscles(muscles))}
               </p>
             </div>
           </div>
@@ -157,7 +159,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           <span>·</span>
           <span class="inline-flex items-center gap-1 font-semibold text-on-surface dark:text-white">
             <span class="material-symbols-outlined text-[15px] text-primary">timer</span>
-            About ${durationMins}m
+            ${trHtml("About")} ${durationMins} ${trHtml("min")}
           </span>
           ${preset?.intensity ? `
             <span>·</span>
@@ -173,13 +175,13 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             class="flex-1 py-2.5 px-4 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-extrabold flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[18px]">play_arrow</span>
-            <span>Start Workout</span>
+            <span>${trHtml("Start Workout")}</span>
           </button>
           <button 
             type="button"
             onclick="window.openPlannerDateDetail(${htmlJsArg(todayKey)})"
             class="py-2.5 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1"
-            aria-label="View or customize today's workout"
+            aria-label="${trHtml("View or customize today's workout")}"
           >
             <span class="material-symbols-outlined text-[18px]">more_horiz</span>
           </button>
@@ -192,7 +194,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
       statusBadge = `
         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-extrabold uppercase tracking-wider border border-amber-500/20">
           <span class="material-symbols-outlined text-[14px]">spa</span>
-          Rest Day
+          ${trHtml("Rest Day")}
         </span>
       `;
 
@@ -203,10 +205,10 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           </div>
           <div class="min-w-0">
             <h3 class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight">
-              Rest & Active Recovery
+              ${trHtml("Rest & Active Recovery")}
             </h3>
             <p class="text-xs text-on-surface-variant dark:text-gray-300 mt-1 leading-relaxed">
-              Recovery is part of your program. Focus on hydration, mobility, and recharging for your next workout.
+              ${trHtml("Recovery is part of your program. Focus on hydration, mobility, and recharging for your next workout.")}
             </p>
           </div>
         </div>
@@ -219,7 +221,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             class="py-2 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">edit_calendar</span>
-            <span>Change Plan</span>
+            <span>${trHtml("Change Plan")}</span>
           </button>
         </div>
       `;
@@ -230,11 +232,11 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
       statusBadge = `
         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-extrabold uppercase tracking-wider border border-rose-500/20">
           <span class="material-symbols-outlined text-[14px]">error_outline</span>
-          Missed
+          ${trHtml("Missed")}
         </span>
       `;
 
-      const title = preset ? preset.title : 'Scheduled Routine';
+      const title = preset ? preset.title : tr("Scheduled Routine");
       const presetId = preset?.id || (scheduledWorkout && scheduledWorkout.type === 'preset' ? scheduledWorkout.presetId : 'full-body');
 
       cardContent = `
@@ -244,10 +246,10 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           </div>
           <div class="min-w-0">
             <h3 class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight truncate">
-              Missed: ${escapeHtml(title)}
+              ${trHtml("Missed:")} ${escapeHtml(translatedLabel(title))}
             </h3>
             <p class="text-xs text-on-surface-variant dark:text-gray-300 mt-1 leading-relaxed">
-              This workout was not logged yet. You can still complete it today or reschedule your week.
+              ${trHtml("This workout was not logged yet. You can still complete it today or reschedule your week.")}
             </p>
           </div>
         </div>
@@ -260,7 +262,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             class="flex-1 py-2.5 px-3 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            <span>Start Anyway</span>
+            <span>${trHtml("Start Anyway")}</span>
           </button>
           <button 
             type="button"
@@ -268,7 +270,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             class="py-2.5 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">event_repeat</span>
-            <span>Reschedule</span>
+            <span>${trHtml("Reschedule")}</span>
           </button>
         </div>
       `;
@@ -280,7 +282,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
       statusBadge = `
         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-extrabold uppercase tracking-wider">
           <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-          No Plan
+          ${trHtml("No Plan")}
         </span>
       `;
 
@@ -291,10 +293,10 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           </div>
           <div class="min-w-0">
             <h3 class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight">
-              Nothing planned for today
+              ${trHtml("Nothing planned for today")}
             </h3>
             <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1 leading-relaxed">
-              Add a workout to your calendar or mark today as a rest day to keep your streak alive.
+              ${trHtml("Add a workout to your calendar or mark today as a rest day to keep your streak alive.")}
             </p>
           </div>
         </div>
@@ -307,7 +309,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             class="flex-1 py-2.5 px-3 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-heading text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[16px]">add_circle</span>
-            <span>Plan Today</span>
+            <span>${trHtml("Plan Today")}</span>
           </button>
           <button 
             type="button"
@@ -315,7 +317,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
             class="py-2.5 px-3.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-on-surface dark:text-white font-heading text-xs font-bold hover:border-primary/40 active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">fitness_center</span>
-            <span>Choose Workout</span>
+            <span>${trHtml("Choose Workout")}</span>
           </button>
         </div>
       `;
@@ -331,7 +333,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
       <div class="flex items-center justify-between pb-2 border-b border-outline-variant/15">
         <div>
           <span class="text-[10px] font-extrabold tracking-wider uppercase text-on-surface-variant/80 dark:text-gray-400 block">
-            TODAY'S WORKOUT
+            ${trHtml("TODAY'S WORKOUT")}
           </span>
           <span class="font-heading font-bold text-xs text-on-surface dark:text-gray-200 block mt-0.5">
             ${todayDisplayDate}

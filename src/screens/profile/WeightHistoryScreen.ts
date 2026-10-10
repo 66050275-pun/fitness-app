@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 /**
  * Weight History Sub-Screen
  * 
@@ -48,8 +49,8 @@ export function renderWeightHistoryScreen(): string {
     chartHtml = `
       <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-2">
         <div class="flex items-center justify-between text-xs">
-          <span class="font-heading font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">Weight Trend</span>
-          <span class="text-[11px] text-on-surface-variant dark:text-gray-400">Range: ${minW.toFixed(1)} - ${maxW.toFixed(1)} ${unit}</span>
+          <span class="font-heading font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">${trHtml("Weight Trend")}</span>
+          <span class="text-[11px] text-on-surface-variant dark:text-gray-400">${trHtml("Range:")} ${minW.toFixed(1)} - ${maxW.toFixed(1)} ${trHtml(unit)}</span>
         </div>
 
         <div class="w-full overflow-hidden flex items-center justify-center pt-2">
@@ -82,12 +83,12 @@ export function renderWeightHistoryScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Weight History</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Weight History")}</h1>
         </div>
 
         <button 
@@ -96,7 +97,7 @@ export function renderWeightHistoryScreen(): string {
           class="px-3.5 py-1.5 rounded-full bg-primary text-white text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all flex items-center gap-1"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
-          <span>Log Weight</span>
+          <span>${trHtml("Log Weight")}</span>
         </button>
       </header>
 
@@ -107,7 +108,7 @@ export function renderWeightHistoryScreen(): string {
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex items-center justify-between">
           <div>
             <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 block">
-              Current Weight
+              ${trHtml("Current Weight")}
             </span>
             <span class="font-heading font-extrabold text-2xl text-on-surface dark:text-white block mt-0.5">
               ${formatWeight(currentKg, unit)}
@@ -121,14 +122,14 @@ export function renderWeightHistoryScreen(): string {
               onclick="window.toggleWeightDisplayUnit('kg')"
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${unit === 'kg' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}"
             >
-              kg
+              ${trHtml("kg")}
             </button>
             <button 
               type="button"
               onclick="window.toggleWeightDisplayUnit('lb')"
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${unit === 'lb' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}"
             >
-              lb
+              ${trHtml("lb")}
             </button>
           </div>
         </div>
@@ -140,7 +141,7 @@ export function renderWeightHistoryScreen(): string {
         <div class="flex flex-col gap-2.5">
           <div class="flex items-center justify-between px-1">
             <h2 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              Recorded Entries (${history.length})
+              ${trHtml("Recorded Entries (")}${history.length})
             </h2>
           </div>
 
@@ -152,10 +153,10 @@ export function renderWeightHistoryScreen(): string {
               </div>
               <div>
                 <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">
-                  No weight entries recorded yet
+                  ${trHtml("No weight entries recorded yet")}
                 </h3>
                 <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1 max-w-xs leading-relaxed">
-                  Track your body weight progress over time by adding your measurements.
+                  ${trHtml("Track your body weight progress over time by adding your measurements.")}
                 </p>
               </div>
               <button 
@@ -163,7 +164,7 @@ export function renderWeightHistoryScreen(): string {
                 onclick="window.openWeightModal()"
                 class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all mt-1"
               >
-                Add First Weight Entry
+                ${trHtml("Add First Weight Entry")}
               </button>
             </div>
           ` : `
@@ -184,7 +185,7 @@ export function renderWeightHistoryScreen(): string {
                             ${displayVal}
                           </span>
                           <span class="text-[11px] font-bold text-on-surface-variant dark:text-gray-400">
-                            ${unit}
+                            ${trHtml(unit)}
                           </span>
                         </div>
                         <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
@@ -201,7 +202,7 @@ export function renderWeightHistoryScreen(): string {
                       <button 
                         type="button" 
                         onclick="window.editWeightEntry(${htmlJsArg(entry.id)})"
-                        aria-label="Edit entry"
+                        aria-label="${trHtml("Edit entry")}"
                         class="w-8 h-8 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container flex items-center justify-center transition-colors"
                       >
                         <span class="material-symbols-outlined text-[18px]">edit</span>
@@ -209,7 +210,7 @@ export function renderWeightHistoryScreen(): string {
                       <button 
                         type="button" 
                         onclick="window.confirmDeleteWeightEntry(${htmlJsArg(entry.id)})"
-                        aria-label="Delete entry"
+                        aria-label="${trHtml("Delete entry")}"
                         class="w-8 h-8 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors"
                       >
                         <span class="material-symbols-outlined text-[18px]">delete</span>

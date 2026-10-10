@@ -1,3 +1,4 @@
+import { tr } from '../i18n/index.ts';
 import type { 
   WeeklyProgramTemplate, 
   ScheduledWorkout, 
@@ -224,7 +225,7 @@ export function calculateMonthlyProgramSummary(
  */
 export function calculateWeeklyTemplateSummary(template: WeeklyProgramTemplate | null): string {
   if (!template || !template.days) {
-    return 'No weekly routine configured';
+    return tr('No weekly routine configured');
   }
 
   let workoutDays = 0;
@@ -239,10 +240,10 @@ export function calculateWeeklyTemplateSummary(template: WeeklyProgramTemplate |
   }
 
   const parts: string[] = [];
-  if (workoutDays > 0) parts.push(`${workoutDays} workout day${workoutDays > 1 ? 's' : ''}`);
-  if (restDays > 0) parts.push(`${restDays} rest day${restDays > 1 ? 's' : ''}`);
+  if (workoutDays > 0) parts.push(tr(workoutDays === 1 ? '{0} workout day' : '{0} workout days', workoutDays));
+  if (restDays > 0) parts.push(tr(restDays === 1 ? '{0} rest day' : '{0} rest days', restDays));
 
-  return parts.length > 0 ? parts.join(' · ') : 'No days configured yet';
+  return parts.length > 0 ? parts.join(' · ') : tr('No days configured yet');
 }
 
 export interface FitnessPlannerResetTarget {

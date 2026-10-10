@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 /**
  * Data & Privacy Sub-Screen
  * 
@@ -29,12 +30,12 @@ export function renderDataPrivacyScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Data & Privacy</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Data & Privacy")}</h1>
         </div>
       </header>
 
@@ -43,11 +44,11 @@ export function renderDataPrivacyScreen(): string {
 
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-5 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
           <div>
-            <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white">Goal Setup</h2>
-            <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">Review your onboarding answers or run the goal setup again. Existing history is preserved until you explicitly delete it.</p>
+            <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Goal Setup")}</h2>
+            <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">${trHtml("Review your onboarding answers or run the goal setup again. Existing history is preserved until you explicitly delete it.")}</p>
           </div>
           <button type="button" onclick="window.restartGoalSetup()" class="w-full min-h-11 px-3 rounded-xl border border-primary/30 text-primary dark:text-primary-container text-xs font-bold flex items-center justify-between">
-            <span>Review or Restart Goal Setup</span><span class="material-symbols-outlined text-[18px]">chevron_right</span>
+            <span>${trHtml("Review or Restart Goal Setup")}</span><span class="material-symbols-outlined text-[18px]">chevron_right</span>
           </button>
         </div>
 
@@ -59,34 +60,34 @@ export function renderDataPrivacyScreen(): string {
             </div>
             <div>
               <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white">
-                Encrypted Browser Vault
+                ${trHtml("Encrypted Browser Vault")}
               </h2>
               <span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-0.5">
-                Passphrase protected &bull; No user cloud database
+                ${trHtml("Passphrase protected • No user cloud database")}
               </span>
             </div>
           </div>
 
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed pt-1 border-t border-outline-variant/20">
-            Your profile, health records, feedback drafts and photo are encrypted before they are saved in this browser. The passphrase is not saved or sent to a server. While unlocked, this app and anyone using your device can access your data. Use Lock when finished. Hosting providers still receive normal page requests and network metadata.
+            ${trHtml("Your profile, health records, feedback drafts and photo are encrypted before they are saved in this browser. The passphrase is not saved or sent to a server. While unlocked, this app and anyone using your device can access your data. Use Lock when finished. Hosting providers still receive normal page requests and network metadata.")}
           </p>
 
           <!-- Storage Statistics Matrix -->
           <div class="grid grid-cols-2 gap-2 pt-1">
             <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-between text-xs">
-              <span class="text-on-surface-variant dark:text-gray-400">Meals Logged:</span>
+              <span class="text-on-surface-variant dark:text-gray-400">${trHtml("Meals Logged:")}</span>
               <span class="font-bold text-on-surface dark:text-white">${mealCount}</span>
             </div>
             <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-between text-xs">
-              <span class="text-on-surface-variant dark:text-gray-400">Workouts:</span>
+              <span class="text-on-surface-variant dark:text-gray-400">${trHtml("Workouts:")}</span>
               <span class="font-bold text-on-surface dark:text-white">${workoutCount}</span>
             </div>
             <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-between text-xs">
-              <span class="text-on-surface-variant dark:text-gray-400">Weight Entries:</span>
+              <span class="text-on-surface-variant dark:text-gray-400">${trHtml("Weight Entries:")}</span>
               <span class="font-bold text-on-surface dark:text-white">${weightCount}</span>
             </div>
             <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-between text-xs">
-              <span class="text-on-surface-variant dark:text-gray-400">Custom Foods:</span>
+              <span class="text-on-surface-variant dark:text-gray-400">${trHtml("Custom Foods:")}</span>
               <span class="font-bold text-on-surface dark:text-white">${customFoodCount}</span>
             </div>
           </div>
@@ -97,10 +98,10 @@ export function renderDataPrivacyScreen(): string {
           <div class="flex items-center justify-between">
             <div>
               <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white">
-                Export Local Backup
+                ${trHtml("Export Local Backup")}
               </h2>
               <span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-0.5">
-                Download a passphrase protected archive, including your photo
+                ${trHtml("Download a passphrase protected archive, including your photo")}
               </span>
             </div>
             <div class="w-9 h-9 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-primary flex items-center justify-center">
@@ -109,7 +110,7 @@ export function renderDataPrivacyScreen(): string {
           </div>
 
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-            The backup stays encrypted with your current passphrase. Keep the passphrase separately: there is no password recovery. Restore from the unlock screen on a browser without an existing vault. Clearing browser storage, private browsing or changing the app URL can make local data unavailable.
+            ${trHtml("The backup stays encrypted with your current passphrase. Keep the passphrase separately: there is no password recovery. Restore from the unlock screen on a browser without an existing vault. Clearing browser storage, private browsing or changing the app URL can make local data unavailable.")}
           </p>
 
           <button 
@@ -118,7 +119,7 @@ export function renderDataPrivacyScreen(): string {
             class="w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all text-center flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[16px]">file_download</span>
-            <span>Export Encrypted Backup</span>
+            <span>${trHtml("Export Encrypted Backup")}</span>
           </button>
         </div>
 
@@ -127,12 +128,12 @@ export function renderDataPrivacyScreen(): string {
           <div class="flex items-center gap-2 text-error">
             <span class="material-symbols-outlined text-[20px]">delete_forever</span>
             <span class="font-heading font-bold text-xs uppercase tracking-wider">
-              Data Management &amp; Deletion
+              ${trHtml("Data Management & Deletion")}
             </span>
           </div>
 
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">
-            Selectively clear specific historical records while preserving your profile, or reset all local application data. Your vault passphrase remains in use. Deletions cannot be undone; downloaded backups are not erased.
+            ${trHtml("Selectively clear specific historical records while preserving your profile, or reset all local application data. Your vault passphrase remains in use. Deletions cannot be undone; downloaded backups are not erased.")}
           </p>
 
           <!-- Granular Delete Buttons -->
@@ -142,7 +143,7 @@ export function renderDataPrivacyScreen(): string {
               onclick="window.confirmDeleteFoodHistory()"
               class="w-full py-2.5 px-3 rounded-xl border border-outline-variant/30 hover:border-error/50 text-left flex items-center justify-between text-xs font-bold text-on-surface dark:text-gray-200 hover:bg-error/5 transition-colors"
             >
-              <span>Delete Food &amp; Diary History (${mealCount} items)</span>
+              <span>${trHtml("Delete Food & Diary History (")}${mealCount} ${trHtml("items)")}</span>
               <span class="material-symbols-outlined text-[18px] text-error">delete</span>
             </button>
 
@@ -151,7 +152,7 @@ export function renderDataPrivacyScreen(): string {
               onclick="window.confirmDeleteWorkoutHistory()"
               class="w-full py-2.5 px-3 rounded-xl border border-outline-variant/30 hover:border-error/50 text-left flex items-center justify-between text-xs font-bold text-on-surface dark:text-gray-200 hover:bg-error/5 transition-colors"
             >
-              <span>Delete Workout History (${workoutCount} workouts)</span>
+              <span>${trHtml("Delete Workout History (")}${workoutCount} ${trHtml("workouts)")}</span>
               <span class="material-symbols-outlined text-[18px] text-error">delete</span>
             </button>
 
@@ -160,7 +161,7 @@ export function renderDataPrivacyScreen(): string {
               onclick="window.confirmDeleteWeightHistory()"
               class="w-full py-2.5 px-3 rounded-xl border border-outline-variant/30 hover:border-error/50 text-left flex items-center justify-between text-xs font-bold text-on-surface dark:text-gray-200 hover:bg-error/5 transition-colors"
             >
-              <span>Delete Weight History (${weightCount} records)</span>
+              <span>${trHtml("Delete Weight History (")}${weightCount} ${trHtml("records)")}</span>
               <span class="material-symbols-outlined text-[18px] text-error">delete</span>
             </button>
 
@@ -169,7 +170,7 @@ export function renderDataPrivacyScreen(): string {
               onclick="window.confirmDeleteAllLocalData()"
               class="w-full py-2.5 px-3 rounded-xl bg-error/10 border border-error/30 text-left flex items-center justify-between text-xs font-bold text-error hover:bg-error/20 transition-colors mt-1"
             >
-              <span>Delete All Local Data (Complete Reset)</span>
+              <span>${trHtml("Delete All Local Data (Complete Reset)")}</span>
               <span class="material-symbols-outlined text-[18px] text-error">warning</span>
             </button>
           </div>

@@ -1,3 +1,5 @@
+import { exerciseLabel } from '../i18n/fitnessLabels.ts';
+import { tr, trHtml, getLocale, translatedLabel } from '../i18n/index.ts';
 import { store } from '../store/appState';
 import { 
   getDateRangeKeys, 
@@ -85,7 +87,7 @@ export function renderInsightsScreen(): string {
         state,
         subtitleType: 'default',
         showQuickAdd: true,
-        quickAddAriaLabel: 'Quick add',
+        quickAddAriaLabel: tr("Quick add"),
       })}
 
       <!-- Main Canvas -->
@@ -96,13 +98,11 @@ export function renderInsightsScreen(): string {
           ${([7, 30, 90] as (7 | 30 | 90)[]).map(r => `
             <button 
               onclick="window.setInsightRange(${r})" 
-              class="flex-1 py-1.5 px-3 rounded-full font-heading text-xs font-bold transition-all ${
-                range === r 
+              class="flex-1 py-1.5 px-3 rounded-full font-heading text-xs font-bold transition-all ${range === r
                   ? 'bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-sm' 
-                  : 'text-on-surface-variant dark:text-gray-400 hover:text-primary'
-              }"
+                  : 'text-on-surface-variant dark:text-gray-400 hover:text-primary'}"
             >
-              ${r} Days
+              ${r} ${trHtml("Days")}
             </button>
           `).join('')}
         </div>
@@ -110,22 +110,22 @@ export function renderInsightsScreen(): string {
         <!-- A. WEEKLY OVERVIEW METRICS GRID -->
         <section class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
-            <h2 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">Period Overview</h2>
-            <span class="text-[10px] text-on-surface-variant dark:text-gray-400">vs previous ${range}d</span>
+            <h2 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">${trHtml("Period Overview")}</h2>
+            <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("vs previous")} ${range}d</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2.5">
             <!-- Avg Calories -->
-            ${renderOverviewCard('Avg Daily Calories', `${curNutritionAvg.avgCalories.toLocaleString()}`, 'kcal', deltaCalories, 'local_fire_department', 'neutral')}
+            ${renderOverviewCard(tr("Avg Daily Calories"), `${curNutritionAvg.avgCalories.toLocaleString(getLocale())}`, 'kcal', deltaCalories, 'local_fire_department', 'neutral')}
             
             <!-- Avg Protein -->
-            ${renderOverviewCard('Avg Daily Protein', `${curNutritionAvg.avgProtein}`, 'g', deltaProtein, 'egg_alt', 'protein')}
+            ${renderOverviewCard(tr("Avg Daily Protein"), `${curNutritionAvg.avgProtein}`, 'g', deltaProtein, 'egg_alt', 'protein')}
             
             <!-- Total Training Duration -->
-            ${renderOverviewCard('Training Time', `${curWorkoutTotals.totalDurationMinutes}`, 'min', deltaDuration, 'timer', 'fitness')}
+            ${renderOverviewCard(tr("Training Time"), `${curWorkoutTotals.totalDurationMinutes}`, 'min', deltaDuration, 'timer', 'fitness')}
             
             <!-- Workouts Completed -->
-            ${renderOverviewCard('Workouts Completed', `${curWorkoutTotals.completedWorkoutCount}`, 'sessions', deltaWorkouts, 'fitness_center', 'fitness')}
+            ${renderOverviewCard(tr("Workouts Completed"), `${curWorkoutTotals.completedWorkoutCount}`, 'sessions', deltaWorkouts, 'fitness_center', 'fitness')}
           </div>
         </section>
 
@@ -134,31 +134,27 @@ export function renderInsightsScreen(): string {
           
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">Nutrition Trajectory</h3>
-              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">Daily intake over ${range} days</p>
+              <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Nutrition Trajectory")}</h3>
+              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">${trHtml("Daily intake over")} ${range} ${trHtml("days")}</p>
             </div>
 
             <!-- Sub-segmented Toggle: Calories vs Macros -->
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-0.5 rounded-xl flex items-center border border-outline-variant/30">
               <button 
                 onclick="window.setInsightTab('calories')" 
-                class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                  activeTab === 'calories' 
+                class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${activeTab === 'calories'
                     ? 'bg-surface-container-lowest dark:bg-dark-surface-card text-primary shadow-xs' 
-                    : 'text-on-surface-variant'
-                }"
+                    : 'text-on-surface-variant'}"
               >
-                Calories
+                ${trHtml("Calories")}
               </button>
               <button 
                 onclick="window.setInsightTab('macros')" 
-                class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                  activeTab === 'macros' 
+                class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${activeTab === 'macros'
                     ? 'bg-surface-container-lowest dark:bg-dark-surface-card text-primary shadow-xs' 
-                    : 'text-on-surface-variant'
-                }"
+                    : 'text-on-surface-variant'}"
               >
-                Macros
+                ${trHtml("Macros")}
               </button>
             </div>
           </div>
@@ -166,8 +162,7 @@ export function renderInsightsScreen(): string {
           <!-- Chart Canvas -->
           ${activeTab === 'calories' 
             ? renderCaloriesChart(curDailyTotals, state.calorieTarget) 
-            : renderMacrosChart(curDailyTotals, 145)
-          }
+            : renderMacrosChart(curDailyTotals, 145)}
 
         </section>
 
@@ -175,36 +170,36 @@ export function renderInsightsScreen(): string {
         <section class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">Fitness & Volume Trends</h3>
-              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">Mechanical load from verified completed sets</p>
+              <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Fitness & Volume Trends")}</h3>
+              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">${trHtml("Mechanical load from verified completed sets")}</p>
             </div>
             <span class="text-xs font-extrabold text-primary dark:text-primary-container">
-              ${curWorkoutTotals.totalVolumeKg.toLocaleString()} kg total vol
+              ${curWorkoutTotals.totalVolumeKg.toLocaleString(getLocale())} ${trHtml("kg total vol")}
             </span>
           </div>
 
           <div class="grid grid-cols-3 gap-2 text-center pt-1">
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl">
-              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">Completed Sets</span>
+              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Completed Sets")}</span>
               <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${curWorkoutTotals.totalCompletedSets}</span>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl">
-              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">Total Volume</span>
-              <span class="font-heading font-extrabold text-base text-primary dark:text-primary-container">${curWorkoutTotals.totalVolumeKg.toLocaleString()} kg</span>
+              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Total Volume")}</span>
+              <span class="font-heading font-extrabold text-base text-primary dark:text-primary-container">${curWorkoutTotals.totalVolumeKg.toLocaleString(getLocale())} ${trHtml("kg")}</span>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl">
-              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">Avg / Session</span>
+              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Avg / Session")}</span>
               <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">
-                ${curWorkoutTotals.completedWorkoutCount > 0 ? Math.round(curWorkoutTotals.totalVolumeKg / curWorkoutTotals.completedWorkoutCount).toLocaleString() : 0} kg
+                ${curWorkoutTotals.completedWorkoutCount > 0 ? Math.round(curWorkoutTotals.totalVolumeKg / curWorkoutTotals.completedWorkoutCount).toLocaleString(getLocale()) : 0} ${trHtml("kg")}
               </span>
             </div>
           </div>
 
           <!-- Workouts in this period list -->
           <div class="flex flex-col gap-2 pt-1 border-t border-outline-variant/20">
-            <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400">Sessions in this range (${curWorkoutTotals.workouts.length})</span>
+            <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400">${trHtml("Sessions in this range (")}${curWorkoutTotals.workouts.length})</span>
             ${curWorkoutTotals.workouts.length === 0 ? `
-              <p class="text-xs text-on-surface-variant dark:text-gray-400 text-center py-2">No workout sessions logged within this ${range}-day window.</p>
+              <p class="text-xs text-on-surface-variant dark:text-gray-400 text-center py-2">${trHtml("No workout sessions logged within this")} ${range}${trHtml("-day window.")}</p>
             ` : `
               <div class="flex flex-col gap-1.5">
                 ${curWorkoutTotals.workouts.map(w => `
@@ -218,14 +213,14 @@ export function renderInsightsScreen(): string {
                         <span class="material-symbols-outlined text-[16px]">fitness_center</span>
                       </div>
                       <div>
-                        <span class="font-heading font-bold text-xs text-on-surface dark:text-white group-hover:text-primary transition-colors">${escapeHtml(w.name)}</span>
+                        <span class="font-heading font-bold text-xs text-on-surface dark:text-white group-hover:text-primary transition-colors">${escapeHtml(translatedLabel(w.name))}</span>
                         <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">
-                          ${new Date(w.startedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} &bull; ${Math.round(w.durationSeconds / 60)} min
+                          ${new Date(w.startedAt).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })} &bull; ${Math.round(w.durationSeconds / 60)} ${trHtml("min")}
                         </span>
                       </div>
                     </div>
                     <div class="flex items-center gap-1.5">
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${w.totalVolume.toLocaleString()} kg</span>
+                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${w.totalVolume.toLocaleString(getLocale())} ${trHtml("kg")}</span>
                       <span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
                     </div>
                   </button>
@@ -238,7 +233,7 @@ export function renderInsightsScreen(): string {
 
         <!-- D. CONSISTENCY & GOAL ADHERENCE -->
         <section class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
-          <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">Consistency & Streaks</h3>
+          <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Consistency & Streaks")}</h3>
           
           <div class="grid grid-cols-2 gap-2.5">
             <!-- Nutrition Streak -->
@@ -247,8 +242,8 @@ export function renderInsightsScreen(): string {
                 <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
               </div>
               <div>
-                <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${loggingStreak} days</span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Logging Streak</span>
+                <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${loggingStreak} ${trHtml("days")}</span>
+                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Logging Streak")}</span>
               </div>
             </div>
 
@@ -258,8 +253,8 @@ export function renderInsightsScreen(): string {
                 <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
               </div>
               <div>
-                <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${workoutStreak} days</span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Workout Streak</span>
+                <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${workoutStreak} ${trHtml("days")}</span>
+                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Workout Streak")}</span>
               </div>
             </div>
 
@@ -270,7 +265,7 @@ export function renderInsightsScreen(): string {
               </div>
               <div>
                 <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${adherence.proteinGoalMetDays} / ${range}</span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Protein Target Met</span>
+                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Protein Target Met")}</span>
               </div>
             </div>
 
@@ -281,7 +276,7 @@ export function renderInsightsScreen(): string {
               </div>
               <div>
                 <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${adherence.hydrationGoalMetDays} / ${range}</span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">Hydration Target Met</span>
+                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Hydration Target Met")}</span>
               </div>
             </div>
           </div>
@@ -292,14 +287,14 @@ export function renderInsightsScreen(): string {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[18px] text-amber-500">emoji_events</span>
-              <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">Personal Records Progress</h3>
+              <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Personal Records Progress")}</h3>
             </div>
-            <span class="text-[10px] text-primary font-semibold">${prs.length} Verified</span>
+            <span class="text-[10px] text-primary font-semibold">${prs.length} ${trHtml("Verified")}</span>
           </div>
 
           ${prs.length === 0 ? `
             <div class="p-4 rounded-xl border border-dashed border-outline-variant/40 text-center">
-              <p class="text-xs text-on-surface-variant dark:text-gray-400">Complete weighted exercises to establish your first verified PR.</p>
+              <p class="text-xs text-on-surface-variant dark:text-gray-400">${trHtml("Complete weighted exercises to establish your first verified PR.")}</p>
             </div>
           ` : `
             <div class="flex flex-col gap-2">
@@ -310,14 +305,14 @@ export function renderInsightsScreen(): string {
                   class="w-full text-left p-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 hover:border-primary/40 active:scale-[0.99] transition-all flex items-center justify-between group cursor-pointer"
                 >
                   <div>
-                    <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white group-hover:text-primary transition-colors">${escapeHtml(pr.exerciseName)}</h4>
-                    <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${escapeHtml(pr.muscleGroup)} &bull; ${pr.achievedAt}</span>
+                    <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white group-hover:text-primary transition-colors">${escapeHtml(exerciseLabel(pr.exerciseName))}</h4>
+                    <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${escapeHtml(translatedLabel(pr.muscleGroup))} &bull; ${pr.achievedAt}</span>
                   </div>
 
                   <div class="flex items-center gap-2">
                     <div class="text-right">
-                      <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white block">${pr.weightKg} kg &times; ${pr.reps}</span>
-                      <span class="text-[9px] text-primary dark:text-primary-container font-semibold">1RM: ${pr.estimatedOneRepMax} kg</span>
+                      <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white block">${pr.weightKg} ${trHtml("kg &times;")} ${pr.reps}</span>
+                      <span class="text-[9px] text-primary dark:text-primary-container font-semibold">${trHtml("1RM:")} ${pr.estimatedOneRepMax} ${trHtml("kg")}</span>
                     </div>
                     <span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
                   </div>
@@ -332,18 +327,16 @@ export function renderInsightsScreen(): string {
           <div class="flex items-center justify-between">
             <div>
               <div class="flex items-center gap-1.5">
-                <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">Micronutrient Trends</h3>
-                <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[9px] font-extrabold uppercase">Vitamins &amp; Trace</span>
+                <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Micronutrient Trends")}</h3>
+                <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[9px] font-extrabold uppercase">${trHtml("Vitamins & Trace")}</span>
               </div>
-              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">Intake evaluation over ${range} days</p>
+              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">${trHtml("Intake evaluation over")} ${range} ${trHtml("days")}</p>
             </div>
 
-            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
-              microTrends.hasMinimumCoverage 
+            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${microTrends.hasMinimumCoverage
                 ? 'bg-primary/10 text-primary dark:text-primary-container border-primary/20' 
-                : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border-outline-variant/30'
-            }">
-              ${microTrends.overallCoveragePercent}% Coverage
+                : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border-outline-variant/30'}">
+              ${microTrends.overallCoveragePercent}${trHtml("% Coverage")}
             </span>
           </div>
 
@@ -352,7 +345,7 @@ export function renderInsightsScreen(): string {
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px] text-primary">pie_chart</span>
               <span class="text-[11px] text-on-surface dark:text-gray-200">
-                Data recorded for <strong>${microTrends.mealsWithMicronutrientData} of ${microTrends.totalLoggedMeals} meals</strong> in this ${range}-day window
+                ${trHtml("Data recorded for")} <strong>${microTrends.mealsWithMicronutrientData} ${trHtml("of")} ${microTrends.totalLoggedMeals} ${trHtml("meals")}</strong> ${trHtml("in this")} ${range}${trHtml("-day window")}
               </span>
             </div>
           </div>
@@ -361,7 +354,7 @@ export function renderInsightsScreen(): string {
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             ${(['all', 'vitamins', 'minerals', 'other'] as const).map(cat => {
               const isActive = selectedNutrientCategory === cat;
-              const label = cat === 'all' ? 'All Nutrients' : cat === 'vitamins' ? 'Vitamins' : cat === 'minerals' ? 'Minerals' : 'Other';
+              const label = cat === 'all' ? tr("All Nutrients") : cat === 'vitamins' ? tr("Vitamins") : cat === 'minerals' ? tr("Minerals") : tr("Other");
               return `
                 <button 
                   type="button"
@@ -398,9 +391,9 @@ export function renderInsightsScreen(): string {
                 <div class="p-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1.5">
                   <div class="flex items-start justify-between">
                     <div>
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${escapeHtml(n.name)}</span>
+                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${trHtml(n.name)}</span>
                       <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
-                        ${n.referenceValue !== null ? `Ref: ${n.referenceValue} ${n.unit} (${n.direction === 'maximum_limit' ? 'max' : 'target'})` : 'Informational'}
+                        ${n.referenceValue !== null ? tr("Ref: {0} {1} ({2})", n.referenceValue, tr(n.unit), tr(n.direction === 'maximum_limit' ? 'max' : 'target')) : tr("Informational")}
                       </span>
                     </div>
 
@@ -411,14 +404,14 @@ export function renderInsightsScreen(): string {
 
                   <div class="flex items-baseline justify-between pt-1">
                     <div>
-                      <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase font-semibold">Daily Avg</span>
+                      <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase font-semibold">${trHtml("Daily Avg")}</span>
                       <div class="font-heading font-extrabold text-sm text-primary dark:text-primary-container">
-                        ${isInsufficient ? 'Insufficient data' : `${n.avgDailyIntake} ${n.unit}`}
+                        ${isInsufficient ? tr("Insufficient data") : `${n.avgDailyIntake} ${trHtml(n.unit)}`}
                       </div>
                     </div>
 
                     <div class="text-right">
-                      <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${n.totalMealsReporting} meals logged</span>
+                      <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${n.totalMealsReporting} ${trHtml("meals logged")}</span>
                     </div>
                   </div>
 
@@ -432,15 +425,15 @@ export function renderInsightsScreen(): string {
 
           <!-- Non-medical Disclaimer -->
           <div class="p-2.5 rounded-xl bg-surface-container-low/60 dark:bg-dark-surface-card/60 border border-outline-variant/20 text-[10px] text-on-surface-variant dark:text-gray-400 leading-relaxed">
-            These insights are based on logged meals and may not represent total dietary intake. Consult healthcare professionals for clinical nutritional evaluations.
+            ${trHtml("These insights are based on logged meals and may not represent total dietary intake. Consult healthcare professionals for clinical nutritional evaluations.")}
           </div>
         </section>
 
         <!-- G. RULE-BASED INSIGHT MESSAGES -->
         <section class="flex flex-col gap-2 pt-1">
           <div class="flex items-center justify-between">
-            <h3 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">Activity & Nutrition Analysis</h3>
-            <span class="text-[10px] text-primary dark:text-primary-container font-semibold">Automated Assessment</span>
+            <h3 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">${trHtml("Activity & Nutrition Analysis")}</h3>
+            <span class="text-[10px] text-primary dark:text-primary-container font-semibold">${trHtml("Automated Assessment")}</span>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -500,7 +493,7 @@ function renderOverviewCard(
   } else {
     deltaHtml = `
       <span class="text-[10px] text-on-surface-variant/70 dark:text-gray-500 block mt-1">
-        Not enough previous data
+        ${trHtml("Not enough previous data")}
       </span>
     `;
   }
@@ -515,7 +508,7 @@ function renderOverviewCard(
       <div>
         <div class="flex items-baseline gap-1">
           <span class="font-heading font-extrabold text-xl text-on-surface dark:text-white leading-tight">${value}</span>
-          <span class="text-xs font-medium text-on-surface-variant dark:text-gray-400">${unit}</span>
+          <span class="text-xs font-medium text-on-surface-variant dark:text-gray-400">${trHtml(unit)}</span>
         </div>
         ${deltaHtml}
       </div>
@@ -534,9 +527,9 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
       <div class="flex items-center justify-between text-[10px] text-on-surface-variant dark:text-gray-400 px-1">
         <div class="flex items-center gap-1.5">
           <span class="w-3 h-0.5 bg-primary/80 rounded-full inline-block"></span>
-          <span>Target: <strong>${targetCal} kcal</strong></span>
+          <span>${trHtml("Target:")} <strong>${targetCal} ${trHtml("kcal")}</strong></span>
         </div>
-        <span class="text-[9px] text-on-surface-variant/70">Tap bar to inspect day</span>
+        <span class="text-[9px] text-on-surface-variant/70">${trHtml("Tap bar to inspect day")}</span>
       </div>
 
       <!-- Accessible Bar Representation -->
@@ -557,29 +550,25 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
           return `
             <div 
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, '${day.calories} kcal logged across ${day.mealCount} meals')"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0} kcal logged across {1} meals', day.calories, day.mealCount))})"
             >
               <!-- Tooltip on hover/touch -->
               <div class="hidden group-hover:flex absolute -top-8 bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-nowrap z-20">
-                ${day.calories} kcal
+                ${day.calories} ${trHtml("kcal")}
               </div>
 
               <!-- Bar Fill -->
               <div 
-                class="w-full max-w-[28px] rounded-t-md transition-all duration-300 ${
-                  isZero 
+                class="w-full max-w-[28px] rounded-t-md transition-all duration-300 ${isZero
                     ? 'bg-outline-variant/20 h-1' 
                     : isOver 
                       ? 'bg-amber-500/80 dark:bg-amber-400/80 group-hover:bg-amber-500' 
-                      : 'bg-primary/80 dark:bg-primary-container group-hover:bg-primary'
-                }"
+                      : 'bg-primary/80 dark:bg-primary-container group-hover:bg-primary'}"
                 style="height: ${Math.max(4, heightPct)}%;"
               ></div>
 
               <!-- Label underneath -->
-              <span class="text-[9px] text-on-surface-variant dark:text-gray-400 mt-1 font-semibold truncate ${
-                isDense && idx % Math.ceil(colCount / 7) !== 0 ? 'opacity-0' : 'opacity-100'
-              }">
+              <span class="text-[9px] text-on-surface-variant dark:text-gray-400 mt-1 font-semibold truncate ${isDense && idx % Math.ceil(colCount / 7) !== 0 ? 'opacity-0' : 'opacity-100'}">
                 ${day.dayLabel.charAt(0)}
               </span>
             </div>
@@ -590,10 +579,10 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
       <!-- Inspection Banner Display -->
       <div id="day-detail-toast" class="hidden p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-[11px] text-on-surface dark:text-gray-200 flex items-center justify-between animate-fade-in">
         <span id="day-detail-toast-text" class="font-medium"></span>
-        <button onclick="document.getElementById('day-detail-toast')?.classList.add('hidden')" class="text-on-surface-variant text-xs ml-2">&times;</button>
+        <button onclick="document.getElementById('day-detail-toast')?.classList.add('hidden')" class="text-on-surface-variant text-xs ml-2">${trHtml("&times;")}</button>
       </div>
 
-      <p class="sr-only">Calories chart displaying ${colCount} days of intake against target ${targetCal} kcal.</p>
+      <p class="sr-only">${trHtml("Calories chart displaying")} ${colCount} ${trHtml("days of intake against target")} ${targetCal} ${trHtml("kcal.")}</p>
     </div>
   `;
 }
@@ -610,15 +599,15 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-1">
             <span class="w-2.5 h-2.5 rounded-xs bg-primary inline-block"></span>
-            <span>Protein (${targetProtein}g target)</span>
+            <span>${trHtml("Protein (")}${targetProtein}${trHtml("g target)")}</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="w-2.5 h-2.5 rounded-xs bg-amber-500 inline-block"></span>
-            <span>Carbs</span>
+            <span>${trHtml("Carbs")}</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="w-2.5 h-2.5 rounded-xs bg-rose-500 inline-block"></span>
-            <span>Fat</span>
+            <span>${trHtml("Fat")}</span>
           </div>
         </div>
       </div>
@@ -636,11 +625,11 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
           return `
             <div 
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, '${day.protein}g P &bull; ${day.carbs}g C &bull; ${day.fat}g F')"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0}g protein · {1}g carbs · {2}g fat', day.protein, day.carbs, day.fat))})"
             >
               <!-- Tooltip on hover/touch -->
               <div class="hidden group-hover:flex absolute -top-8 bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-nowrap z-20">
-                P:${day.protein} C:${day.carbs} F:${day.fat}
+                ${trHtml("P:")}${day.protein} ${trHtml("C:")}${day.carbs} ${trHtml("F:")}${day.fat}
               </div>
 
               <!-- Stacked Segment -->
@@ -650,9 +639,7 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
                 ${pPct > 0 ? `<div class="bg-primary w-full" style="height: ${pPct}%;"></div>` : ''}
               </div>
 
-              <span class="text-[9px] text-on-surface-variant dark:text-gray-400 mt-1 font-semibold truncate ${
-                isDense && idx % Math.ceil(colCount / 7) !== 0 ? 'opacity-0' : 'opacity-100'
-              }">
+              <span class="text-[9px] text-on-surface-variant dark:text-gray-400 mt-1 font-semibold truncate ${isDense && idx % Math.ceil(colCount / 7) !== 0 ? 'opacity-0' : 'opacity-100'}">
                 ${day.dayLabel.charAt(0)}
               </span>
             </div>
@@ -663,10 +650,10 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
       <!-- Inspection Banner Display -->
       <div id="day-detail-toast" class="hidden p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-[11px] text-on-surface dark:text-gray-200 flex items-center justify-between animate-fade-in">
         <span id="day-detail-toast-text" class="font-medium"></span>
-        <button onclick="document.getElementById('day-detail-toast')?.classList.add('hidden')" class="text-on-surface-variant text-xs ml-2">&times;</button>
+        <button onclick="document.getElementById('day-detail-toast')?.classList.add('hidden')" class="text-on-surface-variant text-xs ml-2">${trHtml("&times;")}</button>
       </div>
 
-      <p class="sr-only">Macronutrient distribution chart displaying Protein, Carbs, and Fats across ${colCount} days.</p>
+      <p class="sr-only">${trHtml("Macronutrient distribution chart displaying Protein, Carbs, and Fats across")} ${colCount} ${trHtml("days.")}</p>
     </div>
   `;
 }

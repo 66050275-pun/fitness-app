@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 import { formatFriendlyDate, getTodayKey } from '../../utils/dateUtils.ts';
 import { htmlJsArg, escapeHtml } from '../../utils/sanitize.ts';
 
@@ -56,7 +57,7 @@ export function renderAppHeader(options: AppHeaderOptions): string {
   const { state } = options;
   const selectedDate = options.selectedDate || state.selectedDate || getTodayKey();
   const showQuickAdd = options.showQuickAdd ?? true;
-  const quickAddAriaLabel = options.quickAddAriaLabel || 'Add meal or exercise';
+  const quickAddAriaLabel = options.quickAddAriaLabel || tr("Add meal or exercise");
   const streakDays = state.streakDays ?? 0;
 
   // User Display Info & Initials
@@ -65,7 +66,7 @@ export function renderAppHeader(options: AppHeaderOptions): string {
   const initials = nameParts.length > 1
     ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
     : (nameParts[0]?.slice(0, 2).toUpperCase() || 'NA');
-  const greeting = displayName ? `Good morning, ${escapeHtml(displayName)}` : 'Good morning';
+  const greeting = displayName ? tr("Good morning, {0}", escapeHtml(displayName)) : tr("Good morning");
 
   // Subtitle markup
   let subtitleHtml = '';
@@ -78,7 +79,7 @@ export function renderAppHeader(options: AppHeaderOptions): string {
           <span>${formatFriendlyDate(selectedDate)}</span>
           ${!isToday ? `
             <button onclick="window.selectDate(${htmlJsArg(todayKey)})" class="text-primary font-bold hover:underline">
-              (Show Today)
+              ${trHtml("(Show Today)")}
             </button>
           ` : ''}
         </p>
@@ -87,7 +88,7 @@ export function renderAppHeader(options: AppHeaderOptions): string {
     }
     case 'diary': {
       subtitleHtml = `
-        <button type="button" onclick="window.openDiaryCalendar()" class="flex items-center gap-1 text-xs text-on-surface-variant dark:text-gray-400 hover:text-primary text-left group transition-colors focus:outline-none" aria-label="Choose diary date">
+        <button type="button" onclick="window.openDiaryCalendar()" class="flex items-center gap-1 text-xs text-on-surface-variant dark:text-gray-400 hover:text-primary text-left group transition-colors focus:outline-none" aria-label="${trHtml("Choose diary date")}">
           <span>${formatFriendlyDate(selectedDate)}</span>
           <span class="material-symbols-outlined text-[14px] text-primary">expand_more</span>
         </button>
@@ -110,9 +111,9 @@ export function renderAppHeader(options: AppHeaderOptions): string {
       <header class="sticky top-0 z-40 bg-surface/90 dark:bg-dark-surface/90 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex justify-between items-center border-b border-outline-variant/20">
         <div class="flex items-center gap-3">
           <!-- Leading Avatar with Streak Badge -->
-          <div class="relative cursor-pointer" onclick="window.navigateApp('profile')" aria-label="Open Profile">
+          <div class="relative cursor-pointer" onclick="window.navigateApp('profile')" aria-label="${trHtml("Open Profile")}">
             <div class="w-11 h-11 overflow-hidden rounded-full border-2 border-primary/40 shadow-sm bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center font-heading font-extrabold text-xs">
-              ${state.profileImageUrl ? `<img src="${escapeHtml(state.profileImageUrl)}" class="w-full h-full object-cover" alt="Profile photo">` : `<span>${escapeHtml(initials)}</span>`}
+              ${state.profileImageUrl ? `<img src="${escapeHtml(state.profileImageUrl)}" class="w-full h-full object-cover" alt="${trHtml("Profile photo")}">` : `<span>${escapeHtml(initials)}</span>`}
             </div>
             <!-- Streak Flame Badge -->
             <div class="absolute -bottom-1 -right-1 bg-surface-container-lowest dark:bg-dark-surface-card px-1.5 py-0.5 rounded-full border border-outline-variant/30 shadow-sm flex items-center gap-0.5">
@@ -129,7 +130,7 @@ export function renderAppHeader(options: AppHeaderOptions): string {
         <!-- Trailing Actions -->
         <div class="flex items-center gap-2">
           <!-- Dark Mode Toggle -->
-          <button onclick="window.toggleTheme()" class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all" aria-label="Toggle theme">
+          <button onclick="window.toggleTheme()" class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all" aria-label="${trHtml("Toggle theme")}">
             <span class="material-symbols-outlined text-[18px]">${state.theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
           </button>
           

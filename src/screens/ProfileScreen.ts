@@ -1,3 +1,5 @@
+import { ACTIVITY_MULTIPLIERS } from '../utils/goalCalculations.ts';
+import { tr, trHtml, getLocale } from '../i18n/index.ts';
 /**
  * Main Profile & Settings Screen
  * 
@@ -23,19 +25,19 @@ export function renderProfileScreen(): string {
   const unit = prefs?.weightUnit || 'kg';
 
   const hasName = !!(profile?.displayName && profile.displayName.trim());
-  const displayName = hasName ? profile.displayName.trim() : 'Set up your profile';
+  const displayName = hasName ? profile.displayName.trim() : tr("Set up your profile");
   
-  let goalLabel = 'No goal set';
-  if (profile?.weightGoalType === 'lose') goalLabel = 'Lose Weight';
-  else if (profile?.weightGoalType === 'maintain') goalLabel = 'Maintain Weight';
-  else if (profile?.weightGoalType === 'gain') goalLabel = 'Gain Weight';
+  let goalLabel = tr("No goal set");
+  if (profile?.weightGoalType === 'lose') goalLabel = tr("Lose Weight");
+  else if (profile?.weightGoalType === 'maintain') goalLabel = tr("Maintain Weight");
+  else if (profile?.weightGoalType === 'gain') goalLabel = tr("Gain Weight");
 
   const calorieTarget = state.calorieTarget || 2100;
   const weightCount = state.weightHistory?.length || 0;
   const scheduleActive = state.eatingSchedule?.enabled || false;
   const currentWeightFormatted = formatWeight(profile?.currentWeightKg, unit);
-  const themeLabel = (prefs?.theme ? prefs.theme.charAt(0).toUpperCase() + prefs.theme.slice(1) : 'System');
-  const activityLabel = profile?.activityLevel ? (profile.activityLevel.charAt(0).toUpperCase() + profile.activityLevel.slice(1).replace('_', ' ')) : 'Moderate';
+  const themeLabel = (prefs?.theme ? tr(prefs.theme.charAt(0).toUpperCase() + prefs.theme.slice(1)) : tr("System"));
+  const activityLabel = profile?.activityLevel ? ACTIVITY_MULTIPLIERS[profile.activityLevel]?.label || tr('Moderately Active') : tr("Moderate");
   const profileImageUrl = state.profileImageUrl;
 
   // Initials for avatar placeholder
@@ -49,14 +51,14 @@ export function renderProfileScreen(): string {
   const sectionARows = [
     renderProfileMenuRow({
       id: 'personal-info',
-      label: 'Personal Information',
-      description: currentWeightFormatted !== '--' ? `Weight: ${currentWeightFormatted}` : 'Profile & biometric details',
+      label: tr("Personal Information"),
+      description: currentWeightFormatted !== '--' ? tr("Weight: {0}", currentWeightFormatted) : tr("Profile & biometric details"),
       icon: 'person',
       action: "window.openProfileSubpage('personal_info')"
     }),
     renderProfileMenuRow({
       id: 'weight-goal',
-      label: 'Weight Goal',
+      label: tr("Weight Goal"),
       description: goalLabel,
       icon: 'flag',
       status: goalLabel,
@@ -64,48 +66,48 @@ export function renderProfileScreen(): string {
     }),
     renderProfileMenuRow({
       id: 'nutrition-goals',
-      label: 'Nutrition Goals',
-      description: `${calorieTarget.toLocaleString()} kcal target`,
+      label: tr("Nutrition Goals"),
+      description: tr("{0} kcal target", calorieTarget.toLocaleString(getLocale())),
       icon: 'ads_click',
-      status: `${calorieTarget} kcal`,
+      status: tr("{0} kcal", calorieTarget),
       action: "window.openProfileSubpage('nutrition_goals')"
     }),
     renderProfileMenuRow({
       id: 'activity-level',
-      label: 'Activity Level',
-      description: 'Daily expenditure multiplier',
+      label: tr("Activity Level"),
+      description: tr("Daily expenditure multiplier"),
       icon: 'fitness_center',
       status: activityLabel,
       action: "window.openProfileSubpage('activity_level')"
     }),
     renderProfileMenuRow({
       id: 'weight-history',
-      label: 'Weight History',
-      description: `${weightCount} recorded measurement${weightCount !== 1 ? 's' : ''}`,
+      label: tr("Weight History"),
+      description: tr("{0} recorded measurement{1}", weightCount, weightCount !== 1 ? 's' : ''),
       icon: 'monitoring',
       status: `${weightCount}`,
       action: "window.openProfileSubpage('weight_history')"
     }),
     renderProfileMenuRow({
       id: 'eating-schedule',
-      label: 'Eating Schedule',
-      description: 'Intermittent eating & fasting window',
+      label: tr("Eating Schedule"),
+      description: tr("Intermittent eating & fasting window"),
       icon: 'hourglass_empty',
-      status: scheduleActive ? 'Active' : 'Off',
+      status: scheduleActive ? tr("Active") : tr("Off"),
       action: "window.openProfileSubpage('eating_schedule')"
     }),
     renderProfileMenuRow({
       id: 'health-connections',
-      label: 'Connected Health Apps',
-      description: 'Google Health Connect integration',
+      label: tr("Connected Health Apps"),
+      description: tr("Google Health Connect integration"),
       icon: 'health_and_safety',
-      status: 'Coming soon',
+      status: tr("Coming soon"),
       action: "window.openProfileSubpage('health_connections')"
     }),
     renderProfileMenuRow({
       id: 'app-settings',
-      label: 'App Settings',
-      description: 'Theme, units, week start & accessibility',
+      label: tr("App Settings"),
+      description: tr("Theme, units, week start & accessibility"),
       icon: 'settings',
       status: themeLabel,
       action: "window.openProfileSubpage('app_settings')"
@@ -116,39 +118,39 @@ export function renderProfileScreen(): string {
   const sectionBRows = [
     renderProfileMenuRow({
       id: 'whats-new',
-      label: "What's New",
-      description: `Release highlights for v${APP_METADATA.version}`,
+      label: tr("What's New"),
+      description: tr("Release highlights for v{0}", APP_METADATA.version),
       icon: 'new_releases',
       status: `v${APP_METADATA.version}`,
       action: "window.openProfileSubpage('whats_new')"
     }),
     renderProfileMenuRow({
       id: 'send-feedback',
-      label: 'Send Feedback',
-      description: 'Report an issue or send suggestions',
+      label: tr("Send Feedback"),
+      description: tr("Report an issue or send suggestions"),
       icon: 'feedback',
       action: "window.openProfileSubpage('feedback')"
     }),
     renderProfileMenuRow({
       id: 'suggest-feature',
-      label: 'Suggest a Feature',
-      description: 'Request new nutritional tools',
+      label: tr("Suggest a Feature"),
+      description: tr("Request new nutritional tools"),
       icon: 'lightbulb',
       action: "window.openProfileSubpage('feedback', 'Feature Request')"
     }),
     renderProfileMenuRow({
       id: 'rate-app',
-      label: 'Rate NutriAI',
-      description: 'Review on Google Play Store',
+      label: tr("Rate NutriAI"),
+      description: tr("Review on Google Play Store"),
       icon: 'star',
-      status: 'Available after release',
+      status: tr("Available after release"),
       disabled: true,
       action: ''
     }),
     renderProfileMenuRow({
       id: 'share-app',
-      label: 'Share NutriAI',
-      description: 'Invite friends to track nutrition',
+      label: tr("Share NutriAI"),
+      description: tr("Invite friends to track nutrition"),
       icon: 'share',
       action: 'window.shareNutriAI()'
     })
@@ -158,39 +160,39 @@ export function renderProfileScreen(): string {
   const sectionCRows = [
     renderProfileMenuRow({
       id: 'help-center',
-      label: 'Help Center',
-      description: 'Frequently asked questions & guides',
+      label: tr("Help Center"),
+      description: tr("Frequently asked questions & guides"),
       icon: 'help',
       action: "window.openProfileSubpage('help_center')"
     }),
     renderProfileMenuRow({
       id: 'terms-of-use',
-      label: 'Terms of Use',
-      description: 'Provisional draft terms',
+      label: tr("Terms of Use"),
+      description: tr("Provisional draft terms"),
       icon: 'description',
-      status: 'Draft',
+      status: tr("Draft"),
       action: "window.openProfileSubpage('terms_of_use')"
     }),
     renderProfileMenuRow({
       id: 'privacy-policy',
-      label: 'Privacy Policy',
-      description: 'On-device data storage policy',
+      label: tr("Privacy Policy"),
+      description: tr("On-device data storage policy"),
       icon: 'shield',
-      status: 'Draft',
+      status: tr("Draft"),
       action: "window.openProfileSubpage('privacy_policy')"
     }),
     renderProfileMenuRow({
       id: 'marketing-consent',
-      label: 'Marketing Consent',
-      description: 'Promotional communications preference',
+      label: tr("Marketing Consent"),
+      description: tr("Promotional communications preference"),
       icon: 'check_box',
-      status: prefs?.marketingConsent ? 'Opted In' : 'Off',
+      status: prefs?.marketingConsent ? tr("Opted In") : tr("Off"),
       action: "window.openProfileSubpage('marketing_consent')"
     }),
     renderProfileMenuRow({
       id: 'health-disclaimer',
-      label: 'Health Disclaimer',
-      description: 'Important medical advisory notice',
+      label: tr("Health Disclaimer"),
+      description: tr("Important medical advisory notice"),
       icon: 'health_and_safety',
       action: "window.openProfileSubpage('health_disclaimer')"
     })
@@ -200,8 +202,8 @@ export function renderProfileScreen(): string {
   const sectionDRows = [
     renderProfileMenuRow({
       id: 'data-privacy',
-      label: 'Data & Privacy',
-      description: 'Export backup archive or delete records',
+      label: tr("Data & Privacy"),
+      description: tr("Export backup archive or delete records"),
       icon: 'privacy_tip',
       action: "window.openProfileSubpage('data_privacy')"
     })
@@ -216,12 +218,12 @@ export function renderProfileScreen(): string {
           <button 
             type="button"
             onclick="window.navigateApp('dashboard')" 
-            aria-label="Back to Home"
+            aria-label="${trHtml("Back to Home")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-lg text-on-surface dark:text-white">Profile</h1>
+          <h1 class="font-heading font-bold text-lg text-on-surface dark:text-white">${trHtml("Profile")}</h1>
         </div>
 
         <button 
@@ -229,7 +231,7 @@ export function renderProfileScreen(): string {
           onclick="window.openProfileSubpage('personal_info')" 
           class="text-xs font-bold text-primary dark:text-primary-container px-3 py-1.5 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 hover:bg-surface-container active:scale-95 transition-all"
         >
-          Edit Profile
+          ${trHtml("Edit Profile")}
         </button>
       </header>
 
@@ -239,8 +241,8 @@ export function renderProfileScreen(): string {
         <!-- 1. Profile Header / Identity Card -->
         <section class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex items-center justify-between gap-3">
           <div class="flex items-center gap-3.5 min-w-0">
-            <button type="button" onclick="document.getElementById('profile-photo-input')?.click()" aria-label="Change profile photo" class="relative w-14 h-14 overflow-hidden rounded-full bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center shadow-md border-2 border-surface dark:border-dark-surface shrink-0 cursor-pointer hover:scale-105 transition-transform">
-              ${profileImageUrl ? `<img src="${escapeHtml(profileImageUrl)}" class="w-full h-full object-cover" alt="Profile photo">` : `<span class="font-heading font-extrabold text-base tracking-wider select-none">${escapeHtml(initials)}</span>`}
+            <button type="button" onclick="document.getElementById('profile-photo-input')?.click()" aria-label="${trHtml("Change profile photo")}" class="relative w-14 h-14 overflow-hidden rounded-full bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center shadow-md border-2 border-surface dark:border-dark-surface shrink-0 cursor-pointer hover:scale-105 transition-transform">
+              ${profileImageUrl ? `<img src="${escapeHtml(profileImageUrl)}" class="w-full h-full object-cover" alt="${trHtml("Profile photo")}">` : `<span class="font-heading font-extrabold text-base tracking-wider select-none">${escapeHtml(initials)}</span>`}
               <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-primary ring-2 ring-surface dark:ring-dark-surface flex items-center justify-center">
                 <span class="material-symbols-outlined text-[10px] text-white">edit</span>
               </span>
@@ -257,17 +259,17 @@ export function renderProfileScreen(): string {
                   ${goalLabel}
                 </span>
                 <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
-                  &bull; Local Profile
+                  ${trHtml("• Local Profile")}
                 </span>
               </div>
-              ${profileImageUrl ? `<button type="button" onclick="window.removeProfilePhoto()" class="mt-1.5 text-[10px] font-bold text-error text-left">Remove photo</button>` : ''}
+              ${profileImageUrl ? `<button type="button" onclick="window.removeProfilePhoto()" class="mt-1.5 text-[10px] font-bold text-error text-left">${trHtml("Remove photo")}</button>` : ''}
             </div>
           </div>
 
           <button 
             type="button" 
             onclick="window.openProfileSubpage('personal_info')"
-            aria-label="Edit Profile"
+            aria-label="${trHtml("Edit Profile")}"
             class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary shrink-0 transition-colors"
           >
             <span class="material-symbols-outlined text-[18px]">chevron_right</span>
@@ -277,8 +279,8 @@ export function renderProfileScreen(): string {
         <!-- 2. SECTION A — YOUR PROFILE -->
         ${renderProfileMenuSection({
           id: 'section-your-profile',
-          title: 'Your Profile',
-          description: 'Personal biometrics, nutrition targets, and schedules',
+          title: tr("Your Profile"),
+          description: tr("Personal biometrics, nutrition targets, and schedules"),
           rowsHtml: sectionARows
         })}
 
@@ -286,23 +288,23 @@ export function renderProfileScreen(): string {
         ${renderProfileMenuSection({
           id: 'section-nutriai',
           title: 'NutriAI',
-          description: 'App updates, community feedback, and sharing',
+          description: tr("App updates, community feedback, and sharing"),
           rowsHtml: sectionBRows
         })}
 
         <!-- 4. SECTION C — HELP & LEGAL -->
         ${renderProfileMenuSection({
           id: 'section-help-legal',
-          title: 'Help & Legal',
-          description: 'Guides, policies, consent, and disclaimers',
+          title: tr("Help & Legal"),
+          description: tr("Guides, policies, consent, and disclaimers"),
           rowsHtml: sectionCRows
         })}
 
         <!-- 5. SECTION D — DATA & ACCOUNT -->
         ${renderProfileMenuSection({
           id: 'section-data-account',
-          title: 'Data & Account',
-          description: 'Device storage and cloud readiness',
+          title: tr("Data & Account"),
+          description: tr("Device storage and cloud readiness"),
           rowsHtml: sectionDRows
         })}
 
@@ -313,16 +315,16 @@ export function renderProfileScreen(): string {
               <span class="material-symbols-outlined text-[20px] text-primary">cloud_off</span>
               <div>
                 <span class="font-heading font-bold text-xs text-on-surface dark:text-white block">
-                  Account Status: Local Profile
+                  ${trHtml("Account Status: Local Profile")}
                 </span>
                 <span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-0.5">
-                  Stored exclusively on this physical device
+                  ${trHtml("Stored exclusively on this physical device")}
                 </span>
               </div>
             </div>
 
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border border-outline-variant/30">
-              Offline
+              ${trHtml("Offline")}
             </span>
           </div>
 
@@ -331,17 +333,17 @@ export function renderProfileScreen(): string {
             disabled 
             class="w-full py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant/40 dark:text-gray-500 border border-outline-variant/30 text-xs font-bold cursor-not-allowed text-center"
           >
-            Cloud Account Sync &bull; Coming Soon
+            ${trHtml("Cloud Account Sync • Coming Soon")}
           </button>
         </div>
 
         <!-- App Metadata Footer -->
         <footer class="text-center py-4 flex flex-col gap-0.5 select-none">
           <p class="text-[11px] font-semibold text-on-surface-variant dark:text-gray-500">
-            NutriAI for Android &bull; Version ${APP_METADATA.version} (Build ${APP_METADATA.build})
+            ${trHtml("NutriAI for Android • Version")} ${APP_METADATA.version} ${trHtml("(Build")} ${APP_METADATA.build})
           </p>
           <p class="text-[10px] text-on-surface-variant/70 dark:text-gray-600">
-            Vital Intelligence &bull; On-Device Engine
+            ${trHtml("Vital Intelligence • On-Device Engine")}
           </p>
         </footer>
 

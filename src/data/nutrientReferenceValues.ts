@@ -1,3 +1,4 @@
+import { tr } from '../i18n/index.ts';
 /**
  * Centralized Nutrient Reference Values & Guidelines
  * 
@@ -33,7 +34,7 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
   vitamin_a: {
     key: 'vitamin_a',
     name: 'Vitamin A',
-    shortName: 'Vit A',
+    get shortName() { return tr("Vit A"); },
     category: 'vitamin',
     defaultUnit: 'mcg_RAE',
     referenceValue: 900,
@@ -41,12 +42,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 10,
-    description: 'Essential for immune defense, eye health, and cellular integrity'
+    get description() { return tr("Essential for immune defense, eye health, and cellular integrity"); }
   },
   vitamin_c: {
     key: 'vitamin_c',
     name: 'Vitamin C',
-    shortName: 'Vit C',
+    get shortName() { return tr("Vit C"); },
     category: 'vitamin',
     defaultUnit: 'mg',
     referenceValue: 90,
@@ -54,12 +55,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 11,
-    description: 'Potent antioxidant supporting collagen synthesis and iron absorption'
+    get description() { return tr("Potent antioxidant supporting collagen synthesis and iron absorption"); }
   },
   vitamin_d: {
     key: 'vitamin_d',
     name: 'Vitamin D',
-    shortName: 'Vit D',
+    get shortName() { return tr("Vit D"); },
     category: 'vitamin',
     defaultUnit: 'mcg',
     referenceValue: 20, // 20 mcg = 800 IU
@@ -67,12 +68,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 12,
-    description: 'Critical for calcium uptake, bone mineralization, and immune modulation'
+    get description() { return tr("Critical for calcium uptake, bone mineralization, and immune modulation"); }
   },
   vitamin_e: {
     key: 'vitamin_e',
     name: 'Vitamin E',
-    shortName: 'Vit E',
+    get shortName() { return tr("Vit E"); },
     category: 'vitamin',
     defaultUnit: 'mg_alpha_TE',
     referenceValue: 15,
@@ -80,12 +81,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 13,
-    description: 'Lipid-soluble antioxidant protecting polyunsaturated membranes'
+    get description() { return tr("Lipid-soluble antioxidant protecting polyunsaturated membranes"); }
   },
   vitamin_k: {
     key: 'vitamin_k',
     name: 'Vitamin K',
-    shortName: 'Vit K',
+    get shortName() { return tr("Vit K"); },
     category: 'vitamin',
     defaultUnit: 'mcg',
     referenceValue: 120,
@@ -93,12 +94,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 14,
-    description: 'Required cofactor for coagulation proteins and osteocalcin'
+    get description() { return tr("Required cofactor for coagulation proteins and osteocalcin"); }
   },
   vitamin_b1: {
     key: 'vitamin_b1',
     name: 'Vitamin B1 (Thiamin)',
-    shortName: 'B1 Thiamin',
+    get shortName() { return tr("B1 Thiamin"); },
     category: 'vitamin',
     defaultUnit: 'mg',
     referenceValue: 1.2,
@@ -106,12 +107,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 15,
-    description: 'Central cofactor in carbohydrate catabolism and neural transmission'
+    get description() { return tr("Central cofactor in carbohydrate catabolism and neural transmission"); }
   },
   vitamin_b2: {
     key: 'vitamin_b2',
     name: 'Vitamin B2 (Riboflavin)',
-    shortName: 'B2 Riboflavin',
+    get shortName() { return tr("B2 Riboflavin"); },
     category: 'vitamin',
     defaultUnit: 'mg',
     referenceValue: 1.3,
@@ -119,12 +120,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 16,
-    description: 'Precursor of FMN and FAD coenzymes in cellular bioenergetics'
+    get description() { return tr("Precursor of FMN and FAD coenzymes in cellular bioenergetics"); }
   },
   vitamin_b3: {
     key: 'vitamin_b3',
     name: 'Vitamin B3 (Niacin)',
-    shortName: 'B3 Niacin',
+    get shortName() { return tr("B3 Niacin"); },
     category: 'vitamin',
     defaultUnit: 'mg_NE',
     referenceValue: 16,
@@ -132,12 +133,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 17,
-    description: 'Precursor of NAD/NADP facilitating cellular redox homeostasis'
+    get description() { return tr("Precursor of NAD/NADP facilitating cellular redox homeostasis"); }
   },
   vitamin_b5: {
     key: 'vitamin_b5',
     name: 'Vitamin B5 (Pantothenic Acid)',
-    shortName: 'B5 Pantothenic',
+    get shortName() { return tr("B5 Pantothenic"); },
     category: 'vitamin',
     defaultUnit: 'mg',
     referenceValue: 5,
@@ -145,12 +146,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 18,
-    description: 'Structural component of Coenzyme A driving fatty acid metabolism'
+    get description() { return tr("Structural component of Coenzyme A driving fatty acid metabolism"); }
   },
   vitamin_b6: {
     key: 'vitamin_b6',
     name: 'Vitamin B6 (Pyridoxine)',
-    shortName: 'Vit B6',
+    get shortName() { return tr("Vit B6"); },
     category: 'vitamin',
     defaultUnit: 'mg',
     referenceValue: 1.7,
@@ -158,12 +159,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 19,
-    description: 'Vital in amino acid transamination and neurotransmitter biosynthesis'
+    get description() { return tr("Vital in amino acid transamination and neurotransmitter biosynthesis"); }
   },
   vitamin_b7: {
     key: 'vitamin_b7',
     name: 'Vitamin B7 (Biotin)',
-    shortName: 'B7 Biotin',
+    get shortName() { return tr("B7 Biotin"); },
     category: 'vitamin',
     defaultUnit: 'mcg',
     referenceValue: 30,
@@ -171,12 +172,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 20,
-    description: 'Essential prosthetic group for gluconeogenesis and lipogenesis carboxylases'
+    get description() { return tr("Essential prosthetic group for gluconeogenesis and lipogenesis carboxylases"); }
   },
   vitamin_b9: {
     key: 'vitamin_b9',
     name: 'Vitamin B9 (Folate)',
-    shortName: 'B9 Folate',
+    get shortName() { return tr("B9 Folate"); },
     category: 'vitamin',
     defaultUnit: 'mcg_DFE',
     referenceValue: 400,
@@ -184,12 +185,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 21,
-    description: 'Crucial one-carbon donor for nucleic acid replication and red cell formation'
+    get description() { return tr("Crucial one-carbon donor for nucleic acid replication and red cell formation"); }
   },
   vitamin_b12: {
     key: 'vitamin_b12',
     name: 'Vitamin B12 (Cobalamin)',
-    shortName: 'Vit B12',
+    get shortName() { return tr("Vit B12"); },
     category: 'vitamin',
     defaultUnit: 'mcg',
     referenceValue: 2.4,
@@ -197,12 +198,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 22,
-    description: 'Required for myelin sheath maintenance and methionine synthase activity'
+    get description() { return tr("Required for myelin sheath maintenance and methionine synthase activity"); }
   },
   choline: {
     key: 'choline',
     name: 'Choline',
-    shortName: 'Choline',
+    get shortName() { return tr("Choline"); },
     category: 'vitamin',
     defaultUnit: 'mg',
     referenceValue: 550,
@@ -210,7 +211,7 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 23,
-    description: 'Precursor of acetylcholine and phosphatidylcholine cell membranes'
+    get description() { return tr("Precursor of acetylcholine and phosphatidylcholine cell membranes"); }
   },
 
   // ==========================================
@@ -219,7 +220,7 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
   calcium: {
     key: 'calcium',
     name: 'Calcium',
-    shortName: 'Calcium',
+    get shortName() { return tr("Calcium"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 1300,
@@ -227,12 +228,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 30,
-    description: 'Primary structural cation in bone matrix and neuromuscular signaling'
+    get description() { return tr("Primary structural cation in bone matrix and neuromuscular signaling"); }
   },
   iron: {
     key: 'iron',
     name: 'Iron',
-    shortName: 'Iron',
+    get shortName() { return tr("Iron"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 18,
@@ -240,12 +241,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 31,
-    description: 'Central functional core of hemoglobin and mitochondrial cytochromes'
+    get description() { return tr("Central functional core of hemoglobin and mitochondrial cytochromes"); }
   },
   magnesium: {
     key: 'magnesium',
     name: 'Magnesium',
-    shortName: 'Magnesium',
+    get shortName() { return tr("Magnesium"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 420,
@@ -253,12 +254,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 32,
-    description: 'Enzyme cofactor for >300 biochemical reactions and ATP phosphorylation'
+    get description() { return tr("Enzyme cofactor for >300 biochemical reactions and ATP phosphorylation"); }
   },
   phosphorus: {
     key: 'phosphorus',
     name: 'Phosphorus',
-    shortName: 'Phosphorus',
+    get shortName() { return tr("Phosphorus"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 1250,
@@ -266,12 +267,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 33,
-    description: 'Constituent of hydroxyapatite crystals and phospholipid bilayers'
+    get description() { return tr("Constituent of hydroxyapatite crystals and phospholipid bilayers"); }
   },
   potassium: {
     key: 'potassium',
     name: 'Potassium',
-    shortName: 'Potassium',
+    get shortName() { return tr("Potassium"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 4700,
@@ -279,12 +280,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 34,
-    description: 'Major intracellular electrolyte maintaining resting membrane potential'
+    get description() { return tr("Major intracellular electrolyte maintaining resting membrane potential"); }
   },
   sodium: {
     key: 'sodium',
     name: 'Sodium',
-    shortName: 'Sodium',
+    get shortName() { return tr("Sodium"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 2300,
@@ -292,12 +293,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'maximum_limit', // Exceeding is over limit
     hasDailyValuePercent: true,
     displayOrder: 35,
-    description: 'Primary extracellular osmolytes; recommended limit <= 2,300 mg/day'
+    get description() { return tr("Primary extracellular osmolytes; recommended limit <= 2,300 mg/day"); }
   },
   zinc: {
     key: 'zinc',
     name: 'Zinc',
-    shortName: 'Zinc',
+    get shortName() { return tr("Zinc"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 11,
@@ -305,12 +306,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 36,
-    description: 'Catalytic and structural ion for zinc-finger transcription factors'
+    get description() { return tr("Catalytic and structural ion for zinc-finger transcription factors"); }
   },
   copper: {
     key: 'copper',
     name: 'Copper',
-    shortName: 'Copper',
+    get shortName() { return tr("Copper"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 0.9,
@@ -318,12 +319,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 37,
-    description: 'Cofactor in cytochrome c oxidase and ceruloplasmin'
+    get description() { return tr("Cofactor in cytochrome c oxidase and ceruloplasmin"); }
   },
   manganese: {
     key: 'manganese',
     name: 'Manganese',
-    shortName: 'Manganese',
+    get shortName() { return tr("Manganese"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 2.3,
@@ -331,12 +332,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 38,
-    description: 'Antioxidant activator of mitochondrial Mn-SOD and arginase'
+    get description() { return tr("Antioxidant activator of mitochondrial Mn-SOD and arginase"); }
   },
   selenium: {
     key: 'selenium',
     name: 'Selenium',
-    shortName: 'Selenium',
+    get shortName() { return tr("Selenium"); },
     category: 'mineral',
     defaultUnit: 'mcg',
     referenceValue: 55,
@@ -344,12 +345,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 39,
-    description: 'Integral selenocysteine residue in glutathione peroxidase and deiodinases'
+    get description() { return tr("Integral selenocysteine residue in glutathione peroxidase and deiodinases"); }
   },
   iodine: {
     key: 'iodine',
     name: 'Iodine',
-    shortName: 'Iodine',
+    get shortName() { return tr("Iodine"); },
     category: 'mineral',
     defaultUnit: 'mcg',
     referenceValue: 150,
@@ -357,12 +358,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 40,
-    description: 'Indispensable component of thyroid hormones thyroxine (T4) and T3'
+    get description() { return tr("Indispensable component of thyroid hormones thyroxine (T4) and T3"); }
   },
   chromium: {
     key: 'chromium',
     name: 'Chromium',
-    shortName: 'Chromium',
+    get shortName() { return tr("Chromium"); },
     category: 'mineral',
     defaultUnit: 'mcg',
     referenceValue: 35,
@@ -370,12 +371,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 41,
-    description: 'Potentiates physiological insulin signaling and carbohydrate processing'
+    get description() { return tr("Potentiates physiological insulin signaling and carbohydrate processing"); }
   },
   molybdenum: {
     key: 'molybdenum',
     name: 'Molybdenum',
-    shortName: 'Molybdenum',
+    get shortName() { return tr("Molybdenum"); },
     category: 'mineral',
     defaultUnit: 'mcg',
     referenceValue: 45,
@@ -383,12 +384,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 42,
-    description: 'Cofactor for sulfite oxidase and xanthine oxidoreductase enzymes'
+    get description() { return tr("Cofactor for sulfite oxidase and xanthine oxidoreductase enzymes"); }
   },
   chloride: {
     key: 'chloride',
     name: 'Chloride',
-    shortName: 'Chloride',
+    get shortName() { return tr("Chloride"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 2300,
@@ -396,12 +397,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 43,
-    description: 'Principal anion maintaining extracellular fluid volume and gastric HCl'
+    get description() { return tr("Principal anion maintaining extracellular fluid volume and gastric HCl"); }
   },
   fluoride: {
     key: 'fluoride',
     name: 'Fluoride',
-    shortName: 'Fluoride',
+    get shortName() { return tr("Fluoride"); },
     category: 'mineral',
     defaultUnit: 'mg',
     referenceValue: 4,
@@ -409,7 +410,7 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'informational_only',
     hasDailyValuePercent: false, // Explicitly NO auto %DV
     displayOrder: 44,
-    description: 'Promotes fluorapatite crystal stability in tooth enamel mineralization'
+    get description() { return tr("Promotes fluorapatite crystal stability in tooth enamel mineralization"); }
   },
 
   // ==========================================
@@ -418,7 +419,7 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
   fiber: {
     key: 'fiber',
     name: 'Dietary Fiber',
-    shortName: 'Fiber',
+    get shortName() { return tr("Fiber"); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: 28,
@@ -426,12 +427,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'minimum_target',
     hasDailyValuePercent: true,
     displayOrder: 50,
-    description: 'Non-digestible carbohydrate promoting microbiome diversity and satiety'
+    get description() { return tr("Non-digestible carbohydrate promoting microbiome diversity and satiety"); }
   },
   total_sugars: {
     key: 'total_sugars',
     name: 'Total Sugars',
-    shortName: 'Total Sugars',
+    get shortName() { return tr("Total Sugars"); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: null,
@@ -439,12 +440,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'informational_only',
     hasDailyValuePercent: false, // Explicitly NO auto %DV
     displayOrder: 51,
-    description: 'Combined natural and added mono- and disaccharides (informational only)'
+    get description() { return tr("Combined natural and added mono- and disaccharides (informational only)"); }
   },
   added_sugars: {
     key: 'added_sugars',
     name: 'Added Sugars',
-    shortName: 'Added Sugars',
+    get shortName() { return tr("Added Sugars"); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: 50,
@@ -452,12 +453,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'maximum_limit', // Maximum-oriented
     hasDailyValuePercent: true,
     displayOrder: 52,
-    description: 'Sugars added during processing; recommend limiting to <10% of daily calories'
+    get description() { return tr("Sugars added during processing; recommend limiting to <10% of daily calories"); }
   },
   cholesterol: {
     key: 'cholesterol',
     name: 'Cholesterol',
-    shortName: 'Cholesterol',
+    get shortName() { return tr("Cholesterol"); },
     category: 'other',
     defaultUnit: 'mg',
     referenceValue: 300,
@@ -465,12 +466,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'maximum_limit', // Maximum-oriented
     hasDailyValuePercent: true,
     displayOrder: 53,
-    description: 'Dietary sterol; healthy dietary guideline reference <= 300 mg/day'
+    get description() { return tr("Dietary sterol; healthy dietary guideline reference <= 300 mg/day"); }
   },
   saturated_fat: {
     key: 'saturated_fat',
     name: 'Saturated Fat',
-    shortName: 'Sat. Fat',
+    get shortName() { return tr("Sat. Fat"); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: 20,
@@ -478,12 +479,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'maximum_limit', // Maximum-oriented
     hasDailyValuePercent: true,
     displayOrder: 54,
-    description: 'Saturated fatty acid chains; recommended limit <= 20 g/day'
+    get description() { return tr("Saturated fatty acid chains; recommended limit <= 20 g/day"); }
   },
   trans_fat: {
     key: 'trans_fat',
     name: 'Trans Fat',
-    shortName: 'Trans Fat',
+    get shortName() { return tr("Trans Fat"); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: 0,
@@ -491,12 +492,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'maximum_limit',
     hasDailyValuePercent: false, // Explicitly NO auto %DV
     displayOrder: 55,
-    description: 'Partially hydrogenated industrial fatty acids (keep as close to 0 as possible)'
+    get description() { return tr("Partially hydrogenated industrial fatty acids (keep as close to 0 as possible)"); }
   },
   monounsaturated_fat: {
     key: 'monounsaturated_fat',
     name: 'Monounsaturated Fat',
-    shortName: 'Monounsat.',
+    get shortName() { return tr("Monounsat."); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: null,
@@ -504,12 +505,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'informational_only',
     hasDailyValuePercent: false,
     displayOrder: 56,
-    description: 'Omega-9 rich heart-healthy fats such as oleic acid from olive oil'
+    get description() { return tr("Omega-9 rich heart-healthy fats such as oleic acid from olive oil"); }
   },
   polyunsaturated_fat: {
     key: 'polyunsaturated_fat',
     name: 'Polyunsaturated Fat',
-    shortName: 'Polyunsat.',
+    get shortName() { return tr("Polyunsat."); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: null,
@@ -517,12 +518,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'informational_only',
     hasDailyValuePercent: false,
     displayOrder: 57,
-    description: 'Essential polyunsaturated fatty acids containing multiple double bonds'
+    get description() { return tr("Essential polyunsaturated fatty acids containing multiple double bonds"); }
   },
   omega_3: {
     key: 'omega_3',
     name: 'Omega-3 Fatty Acids',
-    shortName: 'Omega-3',
+    get shortName() { return tr("Omega-3"); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: 1.6,
@@ -530,12 +531,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'informational_only',
     hasDailyValuePercent: false, // Explicitly NO auto %DV
     displayOrder: 58,
-    description: 'Alpha-linolenic acid (ALA), EPA and DHA supporting cardiovascular health'
+    get description() { return tr("Alpha-linolenic acid (ALA), EPA and DHA supporting cardiovascular health"); }
   },
   omega_6: {
     key: 'omega_6',
     name: 'Omega-6 Fatty Acids',
-    shortName: 'Omega-6',
+    get shortName() { return tr("Omega-6"); },
     category: 'other',
     defaultUnit: 'g',
     referenceValue: 14,
@@ -543,12 +544,12 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'informational_only',
     hasDailyValuePercent: false, // Explicitly NO auto %DV
     displayOrder: 59,
-    description: 'Linoleic acid supporting cellular integrity and metabolic regulation'
+    get description() { return tr("Linoleic acid supporting cellular integrity and metabolic regulation"); }
   },
   caffeine: {
     key: 'caffeine',
     name: 'Caffeine',
-    shortName: 'Caffeine',
+    get shortName() { return tr("Caffeine"); },
     category: 'other',
     defaultUnit: 'mg',
     referenceValue: 400,
@@ -556,7 +557,7 @@ export const NUTRIENT_REFERENCE_DICTIONARY: Record<string, NutrientReferenceConf
     direction: 'maximum_limit', // Maximum-oriented
     hasDailyValuePercent: false, // Explicitly NO auto %DV
     displayOrder: 60,
-    description: 'Central nervous system stimulant; safe reference upper threshold is 400 mg/day'
+    get description() { return tr("Central nervous system stimulant; safe reference upper threshold is 400 mg/day"); }
   }
 };
 

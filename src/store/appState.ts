@@ -1,3 +1,5 @@
+import { foodLabel, mealLabel } from '../i18n/foodLabels.ts';
+import { tr, getLanguage, hasLanguageChoice, setLanguage, getLocale } from '../i18n/index.ts';
 import { privateStorage } from '../services/privateStorage.ts';
 import type { 
   AppState, 
@@ -551,6 +553,9 @@ class Store {
       profileImageUrl: null
     };
 
+    // A choice made at the lock screen takes precedence over the encrypted preference.
+    this.state.userPreferences.language = setLanguage(hasLanguageChoice() ? getLanguage() : this.state.userPreferences.language);
+
     // Route to onboarding if not completed
     if (this.state.onboardingState.status !== 'completed') {
       this.state.currentScreen = 'onboarding';
@@ -759,10 +764,12 @@ class Store {
   }
 
   public updateUserPreferences(preferences: Partial<UserPreferences>) {
+    if (preferences.language !== undefined) preferences = { ...preferences, language: setLanguage(preferences.language) };
     this.state.userPreferences = {
       ...this.state.userPreferences,
       ...preferences
     };
+    if (preferences.language !== undefined) this.calculatePersonalRecords();
     if (preferences.theme) {
       this.applyThemePreference(preferences.theme);
     }
@@ -1009,6 +1016,7 @@ class Store {
       this.state.weightHistory = [];
       this.state.userProfile = { displayName: '' };
       this.state.userPreferences = sanitizeUserPreferences(null);
+      this.state.userPreferences.language = getLanguage();
       this.state.eatingSchedule = sanitizeEatingSchedule(null);
       this.state.nutritionGoals = sanitizeNutritionGoals(null);
       this.state.calorieTarget = 2100;
@@ -1306,9 +1314,9 @@ class Store {
       if (this.disposed) return;
       let reply = "Keep focus on progressive overload and adequate post-workout nutrition.";
       const lower = text.toLowerCase();
-      if (lower.includes('protein') || lower.includes('dinner')) {
+      if (['protein', 'dinner', 'โปรตีน', 'มื้อเย็น'].some(word => lower.includes(word))) {
         reply = "For dinner after heavy resistance training, aim for 40-50g protein like wild salmon or chicken breast with complex carbohydrates to replenish glycogen.";
-      } else if (lower.includes('workout') || lower.includes('volume')) {
+      } else if (['workout', 'volume', 'ออกกำลัง', 'ฝึก', 'ปริมาณ'].some(word => lower.includes(word))) {
         reply = "Track your total tonnage across sets. Progressive volume increase week over week is the primary driver for hypertrophy.";
       }
       this.state.chatHistory.push({
@@ -1553,7 +1561,7 @@ class Store {
     this.persistState();
 
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    this.showPlannerToast(`Applied to ${monthNames[month - 1]} ${year}`);
+    this.showPlannerToast(tr('Applied to {0} {1}', tr(monthNames[month - 1]), year));
     this.notify();
   }
 
@@ -1627,11 +1635,11 @@ class Store {
   }
 
   public showPlannerToast(message: string) {
-    this.state.plannerToastMessage = message;
+    this.state.plannerToastMessage = tr(message);
     this.notify();
     setTimeout(() => {
       if (this.disposed) return;
-      if (this.state.plannerToastMessage === message) {
+      if (this.state.plannerToastMessage === tr(message)) {
         this.state.plannerToastMessage = null;
         this.notify();
       }
@@ -1762,7 +1770,7 @@ class Store {
         }
         const restEl = document.getElementById('active-rest-timer-countdown');
         if (restEl && this.state.activeWorkout.restTimerSeconds !== null) {
-          restEl.textContent = `${this.state.activeWorkout.restTimerSeconds}s`;
+          restEl.textContent = `${this.state.activeWorkout.restTimerSeconds} ${tr('s')}`;
         }
       }
     }, 1000);
@@ -2141,7 +2149,7 @@ class Store {
       if (data.maxWeight > 0 && data.maxRepsAtWeight > 0) {
         const epley1RM = Math.round(data.maxWeight * (1 + data.maxRepsAtWeight / 30));
         const dateObj = new Date(data.achievedAt);
-        const achievedDateFormatted = dateObj.toLocaleDateString('en-US', {
+        const achievedDateFormatted = dateObj.toLocaleDateString(getLocale(), {
           month: 'short',
           day: 'numeric',
           year: 'numeric'
@@ -2199,7 +2207,7 @@ class Store {
         });
 
         const dObj = new Date(w.startedAt);
-        const dateStr = dObj.toLocaleDateString('en-US', {
+        const dateStr = dObj.toLocaleDateString(getLocale(), {
           month: 'short',
           day: 'numeric',
           hour: '2-digit',
@@ -2330,9 +2338,9 @@ class Store {
 
     return pool.filter(f => {
       const matchQuery = !q || 
-        f.name.toLowerCase().includes(q) ||
+        f.name.toLowerCase().includes(q) || foodLabel(f, f.name).toLowerCase().includes(q) ||
         (f.brand && f.brand.toLowerCase().includes(q)) ||
-        (f.category && f.category.toLowerCase().includes(q)) ||
+        (f.category && (f.category.toLowerCase().includes(q) || foodLabel(f, f.category).toLowerCase().includes(q))) ||
         (f.barcode && f.barcode.toLowerCase().includes(q));
 
       const matchCat = !category || category === 'all' || f.category === category;
@@ -2432,12 +2440,12 @@ class Store {
     if (!areMacrosCompleteAndValid(macros)) {
       this.state.customFoodValidationErrors.macros = 'Enter protein, carbohydrates, and fat before calculating.';
       this.notify();
-      return { success: false, error: 'Enter protein, carbohydrates, and fat before calculating.' };
+      return { success: false, error: tr("Enter protein, carbohydrates, and fat before calculating.") };
     }
 
     const breakdown = calculateCaloriesFromMacros(macros);
     if (!breakdown) {
-      return { success: false, error: 'Could not calculate calories.' };
+      return { success: false, error: tr("Could not calculate calories.") };
     }
 
     const roundedCalories = Math.round(breakdown.totalCalories);
@@ -2506,7 +2514,7 @@ class Store {
                f.barcode && f.barcode.trim().toLowerCase() === trimmedBarcode
         );
         if (dupBarcode) {
-          errors.barcode = `Barcode is already registered to "${dupBarcode.name}"`;
+          errors.barcode = tr('Barcode is already registered to "{0}"', dupBarcode.name);
         }
       }
 
@@ -2678,7 +2686,7 @@ class Store {
 
   public saveCustomFoodDraft(): { success: boolean; food?: FoodDefinition; error?: string } {
     if (this.state.customFoodIsSaving) {
-      return { success: false, error: 'Saving already in progress' };
+      return { success: false, error: tr("Saving already in progress") };
     }
     this.state.customFoodIsSaving = true;
 
@@ -2687,19 +2695,19 @@ class Store {
       this.state.customFoodStep = 1;
       this.state.customFoodIsSaving = false;
       this.notify();
-      return { success: false, error: 'Please correct errors in Step 1' };
+      return { success: false, error: tr("Please correct errors in Step 1") };
     }
     if (!this.validateCustomFoodStep(2)) {
       this.state.customFoodStep = 2;
       this.state.customFoodIsSaving = false;
       this.notify();
-      return { success: false, error: 'Please correct errors in Step 2' };
+      return { success: false, error: tr("Please correct errors in Step 2") };
     }
     if (!this.validateCustomFoodStep(3)) {
       this.state.customFoodStep = 3;
       this.state.customFoodIsSaving = false;
       this.notify();
-      return { success: false, error: 'Please correct errors in Step 3' };
+      return { success: false, error: tr("Please correct errors in Step 3") };
     }
 
     const draft = this.state.customFoodDraft;
@@ -2709,22 +2717,22 @@ class Store {
     const vitamins: NutrientValue[] = [];
     const minerals: NutrientValue[] = [];
     if (draft.vitaminC !== null) {
-      vitamins.push({ key: 'vitamin_c', name: 'Vitamin C', shortName: 'Vit C', amount: draft.vitaminC, unit: 'mg', source: 'manual' });
+      vitamins.push({ key: 'vitamin_c', name: 'Vitamin C', shortName: tr("Vit C"), amount: draft.vitaminC, unit: 'mg', source: 'manual' });
     }
     if (draft.vitaminD !== null) {
-      vitamins.push({ key: 'vitamin_d', name: 'Vitamin D', shortName: 'Vit D', amount: draft.vitaminD, unit: 'mcg', source: 'manual' });
+      vitamins.push({ key: 'vitamin_d', name: 'Vitamin D', shortName: tr("Vit D"), amount: draft.vitaminD, unit: 'mcg', source: 'manual' });
     }
     if (draft.calcium !== null) {
-      minerals.push({ key: 'calcium', name: 'Calcium', shortName: 'Calcium', amount: draft.calcium, unit: 'mg', source: 'manual' });
+      minerals.push({ key: 'calcium', name: 'Calcium', shortName: tr("Calcium"), amount: draft.calcium, unit: 'mg', source: 'manual' });
     }
     if (draft.iron !== null) {
-      minerals.push({ key: 'iron', name: 'Iron', shortName: 'Iron', amount: draft.iron, unit: 'mg', source: 'manual' });
+      minerals.push({ key: 'iron', name: 'Iron', shortName: tr("Iron"), amount: draft.iron, unit: 'mg', source: 'manual' });
     }
     if (draft.potassium !== null) {
-      minerals.push({ key: 'potassium', name: 'Potassium', shortName: 'Potassium', amount: draft.potassium, unit: 'mg', source: 'manual' });
+      minerals.push({ key: 'potassium', name: 'Potassium', shortName: tr("Potassium"), amount: draft.potassium, unit: 'mg', source: 'manual' });
     }
     if (draft.magnesium !== null) {
-      minerals.push({ key: 'magnesium', name: 'Magnesium', shortName: 'Magnesium', amount: draft.magnesium, unit: 'mg', source: 'manual' });
+      minerals.push({ key: 'magnesium', name: 'Magnesium', shortName: tr("Magnesium"), amount: draft.magnesium, unit: 'mg', source: 'manual' });
     }
 
     const hasMicros = vitamins.length > 0 || minerals.length > 0;
@@ -2878,10 +2886,10 @@ class Store {
     existingFood?: FoodDefinition;
   } {
     if (!foodInput.name || !foodInput.name.trim()) {
-      return { success: false, error: 'Food name is required.' };
+      return { success: false, error: tr("Food name is required.") };
     }
     if (foodInput.nutrition.calories === null || isNaN(foodInput.nutrition.calories) || foodInput.nutrition.calories < 0) {
-      return { success: false, error: 'Valid calories amount is required.' };
+      return { success: false, error: tr("Valid calories amount is required.") };
     }
 
     const now = new Date().toISOString();
@@ -3022,7 +3030,7 @@ class Store {
         nutrition: scaleNutritionForPortion(food.nutrition, 0),
         multiplier: 0,
         portionDescription: `${qty} ${unit}`,
-        error: 'Please enter a quantity greater than zero.'
+        error: tr("Please enter a quantity greater than zero.")
       };
     }
 
@@ -3032,7 +3040,7 @@ class Store {
         nutrition: scaleNutritionForPortion(food.nutrition, 0),
         multiplier: 0,
         portionDescription: `${qty} ${unit}`,
-        error: `Cannot convert unit "${unit}" for ${food.name}. Please select a compatible portion.`
+        error: tr("Cannot convert unit \"{0}\" for {1}. Please select a compatible portion.", unit, food.name)
       };
     }
 
@@ -3161,8 +3169,8 @@ class Store {
     if (source.type === 'scanned') {
       const food = this.state.lastScannedFood;
       return {
-        title: food?.name || 'Scanned Food',
-        subtitle: food?.subtitle || 'Instant Lens Preview',
+        title: tr(food?.name || 'Scanned Food'),
+        subtitle: tr(food?.subtitle || 'Instant Lens Preview'),
         sourceBadge: 'DEMO ESTIMATE',
         profile: food?.micronutrients,
         ingredients: food?.ingredients,
@@ -3178,8 +3186,8 @@ class Store {
       if (!meal) return null;
       const isDemo = meal.micronutrients?.vitamins.some(v => v.source === 'demo');
       return {
-        title: meal.name,
-        subtitle: `${meal.mealType.toUpperCase()} • ${meal.date} at ${meal.time}`,
+        title: mealLabel(meal, meal.name),
+        subtitle: tr("{0} • {1} at {2}", tr(meal.mealType), meal.date, meal.time),
         sourceBadge: isDemo ? 'DEMO' : 'DATABASE',
         profile: meal.nutritionSnapshot?.micronutrients || meal.micronutrients,
         ingredients: meal.ingredients,
@@ -3204,8 +3212,8 @@ class Store {
         const scaledNut = scaleNutritionForPortion(def.nutrition, mult);
 
         return {
-          title: def.name,
-          subtitle: def.brand ? `${def.brand} • ${def.nutritionBasis.servingDescription || def.nutritionBasis.amount + def.nutritionBasis.unit}` : (def.nutritionBasis.servingDescription || `${def.nutritionBasis.amount} ${def.nutritionBasis.unit}`),
+          title: foodLabel(def, def.name),
+          subtitle: def.brand ? `${foodLabel(def, def.brand)} • ${foodLabel(def, def.nutritionBasis.servingDescription || '') || `${def.nutritionBasis.amount} ${tr(def.nutritionBasis.unit)}`}` : (foodLabel(def, def.nutritionBasis.servingDescription || '') || `${def.nutritionBasis.amount} ${tr(def.nutritionBasis.unit)}`),
           sourceBadge: def.source === 'custom' ? 'MY FOOD' : 'DATABASE',
           profile: scaledNut.micronutrients,
           calories: scaledNut.calories || undefined,
@@ -3224,8 +3232,8 @@ class Store {
         : undefined;
 
       return {
-        title: item.name,
-        subtitle: `${item.servingUnit} (${mult}x portion)`,
+        title: tr(item.name),
+        subtitle: tr("{0} ({1}x portion)", tr(item.servingUnit), mult),
         sourceBadge: 'DEMO CATALOG',
         profile: scaledProfile,
         calories: Math.round(item.caloriesPerServing * mult),

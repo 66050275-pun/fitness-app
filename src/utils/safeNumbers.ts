@@ -1,3 +1,4 @@
+import { tr, getLocale } from '../i18n/index.ts';
 /**
  * Safe Number Utilities
  *
@@ -86,14 +87,14 @@ export function formatRemainingCalories(remaining: number): { value: number; tex
     const overAmount = Math.abs(Math.round(safe));
     return {
       value: overAmount,
-      text: `${overAmount.toLocaleString()} kcal over`,
+      text: tr("{0} kcal over", overAmount.toLocaleString(getLocale())),
       isOver: true
     };
   }
   const rounded = Math.round(safe);
   return {
     value: rounded,
-    text: `${rounded.toLocaleString()}`,
+    text: `${rounded.toLocaleString(getLocale())}`,
     isOver: false
   };
 }
@@ -124,7 +125,7 @@ export function formatWeightChange(deltaKg: number, unit: 'kg' | 'lb' = 'kg'): s
  */
 export function formatWeeklyRate(rateKgPerWeek: number, unit: 'kg' | 'lb' = 'kg'): string {
   const safe = safeFiniteNumber(rateKgPerWeek, 0);
-  if (Math.abs(safe) < 0.01) return 'Maintain weight';
+  if (Math.abs(safe) < 0.01) return tr('Maintain weight');
 
   const abs = Math.abs(safe);
   const displayValue = unit === 'lb'
@@ -133,7 +134,7 @@ export function formatWeeklyRate(rateKgPerWeek: number, unit: 'kg' | 'lb' = 'kg'
   const unitLabel = unit === 'lb' ? 'lb' : 'kg';
   const verb = safe < 0 ? 'Lose' : 'Gain';
 
-  return `${verb} approximately ${displayValue} ${unitLabel} per week`;
+  return tr('{0} approximately {1} {2} per week', tr(verb), displayValue, tr(unitLabel));
 }
 
 /**

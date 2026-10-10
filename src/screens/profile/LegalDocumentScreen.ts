@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 /**
  * Legal Document Sub-Screen
  * 
@@ -31,7 +32,7 @@ export function renderLegalDocumentScreen(docType: 'terms_of_use' | 'privacy_pol
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
@@ -41,7 +42,7 @@ export function renderLegalDocumentScreen(docType: 'terms_of_use' | 'privacy_pol
 
         ${doc.status === 'draft' ? `
           <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-extrabold uppercase tracking-wider border border-amber-500/20">
-            Draft
+            ${trHtml("Draft")}
           </span>
         ` : ''}
       </header>
@@ -53,10 +54,10 @@ export function renderLegalDocumentScreen(docType: 'terms_of_use' | 'privacy_pol
         <div class="p-4 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-ambient flex flex-col gap-1.5">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              Document Status
+              ${trHtml("Document Status")}
             </span>
             <span class="text-[11px] text-on-surface-variant dark:text-gray-400">
-              Updated: ${doc.lastUpdated}
+              ${trHtml("Updated:")} ${trHtml(doc.lastUpdated)}
             </span>
           </div>
           <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">

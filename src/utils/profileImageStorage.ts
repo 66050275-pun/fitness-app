@@ -1,3 +1,4 @@
+import { tr } from '../i18n/index.ts';
 /**
  * Profile photos are cropped/compressed in the browser, stripping original metadata.
  * Only encrypted photo bytes reach IndexedDB through the shared private vault.
@@ -24,16 +25,16 @@ export interface ImageValidationResult {
  */
 export function validateProfileImage(file: File): ImageValidationResult {
   if (!file) {
-    return { valid: false, error: 'No file selected' };
+    return { valid: false, error: tr("No file selected") };
   }
 
   if (!ACCEPTED_TYPES.includes(file.type)) {
-    return { valid: false, error: 'Please select a JPG, PNG, or WebP image' };
+    return { valid: false, error: tr("Please select a JPG, PNG, or WebP image") };
   }
 
   if (file.size > MAX_IMAGE_SIZE_BYTES) {
     const maxMB = Math.round(MAX_IMAGE_SIZE_BYTES / (1024 * 1024));
-    return { valid: false, error: `Image must be smaller than ${maxMB} MB` };
+    return { valid: false, error: tr("Image must be smaller than {0} MB", maxMB) };
   }
 
   return { valid: true };

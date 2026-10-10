@@ -1,3 +1,4 @@
+import { tr } from '../i18n/index.ts';
 /**
  * Pure Calculation and Aggregation Utilities for Micronutrients
  * 
@@ -160,8 +161,8 @@ export function evaluateNutrientStatus(
   if (amount === null || !hasEnoughData) {
     return {
       status: 'insufficient_data',
-      label: 'Insufficient Data',
-      guidance: 'Data coverage is below the minimum threshold to evaluate this nutrient.'
+      label: tr("Insufficient Data"),
+      guidance: tr("Data coverage is below the minimum threshold to evaluate this nutrient.")
     };
   }
 
@@ -169,8 +170,8 @@ export function evaluateNutrientStatus(
   if (normalized === null || config.referenceValue === null) {
     return {
       status: 'informational',
-      label: 'Recorded',
-      guidance: 'Nutrient intake recorded for informational monitoring.'
+      label: tr("Recorded"),
+      guidance: tr("Nutrient intake recorded for informational monitoring.")
     };
   }
 
@@ -179,21 +180,21 @@ export function evaluateNutrientStatus(
     if (normalized > config.referenceValue) {
       return {
         status: 'above_limit',
-        label: 'Above Recommended Limit',
-        guidance: `Intake exceeds the recommended maximum reference of ${config.referenceValue}${config.defaultUnit}.`
+        label: tr("Above Recommended Limit"),
+        guidance: tr("Intake exceeds the recommended maximum reference of {0}{1}.", config.referenceValue, config.defaultUnit)
       };
     }
     if (normalized >= config.referenceValue * 0.85) {
       return {
         status: 'near_limit',
-        label: 'Near Limit',
-        guidance: `Intake is approaching the upper boundary of ${config.referenceValue}${config.defaultUnit}.`
+        label: tr("Near Limit"),
+        guidance: tr("Intake is approaching the upper boundary of {0}{1}.", config.referenceValue, config.defaultUnit)
       };
     }
     return {
       status: 'within_limit',
-      label: 'Within Limit',
-      guidance: `Intake is well within the recommended threshold.`
+      label: tr("Within Limit"),
+      guidance: tr("Intake is well within the recommended threshold.")
     };
   }
 
@@ -202,28 +203,28 @@ export function evaluateNutrientStatus(
     if (normalized >= config.referenceValue) {
       return {
         status: 'target_met',
-        label: 'Target Met',
-        guidance: `Daily reference intake target (${config.referenceValue}${config.defaultUnit}) was achieved.`
+        label: tr("Target Met"),
+        guidance: tr("Daily reference intake target ({0}{1}) was achieved.", config.referenceValue, config.defaultUnit)
       };
     }
     if (normalized >= config.referenceValue * 0.7) {
       return {
         status: 'near_target',
-        label: 'Near Target',
-        guidance: `Intake reached ${Math.round((normalized / config.referenceValue) * 100)}% of the reference target.`
+        label: tr("Near Target"),
+        guidance: tr("Intake reached {0}% of the reference target.", Math.round((normalized / config.referenceValue) * 100))
       };
     }
     return {
       status: 'below_target',
-      label: 'Below Logged Target',
-      guidance: 'Intake appears below the reference target based on available meal data.'
+      label: tr("Below Logged Target"),
+      guidance: tr("Intake appears below the reference target based on available meal data.")
     };
   }
 
   return {
     status: 'informational',
-    label: 'Informational',
-    guidance: 'Monitored without strict minimum or maximum reference thresholds.'
+    label: tr("Informational"),
+    guidance: tr("Monitored without strict minimum or maximum reference thresholds.")
   };
 }
 

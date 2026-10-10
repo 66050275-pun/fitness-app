@@ -1,3 +1,4 @@
+import { tr, trHtml } from '../../i18n/index.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
 import { store } from '../../store/appState';
 
@@ -8,10 +9,10 @@ export function renderDeleteWorkoutModal(): string {
 
   const isCancelActive = targetId === 'active_workout_cancel';
   const workout = !isCancelActive ? store.getWorkoutById(targetId) : null;
-  const title = isCancelActive ? 'Cancel Active Workout?' : 'Delete Workout Record?';
+  const title = isCancelActive ? tr("Cancel Active Workout?") : tr("Delete Workout Record?");
   const message = isCancelActive
-    ? 'You have logged completed sets in this session. If you cancel now, your active workout progress will not be saved.'
-    : `Are you sure you want to permanently delete "${workout?.name || 'this workout'}"? All sets, volume, and associated personal records will be updated.`;
+    ? tr("You have logged completed sets in this session. If you cancel now, your active workout progress will not be saved.")
+    : tr("Are you sure you want to permanently delete \"{0}\"? All sets, volume, and associated personal records will be updated.", workout?.name || tr("this workout"));
 
   return `
     <div 
@@ -26,7 +27,7 @@ export function renderDeleteWorkoutModal(): string {
           </div>
           <div>
             <h3 class="font-heading font-extrabold text-sm text-on-surface dark:text-white leading-snug">${title}</h3>
-            <span class="text-[11px] text-error font-semibold">Irreversible action</span>
+            <span class="text-[11px] text-error font-semibold">${trHtml("Irreversible action")}</span>
           </div>
         </div>
 
@@ -39,14 +40,14 @@ export function renderDeleteWorkoutModal(): string {
             onclick="window.closeDeleteModal()" 
             class="flex-1 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs font-bold text-on-surface dark:text-white hover:bg-surface-container active:scale-95 transition-all"
           >
-            Cancel
+            ${trHtml("Cancel")}
           </button>
           
           <button 
             onclick="window.confirmDeleteWorkout()" 
             class="flex-1 py-2.5 rounded-xl bg-error text-white text-xs font-extrabold shadow-sm active:scale-95 transition-all hover:opacity-90"
           >
-            ${isCancelActive ? 'Yes, Cancel' : 'Delete'}
+            ${isCancelActive ? tr("Yes, Cancel") : tr("Delete")}
           </button>
         </div>
 

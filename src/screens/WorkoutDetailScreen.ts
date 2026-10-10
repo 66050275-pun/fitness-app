@@ -1,3 +1,5 @@
+import { translatedMuscles, exerciseLabel } from '../i18n/fitnessLabels.ts';
+import { tr, trHtml, getLocale, translatedLabel } from '../i18n/index.ts';
 import { store } from '../store/appState';
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 
@@ -10,10 +12,10 @@ export function renderWorkoutDetailScreen(): string {
     return `
       <div class="flex flex-col min-h-screen bg-surface dark:bg-dark-surface p-6 items-center justify-center text-center">
         <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">error_outline</span>
-        <h2 class="font-heading font-bold text-base text-on-surface dark:text-white">Workout Not Found</h2>
-        <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">This workout record may have been removed.</p>
+        <h2 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Workout Not Found")}</h2>
+        <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">${trHtml("This workout record may have been removed.")}</p>
         <button onclick="window.closeWorkoutDetail()" class="mt-4 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-sm">
-          Return to Fitness
+          ${trHtml("Return to Fitness")}
         </button>
       </div>
     `;
@@ -22,19 +24,19 @@ export function renderWorkoutDetailScreen(): string {
   const startDateObj = new Date(workout.startedAt);
   const finishDateObj = workout.finishedAt ? new Date(workout.finishedAt) : startDateObj;
   
-  const formattedDate = startDateObj.toLocaleDateString('en-US', {
+  const formattedDate = startDateObj.toLocaleDateString(getLocale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
     year: 'numeric'
   });
 
-  const formattedStartTime = startDateObj.toLocaleTimeString('en-US', {
+  const formattedStartTime = startDateObj.toLocaleTimeString(getLocale(), {
     hour: '2-digit',
     minute: '2-digit'
   });
 
-  const formattedFinishTime = finishDateObj.toLocaleTimeString('en-US', {
+  const formattedFinishTime = finishDateObj.toLocaleTimeString(getLocale(), {
     hour: '2-digit',
     minute: '2-digit'
   });
@@ -49,20 +51,20 @@ export function renderWorkoutDetailScreen(): string {
         <div class="flex items-center gap-2.5">
           <button 
             onclick="window.closeWorkoutDetail()" 
-            aria-label="Back to Fitness" 
+            aria-label="${trHtml("Back to Fitness")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
           <div>
-            <h1 class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">Workout Details</h1>
+            <h1 class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">${trHtml("Workout Details")}</h1>
             <p class="text-xs text-on-surface-variant dark:text-gray-400">${formattedDate}</p>
           </div>
         </div>
 
         <button 
           onclick="window.openDeleteModal(${htmlJsArg(workout.id)})"
-          aria-label="Delete this workout" 
+          aria-label="${trHtml("Delete this workout")}"
           class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-error active:scale-95 transition-all"
         >
           <span class="material-symbols-outlined text-[18px]">delete_outline</span>
@@ -78,21 +80,21 @@ export function renderWorkoutDetailScreen(): string {
           <div class="flex items-start justify-between">
             <div>
               <div class="flex items-center gap-2">
-                <h2 class="font-heading font-extrabold text-lg text-on-surface dark:text-white leading-tight">${escapeHtml(workout.name)}</h2>
+                <h2 class="font-heading font-extrabold text-lg text-on-surface dark:text-white leading-tight">${escapeHtml(translatedLabel(workout.name))}</h2>
                 ${workout.status === 'completed' ? `
                   <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[10px] font-extrabold flex items-center gap-0.5">
                     <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    Completed
+                    ${trHtml("Completed")}
                   </span>
                 ` : `
                   <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-extrabold flex items-center gap-0.5">
                     <span class="material-symbols-outlined text-[12px]">schedule</span>
-                    Incomplete
+                    ${trHtml("Incomplete")}
                   </span>
                 `}
               </div>
               <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">
-                ${formattedStartTime} &ndash; ${formattedFinishTime}
+                ${formattedStartTime} ${trHtml("&ndash;")} ${formattedFinishTime}
               </p>
             </div>
           </div>
@@ -100,30 +102,30 @@ export function renderWorkoutDetailScreen(): string {
           <!-- 4 Core Metrics Grid -->
           <div class="grid grid-cols-2 gap-2.5 pt-1">
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
-              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">Total Duration</span>
+              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Total Duration")}</span>
               <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">
-                ${durationMin !== null ? `${durationMin} <span class="text-xs font-normal">min</span>` : '&mdash;'}
+                ${durationMin !== null ? `${durationMin} <span class="text-xs font-normal">${trHtml("min")}</span>` : '&mdash;'}
               </span>
             </div>
 
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
-              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">Total Volume</span>
+              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Total Volume")}</span>
               <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">
-                ${workout.totalVolume > 0 ? `${workout.totalVolume.toLocaleString()} <span class="text-xs font-normal">kg</span>` : '&mdash;'}
+                ${workout.totalVolume > 0 ? `${workout.totalVolume.toLocaleString(getLocale())} <span class="text-xs font-normal">${trHtml("kg")}</span>` : '&mdash;'}
               </span>
             </div>
 
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
-              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">Sets Completed</span>
+              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Sets Completed")}</span>
               <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">
-                ${workout.completedSetCount} <span class="text-xs font-normal">sets</span>
+                ${workout.completedSetCount} <span class="text-xs font-normal">${trHtml("sets")}</span>
               </span>
             </div>
 
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
-              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">Est. Calories</span>
+              <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Est. Calories")}</span>
               <span class="font-heading font-extrabold text-base text-primary dark:text-primary-container">
-                ${workout.estimatedCalories !== null ? `~${workout.estimatedCalories} <span class="text-xs font-normal">kcal</span>` : '&mdash;'}
+                ${workout.estimatedCalories !== null ? `~${workout.estimatedCalories} <span class="text-xs font-normal">${trHtml("kcal")}</span>` : '&mdash;'}
               </span>
             </div>
           </div>
@@ -132,7 +134,7 @@ export function renderWorkoutDetailScreen(): string {
 
         <!-- Exercise Breakdown Section -->
         <section class="flex flex-col gap-3">
-          <h3 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">Exercise Breakdown (${workout.exercises.length})</h3>
+          <h3 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">${trHtml("Exercise Breakdown (")}${workout.exercises.length})</h3>
 
           <div class="flex flex-col gap-3">
             ${workout.exercises.map((ex, exIdx) => {
@@ -148,14 +150,14 @@ export function renderWorkoutDetailScreen(): string {
                         ${exIdx + 1}
                       </span>
                       <div>
-                        <h4 class="font-heading font-bold text-sm text-on-surface dark:text-white">${escapeHtml(ex.exerciseName)}</h4>
-                        <span class="text-[11px] text-on-surface-variant dark:text-gray-400">${escapeHtml(ex.muscleGroups)}</span>
+                        <h4 class="font-heading font-bold text-sm text-on-surface dark:text-white">${escapeHtml(exerciseLabel(ex.exerciseName))}</h4>
+                        <span class="text-[11px] text-on-surface-variant dark:text-gray-400">${escapeHtml(translatedMuscles(ex.muscleGroups))}</span>
                       </div>
                     </div>
 
                     <div class="text-right">
-                      <span class="text-xs font-bold text-primary dark:text-primary-container block">${exerciseVolume.toLocaleString()} kg vol</span>
-                      <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${completedSets.length} of ${ex.sets.length} sets</span>
+                      <span class="text-xs font-bold text-primary dark:text-primary-container block">${exerciseVolume.toLocaleString(getLocale())} ${trHtml("kg vol")}</span>
+                      <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${completedSets.length} ${trHtml("of")} ${ex.sets.length} ${trHtml("sets")}</span>
                     </div>
                   </div>
 
@@ -164,24 +166,22 @@ export function renderWorkoutDetailScreen(): string {
                     ${ex.sets.map(s => {
                       const setVol = s.weightKg * s.reps;
                       return `
-                        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-xl text-xs ${
-                          s.completed 
+                        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-xl text-xs ${s.completed
                             ? 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface dark:text-gray-200' 
-                            : 'bg-surface-container-low/50 dark:bg-dark-surface-card-high/40 text-on-surface-variant line-through'
-                        }">
+                            : 'bg-surface-container-low/50 dark:bg-dark-surface-card-high/40 text-on-surface-variant line-through'}">
                           <div class="flex items-center gap-2">
-                            <span class="font-heading font-bold text-on-surface-variant text-[11px]">Set ${s.setNumber}</span>
-                            <span class="font-medium">${s.weightKg > 0 ? `${s.weightKg} kg &times; ` : ''}${s.reps} reps</span>
+                            <span class="font-heading font-bold text-on-surface-variant text-[11px]">${trHtml("Set")} ${s.setNumber}</span>
+                            <span class="font-medium">${s.weightKg > 0 ? tr("{0} kg &times;", s.weightKg) : ''}${s.reps} ${trHtml("reps")}</span>
                           </div>
 
                           <div class="flex items-center gap-2">
                             <span class="text-[11px] font-semibold text-on-surface-variant dark:text-gray-400">
-                              ${s.completed ? `${setVol.toLocaleString()} kg` : 'Skipped'}
+                              ${s.completed ? tr("{0} kg", setVol.toLocaleString(getLocale())) : tr("Skipped")}
                             </span>
                             ${s.isPersonalRecord ? `
                               <span class="px-1.5 py-0.2 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-[9px] border border-amber-500/30 flex items-center gap-0.5">
                                 <span class="material-symbols-outlined text-[11px]">emoji_events</span>
-                                PR
+                                ${trHtml("PR")}
                               </span>
                             ` : ''}
                           </div>
@@ -204,7 +204,7 @@ export function renderWorkoutDetailScreen(): string {
             class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-white font-heading text-xs font-extrabold shadow-glow-primary active:scale-[0.99] transition-all flex items-center justify-center gap-2"
           >
             <span class="material-symbols-outlined text-[18px]">replay</span>
-            <span>Repeat This Workout</span>
+            <span>${trHtml("Repeat This Workout")}</span>
           </button>
 
           <!-- Delete Button -->
@@ -213,7 +213,7 @@ export function renderWorkoutDetailScreen(): string {
             class="w-full py-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-xs font-bold text-error active:scale-95 transition-all flex items-center justify-center gap-1.5 hover:bg-red-500/10"
           >
             <span class="material-symbols-outlined text-[18px]">delete</span>
-            <span>Delete Workout Record</span>
+            <span>${trHtml("Delete Workout Record")}</span>
           </button>
         </div>
 

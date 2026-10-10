@@ -1,3 +1,4 @@
+import { tr } from '../i18n/index.ts';
 /**
  * Unit Conversion & Formatting Utilities
  * 
@@ -67,9 +68,9 @@ export function formatWeight(weightKg: number | null | undefined, unit: WeightUn
   }
   if (unit === 'lb') {
     const lb = kgToLb(weightKg);
-    return `${lb} lb`;
+    return `${lb} ${tr('lb')}`;
   }
-  return `${Math.round(weightKg * 10) / 10} kg`;
+  return `${Math.round(weightKg * 10) / 10} ${tr('kg')}`;
 }
 
 /**
@@ -83,5 +84,5 @@ export function formatHeight(heightCm: number | null | undefined, unit: HeightUn
     const { feet, inches } = cmToFtIn(heightCm);
     return `${feet}'${inches}"`;
   }
-  return `${Math.round(heightCm)} cm`;
+  return `${Math.round(heightCm)} ${tr('cm')}`;
 }

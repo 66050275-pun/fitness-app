@@ -1,3 +1,4 @@
+import { trHtml, translatedLabel } from '../../i18n/index.ts';
 import { findExerciseArtwork } from '../../data/exerciseArtwork';
 import { escapeHtml } from '../../utils/sanitize';
 
@@ -8,12 +9,12 @@ export function renderExerciseIllustration(name: string, compact = false): strin
   if (compact) {
     return `<span class="exercise-art-thumbnail" aria-hidden="true"><img src="${artwork.frames[0]}" alt="" width="512" height="512" loading="lazy" decoding="async"></span>`;
   }
-  return `<figure class="exercise-art" aria-label="${escapeHtml(name)} illustrations">
+  return `<figure class="exercise-art" aria-label="${trHtml('Illustrations for {0}', translatedLabel(name))}">
     <div class="exercise-art-frames">
-      ${artwork.frames.map((src, index) => `<div><img src="${src}" alt="${escapeHtml(name)} — pose ${index + 1}" width="512" height="512" loading="lazy" decoding="async"><span>Pose ${index + 1}</span></div>`).join('')}
+      ${artwork.frames.map((src, index) => `<div><img src="${src}" alt="${trHtml('Illustration of {0}, pose {1}', translatedLabel(name), index + 1)}" width="512" height="512" loading="lazy" decoding="async"><span>${trHtml("Pose")} ${index + 1}</span></div>`).join('')}
     </div>
     <figcaption class="exercise-art-credit">
-      ${artwork.note ? `<span class="block mb-1">${escapeHtml(artwork.note)}</span>` : ''}
+      ${artwork.note ? `<span class="block mb-1">${trHtml(artwork.note)}</span>` : ''}
       <a href="${escapeHtml(artwork.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(artwork.credit)}</a>
       · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>
     </figcaption>

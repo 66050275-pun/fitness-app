@@ -1,3 +1,4 @@
+import { tr, getLocale } from '../../i18n/index.ts';
 /**
  * Reusable Calorie Progress Ring Component
  * 
@@ -63,8 +64,8 @@ export function renderCalorieProgressRing(options: CalorieProgressRingOptions): 
 
   // Screen reader description
   const defaultLabel = safeTarget > 0
-    ? `${safeConsumed.toLocaleString()} of ${safeTarget.toLocaleString()} calories logged`
-    : (safeConsumed > 0 ? `${safeConsumed.toLocaleString()} calories logged (target unavailable)` : '0 calories logged');
+    ? tr("{0} of {1} calories logged", safeConsumed.toLocaleString(getLocale()), safeTarget.toLocaleString(getLocale()))
+    : (safeConsumed > 0 ? tr("{0} calories logged (target unavailable)", safeConsumed.toLocaleString(getLocale())) : tr("0 calories logged"));
 
   const finalAriaLabel = ariaLabel || defaultLabel;
 

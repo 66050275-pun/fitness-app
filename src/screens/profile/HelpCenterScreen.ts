@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 /**
  * Help Center Sub-Screen
  * 
@@ -19,12 +20,12 @@ export function renderHelpCenterScreen(): string {
           <button 
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
-            aria-label="Back to Profile"
+            aria-label="${trHtml("Back to Profile")}"
             class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">Help Center</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Help Center")}</h1>
         </div>
       </header>
 
@@ -38,7 +39,7 @@ export function renderHelpCenterScreen(): string {
             type="text" 
             id="faq-search-input"
             oninput="window.filterFaqList(this.value)"
-            placeholder="Search help topics..."
+            placeholder="${trHtml("Search help topics...")}"
             class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-xs text-on-surface dark:text-white focus:border-primary focus:outline-none shadow-ambient"
           />
         </div>

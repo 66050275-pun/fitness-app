@@ -1,3 +1,4 @@
+import { trHtml } from '../../i18n/index.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
@@ -54,7 +55,7 @@ export function renderProfileConfirmationModal(): string {
         ${requireTypingText ? `
           <div class="flex flex-col gap-1.5 pt-1">
             <label for="confirm-typing-input" class="text-[11px] font-semibold text-on-surface-variant dark:text-gray-400">
-              Type <strong class="text-error font-extrabold uppercase">${escapeHtml(requireTypingText)}</strong> to confirm:
+              ${trHtml("Type")} <strong class="text-error font-extrabold uppercase">${escapeHtml(requireTypingText)}</strong> ${trHtml("to confirm:")}
             </label>
             <input 
               type="text"
@@ -73,7 +74,7 @@ export function renderProfileConfirmationModal(): string {
             onclick="window.closeProfileConfirmModal()"
             class="px-4 py-2.5 rounded-xl border border-outline-variant/40 text-xs font-bold text-on-surface dark:text-gray-300 hover:bg-surface-container transition-colors"
           >
-            Cancel
+            ${trHtml("Cancel")}
           </button>
           
           <button
