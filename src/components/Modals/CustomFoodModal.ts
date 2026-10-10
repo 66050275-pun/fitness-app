@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { tr, trHtml, translatedLabel } from '../../i18n/index.ts';
 /**
  * Custom Food Creator & Editor 4-Step Wizard Modal
@@ -395,7 +396,7 @@ function renderStep2(
       </div>
 
       <!-- Basis Options Radio Cards -->
-      <div class="grid grid-cols-3 gap-2">
+      <div class="ui-number-grid grid grid-cols-3 gap-2">
         <button 
           type="button"
           onclick="window.setCustomFoodBasisType('per_100g')"
@@ -586,7 +587,7 @@ function renderStep3(
       </div>
 
       <!-- 1. Protein, Carbs, Fat Inputs -->
-      <div class="grid grid-cols-3 gap-2.5">
+      <div class="ui-number-grid grid grid-cols-3 gap-2.5">
         <!-- Protein -->
         <div>
           <label for="cf-protein" class="text-xs font-bold text-on-surface dark:text-white block mb-1">
@@ -740,7 +741,7 @@ function renderStep3(
             <div class="flex-1">
               <p class="font-bold text-on-surface dark:text-gray-200 leading-tight">${trHtml("Calorie Variance Detected")}</p>
               <p class="text-on-surface-variant dark:text-gray-400 text-[11px] mt-0.5 leading-snug">
-                ${trHtml("Entered:")} <strong class="text-on-surface dark:text-white">${draft.calories} ${trHtml("kcal")}</strong> ${trHtml("vs Calculated:")} <strong class="text-on-surface dark:text-white">${consistency.calculatedCalories} ${trHtml("kcal")}</strong>
+                ${trHtml("Entered:")} <strong class="ui-number text-on-surface dark:text-white">${formatDisplayNumber(draft.calories)} ${trHtml("kcal")}</strong> ${trHtml("vs Calculated:")} <strong class="ui-number text-on-surface dark:text-white">${formatDisplayNumber(consistency.calculatedCalories)} ${trHtml("kcal")}</strong>
                 ${trHtml("(difference of")} ${Math.round(consistency.differenceCalories)} ${trHtml("kcal /")} ${consistency.differencePercent !== null ? consistency.differencePercent.toFixed(1) : '0'}%).
               </p>
               <p class="text-[10px] text-on-surface-variant dark:text-gray-400 mt-1">
@@ -755,14 +756,14 @@ function renderStep3(
               class="px-2.5 py-1.5 rounded-lg bg-primary text-white text-[11px] font-bold shadow-xs hover:brightness-105 transition-all flex items-center gap-1"
             >
               <span class="material-symbols-outlined text-[14px]">check</span>
-              <span>${trHtml("Use Calculated (")}${consistency.calculatedCalories} ${trHtml("kcal)")}</span>
+              <span>${trHtml("Use Calculated (")}${formatDisplayNumber(consistency.calculatedCalories)} ${trHtml("kcal)")}</span>
             </button>
             <button 
               type="button" 
               onclick="window.keepEnteredCustomFoodCalories()"
               class="px-2.5 py-1.5 rounded-lg border border-outline-variant/50 text-on-surface dark:text-gray-200 text-[11px] font-bold hover:bg-surface-container transition-all"
             >
-              ${trHtml("Keep Entered (")}${draft.calories} ${trHtml("kcal)")}
+              ${trHtml("Keep Entered (")}${formatDisplayNumber(draft.calories)} ${trHtml("kcal)")}
             </button>
           </div>
           ${(errors.calorieConsistency || errors.calories_consistency) ? `
@@ -778,14 +779,14 @@ function renderStep3(
         <div class="px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-between text-xs animate-fade-in">
           <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-gray-400">
             <span class="material-symbols-outlined text-[14px] text-amber-500">info</span>
-            <span>${trHtml("Entered calories kept (")}${draft.calories} ${trHtml("kcal,")} <strong class="text-on-surface dark:text-white">${Math.round(consistency.differenceCalories)} ${trHtml("kcal")}</strong> ${trHtml("diff)")}</span>
+            <span>${trHtml("Entered calories kept (")}${formatDisplayNumber(draft.calories)} ${trHtml("kcal,")} <strong class="text-on-surface dark:text-white">${Math.round(consistency.differenceCalories)} ${trHtml("kcal")}</strong> ${trHtml("diff)")}</span>
           </div>
           <button 
             type="button" 
             onclick="window.useCalculatedCustomFoodCalories()"
             class="text-[10px] font-bold text-primary dark:text-primary-container underline hover:no-underline ml-2 shrink-0"
           >
-            ${trHtml("Use")} ${consistency.calculatedCalories} ${trHtml("kcal")}
+            ${trHtml("Use")} ${formatDisplayNumber(consistency.calculatedCalories)} ${trHtml("kcal")}
           </button>
         </div>
       ` : ''}
@@ -794,8 +795,8 @@ function renderStep3(
       <div class="p-3 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex flex-col gap-2.5">
         <div class="flex items-center justify-between text-xs">
           <span class="font-bold text-on-surface dark:text-white text-[11px]">${trHtml("Macro Energy Ratio")}</span>
-          <span class="text-[11px] font-bold text-on-surface-variant dark:text-gray-400">
-            ${breakdown && breakdown.totalCalories > 0 ? tr("Total: {0} kcal", breakdown.totalCalories) : tr("No macros calculated")}
+          <span class="ui-number text-[11px] font-bold text-on-surface-variant dark:text-gray-400">
+            ${breakdown && breakdown.totalCalories > 0 ? tr("Total: {0} kcal", formatDisplayNumber(breakdown.totalCalories, 0)) : tr("No macros calculated")}
           </span>
         </div>
 
@@ -811,17 +812,17 @@ function renderStep3(
         </div>
 
         <!-- Macro Breakdown Legend & Values -->
-        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+        <div class="ui-number-grid grid grid-cols-3 gap-2 text-center text-xs">
           <div class="p-1.5 rounded-lg bg-surface-container-low dark:bg-dark-surface-card-high flex flex-col items-center">
             <div class="flex items-center gap-1 mb-0.5">
               <span class="w-2 h-2 rounded-full bg-blue-500"></span>
               <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400">${trHtml("Protein")}</span>
             </div>
-            <span class="font-extrabold text-xs text-on-surface dark:text-white">
-              ${draft.protein !== null ? `${draft.protein} ${trHtml("g")}` : '-'}
+            <span class="ui-number font-extrabold text-xs text-on-surface dark:text-white">
+              ${draft.protein !== null ? `${formatDisplayNumber(draft.protein)} ${trHtml("g")}` : '-'}
             </span>
-            <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
-              ${breakdown ? tr("{0} kcal ({1}%)", breakdown.proteinCalories, breakdown.proteinPercent.toFixed(0)) : '-'}
+            <span class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400">
+              ${breakdown ? tr("{0} kcal ({1}%)", formatDisplayNumber(breakdown.proteinCalories, 0), breakdown.proteinPercent.toFixed(0)) : '-'}
             </span>
           </div>
 
@@ -830,11 +831,11 @@ function renderStep3(
               <span class="w-2 h-2 rounded-full bg-amber-500"></span>
               <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400">${trHtml("Carbs")}</span>
             </div>
-            <span class="font-extrabold text-xs text-on-surface dark:text-white">
-              ${draft.carbs !== null ? `${draft.carbs} ${trHtml("g")}` : '-'}
+            <span class="ui-number font-extrabold text-xs text-on-surface dark:text-white">
+              ${draft.carbs !== null ? `${formatDisplayNumber(draft.carbs)} ${trHtml("g")}` : '-'}
             </span>
-            <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
-              ${breakdown ? tr("{0} kcal ({1}%)", breakdown.carbohydrateCalories, breakdown.carbsPercent.toFixed(0)) : '-'}
+            <span class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400">
+              ${breakdown ? tr("{0} kcal ({1}%)", formatDisplayNumber(breakdown.carbohydrateCalories, 0), breakdown.carbsPercent.toFixed(0)) : '-'}
             </span>
           </div>
 
@@ -843,11 +844,11 @@ function renderStep3(
               <span class="w-2 h-2 rounded-full bg-rose-500"></span>
               <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400">${trHtml("Fat")}</span>
             </div>
-            <span class="font-extrabold text-xs text-on-surface dark:text-white">
-              ${draft.fat !== null ? `${draft.fat} ${trHtml("g")}` : '-'}
+            <span class="ui-number font-extrabold text-xs text-on-surface dark:text-white">
+              ${draft.fat !== null ? `${formatDisplayNumber(draft.fat)} ${trHtml("g")}` : '-'}
             </span>
-            <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
-              ${breakdown ? tr("{0} kcal ({1}%)", breakdown.fatCalories, breakdown.fatPercent.toFixed(0)) : '-'}
+            <span class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400">
+              ${breakdown ? tr("{0} kcal ({1}%)", formatDisplayNumber(breakdown.fatCalories, 0), breakdown.fatPercent.toFixed(0)) : '-'}
             </span>
           </div>
         </div>
@@ -858,7 +859,7 @@ function renderStep3(
         <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 block mb-2">
           ${trHtml("Secondary Macros (Optional)")}
         </span>
-        <div class="grid grid-cols-3 gap-2.5">
+        <div class="ui-number-grid grid grid-cols-3 gap-2.5">
           <!-- Fiber -->
           <div>
             <label for="cf-fiber" class="text-xs font-bold text-on-surface dark:text-white block mb-1">
@@ -1191,7 +1192,7 @@ function renderStep4(
           <div>
             <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Calories & Source")}</span>
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-extrabold text-primary dark:text-primary-container">${draft.calories ?? 0} ${trHtml("kcal")}</span>
+              <span class="ui-number font-extrabold text-primary dark:text-primary-container">${formatDisplayNumber(draft.calories)} ${trHtml("kcal")}</span>
               <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${draft.calorieSource === 'calculated_from_macros' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-surface-container dark:bg-dark-surface-card-high text-on-surface-variant dark:text-gray-300 border border-outline-variant/30'}">
                 ${trHtml(getCalorieSourceLabel(draft.calorieSource))}
               </span>
@@ -1199,10 +1200,10 @@ function renderStep4(
           </div>
           <div>
             <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Protein / Carbs / Fat")}</span>
-            <span class="font-bold text-on-surface dark:text-white">
-              ${draft.protein !== null ? `${draft.protein} ${trHtml("g")}` : '-'} /
-              ${draft.carbs !== null ? `${draft.carbs} ${trHtml("g")}` : '-'} /
-              ${draft.fat !== null ? `${draft.fat} ${trHtml("g")}` : '-'}
+            <span class="ui-number font-bold text-on-surface dark:text-white">
+              ${draft.protein !== null ? `${formatDisplayNumber(draft.protein)} ${trHtml("g")}` : '-'} /
+              ${draft.carbs !== null ? `${formatDisplayNumber(draft.carbs)} ${trHtml("g")}` : '-'} /
+              ${draft.fat !== null ? `${formatDisplayNumber(draft.fat)} ${trHtml("g")}` : '-'}
             </span>
           </div>
           <div>
@@ -1238,7 +1239,7 @@ function renderStep4(
             return `
               <div class="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[10px] text-amber-700 dark:text-amber-400 flex items-start gap-1.5 mt-1">
                 <span class="material-symbols-outlined text-[14px] shrink-0 mt-0.5">info</span>
-                <span>${trHtml("Note: Entered calories (")}${draft.calories} ${trHtml("kcal) kept by user; differs by")} ${Math.round(c.differenceCalories)} ${trHtml("kcal (")}${c.differencePercent !== null ? c.differencePercent.toFixed(1) : '0'}${trHtml("%) from 4-4-9 formula.")}</span>
+                <span>${trHtml("Note: Entered calories (")}${formatDisplayNumber(draft.calories)} ${trHtml("kcal) kept by user; differs by")} ${Math.round(c.differenceCalories)} ${trHtml("kcal (")}${c.differencePercent !== null ? c.differencePercent.toFixed(1) : '0'}${trHtml("%) from 4-4-9 formula.")}</span>
               </div>
             `;
           }

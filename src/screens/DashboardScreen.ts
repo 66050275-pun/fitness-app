@@ -1,10 +1,10 @@
 import { mealLabel } from '../i18n/foodLabels.ts';
-import { tr, trHtml, getLocale } from '../i18n/index.ts';
+import { tr, trHtml } from '../i18n/index.ts';
 import { escapeHtml } from '../utils/sanitize.ts';
 import { htmlJsArg } from '../utils/sanitize.ts';
 import { store } from '../store/appState';
 import { formatFriendlyDate, getTodayKey } from '../utils/dateUtils';
-import { clampProgressRatio, formatRemainingCalories, safeRatio } from '../utils/safeNumbers';
+import { clampProgressRatio, formatDisplayNumber, formatRemainingCalories, safeRatio } from '../utils/safeNumbers';
 import type { DashboardWidgetId } from '../types/index.ts';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 
@@ -44,12 +44,20 @@ export function renderDashboardScreen(): string {
   const proteinPct = Math.round(clampProgressRatio(safeRatio(totals.protein, proteinGoal)) * 100);
   const carbsPct = Math.round(clampProgressRatio(safeRatio(totals.carbs, carbsGoal)) * 100);
   const fatPct = Math.round(clampProgressRatio(safeRatio(totals.fat, fatGoal)) * 100);
+  const macroCards = [
+    { label: 'Protein', amount: totals.protein, target: proteinGoal, percent: proteinPct,
+      text: 'text-primary dark:text-primary-container', bar: 'bg-primary' },
+    { label: 'Carbs', amount: totals.carbs, target: carbsGoal, percent: carbsPct,
+      text: 'text-tertiary dark:text-tertiary-fixed', bar: 'bg-tertiary dark:bg-tertiary-fixed' },
+    { label: 'Fat', amount: totals.fat, target: fatGoal, percent: fatPct,
+      text: 'text-amber-500', bar: 'bg-amber-500' },
+  ];
   const proteinRemaining = Math.max(0, Math.round(proteinGoal - totals.protein));
   const coachMessage = dayMeals.length === 0
-    ? tr("No meals logged for this day yet. Add your first meal to start tracking your {0}g protein target.", proteinGoal)
+    ? tr("No meals logged for this day yet. Add your first meal to start tracking your {0}g protein target.", formatDisplayNumber(proteinGoal))
     : proteinRemaining > 0
-      ? `${trHtml("You have")} <strong>${proteinRemaining}${trHtml("g protein")}</strong> ${trHtml("remaining toward today's")} ${proteinGoal}${trHtml("g target.")}`
-      : tr("You've reached today's {0}g protein target.", proteinGoal);
+      ? `${trHtml("You have")} <strong>${proteinRemaining}${trHtml("g protein")}</strong> ${trHtml("remaining toward today's")} ${formatDisplayNumber(proteinGoal)}${trHtml("g target.")}`
+      : tr("You've reached today's {0}g protein target.", formatDisplayNumber(proteinGoal));
   const widgetOrder = new Map(state.dashboardWidgetOrder.map((id, index) => [id, index + 1]));
   const widgetStyle = (id: DashboardWidgetId) => state.hiddenDashboardWidgets.includes(id)
     ? 'display: none;'
@@ -97,8 +105,8 @@ export function renderDashboardScreen(): string {
               <span class="w-2 h-2 rounded-full bg-primary-container"></span>
               <h2 class="font-heading text-sm font-bold text-on-surface dark:text-white">${trHtml("Daily Energy Budget")}</h2>
             </div>
-            <span class="text-xs font-semibold text-on-surface-variant dark:text-gray-300 bg-surface-container-low dark:bg-dark-surface-card-high px-2.5 py-0.5 rounded-full border border-outline-variant/30">
-              ${trHtml("Goal:")} ${goal.toLocaleString(getLocale())} ${trHtml("kcal")}
+            <span class="ui-number text-xs font-semibold text-on-surface-variant dark:text-gray-300 bg-surface-container-low dark:bg-dark-surface-card-high px-2.5 py-0.5 rounded-full border border-outline-variant/30">
+              ${trHtml("Goal:")} ${formatDisplayNumber(goal, 0)} ${trHtml("kcal")}
             </span>
           </div>
 
@@ -138,13 +146,13 @@ export function renderDashboardScreen(): string {
           </div>
 
           <!-- Visual Energy Equation Strip -->
-          <div class="grid grid-cols-3 gap-2 mt-2 pt-3 border-t border-outline-variant/30">
+          <div class="ui-number-grid grid grid-cols-3 gap-2 mt-2 pt-3 border-t border-outline-variant/30">
             <div class="flex flex-col items-center bg-surface-container-low dark:bg-dark-surface-card-high py-2 px-1 rounded-xl">
               <div class="flex items-center gap-1 text-on-surface-variant dark:text-gray-400 mb-0.5">
                 <span class="material-symbols-outlined text-[13px]">restaurant</span>
                 <span class="text-[11px] font-semibold">${trHtml("Food")}</span>
               </div>
-              <span class="font-heading font-bold text-sm text-on-surface dark:text-white">${consumed}</span>
+              <span class="ui-number font-heading font-bold text-sm text-on-surface dark:text-white">${formatDisplayNumber(consumed, 0)}</span>
               <span class="text-[9px] text-on-surface-variant dark:text-gray-400">${trHtml("kcal in")}</span>
             </div>
 
@@ -153,7 +161,7 @@ export function renderDashboardScreen(): string {
                 <span class="material-symbols-outlined text-[13px]">fitness_center</span>
                 <span class="text-[11px] font-semibold">${trHtml("Exercise")}</span>
               </div>
-              <span class="font-heading font-bold text-sm text-tertiary dark:text-tertiary-fixed">${burned}</span>
+              <span class="ui-number font-heading font-bold text-sm text-tertiary dark:text-tertiary-fixed">${formatDisplayNumber(burned, 0)}</span>
               <span class="text-[9px] text-on-surface-variant dark:text-gray-400">${trHtml("kcal out")}</span>
             </div>
 
@@ -169,58 +177,29 @@ export function renderDashboardScreen(): string {
         </section>
 
         <!-- Macronutrients Breakdown Section -->
-        <section style="${widgetStyle('macros')}" class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-5 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
-          <div class="flex items-center justify-between">
+        <section style="${widgetStyle('macros')}" class="macro-summary bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-5 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <h3 class="font-heading text-sm font-bold text-on-surface dark:text-white">${trHtml("Macronutrients")}</h3>
-            <span class="text-xs text-primary dark:text-primary-container font-semibold cursor-pointer" onclick="window.navigateApp('diary')">${trHtml("View Diary &rarr;")}</span>
+            <button type="button" class="text-xs text-primary dark:text-primary-container font-semibold" onclick="window.navigateApp('diary')">${trHtml("View Diary &rarr;")}</button>
           </div>
 
           <!-- 3 Macro Cards -->
-          <div class="grid grid-cols-3 gap-2.5">
-            <!-- Protein -->
-            <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl flex flex-col gap-1.5 border border-outline-variant/20">
-              <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-on-surface-variant dark:text-gray-400">${trHtml("Protein")}</span>
-                <span class="text-[10px] font-bold text-primary dark:text-primary-container">${proteinPct}%</span>
+          <div class="macro-grid grid grid-cols-3 gap-2.5">
+            ${macroCards.map(macro => `
+              <div class="macro-card min-w-0 bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl flex flex-col gap-1.5 border border-outline-variant/20">
+                <div class="macro-card-heading flex flex-wrap items-baseline justify-between gap-x-1 gap-y-0.5">
+                  <span class="min-w-0 max-w-full text-[11px] font-bold text-on-surface-variant dark:text-gray-400 [overflow-wrap:anywhere]">${trHtml(macro.label)}</span>
+                  <span class="shrink-0 text-[10px] font-bold ${macro.text}">${macro.percent}%</span>
+                </div>
+                <div class="macro-card-reading min-w-0 flex flex-col gap-0.5">
+                  <span class="ui-number font-heading text-base font-extrabold text-on-surface dark:text-white">${formatDisplayNumber(macro.amount)}</span>
+                  <span class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400">/ ${formatDisplayNumber(macro.target)} ${trHtml("g")}</span>
+                </div>
+                <div class="macro-card-track mt-auto w-full bg-surface-container-highest dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                  <div class="${macro.bar} h-full rounded-full transition-all duration-500" style="width: ${macro.percent}%"></div>
+                </div>
               </div>
-              <div class="flex items-baseline gap-1">
-                <span class="font-heading text-base font-extrabold text-on-surface dark:text-white">${totals.protein}</span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400">/ ${proteinGoal}${trHtml("g")}</span>
-              </div>
-              <div class="w-full bg-surface-container-highest dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
-                <div class="bg-primary h-full rounded-full transition-all duration-500" style="width: ${proteinPct}%"></div>
-              </div>
-            </div>
-
-            <!-- Carbs -->
-            <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl flex flex-col gap-1.5 border border-outline-variant/20">
-              <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-on-surface-variant dark:text-gray-400">${trHtml("Carbs")}</span>
-                <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed">${carbsPct}%</span>
-              </div>
-              <div class="flex items-baseline gap-1">
-                <span class="font-heading text-base font-extrabold text-on-surface dark:text-white">${totals.carbs}</span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400">/ ${carbsGoal}${trHtml("g")}</span>
-              </div>
-              <div class="w-full bg-surface-container-highest dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
-                <div class="bg-tertiary dark:bg-tertiary-fixed h-full rounded-full transition-all duration-500" style="width: ${carbsPct}%"></div>
-              </div>
-            </div>
-
-            <!-- Fat -->
-            <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl flex flex-col gap-1.5 border border-outline-variant/20">
-              <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-on-surface-variant dark:text-gray-400">${trHtml("Fat")}</span>
-                <span class="text-[10px] font-bold text-amber-500">${fatPct}%</span>
-              </div>
-              <div class="flex items-baseline gap-1">
-                <span class="font-heading text-base font-extrabold text-on-surface dark:text-white">${totals.fat}</span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400">/ ${fatGoal}${trHtml("g")}</span>
-              </div>
-              <div class="w-full bg-surface-container-highest dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
-                <div class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: ${fatPct}%"></div>
-              </div>
-            </div>
+            `).join('')}
           </div>
         </section>
 
@@ -303,13 +282,13 @@ export function renderDashboardScreen(): string {
                       <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white">${escapeHtml(mealLabel(meal, meal.name))}</h4>
                       <div class="flex items-center gap-2 mt-0.5">
                         <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase tracking-wider">${trHtml(meal.mealType)} &bull; ${escapeHtml(meal.time)}</span>
-                        <span class="text-[10px] text-primary dark:text-primary-container font-semibold">${meal.protein}${trHtml("g P •")} ${meal.carbs}${trHtml("g C")}</span>
+                        <span class="ui-number text-[10px] text-primary dark:text-primary-container font-semibold">${formatDisplayNumber(meal.protein)} ${trHtml("g P •")} ${formatDisplayNumber(meal.carbs)} ${trHtml("g C")}</span>
                       </div>
                     </div>
                   </div>
 
                   <div class="flex items-center gap-2">
-                    <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${meal.calories} <span class="text-[10px] font-normal text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span></span>
+                    <span class="ui-number font-heading font-bold text-xs text-on-surface dark:text-white">${formatDisplayNumber(meal.calories, 0)} <span class="text-[10px] font-normal text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span></span>
                     <button onclick="window.deleteMeal(${htmlJsArg(meal.id)})" class="text-on-surface-variant hover:text-error p-1 transition-colors">
                       <span class="material-symbols-outlined text-[16px]">delete_outline</span>
                     </button>

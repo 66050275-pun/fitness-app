@@ -70,6 +70,8 @@ Brand accents in Tailwind:
 - Preserve the visible 2px primary focus outline with 3px offset, keyboard access, browser zoom and heading focus after navigation.
 - Use text labels alongside important status colors and progress indicators. Active navigation uses `aria-current="page"`.
 - Form updates should preserve entered text, focus and caret position. Expanded exercise details should remain open during edits.
+- Format numeric readouts with `formatDisplayNumber` from `src/utils/safeNumbers.ts`: at most two decimal places for macros and training values, whole calories in summary cards, and up to four decimals where micronutrients need that precision. Formatting affects presentation only; editable inputs and stored values keep their precision.
+- Numeric cards must allow wrapping and shrinking with `min-width: 0`. Put macro targets on a separate line, let long Thai labels wrap, and rearrange compact grids on narrow phones. Show the full value rather than clipping it or replacing it with an ellipsis.
 
 ## Navigation and motion
 

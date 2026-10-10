@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { translatedMuscles } from '../../i18n/fitnessLabels.ts';
 import { tr, trHtml, getLocale, translatedLabel } from '../../i18n/index.ts';
 import { getTodayKey } from '../../utils/dateUtils.ts';
@@ -52,7 +53,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
       const workoutName = completedWorkout ? completedWorkout.name : (preset ? preset.title : tr("Workout"));
       const setsCount = completedWorkout?.completedSetCount ?? 0;
       const durationMins = completedWorkout?.durationSeconds ? Math.round(completedWorkout.durationSeconds / 60) : 0;
-      const volumeKg = completedWorkout?.totalVolume ? completedWorkout.totalVolume.toLocaleString(getLocale()) : '0';
+      const volumeKg = completedWorkout?.totalVolume ? formatDisplayNumber(completedWorkout.totalVolume) : '0';
       const burnedKcal = completedWorkout?.estimatedCalories ?? 0;
       const workoutId = completedWorkout?.id || '';
 
@@ -85,7 +86,7 @@ export function renderTodaysWorkoutCard(passedState?: TodaysWorkoutCardState): s
           </div>
           <div class="py-2 px-1 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col items-center justify-center min-w-0">
             <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">${trHtml("Volume")}</span>
-            <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white block mt-0.5 truncate w-full">${volumeKg} ${trHtml("kg")}</span>
+            <span class="ui-number font-heading font-extrabold text-xs text-on-surface dark:text-white block mt-0.5 truncate w-full">${volumeKg} ${trHtml("kg")}</span>
           </div>
           <div class="py-2 px-1 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col items-center justify-center min-w-0">
             <span class="text-[9px] uppercase font-bold text-on-surface-variant dark:text-gray-400 block truncate w-full">${trHtml("Burned")}</span>

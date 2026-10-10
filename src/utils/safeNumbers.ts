@@ -46,6 +46,13 @@ export function safeFiniteOrNull(value: unknown): number | null {
   return num;
 }
 
+/** Format display values only; keep stored values and editable inputs at full precision. */
+export function formatDisplayNumber(value: number | null | undefined, maximumFractionDigits = 2): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
+  const displayValue = Math.abs(value) < 0.5 / 10 ** maximumFractionDigits ? 0 : value;
+  return displayValue.toLocaleString(getLocale(), { maximumFractionDigits });
+}
+
 /**
  * Safe division: returns 0 when denominator is 0, NaN, or Infinity.
  * Prevents division-by-zero across all ratio calculations.

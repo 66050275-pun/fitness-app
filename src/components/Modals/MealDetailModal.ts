@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { mealLabel, mealDescription } from '../../i18n/foodLabels.ts';
 import { tr, trHtml } from '../../i18n/index.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
@@ -51,7 +52,7 @@ export function renderMealDetailModal(): string {
         <div class="px-5 pt-3 pb-3 border-b border-outline-variant/20 flex flex-col gap-2 shrink-0 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
           <div class="w-12 h-1.5 rounded-full bg-outline-variant/40 mx-auto"></div>
           
-          <div class="flex items-start justify-between">
+          <div class="flex flex-wrap items-start justify-between gap-2">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary dark:text-primary-container flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-[24px]">${escapeHtml(meal.icon || 'restaurant')}</span>
@@ -92,22 +93,22 @@ export function renderMealDetailModal(): string {
             <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
               ${trHtml("Macronutrient Breakdown")}
             </span>
-            <div class="grid grid-cols-4 gap-2">
+            <div class="ui-stat-grid grid grid-cols-4 gap-2">
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Energy")}</span>
-                <span class="font-heading font-extrabold text-sm text-primary dark:text-primary-container mt-0.5 block">${meal.calories} ${trHtml("kcal")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-primary dark:text-primary-container mt-0.5 block">${formatDisplayNumber(meal.calories, 0)} ${trHtml("kcal")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">${trHtml("Protein")}</span>
-                <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${meal.protein}${trHtml("g")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(meal.protein)} ${trHtml("g")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">${trHtml("Carbs")}</span>
-                <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${meal.carbs}${trHtml("g")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(meal.carbs)} ${trHtml("g")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-amber-500 block uppercase">${trHtml("Fat")}</span>
-                <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${meal.fat}${trHtml("g")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(meal.fat)} ${trHtml("g")}</span>
               </div>
             </div>
           </section>
@@ -201,7 +202,7 @@ export function renderMealDetailModal(): string {
 function renderMiniNutrientCard(n: NutrientValue): string {
   const config = getNutrientReference(n.key);
   const safeName = trHtml(n.name);
-  const amountStr = n.amount !== null ? `${n.amount} ${trHtml(n.unit)}` : '—';
+  const amountStr = n.amount !== null ? `${formatDisplayNumber(n.amount, 4)} ${trHtml(n.unit)}` : '—';
   const hasDV = config?.hasDailyValuePercent ?? (n.dailyValuePercent !== null && n.dailyValuePercent !== undefined);
 
   return `
@@ -211,8 +212,8 @@ function renderMiniNutrientCard(n: NutrientValue): string {
         <span class="text-[10px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${amountStr}</span>
       </div>
       ${hasDV && n.dailyValuePercent !== null && n.dailyValuePercent !== undefined ? `
-        <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary dark:text-primary-container">
-          ${n.dailyValuePercent}${trHtml("% DV")}
+        <span class="ui-number text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary dark:text-primary-container">
+          ${formatDisplayNumber(n.dailyValuePercent, 1)}${trHtml("% DV")}
         </span>
       ` : ''}
     </div>

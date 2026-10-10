@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { foodLabel } from '../../i18n/foodLabels.ts';
 import { tr, trHtml } from '../../i18n/index.ts';
 /**
@@ -35,14 +36,14 @@ export function renderSetPortionModal(): string {
   const errorMsg = calcResult?.error;
   const nutrition = calcResult?.nutrition;
 
-  const calDisplay = nutrition?.calories !== null && nutrition?.calories !== undefined ? `${nutrition.calories}` : '—';
-  const proDisplay = nutrition?.protein !== null && nutrition?.protein !== undefined ? `${nutrition.protein} ${trHtml("g")}` : '—';
-  const carbDisplay = nutrition?.carbs !== null && nutrition?.carbs !== undefined ? `${nutrition.carbs} ${trHtml("g")}` : '—';
-  const fatDisplay = nutrition?.fat !== null && nutrition?.fat !== undefined ? `${nutrition.fat} ${trHtml("g")}` : '—';
+  const calDisplay = nutrition?.calories !== null && nutrition?.calories !== undefined ? `${formatDisplayNumber(nutrition.calories, 0)}` : '—';
+  const proDisplay = nutrition?.protein !== null && nutrition?.protein !== undefined ? `${formatDisplayNumber(nutrition.protein)} ${trHtml("g")}` : '—';
+  const carbDisplay = nutrition?.carbs !== null && nutrition?.carbs !== undefined ? `${formatDisplayNumber(nutrition.carbs)} ${trHtml("g")}` : '—';
+  const fatDisplay = nutrition?.fat !== null && nutrition?.fat !== undefined ? `${formatDisplayNumber(nutrition.fat)} ${trHtml("g")}` : '—';
 
   const basisText = food.nutritionBasis.servingDescription 
     ? food.nutritionBasis.servingDescription 
-    : tr("per {0} {1}", food.nutritionBasis.amount, food.nutritionBasis.unit);
+    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), food.nutritionBasis.unit);
 
   const hasMicronutrients = food.nutrition.micronutrients && (
     food.nutrition.micronutrients.vitamins.length > 0 || 
@@ -188,29 +189,29 @@ export function renderSetPortionModal(): string {
               ` : ''}
             </div>
 
-            <div class="grid grid-cols-4 gap-2 text-center pt-1">
+            <div class="ui-stat-grid grid grid-cols-4 gap-2 text-center pt-1">
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
                 <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Calories")}</span>
-                <span class="font-heading font-extrabold text-base text-primary dark:text-primary-container block mt-0.5">
+                <span class="ui-number font-heading font-extrabold text-base text-primary dark:text-primary-container block mt-0.5">
                   ${calDisplay}
                 </span>
                 <span class="text-[9px] text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
                 <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">${trHtml("Protein")}</span>
-                <span class="font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
+                <span class="ui-number font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
                   ${proDisplay}
                 </span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
                 <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">${trHtml("Carbs")}</span>
-                <span class="font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
+                <span class="ui-number font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
                   ${carbDisplay}
                 </span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30">
                 <span class="text-[10px] font-bold text-amber-500 block uppercase">${trHtml("Fat")}</span>
-                <span class="font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
+                <span class="ui-number font-heading font-extrabold text-base text-on-surface dark:text-white block mt-0.5">
                   ${fatDisplay}
                 </span>
               </div>

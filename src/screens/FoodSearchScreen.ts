@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { foodLabel, portionLabel } from '../i18n/foodLabels.ts';
 import { tr, trHtml, getLocale } from '../i18n/index.ts';
 import { store } from '../store/appState';
@@ -394,12 +395,12 @@ function renderMyFoodsTab(customFoods: FoodDefinition[]): string {
 function renderCustomFoodCard(food: FoodDefinition): string {
   const basis = food.nutritionBasis.servingDescription 
     ? food.nutritionBasis.servingDescription 
-    : tr("per {0} {1}", food.nutritionBasis.amount, food.nutritionBasis.unit);
+    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), food.nutritionBasis.unit);
 
-  const cal = food.nutrition.calories ?? '—';
-  const pro = food.nutrition.protein !== null && food.nutrition.protein !== undefined ? `${food.nutrition.protein} ${trHtml("g")}` : '—';
-  const carb = food.nutrition.carbs !== null && food.nutrition.carbs !== undefined ? `${food.nutrition.carbs} ${trHtml("g")}` : '—';
-  const fat = food.nutrition.fat !== null && food.nutrition.fat !== undefined ? `${food.nutrition.fat} ${trHtml("g")}` : '—';
+  const cal = formatDisplayNumber(food.nutrition.calories, 0);
+  const pro = food.nutrition.protein !== null && food.nutrition.protein !== undefined ? `${formatDisplayNumber(food.nutrition.protein)} ${trHtml("g")}` : '—';
+  const carb = food.nutrition.carbs !== null && food.nutrition.carbs !== undefined ? `${formatDisplayNumber(food.nutrition.carbs)} ${trHtml("g")}` : '—';
+  const fat = food.nutrition.fat !== null && food.nutrition.fat !== undefined ? `${formatDisplayNumber(food.nutrition.fat)} ${trHtml("g")}` : '—';
 
   return `
     <div class="p-4 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col gap-2.5 hover:border-primary/40 transition-all">
@@ -449,22 +450,22 @@ function renderCustomFoodCard(food: FoodDefinition): string {
       </div>
 
       <!-- Macro Strip -->
-      <div class="grid grid-cols-4 gap-1.5 p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center text-xs">
+      <div class="ui-stat-grid grid grid-cols-4 gap-1.5 p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center text-xs">
         <div>
           <span class="text-[9px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Calories")}</span>
-          <span class="font-heading font-extrabold text-primary dark:text-primary-container">${cal}</span>
+          <span class="ui-number font-heading font-extrabold text-primary dark:text-primary-container">${cal}</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Protein")}</span>
-          <span class="font-bold text-on-surface dark:text-white">${pro}</span>
+          <span class="ui-number font-bold text-on-surface dark:text-white">${pro}</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Carbs")}</span>
-          <span class="font-bold text-on-surface dark:text-white">${carb}</span>
+          <span class="ui-number font-bold text-on-surface dark:text-white">${carb}</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Fat")}</span>
-          <span class="font-bold text-on-surface dark:text-white">${fat}</span>
+          <span class="ui-number font-bold text-on-surface dark:text-white">${fat}</span>
         </div>
       </div>
 
@@ -520,9 +521,9 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
   const isCustom = food.source === 'custom';
   const basisText = food.nutritionBasis.servingDescription 
     ? food.nutritionBasis.servingDescription 
-    : tr("per {0} {1}", food.nutritionBasis.amount, food.nutritionBasis.unit);
+    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), food.nutritionBasis.unit);
 
-  const cal = food.nutrition.calories ?? '—';
+  const cal = formatDisplayNumber(food.nutrition.calories, 0);
   const pro = food.nutrition.protein !== null && food.nutrition.protein !== undefined ? tr("{0}g P", food.nutrition.protein) : '';
   const carb = food.nutrition.carbs !== null && food.nutrition.carbs !== undefined ? tr("{0}g C", food.nutrition.carbs) : '';
   const fat = food.nutrition.fat !== null && food.nutrition.fat !== undefined ? tr("{0}g F", food.nutrition.fat) : '';
@@ -559,7 +560,7 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
 
       <div class="flex items-center gap-2 shrink-0">
         <div class="text-right">
-          <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white block">
+          <span class="ui-number font-heading font-extrabold text-xs text-on-surface dark:text-white block">
             ${cal} ${trHtml("kcal")}
           </span>
           <span class="text-[9px] text-primary dark:text-primary-container font-semibold">

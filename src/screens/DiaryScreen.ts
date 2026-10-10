@@ -1,5 +1,6 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { mealLabel, mealDescription, portionLabel } from '../i18n/foodLabels.ts';
-import { tr, trHtml, getLocale } from '../i18n/index.ts';
+import { tr, trHtml } from '../i18n/index.ts';
 import { escapeHtml } from '../utils/sanitize.ts';
 import { htmlJsArg } from '../utils/sanitize.ts';
 /**
@@ -63,15 +64,15 @@ export function renderDiaryScreen(): string {
         </button>
 
         <!-- 7 Days with Calorie Progress Rings (No % numbers displayed) -->
-        <div class="flex-1 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+        <div class="ui-number flex-1 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
           ${weekDays.map(day => {
             const isSelected = day.dateKey === selectedDate;
             const dayConsumed = dailyCalories[day.dateKey] || 0;
 
             const dayAriaLabel = `${day.dayName}, ${day.monthName} ${day.dayNum}, ${day.year}. ${
               dayConsumed > 0 
-                ? tr("{0} of {1} calories logged", dayConsumed.toLocaleString(getLocale()), calorieTarget.toLocaleString(getLocale()))
-                : (calorieTarget > 0 ? tr("0 of {0} calories logged", calorieTarget.toLocaleString(getLocale())) : tr("calorie target unavailable"))
+                ? tr("{0} of {1} calories logged", formatDisplayNumber(dayConsumed, 0), formatDisplayNumber(calorieTarget, 0))
+                : (calorieTarget > 0 ? tr("0 of {0} calories logged", formatDisplayNumber(calorieTarget, 0)) : tr("calorie target unavailable"))
             }${day.isToday ? tr(". Today") : ''}${isSelected ? tr(". Selected") : ''}`;
 
             return `
@@ -155,29 +156,29 @@ export function renderDiaryScreen(): string {
                 ariaLabel: tr("Daily calorie total: {0} of {1} kcal", consumed, calorieTarget)
               })}
               <div class="text-right">
-                <span class="text-xs font-extrabold ${consumed > 0 ? 'text-primary dark:text-primary-container' : 'text-on-surface-variant dark:text-gray-400'} block">
-                  ${consumed.toLocaleString(getLocale())} ${trHtml("kcal")}
+                <span class="ui-number text-xs font-extrabold ${consumed > 0 ? 'text-primary dark:text-primary-container' : 'text-on-surface-variant dark:text-gray-400'} block">
+                  ${formatDisplayNumber(consumed, 0)} ${trHtml("kcal")}
                 </span>
-                <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">
-                  ${trHtml("of {0} goal", calorieTarget.toLocaleString(getLocale()))}
+                <span class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400 block">
+                  ${trHtml("of {0} goal", formatDisplayNumber(calorieTarget, 0))}
                 </span>
               </div>
             </div>
           </div>
 
           <!-- Mini Macro Progress Grid -->
-          <div class="grid grid-cols-4 gap-2 mt-3">
+          <div class="ui-stat-grid grid grid-cols-4 gap-2 mt-3">
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-primary dark:text-primary-container block">${trHtml("Protein")}</span>
-              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.protein}${trHtml("g")}</p>
+              <p class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(totals.protein)} ${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block">${trHtml("Carbs")}</span>
-              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.carbs}${trHtml("g")}</p>
+              <p class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(totals.carbs)} ${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-amber-500 block">${trHtml("Fat")}</span>
-              <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${totals.fat}${trHtml("g")}</p>
+              <p class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(totals.fat)} ${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-blue-500 block">${trHtml("Water")}</span>
@@ -220,20 +221,20 @@ export function renderDiaryScreen(): string {
 
           ${microSummary.nutrients.length > 0 ? `
             <!-- Top Key Nutrients Grid -->
-            <div class="grid grid-cols-2 gap-2">
+            <div class="ui-number-grid grid grid-cols-2 gap-2">
               ${microSummary.nutrients.slice(0, 6).map(n => {
                 const dv = n.dailyValuePercent;
                 const progressWidth = dv !== null && dv !== undefined ? Math.min(100, Math.max(0, dv)) : 0;
                 return `
                   <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1">
-                    <div class="flex items-start justify-between">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${trHtml(n.shortName || n.name)}</span>
-                        <span class="text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${n.totalAmount} ${trHtml(n.unit)}</span>
+                        <span class="ui-number text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${formatDisplayNumber(n.totalAmount, 4)} ${trHtml(n.unit)}</span>
                       </div>
                       ${dv !== null && dv !== undefined ? `
                         <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-primary/10 text-primary dark:text-primary-container">
-                          ${dv}${trHtml("% DV")}
+                          ${formatDisplayNumber(dv, 1)}${trHtml("% DV")}
                         </span>
                       ` : ''}
                     </div>
@@ -333,7 +334,7 @@ export function renderDiaryScreen(): string {
                     </div>
 
                     <div class="text-right">
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${meal.calories} ${trHtml("kcal")}</span>
+                      <span class="ui-number font-heading font-bold text-xs text-on-surface dark:text-white">${formatDisplayNumber(meal.calories, 0)} ${trHtml("kcal")}</span>
                       <button 
                         type="button"
                         onclick="event.stopPropagation(); window.deleteMeal(${htmlJsArg(meal.id)})"
@@ -353,9 +354,9 @@ export function renderDiaryScreen(): string {
                           ${escapeHtml(portionLabel(meal.portion, meal.foodSource === 'built_in' || meal.foodSource === 'demo'))}
                         </span>
                       ` : ''}
-                      <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container font-semibold">${meal.protein}${trHtml("g Protein")}</span>
-                      <span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary dark:text-tertiary-fixed font-semibold">${meal.carbs}${trHtml("g Carbs")}</span>
-                      <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">${meal.fat}${trHtml("g Fat")}</span>
+                      <span class="ui-number px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container font-semibold">${formatDisplayNumber(meal.protein)} ${trHtml("g Protein")}</span>
+                      <span class="ui-number px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary dark:text-tertiary-fixed font-semibold">${formatDisplayNumber(meal.carbs)} ${trHtml("g Carbs")}</span>
+                      <span class="ui-number px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">${formatDisplayNumber(meal.fat)} ${trHtml("g Fat")}</span>
                     </div>
 
                     <div class="flex items-center gap-1.5 shrink-0">

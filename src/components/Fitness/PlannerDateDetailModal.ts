@@ -1,5 +1,6 @@
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { translatedMuscles } from '../../i18n/fitnessLabels.ts';
-import { tr, trHtml, getLocale, translatedLabel } from '../../i18n/index.ts';
+import { tr, trHtml, translatedLabel } from '../../i18n/index.ts';
 import { store } from '../../store/appState.ts';
 import { formatDiaryDate, getTodayKey } from '../../utils/dateUtils.ts';
 import { 
@@ -150,7 +151,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
                 </div>
                 <div class="p-2 rounded-xl bg-surface/60 dark:bg-dark-surface/60 border border-outline-variant/20">
                   <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Volume")}</span>
-                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${(completedWorkout.totalVolume || 0).toLocaleString(getLocale())} ${trHtml("kg")}</span>
+                  <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white">${formatDisplayNumber(completedWorkout.totalVolume || 0)} ${trHtml("kg")}</span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface/60 dark:bg-dark-surface/60 border border-outline-variant/20">
                   <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Burned")}</span>

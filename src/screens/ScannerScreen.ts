@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { tr, trHtml } from '../i18n/index.ts';
 import { demoFoodImage } from '../data/demoImage.ts';
 import { store } from '../store/appState';
@@ -113,7 +114,7 @@ export function renderScannerScreen(): string {
                 <span class="font-heading font-bold text-xs truncate text-on-surface">${trHtml(food.name)}</span>
                 <span class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary text-[9px] font-extrabold">${Math.round(food.confidence * 100)}${trHtml("% Match")}</span>
               </div>
-              <p class="text-[11px] text-on-surface-variant mt-0.5">${food.calories} ${trHtml("kcal •")} ${food.protein}${trHtml("g Protein • Tap for Details &rarr;")}</p>
+              <p class="ui-number text-[11px] text-on-surface-variant mt-0.5">${formatDisplayNumber(food.calories, 0)} ${trHtml("kcal •")} ${formatDisplayNumber(food.protein)}${trHtml("g Protein • Tap for Details &rarr;")}</p>
             </div>
           </div>
         ` : `

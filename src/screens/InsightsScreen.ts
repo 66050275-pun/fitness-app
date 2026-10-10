@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { exerciseLabel } from '../i18n/fitnessLabels.ts';
 import { tr, trHtml, getLocale, translatedLabel } from '../i18n/index.ts';
 import { store } from '../store/appState';
@@ -114,12 +115,12 @@ export function renderInsightsScreen(): string {
             <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("vs previous")} ${range}d</span>
           </div>
 
-          <div class="grid grid-cols-2 gap-2.5">
+          <div class="ui-number-grid grid grid-cols-2 gap-2.5">
             <!-- Avg Calories -->
-            ${renderOverviewCard(tr("Avg Daily Calories"), `${curNutritionAvg.avgCalories.toLocaleString(getLocale())}`, 'kcal', deltaCalories, 'local_fire_department', 'neutral')}
+            ${renderOverviewCard(tr("Avg Daily Calories"), `${formatDisplayNumber(curNutritionAvg.avgCalories, 0)}`, 'kcal', deltaCalories, 'local_fire_department', 'neutral')}
             
             <!-- Avg Protein -->
-            ${renderOverviewCard(tr("Avg Daily Protein"), `${curNutritionAvg.avgProtein}`, 'g', deltaProtein, 'egg_alt', 'protein')}
+            ${renderOverviewCard(tr("Avg Daily Protein"), formatDisplayNumber(curNutritionAvg.avgProtein), 'g', deltaProtein, 'egg_alt', 'protein')}
             
             <!-- Total Training Duration -->
             ${renderOverviewCard(tr("Training Time"), `${curWorkoutTotals.totalDurationMinutes}`, 'min', deltaDuration, 'timer', 'fitness')}
@@ -173,19 +174,19 @@ export function renderInsightsScreen(): string {
               <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Fitness & Volume Trends")}</h3>
               <p class="text-[11px] text-on-surface-variant dark:text-gray-400">${trHtml("Mechanical load from verified completed sets")}</p>
             </div>
-            <span class="text-xs font-extrabold text-primary dark:text-primary-container">
-              ${curWorkoutTotals.totalVolumeKg.toLocaleString(getLocale())} ${trHtml("kg total vol")}
+            <span class="ui-number text-xs font-extrabold text-primary dark:text-primary-container">
+              ${formatDisplayNumber(curWorkoutTotals.totalVolumeKg)} ${trHtml("kg total vol")}
             </span>
           </div>
 
-          <div class="grid grid-cols-3 gap-2 text-center pt-1">
+          <div class="ui-number-grid grid grid-cols-3 gap-2 text-center pt-1">
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl">
               <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Completed Sets")}</span>
               <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">${curWorkoutTotals.totalCompletedSets}</span>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl">
               <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Total Volume")}</span>
-              <span class="font-heading font-extrabold text-base text-primary dark:text-primary-container">${curWorkoutTotals.totalVolumeKg.toLocaleString(getLocale())} ${trHtml("kg")}</span>
+              <span class="ui-number font-heading font-extrabold text-base text-primary dark:text-primary-container">${formatDisplayNumber(curWorkoutTotals.totalVolumeKg)} ${trHtml("kg")}</span>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl">
               <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Avg / Session")}</span>
@@ -220,7 +221,7 @@ export function renderInsightsScreen(): string {
                       </div>
                     </div>
                     <div class="flex items-center gap-1.5">
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${w.totalVolume.toLocaleString(getLocale())} ${trHtml("kg")}</span>
+                      <span class="ui-number font-heading font-bold text-xs text-on-surface dark:text-white">${formatDisplayNumber(w.totalVolume)} ${trHtml("kg")}</span>
                       <span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
                     </div>
                   </button>
@@ -235,7 +236,7 @@ export function renderInsightsScreen(): string {
         <section class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
           <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Consistency & Streaks")}</h3>
           
-          <div class="grid grid-cols-2 gap-2.5">
+          <div class="ui-number-grid grid grid-cols-2 gap-2.5">
             <!-- Nutrition Streak -->
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl border border-outline-variant/20 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-[#FF6B00] flex items-center justify-center shrink-0">
@@ -311,7 +312,7 @@ export function renderInsightsScreen(): string {
 
                   <div class="flex items-center gap-2">
                     <div class="text-right">
-                      <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white block">${pr.weightKg} ${trHtml("kg &times;")} ${pr.reps}</span>
+                      <span class="ui-number font-heading font-extrabold text-xs text-on-surface dark:text-white block">${formatDisplayNumber(pr.weightKg)} ${trHtml("kg &times;")} ${pr.reps}</span>
                       <span class="text-[9px] text-primary dark:text-primary-container font-semibold">${trHtml("1RM:")} ${pr.estimatedOneRepMax} ${trHtml("kg")}</span>
                     </div>
                     <span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
@@ -393,7 +394,7 @@ export function renderInsightsScreen(): string {
                     <div>
                       <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${trHtml(n.name)}</span>
                       <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
-                        ${n.referenceValue !== null ? tr("Ref: {0} {1} ({2})", n.referenceValue, tr(n.unit), tr(n.direction === 'maximum_limit' ? 'max' : 'target')) : tr("Informational")}
+                        ${n.referenceValue !== null ? tr("Ref: {0} {1} ({2})", formatDisplayNumber(n.referenceValue, 4), tr(n.unit), tr(n.direction === 'maximum_limit' ? 'max' : 'target')) : tr("Informational")}
                       </span>
                     </div>
 
@@ -402,11 +403,11 @@ export function renderInsightsScreen(): string {
                     </span>
                   </div>
 
-                  <div class="flex items-baseline justify-between pt-1">
+                  <div class="flex flex-wrap items-baseline justify-between gap-2 pt-1">
                     <div>
                       <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase font-semibold">${trHtml("Daily Avg")}</span>
-                      <div class="font-heading font-extrabold text-sm text-primary dark:text-primary-container">
-                        ${isInsufficient ? tr("Insufficient data") : `${n.avgDailyIntake} ${trHtml(n.unit)}`}
+                      <div class="ui-number font-heading font-extrabold text-sm text-primary dark:text-primary-container">
+                        ${isInsufficient ? tr("Insufficient data") : `${formatDisplayNumber(n.avgDailyIntake, 4)} ${trHtml(n.unit)}`}
                       </div>
                     </div>
 
@@ -487,7 +488,7 @@ function renderOverviewCard(
     deltaHtml = `
       <div class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md ${colorClass} text-[10px] font-bold mt-1">
         <span class="material-symbols-outlined text-[12px]">${iconName}</span>
-        <span>${isUp ? '+' : isDown ? '-' : ''}${delta.percent}%</span>
+        <span>${isUp ? '+' : isDown ? '-' : ''}${formatDisplayNumber(delta.percent, 1)}%</span>
       </div>
     `;
   } else {
@@ -501,13 +502,13 @@ function renderOverviewCard(
   return `
     <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between text-on-surface-variant dark:text-gray-400 mb-1">
-        <span class="text-[10px] font-bold uppercase truncate max-w-[110px]">${title}</span>
+        <span class="text-[10px] font-bold uppercase min-w-0 [overflow-wrap:anywhere]">${title}</span>
         <span class="material-symbols-outlined text-[16px] text-primary">${icon}</span>
       </div>
 
       <div>
-        <div class="flex items-baseline gap-1">
-          <span class="font-heading font-extrabold text-xl text-on-surface dark:text-white leading-tight">${value}</span>
+        <div class="flex flex-wrap items-baseline gap-1">
+          <span class="ui-number font-heading font-extrabold text-xl text-on-surface dark:text-white leading-tight">${value}</span>
           <span class="text-xs font-medium text-on-surface-variant dark:text-gray-400">${trHtml(unit)}</span>
         </div>
         ${deltaHtml}
@@ -550,11 +551,11 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
           return `
             <div 
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0} kcal logged across {1} meals', day.calories, day.mealCount))})"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0} kcal logged across {1} meals', formatDisplayNumber(day.calories, 0), day.mealCount))})"
             >
               <!-- Tooltip on hover/touch -->
-              <div class="hidden group-hover:flex absolute -top-8 bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-nowrap z-20">
-                ${day.calories} ${trHtml("kcal")}
+              <div class="hidden group-hover:flex absolute top-1 -translate-x-1/2 w-[140px] max-w-[calc(100vw-80px)] bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-normal [overflow-wrap:anywhere] z-20" style="left: calc(50% + ${(0.5 - (colCount > 1 ? idx / (colCount - 1) : 0.5)) * 140}px);">
+                ${formatDisplayNumber(day.calories, 0)} ${trHtml("kcal")}
               </div>
 
               <!-- Bar Fill -->
@@ -625,11 +626,11 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
           return `
             <div 
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0}g protein · {1}g carbs · {2}g fat', day.protein, day.carbs, day.fat))})"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0}g protein · {1}g carbs · {2}g fat', formatDisplayNumber(day.protein), formatDisplayNumber(day.carbs), formatDisplayNumber(day.fat)))})"
             >
               <!-- Tooltip on hover/touch -->
-              <div class="hidden group-hover:flex absolute -top-8 bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-nowrap z-20">
-                ${trHtml("P:")}${day.protein} ${trHtml("C:")}${day.carbs} ${trHtml("F:")}${day.fat}
+              <div class="hidden group-hover:flex absolute top-1 -translate-x-1/2 w-[140px] max-w-[calc(100vw-80px)] bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-normal [overflow-wrap:anywhere] z-20" style="left: calc(50% + ${(0.5 - (colCount > 1 ? idx / (colCount - 1) : 0.5)) * 140}px);">
+                ${trHtml("P:")}${formatDisplayNumber(day.protein)} ${trHtml("C:")}${formatDisplayNumber(day.carbs)} ${trHtml("F:")}${formatDisplayNumber(day.fat)}
               </div>
 
               <!-- Stacked Segment -->

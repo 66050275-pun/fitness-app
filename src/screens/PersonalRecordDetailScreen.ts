@@ -1,5 +1,6 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { translatedMuscles, exerciseLabel } from '../i18n/fitnessLabels.ts';
-import { tr, trHtml, getLocale, translatedLabel } from '../i18n/index.ts';
+import { tr, trHtml, translatedLabel } from '../i18n/index.ts';
 import { store } from '../store/appState';
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 
@@ -62,8 +63,8 @@ export function renderPersonalRecordDetailScreen(): string {
           </div>
 
           <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-400">${trHtml("Current All-Time Record")}</span>
-          <div class="flex items-baseline gap-1.5 my-1">
-            <span class="font-display font-extrabold text-3xl text-on-surface dark:text-white">${pr.weightKg}</span>
+          <div class="flex flex-wrap items-baseline gap-1.5 my-1">
+            <span class="ui-number font-display font-extrabold text-3xl text-on-surface dark:text-white">${formatDisplayNumber(pr.weightKg)}</span>
             <span class="text-base font-bold text-on-surface dark:text-gray-200">${trHtml("kg")}</span>
             <span class="text-sm font-semibold text-on-surface-variant dark:text-gray-400">${trHtml("&times;")} ${pr.reps} ${trHtml("reps")}</span>
           </div>
@@ -74,7 +75,7 @@ export function renderPersonalRecordDetailScreen(): string {
         </section>
 
         <!-- Analytics Metric Tiles -->
-        <div class="grid grid-cols-2 gap-2.5">
+        <div class="ui-number-grid grid grid-cols-2 gap-2.5">
           
           <!-- Estimated 1RM (Epley) -->
           <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col">
@@ -82,7 +83,7 @@ export function renderPersonalRecordDetailScreen(): string {
               <span class="text-[10px] font-bold uppercase">${trHtml("Estimated 1RM")}</span>
               <span class="material-symbols-outlined text-[14px] text-primary">functions</span>
             </div>
-            <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white">${pr.estimatedOneRepMax} <span class="text-xs font-normal">${trHtml("kg")}</span></span>
+            <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white">${formatDisplayNumber(pr.estimatedOneRepMax)} <span class="text-xs font-normal">${trHtml("kg")}</span></span>
             <span class="text-[10px] text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Epley Formula: w &times; (1 + r/30)")}</span>
           </div>
 
@@ -147,22 +148,22 @@ export function renderPersonalRecordDetailScreen(): string {
                   </div>
 
                   <div class="text-right">
-                    <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white">${occ.bestSet.weightKg} ${trHtml("kg &times;")} ${occ.bestSet.reps}</span>
-                    <span class="text-[10px] text-primary dark:text-primary-container font-semibold block">${occ.totalExerciseVolume.toLocaleString(getLocale())} ${trHtml("kg vol")}</span>
+                    <span class="ui-number font-heading font-extrabold text-xs text-on-surface dark:text-white">${formatDisplayNumber(occ.bestSet.weightKg)} ${trHtml("kg &times;")} ${occ.bestSet.reps}</span>
+                    <span class="ui-number text-[10px] text-primary dark:text-primary-container font-semibold block">${formatDisplayNumber(occ.totalExerciseVolume)} ${trHtml("kg vol")}</span>
                   </div>
                 </div>
 
                 <!-- Sets mini breakdown -->
                 <div class="flex flex-wrap gap-1 pt-1.5 border-t border-outline-variant/20">
                   ${occ.sets.map(s => `
-                    <span class="px-1.5 py-0.5 rounded text-[10px] ${
+                    <span class="ui-number px-1.5 py-0.5 rounded text-[10px] ${
                       s.isPersonalRecord 
                         ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold' 
                         : s.completed 
                           ? 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface dark:text-gray-300' 
                           : 'bg-surface-container/40 text-on-surface-variant line-through'
                     }">
-                      ${s.weightKg > 0 ? tr("{0}k &times;", s.weightKg) : ''}${s.reps}
+                      ${s.weightKg > 0 ? tr("{0}k &times;", formatDisplayNumber(s.weightKg)) : ''}${s.reps}
                     </span>
                   `).join('')}
                 </div>

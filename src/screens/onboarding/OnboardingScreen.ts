@@ -1,4 +1,5 @@
-import { tr, trHtml, getLocale } from '../../i18n/index.ts';
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
+import { tr, trHtml } from '../../i18n/index.ts';
 import { store } from '../../store/appState';
 import { ACTIVITY_MULTIPLIERS, calculateAge, calculateFullGoals, resolveCalculationSex } from '../../utils/goalCalculations';
 import { cmToFtIn, kgToLb } from '../../utils/unitConversions';
@@ -132,8 +133,8 @@ function renderReview(): string {
       <div class="mt-5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 divide-y divide-outline-variant/20">
         <div class="p-4 flex justify-between"><span class="text-sm text-on-surface-variant">${trHtml("Goal")}</span><strong class="text-sm">${d.weightDirection === null ? tr("Not selected") : formatWeeklyRate(d.weightDirection, d.weightUnit)}</strong></div>
         <div class="p-4 flex justify-between"><span class="text-sm text-on-surface-variant">${trHtml("Activity")}</span><strong class="text-sm">${d.activityLevel ? ACTIVITY_MULTIPLIERS[d.activityLevel].label : tr("Not selected")}</strong></div>
-        <div class="p-4 flex justify-between"><span class="text-sm text-on-surface-variant">${trHtml("Daily calories")}</span><strong class="text-lg text-primary">${goals.calories.toLocaleString(getLocale())} ${trHtml("kcal")}</strong></div>
-        <div class="p-4 grid grid-cols-3 text-center gap-2"><div><span class="text-xs text-on-surface-variant block">${trHtml("Protein")}</span><strong>${goals.protein}${trHtml("g")}</strong></div><div><span class="text-xs text-on-surface-variant block">${trHtml("Carbs")}</span><strong>${goals.carbs}${trHtml("g")}</strong></div><div><span class="text-xs text-on-surface-variant block">${trHtml("Fat")}</span><strong>${goals.fat}${trHtml("g")}</strong></div></div>
+        <div class="p-4 flex justify-between"><span class="text-sm text-on-surface-variant">${trHtml("Daily calories")}</span><strong class="text-lg text-primary">${formatDisplayNumber(goals.calories, 0)} ${trHtml("kcal")}</strong></div>
+        <div class="p-4 ui-number-grid grid grid-cols-3 text-center gap-2"><div><span class="text-xs text-on-surface-variant block">${trHtml("Protein")}</span><strong>${formatDisplayNumber(goals.protein)} ${trHtml("g")}</strong></div><div><span class="text-xs text-on-surface-variant block">${trHtml("Carbs")}</span><strong>${formatDisplayNumber(goals.carbs)} ${trHtml("g")}</strong></div><div><span class="text-xs text-on-surface-variant block">${trHtml("Fat")}</span><strong>${formatDisplayNumber(goals.fat)} ${trHtml("g")}</strong></div></div>
       </div>
       <p id="onboarding-error" class="min-h-5 mt-3 text-xs text-error" role="alert"></p>
       ${actions(5, tr("Use These Goals"))}

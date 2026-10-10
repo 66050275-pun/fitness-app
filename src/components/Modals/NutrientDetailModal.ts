@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { tr, trHtml } from '../../i18n/index.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 /**
@@ -143,22 +144,22 @@ export function renderNutrientDetailModal(): string {
                 </span>
                 <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Primary Fuel")}</span>
               </div>
-              <div class="grid grid-cols-4 gap-2">
+              <div class="ui-stat-grid grid grid-cols-4 gap-2">
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
                   <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Energy")}</span>
-                  <span class="font-heading font-extrabold text-sm text-primary dark:text-primary-container">${modalData.calories || 0} ${trHtml("kcal")}</span>
+                  <span class="ui-number font-heading font-extrabold text-sm text-primary dark:text-primary-container">${formatDisplayNumber(modalData.calories, 0)} ${trHtml("kcal")}</span>
                 </div>
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
                   <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">${trHtml("Protein")}</span>
-                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.protein || 0}${trHtml("g")}</span>
+                  <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white">${formatDisplayNumber(modalData.protein)} ${trHtml("g")}</span>
                 </div>
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
                   <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">${trHtml("Carbs")}</span>
-                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.carbs || 0}${trHtml("g")}</span>
+                  <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white">${formatDisplayNumber(modalData.carbs)} ${trHtml("g")}</span>
                 </div>
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high text-center">
                   <span class="text-[10px] font-bold text-amber-500 block uppercase">${trHtml("Fat")}</span>
-                  <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${modalData.fat || 0}${trHtml("g")}</span>
+                  <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white">${formatDisplayNumber(modalData.fat)} ${trHtml("g")}</span>
                 </div>
               </div>
             </section>
@@ -217,7 +218,7 @@ function renderNutrientCategoryBlock(title: string, list: NutrientValue[]): stri
 function renderNutrientRow(item: NutrientValue): string {
   const config = getNutrientReference(item.key);
   const safeName = trHtml(item.name);
-  const amountStr = item.amount !== null ? `${item.amount} ${trHtml(item.unit)}` : tr("Not available");
+  const amountStr = item.amount !== null ? `${formatDisplayNumber(item.amount, 4)} ${trHtml(item.unit)}` : tr("Not available");
   const dv = item.dailyValuePercent;
   const isMaxLimit = config?.direction === 'maximum_limit';
   const hasDV = config?.hasDailyValuePercent ?? (dv !== null && dv !== undefined);
@@ -237,7 +238,7 @@ function renderNutrientRow(item: NutrientValue): string {
 
   return `
     <div class="nutrient-row p-3 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col gap-1.5" data-nutrient-name="${safeName.toLowerCase()}">
-      <div class="flex items-start justify-between">
+      <div class="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${safeName}</span>
@@ -248,7 +249,7 @@ function renderNutrientRow(item: NutrientValue): string {
 
         <div class="text-right">
           ${hasDV && dv !== null && dv !== undefined ? `
-            <span class="font-heading font-extrabold text-xs text-on-surface dark:text-white">${dv}${trHtml("% DV")}</span>
+            <span class="ui-number font-heading font-extrabold text-xs text-on-surface dark:text-white">${formatDisplayNumber(dv, 1)}${trHtml("% DV")}</span>
             <span class="text-[9px] text-on-surface-variant dark:text-gray-400 block">${isMaxLimit ? tr("Max Daily Ref") : tr("Daily Value")}</span>
           ` : `
             <span class="text-[10px] text-on-surface-variant dark:text-gray-400 font-semibold italic">${trHtml("Informational")}</span>
@@ -261,10 +262,10 @@ function renderNutrientRow(item: NutrientValue): string {
         <div 
           class="w-full h-1.5 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high overflow-hidden" 
           role="progressbar" 
-          aria-valuenow="${dv}" 
+          aria-valuenow="${progressWidth}"
           aria-valuemin="0" 
           aria-valuemax="100"
-          aria-label="${safeName} ${dv} ${trHtml("percent of daily reference")}"
+          aria-label="${safeName} ${formatDisplayNumber(dv, 1)} ${trHtml("percent of daily reference")}"
         >
           <div 
             class="h-full rounded-full transition-all duration-500 ${isMaxLimit && dv > 100

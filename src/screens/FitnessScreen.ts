@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { translatedMuscles, exerciseLabel } from '../i18n/fitnessLabels.ts';
 import { tr, trHtml, getLocale, translatedLabel } from '../i18n/index.ts';
 import { renderWorkoutMuscleMap } from '../components/Fitness/WorkoutMuscleMap';
@@ -144,12 +145,12 @@ function renderWorkoutHomeView(state: AppState): string {
                     </div>
 
                     <div>
-                      <div class="flex items-baseline gap-1">
-                        <span class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight">${pr.weightKg} ${trHtml("kg")}</span>
+                      <div class="flex flex-wrap items-baseline gap-1">
+                        <span class="ui-number font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight">${formatDisplayNumber(pr.weightKg)} ${trHtml("kg")}</span>
                         <span class="text-[10px] text-on-surface-variant dark:text-gray-400 font-semibold">${trHtml("&times;")} ${pr.reps}</span>
                       </div>
-                      <span class="text-[10px] ${delta && delta > 0 ? 'text-primary dark:text-primary-container font-semibold' : 'text-on-surface-variant dark:text-gray-400'} block mt-0.5 truncate">
-                        ${delta && delta > 0 ? tr("+{0} kg progression", delta) : tr("Est 1RM: {0} kg", pr.estimatedOneRepMax)}
+                      <span class="ui-number text-[10px] ${delta && delta > 0 ? 'text-primary dark:text-primary-container font-semibold' : 'text-on-surface-variant dark:text-gray-400'} block mt-0.5">
+                        ${delta && delta > 0 ? tr("+{0} kg progression", formatDisplayNumber(delta)) : tr("Est 1RM: {0} kg", formatDisplayNumber(pr.estimatedOneRepMax))}
                       </span>
                     </div>
                   </button>
@@ -221,8 +222,8 @@ function renderWorkoutHomeView(state: AppState): string {
                         <span class="font-heading font-bold text-xs ${item.estimatedCalories ? 'text-primary dark:text-primary-container' : 'text-on-surface-variant dark:text-gray-400'} block">
                           ${item.estimatedCalories ? tr("~{0} kcal", item.estimatedCalories) : '&mdash;'}
                         </span>
-                        <span class="text-[10px] text-on-surface-variant dark:text-gray-400 font-medium">
-                          ${item.totalVolume > 0 ? tr("{0} kg vol", item.totalVolume.toLocaleString(getLocale())) : '&mdash;'}
+                        <span class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400 font-medium">
+                          ${item.totalVolume > 0 ? tr("{0} kg vol", formatDisplayNumber(item.totalVolume)) : '&mdash;'}
                         </span>
                       </div>
                       <span class="material-symbols-outlined text-[18px] text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all">chevron_right</span>
@@ -712,7 +713,7 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
               <span class="material-symbols-outlined text-[16px]">weight</span>
               <span class="text-[11px] font-bold uppercase">${trHtml("Total Volume")}</span>
             </div>
-            <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white">${summary.totalVolume > 0 ? `${summary.totalVolume.toLocaleString(getLocale())} <span class="text-xs font-normal">${trHtml("kg")}</span>` : '&mdash;'}</span>
+            <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white">${summary.totalVolume > 0 ? `${formatDisplayNumber(summary.totalVolume)} <span class="text-xs font-normal">${trHtml("kg")}</span>` : '&mdash;'}</span>
           </div>
 
         </div>
@@ -729,9 +730,9 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
               </h4>
               ${summary.estimatedCalories ? `<span class="px-1.5 py-0.2 rounded-full bg-orange-500/10 text-orange-600 text-[9px] font-extrabold uppercase">${trHtml("Calculated")}</span>` : ''}
             </div>
-            <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5 leading-relaxed">
+            <p class="ui-number text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5 leading-relaxed">
               ${summary.estimatedCalories 
-                ? tr("Based on mechanical volume ({0} kg) and duration. Connect biometric sensor in Settings for real-time heart rate accuracy.", summary.totalVolume.toLocaleString(getLocale()))
+                ? tr("Based on mechanical volume ({0} kg) and duration. Connect biometric sensor in Settings for real-time heart rate accuracy.", formatDisplayNumber(summary.totalVolume))
                 : tr("No calories recorded as this workout did not complete weighted volume.")}
             </p>
           </div>
@@ -750,10 +751,10 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
                 </div>
                 <div class="flex flex-wrap gap-1.5">
                   ${ex.sets.map(s => `
-                    <span class="px-2 py-0.5 rounded-md text-[10px] ${s.completed
+                    <span class="ui-number px-2 py-0.5 rounded-md text-[10px] ${s.completed
                         ? 'bg-primary/10 text-primary dark:text-primary-container font-semibold' 
                         : 'bg-surface-container dark:bg-gray-700 text-on-surface-variant line-through'}">
-                      ${trHtml("Set")} ${s.setNumber}: ${s.weightKg > 0 ? tr("{0}kg &times;", s.weightKg) : ''}${s.reps} ${trHtml("reps")}
+                      ${trHtml("Set")} ${s.setNumber}: ${s.weightKg > 0 ? tr("{0}kg &times;", formatDisplayNumber(s.weightKg)) : ''}${s.reps} ${trHtml("reps")}
                     </span>
                   `).join('')}
                 </div>

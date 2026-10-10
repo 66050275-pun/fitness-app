@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { tr, trHtml } from '../i18n/index.ts';
 import { demoFoodImage } from '../data/demoImage.ts';
 import { htmlJsArg } from '../utils/sanitize.ts';
@@ -71,8 +72,8 @@ export function renderFoodResultScreen(): string {
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex items-center justify-between">
           <div>
             <span class="text-xs text-on-surface-variant dark:text-gray-400 font-medium">${trHtml("Estimated Caloric Intake")}</span>
-            <div class="flex items-baseline gap-1 mt-0.5">
-              <span class="font-display text-3xl font-extrabold text-on-surface dark:text-white leading-none">${food.calories}</span>
+            <div class="flex flex-wrap items-baseline gap-1 mt-0.5">
+              <span class="ui-number font-display text-3xl font-extrabold text-on-surface dark:text-white leading-none">${formatDisplayNumber(food.calories, 0)}</span>
               <span class="text-xs font-bold text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span>
             </div>
           </div>
@@ -86,25 +87,25 @@ export function renderFoodResultScreen(): string {
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient">
           <h3 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-3">${trHtml("Macronutrient Profile")}</h3>
           
-          <div class="grid grid-cols-3 gap-3">
+          <div class="ui-number-grid grid grid-cols-3 gap-3">
             <!-- Protein -->
             <div class="flex flex-col items-center bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
               <span class="text-[11px] font-bold text-primary dark:text-primary-container">${trHtml("Protein")}</span>
-              <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${food.protein}${trHtml("g")}</span>
+              <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(food.protein)} ${trHtml("g")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("32% of total")}</span>
             </div>
 
             <!-- Carbs -->
             <div class="flex flex-col items-center bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
               <span class="text-[11px] font-bold text-tertiary dark:text-tertiary-fixed">${trHtml("Carbs")}</span>
-              <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${food.carbs}${trHtml("g")}</span>
+              <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(food.carbs)} ${trHtml("g")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("44% of total")}</span>
             </div>
 
             <!-- Fat -->
             <div class="flex flex-col items-center bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
               <span class="text-[11px] font-bold text-amber-500">${trHtml("Healthy Fats")}</span>
-              <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${food.fat}${trHtml("g")}</span>
+              <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(food.fat)} ${trHtml("g")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("24% of total")}</span>
             </div>
           </div>
@@ -144,20 +145,20 @@ export function renderFoodResultScreen(): string {
           </div>
 
           <!-- Nutrient Highlights (4-6 items) -->
-          <div class="grid grid-cols-2 gap-2">
+          <div class="ui-number-grid grid grid-cols-2 gap-2">
             ${highlights.map(n => {
               const dv = n.dailyValuePercent;
               const progressWidth = dv !== null && dv !== undefined ? Math.min(100, Math.max(0, dv)) : 0;
               return `
                 <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1.5">
-                  <div class="flex items-start justify-between">
+                  <div class="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${trHtml(n.name)}</span>
-                      <span class="text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${n.amount} ${trHtml(n.unit)}</span>
+                      <span class="ui-number text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${formatDisplayNumber(n.amount, 4)} ${trHtml(n.unit)}</span>
                     </div>
                     ${dv !== null && dv !== undefined ? `
-                      <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary dark:text-primary-container">
-                        ${dv}${trHtml("% DV")}
+                      <span class="ui-number text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary dark:text-primary-container">
+                        ${formatDisplayNumber(dv, 1)}${trHtml("% DV")}
                       </span>
                     ` : ''}
                   </div>
@@ -166,10 +167,10 @@ export function renderFoodResultScreen(): string {
                     <div 
                       class="w-full h-1 rounded-full bg-surface-container-lowest dark:bg-dark-surface-card overflow-hidden"
                       role="progressbar"
-                      aria-valuenow="${dv}"
+                      aria-valuenow="${progressWidth}"
                       aria-valuemin="0"
                       aria-valuemax="100"
-                      aria-label="${trHtml(n.name)} ${dv} ${trHtml("percent daily value")}"
+                      aria-label="${trHtml(n.name)} ${formatDisplayNumber(dv, 1)} ${trHtml("percent daily value")}"
                     >
                       <div class="h-full rounded-full bg-primary" style="width: ${progressWidth}%;"></div>
                     </div>

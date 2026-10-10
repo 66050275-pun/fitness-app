@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { translatedMuscles, exerciseLabel } from '../i18n/fitnessLabels.ts';
 import { tr, trHtml, getLocale, translatedLabel } from '../i18n/index.ts';
 import { store } from '../store/appState';
@@ -100,7 +101,7 @@ export function renderWorkoutDetailScreen(): string {
           </div>
 
           <!-- 4 Core Metrics Grid -->
-          <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <div class="ui-number-grid grid grid-cols-2 gap-2.5 pt-1">
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
               <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Total Duration")}</span>
               <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">
@@ -110,8 +111,8 @@ export function renderWorkoutDetailScreen(): string {
 
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
               <span class="text-[10px] font-bold uppercase text-on-surface-variant dark:text-gray-400 block mb-0.5">${trHtml("Total Volume")}</span>
-              <span class="font-heading font-extrabold text-base text-on-surface dark:text-white">
-                ${workout.totalVolume > 0 ? `${workout.totalVolume.toLocaleString(getLocale())} <span class="text-xs font-normal">${trHtml("kg")}</span>` : '&mdash;'}
+              <span class="ui-number font-heading font-extrabold text-base text-on-surface dark:text-white">
+                ${workout.totalVolume > 0 ? `${formatDisplayNumber(workout.totalVolume)} <span class="text-xs font-normal">${trHtml("kg")}</span>` : '&mdash;'}
               </span>
             </div>
 
@@ -156,7 +157,7 @@ export function renderWorkoutDetailScreen(): string {
                     </div>
 
                     <div class="text-right">
-                      <span class="text-xs font-bold text-primary dark:text-primary-container block">${exerciseVolume.toLocaleString(getLocale())} ${trHtml("kg vol")}</span>
+                      <span class="ui-number text-xs font-bold text-primary dark:text-primary-container block">${formatDisplayNumber(exerciseVolume)} ${trHtml("kg vol")}</span>
                       <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${completedSets.length} ${trHtml("of")} ${ex.sets.length} ${trHtml("sets")}</span>
                     </div>
                   </div>
@@ -171,12 +172,12 @@ export function renderWorkoutDetailScreen(): string {
                             : 'bg-surface-container-low/50 dark:bg-dark-surface-card-high/40 text-on-surface-variant line-through'}">
                           <div class="flex items-center gap-2">
                             <span class="font-heading font-bold text-on-surface-variant text-[11px]">${trHtml("Set")} ${s.setNumber}</span>
-                            <span class="font-medium">${s.weightKg > 0 ? tr("{0} kg &times;", s.weightKg) : ''}${s.reps} ${trHtml("reps")}</span>
+                            <span class="ui-number font-medium">${s.weightKg > 0 ? tr("{0} kg &times;", formatDisplayNumber(s.weightKg)) : ''}${s.reps} ${trHtml("reps")}</span>
                           </div>
 
                           <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-semibold text-on-surface-variant dark:text-gray-400">
-                              ${s.completed ? tr("{0} kg", setVol.toLocaleString(getLocale())) : tr("Skipped")}
+                            <span class="ui-number text-[11px] font-semibold text-on-surface-variant dark:text-gray-400">
+                              ${s.completed ? tr("{0} kg", formatDisplayNumber(setVol)) : tr("Skipped")}
                             </span>
                             ${s.isPersonalRecord ? `
                               <span class="px-1.5 py-0.2 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-[9px] border border-amber-500/30 flex items-center gap-0.5">
