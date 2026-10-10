@@ -20,6 +20,7 @@ import { renderDashboardWidgetDrawer } from './components/Modals/DashboardWidget
 import { renderWeeklyProgramEditorModal } from './components/Fitness/WeeklyProgramEditorModal';
 import { renderPlannerDateDetailModal } from './components/Fitness/PlannerDateDetailModal';
 import { renderRestTimerDialog, updateRestTimerDisplay } from './components/Fitness/RestTimerDialog';
+import { updateWorkoutAssistantTip } from './components/Fitness/WorkoutAssistantTip';
 import { renderQuickAddBottomSheet } from './components/BottomSheets/QuickAddBottomSheet';
 import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
@@ -53,7 +54,7 @@ import { renderDataPrivacyScreen } from './screens/profile/DataPrivacyScreen';
 import { renderProfileConfirmationModal } from './components/Modals/ProfileConfirmationModal';
 import { renderWeightEntryModal } from './components/Modals/WeightEntryModal';
 import { renderInsightsScreen } from './screens/InsightsScreen';
-import { renderFoodSearchScreen, renderFoodDefinitionCard } from './screens/FoodSearchScreen';
+import { renderFoodSearchScreen, updateFoodSearchContent } from './screens/FoodSearchScreen';
 import { renderQuickLogScreen } from './screens/QuickLogScreen';
 import { getUnitDimension } from './utils/portionCalculations';
 import { escapeHtml } from './utils/sanitize';
@@ -113,6 +114,7 @@ declare global {
     closeRestTimer: () => void;
     toggleRestTimerPause: () => void;
     addRestTimerSeconds: (seconds: number) => void;
+    applyOverloadSuggestion: () => void;
     nextActiveExercise: () => void;
     prevActiveExercise: () => void;
     finishActiveWorkout: () => void;
@@ -205,6 +207,7 @@ declare global {
 
     setFoodSearchTab: (tab: 'recent' | 'myFoods' | 'allFoods') => void;
     handleFoodSearchInput: (query: string) => void;
+    searchThaiFoodOnline: () => void;
     removeRecentFood: (foodId: string) => void;
     clearRecentFoods: () => void;
     addAgainMeal: (mealId: string) => void;
@@ -527,6 +530,7 @@ window.updateActiveSetInput = (exerciseIndex: number, setIndex: number, weightVa
   const newWeight = weightVal !== null ? parseFloat(weightVal) || 0 : currentSet.weightKg;
   const newReps = repsVal !== null ? parseInt(repsVal, 10) || 0 : currentSet.actualReps;
   store.updateActiveSetData(exerciseIndex, setIndex, newWeight, newReps);
+  updateWorkoutAssistantTip(state.activeWorkout);
 };
 
 window.completeActiveSet = (exerciseIndex: number, setIndex: number) => {
@@ -541,6 +545,7 @@ window.openRestTimer = () => store.openRestTimer();
 window.closeRestTimer = () => store.closeRestTimer();
 window.toggleRestTimerPause = () => store.toggleRestTimerPause();
 window.addRestTimerSeconds = (seconds: number) => store.addRestTimerSeconds(seconds);
+window.applyOverloadSuggestion = () => store.applyOverloadSuggestion();
 
 window.nextActiveExercise = () => {
   store.nextActiveExercise();
@@ -779,46 +784,10 @@ window.setFoodSearchTab = (tab: 'recent' | 'myFoods' | 'allFoods') => {
 };
 
 window.handleFoodSearchInput = (query: string) => {
-  const container = document.getElementById('food-search-content-area');
-  if (!container) return;
-  const q = query.trim().toLowerCase();
-
-  if (!q) {
-    // Re-render tab content
-    store.setFoodSearchTab(store.getState().foodSearchTab);
-    return;
-  }
-
-  const allMatched = store.searchFoods(q, undefined, 'allFoods');
-
-  if (allMatched.length === 0) {
-    container.innerHTML = `
-      <div class="p-8 text-center bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-dashed border-outline-variant/40">
-        <span class="material-symbols-outlined text-3xl text-on-surface-variant dark:text-gray-400 mb-1">search_off</span>
-        <h4 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("No Matching Foods Found")}</h4>
-        <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">${trHtml("No foods match \"")}${escapeHtml(q)}".</p>
-        <button onclick="window.openCreateCustomFood()" class="mt-3 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-xs">
-          ${trHtml("+ Create Custom Food")}
-        </button>
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="flex flex-col gap-2.5">
-      <div class="flex items-center justify-between">
-        <span class="text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-          ${trHtml("Search Matches (")}${allMatched.length})
-        </span>
-        <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Tap to set portion")}</span>
-      </div>
-      <div class="flex flex-col gap-2">
-        ${allMatched.map(f => renderFoodDefinitionCard(f)).join('')}
-      </div>
-    </div>
-  `;
+  store.setFoodSearchQuery(query);
+  updateFoodSearchContent();
 };
+window.searchThaiFoodOnline = () => { void store.searchThaiFoodOnline(); };
 
 // ==========================================
 // PORTION CONFIGURATOR & DIARY LOGGING
@@ -2233,5 +2202,6 @@ void startPrivateApp(() => {
   initializeStore();
   store.subscribe(renderApp);
   store.subscribeWorkoutTimer(updateRestTimerDisplay);
+  store.subscribeFoodSearch(updateFoodSearchContent);
   renderApp();
 }, () => { screenTransitions.reset(); disposeStore(); });

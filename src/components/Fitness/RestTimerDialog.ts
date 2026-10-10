@@ -3,6 +3,7 @@ import { getLocale, tr, trHtml } from '../../i18n/index.ts';
 import { store } from '../../store/appState.ts';
 import type { ActiveWorkoutSessionState } from '../../types/index.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
+import { renderWorkoutAssistantMount } from './WorkoutAssistantTip.ts';
 
 const TICK_COUNT = 180;
 
@@ -108,6 +109,7 @@ export function renderRestTimerDialog(): string {
             <span class="material-symbols-outlined" aria-hidden="true">add_circle</span>
             <span>${trHtml('+30 seconds')}</span>
           </button>
+          ${renderWorkoutAssistantMount(workout)}
         </div>
 
         <footer class="ui-dialog-footer rest-timer-controls">

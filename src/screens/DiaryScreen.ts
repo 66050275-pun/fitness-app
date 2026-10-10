@@ -1,4 +1,5 @@
 import { formatDisplayNumber } from '../utils/safeNumbers.ts';
+import { getMealMicronutrientsForDisplay, getMealNutrientForDisplay } from '../utils/mealNutritionDisplay.ts';
 import { mealLabel, mealDescription, portionLabel } from '../i18n/foodLabels.ts';
 import { tr, trHtml } from '../i18n/index.ts';
 import { escapeHtml } from '../utils/sanitize.ts';
@@ -316,7 +317,7 @@ export function renderDiaryScreen(): string {
           ` : `
             <div class="flex flex-col gap-2.5">
               ${dayMeals.map(meal => {
-                const hasMicro = !!meal.micronutrients;
+                const hasMicro = !!getMealMicronutrientsForDisplay(meal);
                 return `
                 <div 
                   onclick="window.openMealDetail(${htmlJsArg(meal.id)})"
@@ -334,7 +335,7 @@ export function renderDiaryScreen(): string {
                     </div>
 
                     <div class="text-right">
-                      <span class="ui-number font-heading font-bold text-xs text-on-surface dark:text-white">${formatDisplayNumber(meal.calories, 0)} ${trHtml("kcal")}</span>
+                      <span class="ui-number font-heading font-bold text-xs text-on-surface dark:text-white">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'calories'), 0)} ${trHtml("kcal")}</span>
                       <button 
                         type="button"
                         onclick="event.stopPropagation(); window.deleteMeal(${htmlJsArg(meal.id)})"
@@ -354,9 +355,9 @@ export function renderDiaryScreen(): string {
                           ${escapeHtml(portionLabel(meal.portion, meal.foodSource === 'built_in' || meal.foodSource === 'demo'))}
                         </span>
                       ` : ''}
-                      <span class="ui-number px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container font-semibold">${formatDisplayNumber(meal.protein)} ${trHtml("g Protein")}</span>
-                      <span class="ui-number px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary dark:text-tertiary-fixed font-semibold">${formatDisplayNumber(meal.carbs)} ${trHtml("g Carbs")}</span>
-                      <span class="ui-number px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">${formatDisplayNumber(meal.fat)} ${trHtml("g Fat")}</span>
+                      <span class="ui-number px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container font-semibold">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'protein'))} ${trHtml("g Protein")}</span>
+                      <span class="ui-number px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary dark:text-tertiary-fixed font-semibold">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'carbs'))} ${trHtml("g Carbs")}</span>
+                      <span class="ui-number px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'fat'))} ${trHtml("g Fat")}</span>
                     </div>
 
                     <div class="flex items-center gap-1.5 shrink-0">

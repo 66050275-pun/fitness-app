@@ -9,6 +9,7 @@ import type {
   ChatMessage, 
   ActiveScreen, 
   WorkoutExercise, 
+  ExerciseSet,
   WorkoutHistoryEntry,
   CompletedExercise,
   PersonalRecord,
@@ -58,6 +59,8 @@ import { WORKOUT_PRESETS, createWorkoutExercisesFromPreset } from '../data/worko
 import { scaleMicronutrientProfile } from '../utils/nutrientCalculations';
 import { LOCAL_FOOD_CATALOG } from '../data/foodCatalog';
 import { BUILT_IN_FOOD_DEFINITIONS, findBuiltInFood } from '../data/foodDefinitions';
+import { ThaiFoodService } from '../services/thaiFoodService';
+import { ProgressiveOverloadService } from '../services/progressiveOverloadService';
 import { 
   calculatePortionMultiplier, 
   scaleNutritionForPortion, 
@@ -444,8 +447,21 @@ class Store {
   private workoutTimerInterval: ReturnType<typeof setInterval> | null = null;
   private workoutTimerLastTick: number | null = null;
   private workoutTimerListeners = new Set<(workout: ActiveWorkoutSessionState) => void>();
+  private externalFoodSearchController: AbortController | null = null;
+  private foodSearchListeners = new Set<() => void>();
+  private automaticSetAdjustments = new Map<string, {
+    nextSetIndex: number;
+    previous: Pick<ExerciseSet, 'weightKg' | 'targetReps' | 'actualReps' | 'isUserEdited'>;
+    applied: Pick<ExerciseSet, 'weightKg' | 'targetReps' | 'actualReps'>;
+  }>();
 
-  dispose() { this.disposed = true; this.listeners.clear(); this.workoutTimerListeners.clear(); this.stopWorkoutTimers(); this.setProfileImageUrl(null); this.state = null!; }
+  dispose() {
+    this.disposed = true;
+    this.externalFoodSearchController?.abort();
+    this.externalFoodSearchController = null;
+    this.listeners.clear(); this.foodSearchListeners.clear(); this.workoutTimerListeners.clear();
+    this.stopWorkoutTimers(); this.setProfileImageUrl(null); this.state = null!;
+  }
 
   constructor() {
     const persisted = loadPersistedAppData(INITIAL_MEALS);
@@ -510,6 +526,10 @@ class Store {
       customFoods: persisted.customFoods,
       recentFoods: persisted.recentFoods,
       foodSearchTab: 'recent',
+      foodSearchQuery: '',
+      externalFoodSearchState: 'idle',
+      externalFoodSearchQuery: '',
+      externalFoodResults: [],
       isSetPortionOpen: false,
       activePortionFood: null,
       activePortionQuantity: 100,
@@ -592,12 +612,18 @@ class Store {
     return () => this.workoutTimerListeners.delete(listener);
   }
 
+  public subscribeFoodSearch(listener: () => void): () => void {
+    this.foodSearchListeners.add(listener);
+    return () => this.foodSearchListeners.delete(listener);
+  }
+
   private notify() {
     if (this.disposed) return;
     this.listeners.forEach(cb => cb());
   }
 
   public setScreen(screen: ActiveScreen) {
+    if (screen !== 'foodSearch') this.resetExternalFoodSearch();
     this.state.currentScreen = screen;
     this.state.quickAddOpen = false;
     this.state.selectedMealDetailId = null;
@@ -1662,8 +1688,50 @@ class Store {
     if (!preset) return;
     this.state.selectedPresetId = presetId;
     this.state.draftWorkout = createWorkoutExercisesFromPreset(preset);
+    this.prepareStartingLoads(this.state.draftWorkout);
     this.state.fitnessSubView = 'setup';
     this.notify();
+  }
+
+  private prepareStartingLoads(exercises: WorkoutExercise[], history = this.state.workoutHistory) {
+    const identity = (name: string) => name.trim().toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ')
+      .replace(/^barbell bench press$/, 'bench press').replace(/^lat pull down$/, 'lat pulldown');
+    const recent = [...history].sort((a, b) =>
+      (Date.parse(b.finishedAt || b.startedAt) || 0) - (Date.parse(a.finishedAt || a.startedAt) || 0));
+    for (const exercise of exercises) {
+      if (!ProgressiveOverloadService.isSupportedExercise(exercise)) continue;
+      exercise.repRange ??= { minRepTarget: exercise.targetReps, maxRepTarget: Math.min(100, exercise.targetReps + 2) };
+      const previous = recent.flatMap(workout => workout.exercises
+        .filter(item => identity(item.exerciseName) === identity(exercise.name))).find(item => item.sets.some(set =>
+          set.completed && Number.isFinite(set.weightKg) && set.weightKg > 0 && Number.isInteger(set.reps) && set.reps > 0));
+      if (!previous) continue;
+      const previousSets = previous.sets.map(set => ({
+        setNumber: set.setNumber,
+        weightKg: set.weightKg,
+        targetReps: set.targetReps ?? exercise.repRange!.minRepTarget,
+        actualReps: set.reps,
+        completed: set.completed
+      }));
+      const step = ProgressiveOverloadService.getWeightStepKg(exercise);
+      const recommendation = ProgressiveOverloadService.getNextSessionStartingLoad(previousSets,
+        exercise.repRange.minRepTarget, exercise.repRange.maxRepTarget, step);
+      if (recommendation.nextWeightKg <= 0) continue;
+      const previousWeightKg = Math.min(...previousSets.filter(set => set.completed && Number.isFinite(set.weightKg) && set.weightKg > 0).map(set => set.weightKg));
+      // A changed set count does not establish completion of this prescription.
+      if (previousSets.length !== exercise.sets.length) {
+        recommendation.nextWeightKg = previousWeightKg;
+        recommendation.targetReps = exercise.repRange.minRepTarget;
+        recommendation.progressionTriggered = false;
+      }
+      exercise.targetReps = recommendation.targetReps;
+      exercise.progressionHint = { previousWeightKg, startingWeightKg: recommendation.nextWeightKg,
+        targetReps: recommendation.targetReps, progressionTriggered: recommendation.progressionTriggered };
+      for (const set of exercise.sets) {
+        set.weightKg = recommendation.nextWeightKg;
+        set.targetReps = recommendation.targetReps;
+        set.actualReps = recommendation.targetReps;
+      }
+    }
   }
 
   public cancelWorkoutSetup() {
@@ -1692,6 +1760,7 @@ class Store {
     } else if (ex.sets.length > newSetsCount) {
       ex.sets = ex.sets.slice(0, newSetsCount);
     }
+    if (ex.progressionHint) this.prepareStartingLoads([ex]);
     this.notify();
   }
 
@@ -1700,6 +1769,8 @@ class Store {
     const ex = this.state.draftWorkout[exerciseIndex];
     const newReps = Math.max(1, Math.min(100, ex.targetReps + delta));
     ex.targetReps = newReps;
+    ex.repRange = { minRepTarget: newReps, maxRepTarget: Math.min(100, newReps + 2) };
+    delete ex.progressionHint;
     ex.sets.forEach(s => {
       s.targetReps = newReps;
       if (!s.completed && s.actualReps === s.targetReps - delta) {
@@ -1756,6 +1827,7 @@ class Store {
       restTimerPaused: false,
       restTimerOpen: false,
       restTimerEndsAt: null,
+      overloadSuggestion: null,
       scheduledDate: this.state.selectedPlannerDate || undefined
     };
 
@@ -1812,6 +1884,7 @@ class Store {
   }
 
   private stopWorkoutTimers() {
+    this.automaticSetAdjustments.clear();
     if (this.workoutTimerInterval) {
       clearInterval(this.workoutTimerInterval);
       this.workoutTimerInterval = null;
@@ -1845,6 +1918,54 @@ class Store {
     if (!ex || !ex.sets[setIndex]) return;
     ex.sets[setIndex].weightKg = clampNonNegative(safeFiniteNumber(weightKg));
     ex.sets[setIndex].actualReps = Math.floor(clampNonNegative(safeFiniteNumber(actualReps)));
+    ex.sets[setIndex].isUserEdited = true;
+    const suggestion = this.state.activeWorkout.overloadSuggestion;
+    if (suggestion?.exerciseIndex === exerciseIndex && (suggestion.nextSetIndex === setIndex || suggestion.completedSetIndex === setIndex)) {
+      suggestion.applied = false;
+    }
+  }
+
+  private applyCurrentOverloadSuggestion(): boolean {
+    const active = this.state.activeWorkout;
+    const suggestion = active?.overloadSuggestion;
+    if (!active || !suggestion || suggestion.exerciseIndex !== active.currentExerciseIndex) return false;
+    const exercise = active.exercises[suggestion.exerciseIndex];
+    const next = exercise?.sets[suggestion.nextSetIndex];
+    if (!exercise || !next || next.completed) return false;
+    const recommendation = ProgressiveOverloadService.getNextSetRecommendation(exercise, suggestion.completedSetIndex);
+    if (!recommendation) return false;
+    const adjustmentKey = `${suggestion.exerciseIndex}:${suggestion.completedSetIndex}`;
+    const existing = this.automaticSetAdjustments.get(adjustmentKey);
+    const previous = existing && !next.isUserEdited && next.weightKg === existing.applied.weightKg
+      && next.targetReps === existing.applied.targetReps && next.actualReps === existing.applied.actualReps
+      ? existing.previous : { weightKg: next.weightKg, targetReps: next.targetReps, actualReps: next.actualReps, isUserEdited: next.isUserEdited };
+    next.weightKg = recommendation.suggestedWeightKg;
+    next.targetReps = recommendation.suggestedTargetReps;
+    next.actualReps = recommendation.suggestedTargetReps;
+    next.isUserEdited = false;
+    this.automaticSetAdjustments.set(adjustmentKey, { nextSetIndex: suggestion.nextSetIndex, previous,
+      applied: { weightKg: next.weightKg, targetReps: next.targetReps, actualReps: next.actualReps } });
+    suggestion.applied = true;
+    return true;
+  }
+
+  public applyOverloadSuggestion() {
+    if (this.applyCurrentOverloadSuggestion()) this.notify();
+  }
+
+  private restoreSuggestedNextSet(exerciseIndex: number, completedSetIndex: number) {
+    const active = this.state.activeWorkout;
+    const key = `${exerciseIndex}:${completedSetIndex}`;
+    const adjustment = this.automaticSetAdjustments.get(key);
+    if (!active || !adjustment) return;
+    const next = active.exercises[exerciseIndex]?.sets[adjustment.nextSetIndex];
+    const before = adjustment.previous;
+    const applied = adjustment.applied;
+    if (next && !next.completed && !next.isUserEdited && before && applied
+      && next.weightKg === applied.weightKg && next.targetReps === applied.targetReps && next.actualReps === applied.actualReps) {
+      Object.assign(next, before);
+    }
+    this.automaticSetAdjustments.delete(key);
   }
 
   public completeActiveSet(exerciseIndex: number, setIndex: number) {
@@ -1853,7 +1974,9 @@ class Store {
     if (!ex || !ex.sets[setIndex]) return;
 
     const currentStatus = ex.sets[setIndex].completed;
+    if (currentStatus) this.restoreSuggestedNextSet(exerciseIndex, setIndex);
     ex.sets[setIndex].completed = !currentStatus;
+    this.state.activeWorkout.overloadSuggestion = null;
 
     if (!currentStatus) {
       const restTime = Math.min(3600, Math.max(1, Math.ceil(safeFiniteNumber(ex.restSeconds, 60) || 60)));
@@ -1863,6 +1986,11 @@ class Store {
       active.restTimerPaused = false;
       active.restTimerOpen = true;
       active.restTimerEndsAt = active.isPaused ? null : Date.now() + restTime * 1000;
+      const next = ex.sets[setIndex + 1];
+      if (next && !next.completed && ProgressiveOverloadService.getNextSetRecommendation(ex, setIndex)) {
+        active.overloadSuggestion = { exerciseIndex, completedSetIndex: setIndex, nextSetIndex: setIndex + 1, applied: false };
+        if (!next.isUserEdited) this.applyCurrentOverloadSuggestion();
+      }
     } else {
       this.clearRestTimer();
     }
@@ -1968,6 +2096,7 @@ class Store {
           weightKg: s.weightKg,
           reps: s.actualReps,
           completed: s.completed,
+          targetReps: s.targetReps,
           restSeconds: ex.restSeconds,
           completedAt: s.completed ? finishedAt : undefined
         };
@@ -1977,6 +2106,7 @@ class Store {
         exerciseId: ex.id,
         exerciseName: ex.name,
         muscleGroups: ex.muscleGroup,
+        repRange: ex.repRange,
         sets
       };
     });
@@ -2109,7 +2239,7 @@ class Store {
 
     this.state.draftWorkout = workout.exercises.map((ex, exIdx) => {
       const targetSets = Math.max(1, ex.sets.length);
-      const targetReps = ex.sets[0]?.reps || 10;
+      const targetReps = ex.repRange?.minRepTarget || ex.sets[0]?.targetReps || ex.sets[0]?.reps || 10;
       const restSec = ex.sets[0]?.restSeconds || 60;
 
       return {
@@ -2119,6 +2249,7 @@ class Store {
         targetSets,
         targetReps,
         restSeconds: restSec,
+        repRange: ex.repRange,
         sets: Array.from({ length: targetSets }, (_, sIdx) => ({
           setNumber: sIdx + 1,
           targetReps,
@@ -2129,6 +2260,7 @@ class Store {
       };
     });
 
+    this.prepareStartingLoads(this.state.draftWorkout, [workout]);
     this.state.selectedPresetId = null;
     this.state.fitnessSubView = 'setup';
     this.state.currentScreen = 'fitness';
@@ -2400,7 +2532,44 @@ class Store {
   public getFoodDefinitionById(id: string): FoodDefinition | undefined {
     const custom = this.state.customFoods.find(f => f.id === id);
     if (custom) return custom;
-    return findBuiltInFood(id);
+    return findBuiltInFood(id) || this.state.externalFoodResults.find(food => food.id === id);
+  }
+
+  private resetExternalFoodSearch() {
+    this.externalFoodSearchController?.abort();
+    this.externalFoodSearchController = null;
+    this.state.externalFoodResults = [];
+    this.state.externalFoodSearchQuery = '';
+    this.state.externalFoodSearchState = 'idle';
+  }
+
+  public setFoodSearchQuery(query: string) {
+    const next = query.slice(0, 120);
+    if (next.trim() !== this.state.foodSearchQuery.trim()) this.resetExternalFoodSearch();
+    this.state.foodSearchQuery = next;
+  }
+
+  public async searchThaiFoodOnline(): Promise<void> {
+    const query = this.state.foodSearchQuery.trim();
+    if (query.length < 2 || this.state.currentScreen !== 'foodSearch') return;
+    this.resetExternalFoodSearch();
+    const controller = new AbortController();
+    this.externalFoodSearchController = controller;
+    this.state.externalFoodSearchState = 'loading';
+    this.state.externalFoodSearchQuery = query;
+    this.foodSearchListeners.forEach(listener => listener());
+    try {
+      const foods = await ThaiFoodService.searchOpenFoodFactsThailand(query, controller.signal);
+      if (this.disposed || this.externalFoodSearchController !== controller) return;
+      this.state.externalFoodResults = foods;
+      this.state.externalFoodSearchState = 'loaded';
+    } catch {
+      if (this.disposed || this.externalFoodSearchController !== controller) return;
+      this.state.externalFoodSearchState = 'error';
+    }
+    if (this.disposed || this.externalFoodSearchController !== controller) return;
+    this.externalFoodSearchController = null;
+    this.foodSearchListeners.forEach(listener => listener());
   }
 
   public setFoodSearchTab(tab: 'recent' | 'myFoods' | 'allFoods') {
@@ -2430,6 +2599,7 @@ class Store {
     return pool.filter(f => {
       const matchQuery = !q || 
         f.name.toLowerCase().includes(q) || foodLabel(f, f.name).toLowerCase().includes(q) ||
+        f.searchAliases?.some(alias => alias.toLowerCase().includes(q)) ||
         (f.brand && f.brand.toLowerCase().includes(q)) ||
         (f.category && (f.category.toLowerCase().includes(q) || foodLabel(f, f.category).toLowerCase().includes(q))) ||
         (f.barcode && f.barcode.toLowerCase().includes(q));
@@ -2849,6 +3019,9 @@ class Store {
         category: draft.category || 'other',
         barcode: draft.barcode.trim() || undefined,
         source: 'custom',
+        dataProvenance: existing?.dataProvenance?.provider === 'open_food_facts'
+          ? { ...existing.dataProvenance, modifiedLocally: true } : undefined,
+        searchAliases: existing?.searchAliases,
         nutritionBasis: {
           amount: isPerServing ? draft.servingQuantity : 100,
           unit: isPerServing ? 'serving' : (isPer100ml ? 'ml' : 'g'),
@@ -3015,6 +3188,9 @@ class Store {
     this.state.customFoods[idx] = {
       ...current,
       ...updates,
+      source: 'custom',
+      dataProvenance: current.dataProvenance?.provider === 'open_food_facts'
+        ? { ...current.dataProvenance, modifiedLocally: true } : undefined,
       updatedAt: new Date().toISOString()
     };
 
@@ -3192,6 +3368,11 @@ class Store {
     };
 
     this.state.meals.unshift(newMeal);
+    // Keep selected community product definitions in the same encrypted vault
+    // as the diary so recents still work after reloading or locking the app.
+    if (food.source === 'database' && !this.state.customFoods.some(item => item.id === food.id)) {
+      this.state.customFoods.unshift(structuredClone(food));
+    }
     this.updateRecentFood(portion, this.state.activePortionMealType);
     this.persistState();
 

@@ -8,6 +8,7 @@
  */
 
 import type { FoodDefinition } from '../types/index.ts';
+import { THAI_SINGLE_DISH_CATALOG } from './thaiFoodCatalog.ts';
 import { 
   DEMO_CHICKEN_BREAST_MICRONUTRIENTS, 
   DEMO_SALMON_BOWL_MICRONUTRIENTS, 
@@ -15,6 +16,7 @@ import {
 } from './demoNutritionData';
 
 export const BUILT_IN_FOOD_DEFINITIONS: FoodDefinition[] = [
+  ...THAI_SINGLE_DISH_CATALOG,
   // ==========================================
   // GRAINS & CARBOHYDRATES
   // ==========================================

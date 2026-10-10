@@ -49,7 +49,7 @@ Only seven explicitly named legacy NutriAI localStorage keys and `nutriai_profil
 - Wrong passphrases and authentication failures leave stored records untouched. Locks wait for pending writes; failed writes leave a protected recovery screen instead of pretending the lock completed.
 - Manual lock and five-minute inactivity lock discard the application store, revoke the profile object URL, stop workout timers, clear personal DOM and remove the in-memory key reference. Backgrounding immediately covers the screen; elapsed time is checked again on return because background timers can be throttled.
 - User text is HTML escaped. Dynamic string arguments in inline event handlers are JSON encoded and then HTML escaped, including names/IDs containing quotes. Coach messages, meal labels, confirmation messages, legacy dates, photo URLs and custom food descriptions were covered.
-- Google-hosted fonts and Unsplash demo images were replaced with bundled fonts and a local illustration. Production iframe CSP blocks fetch/WebSocket connections, frames, workers, form submissions and external image/font sources. Existing template event handlers still require `unsafe-inline`; this policy is a supplementary protection, not a replacement for escaping or a guarantee against hostile application code.
+- Google-hosted fonts and Unsplash demo images were replaced with bundled fonts and a local illustration. Production iframe CSP permits only the Open Food Facts JSON search endpoint for connections; it blocks other fetch/WebSocket destinations, frames, workers, form submissions and external image/font sources. Existing template event handlers still require `unsafe-inline`; this policy is a supplementary protection, not a replacement for escaping or a guarantee against hostile application code.
 - Privacy/FAQ/coach text now distinguishes local demos, encrypted local records, public source code, network metadata and the limits of unlocked-device protection.
 
 ## Practical limits
@@ -166,3 +166,12 @@ Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG a
 - Verification: TypeScript/Vite production build; 121 mobile views/states across both languages; 16 checks in the actual Streamlit srcdoc, including language selection, red muscle highlights, lock/reload, localized password errors, safely escaped unchanged user text and the plaintext language flag. The frontend made no external requests and logged no runtime errors in these checks. Only synthetic data was used.
 
 - Streamlit now fingerprints frontend sources (including translation JSON) and dependency files. Changed sources rebuild once, and the HTML cache uses the same signature so a previous language bundle is not reused. Unchanged dependencies and builds remain cached.
+
+
+## Thai food search and workout assistant — 2026-10-10
+
+- The six bundled Thai dishes use the supplied recipe estimates, labelled as estimates rather than verified Mahidol or Open Food Facts records. Portions scale by gram weight. No recipe database or user data is sent to the Streamlit server.
+- Open Food Facts searches run only after the visible Search online action. The JSON request sends the search text and fixed public product filters, omits credentials and referrer, and loads no remote images. Open Food Facts receives the request and network address. CSP allows only https://world.openfoodfacts.org/cgi/search.pl for this feature.
+- Queries and unsaved results remain in memory. Navigation, query changes and locking cancel outstanding requests; disposed stores cannot apply late results. Logging a community product retains its definition and source attribution in the existing encrypted browser vault for recents/reload.
+- Weight recommendations derive locally from completed sets and saved workout history. Automatic fills preserve manual and completed set entries, and each suggestion is shown in the workout and rest clock. Stable rep brackets are stored with saved exercises; suggestion wording and undo snapshots stay in session memory and are discarded on lock.
+- Build verification is recorded separately from the earlier regression results above. No new test suite or live Open Food Facts API verification was run for this addition.

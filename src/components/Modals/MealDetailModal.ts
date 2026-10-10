@@ -1,4 +1,5 @@
 import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
+import { getMealMicronutrientsForDisplay, getMealNutrientForDisplay } from '../../utils/mealNutritionDisplay.ts';
 import { mealLabel, mealDescription } from '../../i18n/foodLabels.ts';
 import { tr, trHtml } from '../../i18n/index.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
@@ -29,12 +30,12 @@ export function renderMealDetailModal(): string {
   if (!meal) return '';
 
   const safeName = escapeHtml(mealLabel(meal, meal.name));
-  const profile = meal.micronutrients;
+  const profile = getMealMicronutrientsForDisplay(meal);
   const isDemo = profile?.vitamins.some(v => v.source === 'demo');
 
   const vitamins = profile?.vitamins.filter(v => v.amount !== null) || [];
   const minerals = profile?.minerals.filter(m => m.amount !== null) || [];
-  const otherNutrients = profile?.otherNutrients.filter(o => o.amount !== null) || [];
+  const otherNutrients = profile?.otherNutrients?.filter(o => o.amount !== null) || [];
 
   return `
     <div 
@@ -95,19 +96,19 @@ export function renderMealDetailModal(): string {
             <div class="ui-stat-grid grid grid-cols-4 gap-2">
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 block uppercase">${trHtml("Energy")}</span>
-                <span class="ui-number font-heading font-extrabold text-sm text-primary dark:text-primary-container mt-0.5 block">${formatDisplayNumber(meal.calories, 0)} ${trHtml("kcal")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-primary dark:text-primary-container mt-0.5 block">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'calories'), 0)} ${trHtml("kcal")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-primary dark:text-primary-container block uppercase">${trHtml("Protein")}</span>
-                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(meal.protein)} ${trHtml("g")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'protein'))} ${trHtml("g")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block uppercase">${trHtml("Carbs")}</span>
-                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(meal.carbs)} ${trHtml("g")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'carbs'))} ${trHtml("g")}</span>
               </div>
               <div class="p-2.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 text-center">
                 <span class="text-[10px] font-bold text-amber-500 block uppercase">${trHtml("Fat")}</span>
-                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(meal.fat)} ${trHtml("g")}</span>
+                <span class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5 block">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'fat'))} ${trHtml("g")}</span>
               </div>
             </div>
           </section>
@@ -154,7 +155,7 @@ export function renderMealDetailModal(): string {
                 <span class="material-symbols-outlined text-[24px] text-on-surface-variant mb-1 block">info</span>
                 <p class="text-xs text-on-surface dark:text-white font-semibold">${trHtml("No micronutrient profile recorded")}</p>
                 <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">
-                  ${trHtml("This meal was manually logged with energy and macronutrients. Detailed micronutrient tracking is available for items scanned or selected from the verified database.")}
+                  ${trHtml('No detailed micronutrient values were provided for this meal.')}
                 </p>
               </div>
             ` : `

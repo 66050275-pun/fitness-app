@@ -1,4 +1,12 @@
 {
+  "Edited locally from Open Food Facts.": {
+    "en": "Edited locally from Open Food Facts.",
+    "th": "แก้ไขในเครื่องจากข้อมูล Open Food Facts"
+  },
+  "No detailed micronutrient values were provided for this meal.": {
+    "en": "No detailed micronutrient values were provided for this meal.",
+    "th": "อาหารรายการนี้ไม่มีข้อมูลสารอาหารรองโดยละเอียด"
+  },
   "Quick Add": {
     "en": "Quick Add",
     "th": "เพิ่มรายการ"
@@ -7198,5 +7206,193 @@
   "in workout": {
     "en": "in",
     "th": "ในโปรแกรม"
+  },
+  "Pad Krapow Minced Pork with Fried Egg": {
+    "en": "Pad Krapow Minced Pork with Fried Egg",
+    "th": "ข้าวกะเพราหมูสับไข่ดาว"
+  },
+  "Hainanese Chicken Rice": {
+    "en": "Hainanese Chicken Rice",
+    "th": "ข้าวมันไก่ต้ม"
+  },
+  "Pad Thai with Fresh Shrimp": {
+    "en": "Pad Thai with Fresh Shrimp",
+    "th": "ผัดไทยกุ้งสด"
+  },
+  "Braised Pork Leg on Rice": {
+    "en": "Braised Pork Leg on Rice",
+    "th": "ข้าวขาหมู"
+  },
+  "Thai Boat Noodles with Beef": {
+    "en": "Thai Boat Noodles with Beef",
+    "th": "ก๋วยเตี๋ยวเรือเนื้อน้ำตก"
+  },
+  "Som Tum Thai": {
+    "en": "Som Tum Thai",
+    "th": "ส้มตำไทย"
+  },
+  "Rice Dishes": {
+    "en": "Rice Dishes",
+    "th": "อาหารจานข้าว"
+  },
+  "Noodle Dishes": {
+    "en": "Noodle Dishes",
+    "th": "อาหารเส้น"
+  },
+  "Salads & Sides": {
+    "en": "Salads & Sides",
+    "th": "ยำและอาหารเคียง"
+  },
+  "Packaged Foods": {
+    "en": "Packaged Foods",
+    "th": "อาหารบรรจุสำเร็จ"
+  },
+  "1 standard plate (~{0} g)": {
+    "en": "1 standard plate (~{0} g)",
+    "th": "1 จานปกติ (~{0} กรัม)"
+  },
+  "1 large plate (~{0} g)": {
+    "en": "1 large plate (~{0} g)",
+    "th": "1 จานพิเศษ (~{0} กรัม)"
+  },
+  "1 standard bowl (~{0} g)": {
+    "en": "1 standard bowl (~{0} g)",
+    "th": "1 ชามปกติ (~{0} กรัม)"
+  },
+  "1 small bowl (~{0} g)": {
+    "en": "1 small bowl (~{0} g)",
+    "th": "1 ชามเล็ก (~{0} กรัม)"
+  },
+  "per 100 g prepared dish": {
+    "en": "per 100 g prepared dish",
+    "th": "ต่ออาหารปรุงสำเร็จ 100 กรัม"
+  },
+  "Next set suggestion": {
+    "en": "Next set suggestion",
+    "th": "คำแนะนำสำหรับเซ็ตถัดไป"
+  },
+  "{0} kg · {1} reps": {
+    "en": "{0} kg · {1} reps",
+    "th": "{0} กก. · {1} ครั้ง"
+  },
+  "Estimated 1RM: {0} kg": {
+    "en": "Estimated 1RM: {0} kg",
+    "th": "น้ำหนักสูงสุด 1 ครั้งโดยประมาณ: {0} กก."
+  },
+  "Applied to set {0}": {
+    "en": "Applied to set {0}",
+    "th": "ปรับให้เซ็ตที่ {0} แล้ว"
+  },
+  "Apply to set {0}": {
+    "en": "Apply to set {0}",
+    "th": "ใช้กับเซ็ตที่ {0}"
+  },
+  "Starting load from last workout": {
+    "en": "Starting load from last workout",
+    "th": "น้ำหนักเริ่มต้นจากการฝึกครั้งก่อน"
+  },
+  "Progression: {0} → {1} kg": {
+    "en": "Progression: {0} → {1} kg",
+    "th": "เพิ่มน้ำหนัก: {0} → {1} กก."
+  },
+  "Target: {0} reps": {
+    "en": "Target: {0} reps",
+    "th": "เป้าหมาย: {0} ครั้ง"
+  },
+  "Weight for set {0}": {
+    "en": "Weight for set {0}",
+    "th": "น้ำหนักสำหรับเซ็ตที่ {0}"
+  },
+  "Actual reps for set {0}": {
+    "en": "Actual reps for set {0}",
+    "th": "จำนวนครั้งที่ทำได้ในเซ็ตที่ {0}"
+  },
+  "Completed {0}/{1} reps. Try {2} kg for {1} reps in the next set (+{3} kg).": {
+    "en": "Completed {0}/{1} reps. Try {2} kg for {1} reps in the next set (+{3} kg).",
+    "th": "ทำได้ {0}/{1} ครั้ง ลอง {2} กก. จำนวน {1} ครั้งในเซ็ตถัดไป (+{3} กก.)"
+  },
+  "Completed {0}/{1} reps. Keep {2} kg and aim for {1} reps in the next set.": {
+    "en": "Completed {0}/{1} reps. Keep {2} kg and aim for {1} reps in the next set.",
+    "th": "ทำได้ {0}/{1} ครั้ง ใช้ {2} กก. เท่าเดิม และตั้งเป้า {1} ครั้งในเซ็ตถัดไป"
+  },
+  "Completed {0}/{1} reps. Keep {2} kg; the next-set goal stays at {1} reps.": {
+    "en": "Completed {0}/{1} reps. Keep {2} kg; the next-set goal stays at {1} reps.",
+    "th": "ทำได้ {0}/{1} ครั้ง ใช้ {2} กก. เท่าเดิม เป้าหมายเซ็ตถัดไปยังเป็น {1} ครั้ง"
+  },
+  "Completed {0}/{1} reps. Try {2} kg for {1} reps in the next set (down from {3} kg).": {
+    "en": "Completed {0}/{1} reps. Try {2} kg for {1} reps in the next set (down from {3} kg).",
+    "th": "ทำได้ {0}/{1} ครั้ง ลอง {2} กก. จำนวน {1} ครั้งในเซ็ตถัดไป (ลดจาก {3} กก.)"
+  },
+  "Recent foods, recipes & food catalog": {
+    "en": "Recent foods, recipes & food catalog",
+    "th": "อาหารล่าสุด สูตรอาหาร และคลังอาหาร"
+  },
+  "Search foods": {
+    "en": "Search foods",
+    "th": "ค้นหาอาหาร"
+  },
+  "Open Food Facts · Thailand": {
+    "en": "Open Food Facts · Thailand",
+    "th": "Open Food Facts · ประเทศไทย"
+  },
+  "Thai dishes are available offline. Search packaged products sold in Thailand online.": {
+    "en": "Thai dishes are available offline. Search packaged products sold in Thailand online.",
+    "th": "อาหารไทยพร้อมใช้งานแบบออฟไลน์ ค้นหาผลิตภัณฑ์อาหารบรรจุห่อที่จำหน่ายในประเทศไทยทางออนไลน์ได้"
+  },
+  "Search online": {
+    "en": "Search online",
+    "th": "ค้นหาออนไลน์"
+  },
+  "Searching online...": {
+    "en": "Searching online...",
+    "th": "กำลังค้นหาออนไลน์..."
+  },
+  "Only your search text is sent to Open Food Facts.": {
+    "en": "Only your search text is sent to Open Food Facts.",
+    "th": "ส่งเฉพาะข้อความค้นหาของคุณไปยัง Open Food Facts"
+  },
+  "Searching Open Food Facts...": {
+    "en": "Searching Open Food Facts...",
+    "th": "กำลังค้นหาใน Open Food Facts..."
+  },
+  "Online search is unavailable. Try again or use the local food catalog.": {
+    "en": "Online search is unavailable. Try again or use the local food catalog.",
+    "th": "ค้นหาออนไลน์ไม่ได้ ลองอีกครั้งหรือใช้คลังอาหารในเครื่อง"
+  },
+  "No matching products found online. Try another name or add your own food.": {
+    "en": "No matching products found online. Try another name or add your own food.",
+    "th": "ไม่พบผลิตภัณฑ์ที่ตรงกันทางออนไลน์ ลองชื่ออื่นหรือเพิ่มอาหารเอง"
+  },
+  "Online products ({0})": {
+    "en": "Online products ({0})",
+    "th": "ผลิตภัณฑ์ออนไลน์ ({0})"
+  },
+  "Data:": {
+    "en": "Data:",
+    "th": "ข้อมูล:"
+  },
+  "Estimated recipe nutrition": {
+    "en": "Estimated recipe nutrition",
+    "th": "โภชนาการจากสูตรโดยประมาณ"
+  },
+  "Actual nutrition varies with the recipe and portion.": {
+    "en": "Actual nutrition varies with the recipe and portion.",
+    "th": "สารอาหารจริงแตกต่างกันตามสูตรและปริมาณที่รับประทาน"
+  },
+  "Community-provided nutrition; check the product label.": {
+    "en": "Community-provided nutrition; check the product label.",
+    "th": "ข้อมูลโภชนาการจากชุมชน กรุณาตรวจสอบฉลากผลิตภัณฑ์"
+  },
+  "Local food matches ({0})": {
+    "en": "Local food matches ({0})",
+    "th": "อาหารที่พบในเครื่อง ({0})"
+  },
+  "Food catalog ({0})": {
+    "en": "Food catalog ({0})",
+    "th": "คลังอาหาร ({0})"
+  },
+  "No local matches. Try another name, search online, or create a food.": {
+    "en": "No local matches. Try another name, search online, or create a food.",
+    "th": "ไม่พบอาหารในเครื่อง ลองชื่ออื่น ค้นหาออนไลน์ หรือสร้างอาหารใหม่"
   }
 }

@@ -126,6 +126,14 @@ export interface FoodDefinition {
   portionOptions: FoodPortionOption[];
   densityGramsPerMl?: number | null;
   icon?: string;
+  dataProvenance?: {
+    provider: 'user_estimate' | 'open_food_facts';
+    url?: string;
+    license?: string;
+    retrievedAt?: string;
+    modifiedLocally?: boolean;
+  };
+  searchAliases?: string[];
 
   createdAt: string;
   updatedAt: string;
@@ -211,6 +219,7 @@ export interface ExerciseSet {
   actualReps: number;
   weightKg: number;
   completed: boolean;
+  isUserEdited?: boolean;
 }
 
 export interface WorkoutExercise {
@@ -221,6 +230,13 @@ export interface WorkoutExercise {
   targetReps: number;
   restSeconds: number;
   sets: ExerciseSet[];
+  repRange?: { minRepTarget: number; maxRepTarget: number };
+  progressionHint?: {
+    previousWeightKg: number;
+    startingWeightKg: number;
+    targetReps: number;
+    progressionTriggered: boolean;
+  };
 }
 
 export interface WorkoutPreset {
@@ -281,6 +297,12 @@ export interface ActiveWorkoutSessionState {
   restTimerPaused: boolean;
   restTimerOpen: boolean;
   restTimerEndsAt: number | null;
+  overloadSuggestion?: {
+    exerciseIndex: number;
+    completedSetIndex: number;
+    nextSetIndex: number;
+    applied: boolean;
+  } | null;
   scheduledDate?: string; // YYYY-MM-DD if started from planned routine
 }
 
@@ -289,6 +311,7 @@ export interface CompletedSet {
   weightKg: number;
   reps: number;
   completed: boolean;
+  targetReps?: number;
   completedAt?: string;
   restSeconds?: number;
   isPersonalRecord?: boolean;
@@ -299,6 +322,7 @@ export interface CompletedExercise {
   exerciseName: string;
   muscleGroups: string;
   sets: CompletedSet[];
+  repRange?: { minRepTarget: number; maxRepTarget: number };
 }
 
 export interface WorkoutHistoryEntry {
@@ -475,6 +499,10 @@ export interface AppState {
   customFoods: FoodDefinition[];
   recentFoods: RecentFoodEntry[];
   foodSearchTab: 'recent' | 'myFoods' | 'allFoods';
+  foodSearchQuery: string;
+  externalFoodSearchState: 'idle' | 'loading' | 'loaded' | 'error';
+  externalFoodSearchQuery: string;
+  externalFoodResults: FoodDefinition[];
   isSetPortionOpen: boolean;
   activePortionFood: FoodDefinition | null;
   activePortionQuantity: number;

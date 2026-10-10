@@ -346,3 +346,39 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
   .rest-timer-round-button { width: 60px; height: 60px; }
   .rest-timer-control { gap: 5px; }
 }
+
+/* The workout assistant shares the green surface language with the rest clock. */
+.workout-assistant-tip {
+  width: 100%; min-width: 0; padding: 14px; border-radius: 18px;
+  border: 1px solid var(--ui-border); background: var(--ui-primary-soft);
+  color: var(--ui-text); overflow-wrap: anywhere;
+}
+.workout-assistant-heading { display: flex; align-items: center; gap: 8px; color: var(--ui-primary); }
+.workout-assistant-heading .material-symbols-outlined { flex-shrink: 0; font-size: 20px; }
+.workout-assistant-heading h4 { min-width: 0; font: 700 13px/1.5 'Plus Jakarta Sans', sans-serif; }
+.workout-assistant-load { margin-top: 8px; font: 800 18px/1.5 'Plus Jakarta Sans', sans-serif; font-variant-numeric: tabular-nums; }
+.workout-assistant-reason { margin-top: 5px; font-size: 12px; line-height: 1.65; }
+.workout-assistant-estimate { margin-top: 8px; color: var(--ui-muted); font-size: 11px; line-height: 1.6; }
+.workout-assistant-applied { display: flex; align-items: center; gap: 6px; margin-top: 10px; color: var(--ui-primary); font-size: 12px; font-weight: 600; line-height: 1.5; }
+.workout-assistant-applied .material-symbols-outlined { flex-shrink: 0; font-size: 18px; }
+.workout-assistant-apply {
+  width: 100%; min-height: 44px; margin-top: 12px; padding: 9px 12px; border-radius: 12px;
+  background: #006d36; color: #fff; font-size: 12px; font-weight: 700; line-height: 1.5;
+  transition: background var(--ui-motion-duration), transform var(--ui-motion-duration);
+}
+.workout-assistant-apply:hover { background: #005c2d; }
+.workout-assistant-apply:active { transform: scale(0.99); }
+.rest-timer-body:has(.workout-assistant-tip) { gap: 16px; }
+.rest-timer-body:has(.workout-assistant-tip) .rest-timer-dial { width: min(100%, 270px); margin-top: 0; }
+.rest-timer-body:has(.workout-assistant-tip) .rest-timer-add { margin-bottom: 0; }
+.workout-progression-hint {
+  display: flex; align-items: flex-start; gap: 8px; min-width: 0; padding: 10px 12px;
+  border: 1px solid var(--ui-border); border-radius: 12px;
+  background: var(--ui-primary-soft); color: var(--ui-primary-label); overflow-wrap: anywhere;
+}
+.workout-progression-hint > .material-symbols-outlined { flex-shrink: 0; font-size: 20px; }
+.workout-progression-hint > div { min-width: 0; }
+.workout-progression-hint p { font-size: 11px; line-height: 1.5; }
+.workout-progression-hint strong { display: block; margin-top: 2px; font-size: 12px; line-height: 1.6; font-variant-numeric: tabular-nums; }
+.workout-progression-hint span:not(.material-symbols-outlined) { display: block; font-size: 11px; line-height: 1.5; }
+.workout-set-target { max-width: 100%; color: var(--ui-muted); font-size: 11px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }

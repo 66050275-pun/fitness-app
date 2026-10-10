@@ -5,6 +5,7 @@ import { htmlJsArg } from '../utils/sanitize.ts';
 import { store } from '../store/appState';
 import { formatFriendlyDate, getTodayKey } from '../utils/dateUtils';
 import { clampProgressRatio, formatDisplayNumber, formatRemainingCalories, safeRatio } from '../utils/safeNumbers';
+import { getMealNutrientForDisplay } from '../utils/mealNutritionDisplay.ts';
 import type { DashboardWidgetId } from '../types/index.ts';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 
@@ -274,13 +275,13 @@ export function renderDashboardScreen(): string {
                       <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white">${escapeHtml(mealLabel(meal, meal.name))}</h4>
                       <div class="flex items-center gap-2 mt-0.5">
                         <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase tracking-wider">${trHtml(meal.mealType)} &bull; ${escapeHtml(meal.time)}</span>
-                        <span class="ui-number text-[10px] text-primary dark:text-primary-container font-semibold">${formatDisplayNumber(meal.protein)} ${trHtml("g P •")} ${formatDisplayNumber(meal.carbs)} ${trHtml("g C")}</span>
+                        <span class="ui-number text-[10px] text-primary dark:text-primary-container font-semibold">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'protein'))} ${trHtml("g P •")} ${formatDisplayNumber(getMealNutrientForDisplay(meal, 'carbs'))} ${trHtml("g C")}</span>
                       </div>
                     </div>
                   </div>
 
                   <div class="flex items-center gap-2">
-                    <span class="ui-number font-heading font-bold text-xs text-on-surface dark:text-white">${formatDisplayNumber(meal.calories, 0)} <span class="text-[10px] font-normal text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span></span>
+                    <span class="ui-number font-heading font-bold text-xs text-on-surface dark:text-white">${formatDisplayNumber(getMealNutrientForDisplay(meal, 'calories'), 0)} <span class="text-[10px] font-normal text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span></span>
                     <button onclick="window.deleteMeal(${htmlJsArg(meal.id)})" class="text-on-surface-variant hover:text-error p-1 transition-colors">
                       <span class="material-symbols-outlined text-[16px]">delete_outline</span>
                     </button>

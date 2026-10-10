@@ -17,6 +17,7 @@ import { store } from '../../store/appState';
 import { htmlJsArg, escapeHtml } from '../../utils/sanitize';
 import { getAvailableUnitsForFood } from '../../utils/portionCalculations';
 import type { MealType } from '../../types/index.ts';
+import { renderFoodSourceNote } from '../Food/FoodSourceNote.ts';
 
 export function renderSetPortionModal(): string {
   const state = store.getState();
@@ -40,10 +41,12 @@ export function renderSetPortionModal(): string {
   const proDisplay = nutrition?.protein !== null && nutrition?.protein !== undefined ? `${formatDisplayNumber(nutrition.protein)} ${trHtml("g")}` : '—';
   const carbDisplay = nutrition?.carbs !== null && nutrition?.carbs !== undefined ? `${formatDisplayNumber(nutrition.carbs)} ${trHtml("g")}` : '—';
   const fatDisplay = nutrition?.fat !== null && nutrition?.fat !== undefined ? `${formatDisplayNumber(nutrition.fat)} ${trHtml("g")}` : '—';
+  const fiberKnown = typeof nutrition?.fiber === 'number' && Number.isFinite(nutrition.fiber);
+  const sodiumKnown = typeof nutrition?.sodium === 'number' && Number.isFinite(nutrition.sodium);
 
   const basisText = food.nutritionBasis.servingDescription 
     ? food.nutritionBasis.servingDescription 
-    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), food.nutritionBasis.unit);
+    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), tr(food.nutritionBasis.unit));
 
   const hasMicronutrients = food.nutrition.micronutrients && (
     food.nutrition.micronutrients.vitamins.length > 0 || 
@@ -212,6 +215,13 @@ export function renderSetPortionModal(): string {
                 </span>
               </div>
             </div>
+            ${fiberKnown || sodiumKnown ? `
+              <div class="flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-[11px] text-on-surface-variant dark:text-gray-400">
+                ${fiberKnown ? `<span>${trHtml('Fiber')}: <strong class="ui-number text-on-surface dark:text-gray-200">${formatDisplayNumber(nutrition!.fiber!)} ${trHtml('g')}</strong></span>` : ''}
+                ${sodiumKnown ? `<span>${trHtml('Sodium')}: <strong class="ui-number text-on-surface dark:text-gray-200">${formatDisplayNumber(nutrition!.sodium!, 0)} ${trHtml('mg')}</strong></span>` : ''}
+              </div>
+            ` : ''}
+            ${renderFoodSourceNote(food)}
           </div>
 
           <!-- Meal Type & Date / Time Configuration -->

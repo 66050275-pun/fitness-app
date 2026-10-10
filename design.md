@@ -106,6 +106,21 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Back closes the clock while the rest continues; the compact workout timer reopens it. Skip ends the rest. Rest Pause affects the rest countdown; the workout's Pause freezes both timers. Resume Workout resumes the session while preserving any separate rest pause.
 - Derive the rest countdown from its local deadline rather than interval callback counts. Update the dial in place without restarting transitions or moving focus, and close it when the rest finishes. Timer state stays in memory and is cleared when the vault locks.
 
+### Workout assistant
+
+- Show the next-set suggestion in the rest clock's scrollable body and above the active set log. Use the same green surfaces, readable reason, formatted load and reps, and explicit Apply/Applied status.
+- Automatically fill only an incomplete set that the user has not edited. Preserve manual entries and completed sets. Undoing the source set restores an untouched automatic fill; manual changes are retained.
+- Distinguish target reps from actual reps. Load inputs accept 0.25 kg steps to accommodate 1.25 kg increments.
+- Before starting, explain loads drawn from saved history. Use a stable rep bracket and increase only after every prescribed set reaches its upper bound at the same positive load. Bodyweight, timed and assisted movements do not receive automatic weight increases.
+- Suggestions and Epley estimates are local calculations. Recompute their wording when the language changes; do not store localized reasons in workout history.
+
+## Food catalog and online search
+
+- Bundle Thai dish estimates for offline search in both English and Thai, with gram-based regular/large/small portions. Clearly label estimated recipe nutrition; changing ingredients needs a separate recipe, rather than a size option.
+- Keep local search immediate. Open Food Facts Thailand search requires the visible **Search online** action and explains that the search text is sent to that provider.
+- Show distinct loading, unavailable and no-result states. Retain the Open Food Facts product link and ODbL attribution on imported foods. Unknown nutrients display as unavailable and remain null.
+- Query text and unsaved results remain in memory. Logged product definitions and diary snapshots use the existing encrypted browser vault; locking cancels outstanding requests.
+
 ## English and Thai
 
 - The selected language applies throughout the app: lock screen, navigation, settings, forms, calendars, validation, exercise names, muscle labels and demo replies.

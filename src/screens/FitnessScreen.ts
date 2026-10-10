@@ -10,6 +10,7 @@ import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 import { renderMonthlyFitnessCalendar } from '../components/Fitness/MonthlyFitnessCalendar';
 import { renderTodaysWorkoutCard } from '../components/Fitness/TodaysWorkoutCard';
+import { renderWorkoutAssistantMount, renderWorkoutProgressionHint } from '../components/Fitness/WorkoutAssistantTip';
 
 export function renderFitnessScreen(passedState?: AppState): string {
   const state = passedState || store.getState();
@@ -360,6 +361,8 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
 
               ${renderExerciseIllustration(ex.name)}
 
+              ${renderWorkoutProgressionHint(ex)}
+
               <!-- Sets and Reps Counter Controls -->
               <div class="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant/20">
                 
@@ -540,6 +543,8 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
 
           ${renderExerciseIllustration(currentEx.name)}
 
+          ${renderWorkoutAssistantMount(activeWorkout)}
+
           <!-- Sets Logging Table -->
           <div class="flex flex-col gap-2">
             <!-- Table Header -->
@@ -561,27 +566,33 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
                 </div>
 
                 <!-- Weight Input -->
-                <div class="col-span-4 flex items-center justify-center">
+                <div class="col-span-4 min-w-0 flex items-center justify-center">
                   <input 
+                    id="active-set-weight-${currentExerciseIndex}-${sIdx}"
                     type="number" 
                     min="0" 
-                    step="0.5" 
+                    step="0.25"
+                    aria-label="${trHtml('Weight for set {0}', set.setNumber)}"
                     value="${escapeHtml(set.weightKg === 0 ? '' : set.weightKg)}"
                     placeholder="0"
                     onchange="window.updateActiveSetInput(${currentExerciseIndex}, ${sIdx}, this.value, null)"
-                    class="w-16 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
+                    class="w-full max-w-16 min-w-0 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
                   />
                 </div>
 
                 <!-- Reps Input -->
-                <div class="col-span-4 flex items-center justify-center">
+                <div class="col-span-4 min-w-0 flex flex-col items-center justify-center gap-1">
                   <input 
+                    id="active-set-reps-${currentExerciseIndex}-${sIdx}"
                     type="number" 
                     min="0" 
+                    step="1"
+                    aria-label="${trHtml('Actual reps for set {0}', set.setNumber)}"
                     value="${escapeHtml(set.actualReps)}"
                     onchange="window.updateActiveSetInput(${currentExerciseIndex}, ${sIdx}, null, this.value)"
-                    class="w-16 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
+                    class="w-full max-w-16 min-w-0 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
                   />
+                  <span class="workout-set-target">${trHtml('Target: {0} reps', formatDisplayNumber(set.targetReps, 0))}</span>
                 </div>
 
                 <!-- Complete Checkbox Button -->

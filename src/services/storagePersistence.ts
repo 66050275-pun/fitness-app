@@ -102,11 +102,18 @@ export function migrateLegacyMealItem(raw: any): MealItem | null {
     // Existing nutritionSnapshot or legacy copy
     let nutritionSnapshot: NutritionValues;
     if (raw.nutritionSnapshot && typeof raw.nutritionSnapshot === 'object') {
+      // An explicit unknown must survive reload; legacy totals use 0 only as
+      // an aggregation fallback, never as evidence that a nutrient was measured.
+      const snapshotValue = (key: string, fallback: number | null): number | null => {
+        const value = raw.nutritionSnapshot[key];
+        if (value === undefined) return fallback;
+        return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
+      };
       nutritionSnapshot = {
-        calories: typeof raw.nutritionSnapshot.calories === 'number' ? raw.nutritionSnapshot.calories : calNum,
-        protein: typeof raw.nutritionSnapshot.protein === 'number' ? raw.nutritionSnapshot.protein : proNum,
-        carbs: typeof raw.nutritionSnapshot.carbs === 'number' ? raw.nutritionSnapshot.carbs : carbNum,
-        fat: typeof raw.nutritionSnapshot.fat === 'number' ? raw.nutritionSnapshot.fat : fatNum,
+        calories: snapshotValue('calories', calNum),
+        protein: snapshotValue('protein', proNum),
+        carbs: snapshotValue('carbs', carbNum),
+        fat: snapshotValue('fat', fatNum),
         fiber: typeof raw.nutritionSnapshot.fiber === 'number' ? raw.nutritionSnapshot.fiber : null,
         sugar: typeof raw.nutritionSnapshot.sugar === 'number' ? raw.nutritionSnapshot.sugar : null,
         sodium: typeof raw.nutritionSnapshot.sodium === 'number' ? raw.nutritionSnapshot.sodium : null,
@@ -173,8 +180,17 @@ export function sanitizeCustomFood(raw: any): FoodDefinition | null {
       brand: raw.brand ? String(raw.brand) : undefined,
       category: raw.category ? String(raw.category) : 'Custom Food',
       barcode: raw.barcode ? String(raw.barcode).trim() : undefined,
-      source: 'custom',
+      source: raw.source === 'database' && raw.dataProvenance?.provider === 'open_food_facts' ? 'database' : 'custom',
       calorieSource,
+      searchAliases: Array.isArray(raw.searchAliases) ? raw.searchAliases.filter((value: unknown) => typeof value === 'string').slice(0, 12).map((value: string) => value.slice(0, 200)) : undefined,
+      dataProvenance: raw.dataProvenance?.provider === 'open_food_facts' ? {
+        provider: 'open_food_facts',
+        url: typeof raw.dataProvenance.url === 'string' && /^https:\/\/(?:world|th|en)\.openfoodfacts\.org\/product\/\d{8,14}(?:\/[^?#]*)?$/.test(raw.dataProvenance.url)
+          ? raw.dataProvenance.url : undefined,
+        license: 'ODbL-1.0',
+        modifiedLocally: raw.dataProvenance.modifiedLocally === true,
+        retrievedAt: typeof raw.dataProvenance.retrievedAt === 'string' ? raw.dataProvenance.retrievedAt : undefined
+      } : undefined,
       nutritionBasis: {
         amount: typeof raw.nutritionBasis?.amount === 'number' && raw.nutritionBasis.amount > 0 ? raw.nutritionBasis.amount : 100,
         unit: ['g', 'ml', 'serving'].includes(raw.nutritionBasis?.unit) ? raw.nutritionBasis.unit : 'g',

@@ -4,6 +4,16 @@ import { tr, trHtml, getLocale } from '../i18n/index.ts';
 import { store } from '../store/appState';
 import type { FoodDefinition, RecentFoodEntry } from '../types/index.ts';
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
+import { renderFoodSourceNote } from '../components/Food/FoodSourceNote.ts';
+import { calculatePortionMultiplier } from '../utils/portionCalculations.ts';
+
+function lastPortionCalories(food: FoodDefinition | undefined, entry: RecentFoodEntry): number | null {
+  if (!food || food.nutrition.calories === null || !Number.isFinite(food.nutrition.calories)) return null;
+  const multiplier = calculatePortionMultiplier(entry.lastPortion.quantity, entry.lastPortion.unit, food);
+  if (multiplier === null) return null;
+  const calories = food.nutrition.calories * multiplier;
+  return Number.isFinite(calories) && calories >= 0 ? calories : null;
+}
 
 function formatRelativeTime(isoString: string): string {
   try {
@@ -29,30 +39,31 @@ export function renderFoodSearchScreen(): string {
   const recentFoods = store.getRecentFoods();
   const frequentlyUsed = store.getFrequentlyUsedFoods();
   const customFoods = store.getCustomFoods();
+  const query = state.foodSearchQuery || '';
 
   return `
     <div class="flex flex-col min-h-screen pb-28 bg-surface dark:bg-dark-surface transition-colors">
       
       <!-- Top App Bar -->
       <header class="sticky top-0 z-40 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20 shadow-sm">
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2.5 min-w-0">
           <button 
             onclick="window.navigateApp('dashboard')" 
             aria-label="${trHtml("Back to Dashboard")}"
-            class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
+            class="w-9 h-9 shrink-0 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
           <div>
             <h1 class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">${trHtml("Food Database")}</h1>
-            <p class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Recents, custom foods & verified catalog")}</p>
+            <p class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Recent foods, recipes & food catalog")}</p>
           </div>
         </div>
 
         <button 
           type="button" 
           onclick="window.openCreateCustomFood()"
-          class="px-3 py-1.5 rounded-full bg-primary/10 text-primary dark:text-primary-container text-xs font-bold border border-primary/30 flex items-center gap-1 active:scale-95 transition-all hover:bg-primary/20"
+          class="px-3 py-1.5 shrink-0 rounded-full bg-primary/10 text-primary dark:text-primary-container text-xs font-bold border border-primary/30 flex items-center gap-1 active:scale-95 transition-all hover:bg-primary/20"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
           <span>${trHtml("New Food")}</span>
@@ -68,6 +79,9 @@ export function renderFoodSearchScreen(): string {
           <input 
             type="text" 
             id="food-search-input"
+            maxlength="120"
+            value="${escapeHtml(query)}"
+            aria-label="${trHtml('Search foods')}"
             placeholder="${trHtml("Search by name, brand, barcode, category...")}"
             oninput="window.handleFoodSearchInput(this.value)"
             class="w-full pl-10 pr-10 py-3 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm placeholder:text-on-surface-variant/60"
@@ -125,14 +139,72 @@ export function renderFoodSearchScreen(): string {
           </button>
         </div>
 
+        <div id="online-food-search-area">${renderOnlineFoodSearch()}</div>
+
         <!-- Dynamic Results / Tab Content Container -->
         <div id="food-search-content-area" class="flex flex-col gap-4">
-          ${renderTabContent(activeTab, recentFoods, frequentlyUsed, customFoods)}
+          ${query.trim() ? renderAllFoodsTab(query) : renderTabContent(activeTab, recentFoods, frequentlyUsed, customFoods)}
         </div>
 
       </main>
 
     </div>
+  `;
+}
+
+/** Update results without replacing the focused search input or the mobile keyboard. */
+export function updateFoodSearchContent(): void {
+  const contentArea = document.getElementById('food-search-content-area');
+  const onlineArea = document.getElementById('online-food-search-area');
+  if (!contentArea && !onlineArea) return;
+  const state = store.getState();
+  const query = state.foodSearchQuery || '';
+  if (contentArea) {
+    contentArea.innerHTML = query.trim()
+      ? renderAllFoodsTab(query)
+      : renderTabContent(state.foodSearchTab || 'recent', store.getRecentFoods(), store.getFrequentlyUsedFoods(), store.getCustomFoods());
+  }
+  if (onlineArea) onlineArea.innerHTML = renderOnlineFoodSearch();
+}
+
+function renderOnlineFoodSearch(): string {
+  const state = store.getState();
+  const query = (state.foodSearchQuery || '').trim();
+  const status = state.externalFoodSearchState;
+  const isCurrentQuery = state.externalFoodSearchQuery === query;
+  const results = isCurrentQuery ? state.externalFoodResults : [];
+  const isLoading = status === 'loading';
+  const disabled = query.length < 2 || isLoading;
+
+  return `
+    <section class="rounded-2xl border border-primary/20 bg-primary/5 p-3.5 flex flex-col gap-2.5" aria-labelledby="online-food-search-title">
+      <div>
+        <h2 id="online-food-search-title" class="font-heading font-bold text-xs text-on-surface dark:text-white">${trHtml('Open Food Facts · Thailand')}</h2>
+        <p class="mt-1 text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Thai dishes are available offline. Search packaged products sold in Thailand online.')}</p>
+      </div>
+      <button type="button" onclick="window.searchThaiFoodOnline()" ${disabled ? 'disabled' : ''}
+        class="w-full py-2.5 px-3 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-2 transition-all enabled:active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
+        <span class="material-symbols-outlined text-[18px] ${isLoading ? 'animate-spin' : ''}" aria-hidden="true">${isLoading ? 'progress_activity' : 'travel_explore'}</span>
+        <span>${trHtml(isLoading ? 'Searching online...' : 'Search online')}</span>
+      </button>
+      <p class="text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Only your search text is sent to Open Food Facts.')}</p>
+      <div aria-live="polite" aria-atomic="true" class="text-[11px] leading-relaxed text-on-surface-variant dark:text-gray-400">
+        ${isLoading ? trHtml('Searching Open Food Facts...') : ''}
+        ${isCurrentQuery && status === 'error' ? `<p class="text-error">${trHtml('Online search is unavailable. Try again or use the local food catalog.')}</p>` : ''}
+        ${isCurrentQuery && status === 'loaded' && results.length === 0 ? trHtml('No matching products found online. Try another name or add your own food.') : ''}
+      </div>
+      ${isCurrentQuery && status === 'loaded' && results.length > 0 ? `
+        <div class="flex flex-col gap-2">
+          <h3 class="text-[10px] font-semibold text-on-surface-variant dark:text-gray-400">${trHtml('Online products ({0})', results.length)}</h3>
+          ${results.map(renderFoodDefinitionCard).join('')}
+        </div>
+      ` : ''}
+      <p class="text-[9px] leading-relaxed text-on-surface-variant dark:text-gray-400">
+        ${trHtml('Data:')}
+        <a href="https://th.openfoodfacts.org/" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-container underline underline-offset-2">Open Food Facts</a>
+        · <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-container underline underline-offset-2">ODbL</a>
+      </p>
+    </section>
   `;
 }
 
@@ -197,6 +269,7 @@ function renderRecentFoodsTab(
 
           <div class="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
             ${frequentlyUsed.map(({ food, entry }) => {
+              const calories = lastPortionCalories(food, entry);
               return `
                 <div class="min-w-[190px] max-w-[210px] p-3 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col justify-between shrink-0">
                   <div>
@@ -211,11 +284,12 @@ function renderRecentFoodsTab(
                     <p class="text-[10px] text-on-surface-variant dark:text-gray-400 mt-0.5 truncate">
                       ${escapeHtml(portionLabel(entry.lastPortion, food.source === 'built_in' || food.source === 'demo') || `${entry.lastPortion.quantity} ${tr(entry.lastPortion.unit)}`)}
                     </p>
+                    ${renderFoodSourceNote(food, true)}
                   </div>
 
                   <div class="mt-3 pt-2 border-t border-outline-variant/20 flex items-center justify-between">
                     <span class="text-xs font-heading font-extrabold text-primary dark:text-primary-container">
-                      ${food.nutrition.calories ? Math.round(food.nutrition.calories * (entry.lastPortion.quantity / (food.nutritionBasis.amount || 1))) : '—'} ${trHtml("kcal")}
+                      ${calories !== null ? formatDisplayNumber(calories, 0) : '—'} ${trHtml("kcal")}
                     </span>
                     <button 
                       type="button" 
@@ -262,17 +336,13 @@ function renderRecentFoodCard(entry: RecentFoodEntry): string {
   const brand = food?.brand;
   const relativeTime = formatRelativeTime(entry.lastUsedAt);
 
-  // Calculate calories for the last portion
-  let lastCal = 0;
-  if (food && food.nutrition.calories !== null) {
-    const basisAmount = food.nutritionBasis.amount || 1;
-    lastCal = Math.round(food.nutrition.calories * (entry.lastPortion.quantity / basisAmount));
-  }
+  const lastCal = lastPortionCalories(food, entry);
 
   const portionDesc = portionLabel(entry.lastPortion, food?.source === 'built_in' || food?.source === 'demo') || `${entry.lastPortion.quantity} ${tr(entry.lastPortion.unit)}`;
 
   return `
-    <div class="p-3.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex items-center justify-between gap-3 hover:border-primary/40 transition-all group">
+    <div class="p-3.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col gap-2 hover:border-primary/40 transition-all group">
+      <div class="flex items-center justify-between gap-3">
       
       <div 
         onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})"
@@ -281,24 +351,24 @@ function renderRecentFoodCard(entry: RecentFoodEntry): string {
         tabindex="0"
         aria-label="${trHtml("Log {0} again", foodName)}"
       >
-        <div class="flex items-center gap-1.5">
+        <div class="flex flex-wrap items-center gap-1.5 min-w-0">
           <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white truncate group-hover:text-primary transition-colors">
             ${escapeHtml(foodName)}
           </h4>
           ${brand ? `
-            <span class="text-[10px] text-on-surface-variant dark:text-gray-400 shrink-0">
+            <span class="text-[10px] text-on-surface-variant dark:text-gray-400 truncate max-w-full">
               &bull; ${escapeHtml(brand)}
             </span>
           ` : ''}
         </div>
 
-        <div class="flex items-center gap-2 mt-1 text-[10px] text-on-surface-variant dark:text-gray-400">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-on-surface-variant dark:text-gray-400">
           <span class="font-semibold text-on-surface dark:text-gray-200">
             ${escapeHtml(portionDesc)}
           </span>
           <span>&bull;</span>
           <span class="font-bold text-primary dark:text-primary-container">
-            ${lastCal > 0 ? tr("{0} kcal", lastCal) : ''}
+            ${lastCal !== null ? trHtml("{0} kcal", formatDisplayNumber(lastCal, 0)) : `— ${trHtml('kcal')}`}
           </span>
           <span>&bull;</span>
           <span>${relativeTime}</span>
@@ -333,7 +403,8 @@ function renderRecentFoodCard(entry: RecentFoodEntry): string {
           <span class="material-symbols-outlined text-[16px]">close</span>
         </button>
       </div>
-
+      </div>
+      ${food ? renderFoodSourceNote(food, true) : ''}
     </div>
   `;
 }
@@ -393,9 +464,10 @@ function renderMyFoodsTab(customFoods: FoodDefinition[]): string {
 }
 
 function renderCustomFoodCard(food: FoodDefinition): string {
+  const isImported = food.dataProvenance?.provider === 'open_food_facts' && food.source !== 'custom';
   const basis = food.nutritionBasis.servingDescription 
     ? food.nutritionBasis.servingDescription 
-    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), food.nutritionBasis.unit);
+    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), tr(food.nutritionBasis.unit));
 
   const cal = formatDisplayNumber(food.nutrition.calories, 0);
   const pro = food.nutrition.protein !== null && food.nutrition.protein !== undefined ? `${formatDisplayNumber(food.nutrition.protein)} ${trHtml("g")}` : '—';
@@ -409,7 +481,7 @@ function renderCustomFoodCard(food: FoodDefinition): string {
         <div class="flex-1 min-w-0 pr-2">
           <div class="flex items-center gap-1.5">
             <span class="px-2 py-0.2 rounded-md bg-tertiary/10 text-tertiary dark:text-tertiary-fixed text-[9px] font-extrabold uppercase tracking-wider">
-              ${trHtml("Custom")}
+              ${isImported ? 'Open Food Facts' : trHtml("Custom")}
             </span>
             ${food.brand ? `
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 truncate">
@@ -469,6 +541,8 @@ function renderCustomFoodCard(food: FoodDefinition): string {
         </div>
       </div>
 
+      ${renderFoodSourceNote(food, true)}
+
       <!-- Portion Options Chips (if any) -->
       ${food.portionOptions.length > 0 ? `
         <div class="flex flex-wrap gap-1 items-center">
@@ -503,15 +577,17 @@ function renderAllFoodsTab(searchQuery = ''): string {
 
   return `
     <div class="flex flex-col gap-2.5">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-wrap items-center justify-between gap-2">
         <span class="text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400" id="all-foods-counter">
-          ${trHtml("Verified Catalog & Custom Foods (")}${allFoods.length})
+          ${trHtml(searchQuery.trim() ? 'Local food matches ({0})' : 'Food catalog ({0})', allFoods.length)}
         </span>
         <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Tap to set portion")}</span>
       </div>
 
       <div id="all-foods-list-container" class="flex flex-col gap-2">
-        ${allFoods.map(food => renderFoodDefinitionCard(food)).join('')}
+        ${allFoods.length > 0 ? allFoods.map(food => renderFoodDefinitionCard(food)).join('') : `
+          <p class="rounded-2xl border border-dashed border-outline-variant/40 p-4 text-xs leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('No local matches. Try another name, search online, or create a food.')}</p>
+        `}
       </div>
     </div>
   `;
@@ -519,30 +595,32 @@ function renderAllFoodsTab(searchQuery = ''): string {
 
 export function renderFoodDefinitionCard(food: FoodDefinition): string {
   const isCustom = food.source === 'custom';
+  const sourceNote = renderFoodSourceNote(food, true);
   const basisText = food.nutritionBasis.servingDescription 
     ? food.nutritionBasis.servingDescription 
-    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), food.nutritionBasis.unit);
+    : tr("per {0} {1}", formatDisplayNumber(food.nutritionBasis.amount), tr(food.nutritionBasis.unit));
 
   const cal = formatDisplayNumber(food.nutrition.calories, 0);
-  const pro = food.nutrition.protein !== null && food.nutrition.protein !== undefined ? tr("{0}g P", food.nutrition.protein) : '';
-  const carb = food.nutrition.carbs !== null && food.nutrition.carbs !== undefined ? tr("{0}g C", food.nutrition.carbs) : '';
-  const fat = food.nutrition.fat !== null && food.nutrition.fat !== undefined ? tr("{0}g F", food.nutrition.fat) : '';
+  const pro = food.nutrition.protein !== null && food.nutrition.protein !== undefined ? tr("{0}g P", formatDisplayNumber(food.nutrition.protein)) : '';
+  const carb = food.nutrition.carbs !== null && food.nutrition.carbs !== undefined ? tr("{0}g C", formatDisplayNumber(food.nutrition.carbs)) : '';
+  const fat = food.nutrition.fat !== null && food.nutrition.fat !== undefined ? tr("{0}g F", formatDisplayNumber(food.nutrition.fat)) : '';
   const macrosSummary = [pro, carb, fat].filter(Boolean).join(' • ');
 
   return `
+    <div class="w-full min-w-0 bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 shadow-xs hover:border-primary/50 transition-colors overflow-hidden">
     <button 
       type="button" 
       onclick="window.openSetPortion(${htmlJsArg(food.id)})"
       aria-label="${trHtml("Configure portion for")} ${escapeHtml(foodLabel(food, food.name))}"
-      class="w-full text-left bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-xs hover:border-primary/50 active:scale-[0.99] transition-all flex items-center justify-between group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary min-h-[64px]"
+      class="w-full text-left p-3.5 ${sourceNote ? 'pb-2' : ''} active:scale-[0.99] transition-all flex items-center justify-between gap-2 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary min-h-[64px]"
     >
-      <div class="flex items-center gap-3 min-w-0">
+      <div class="flex flex-1 items-center gap-3 min-w-0">
         <div class="w-10 h-10 rounded-xl ${isCustom ? 'bg-tertiary/10 text-tertiary dark:text-tertiary-fixed' : 'bg-primary/10 text-primary dark:text-primary-container'} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
           <span class="material-symbols-outlined text-[20px]">${escapeHtml(food.icon || (isCustom ? 'restaurant_menu' : 'nutrition'))}</span>
         </div>
         <div class="min-w-0">
-          <div class="flex items-center gap-1.5">
-            <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white group-hover:text-primary transition-colors truncate">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white group-hover:text-primary transition-colors break-words">
               ${escapeHtml(foodLabel(food, food.name))}
             </h4>
             ${isCustom ? `
@@ -552,13 +630,14 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
             ` : ''}
           </div>
 
-          <p class="text-[10px] text-on-surface-variant dark:text-gray-400 mt-0.5 truncate">
-            ${escapeHtml(foodLabel(food, basisText))} ${macrosSummary ? tr("&bull; {0}", macrosSummary) : ''}
+          ${food.brand ? `<p class="text-[10px] text-on-surface-variant dark:text-gray-400 mt-0.5 break-words">${escapeHtml(foodLabel(food, food.brand))}</p>` : ''}
+          <p class="text-[10px] text-on-surface-variant dark:text-gray-400 mt-0.5 break-words">
+            ${escapeHtml(foodLabel(food, basisText))} ${macrosSummary ? `• ${escapeHtml(macrosSummary)}` : ''}
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 shrink-0">
+      <div class="flex items-center gap-2 shrink-0 max-w-[96px]">
         <div class="text-right">
           <span class="ui-number font-heading font-extrabold text-xs text-on-surface dark:text-white block">
             ${cal} ${trHtml("kcal")}
@@ -569,5 +648,7 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
         </div>
       </div>
     </button>
+    ${sourceNote ? `<div class="px-3.5 pb-3.5">${sourceNote}</div>` : ''}
+    </div>
   `;
 }
