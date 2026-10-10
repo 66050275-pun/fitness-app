@@ -38,19 +38,18 @@ export function renderMealDetailModal(): string {
 
   return `
     <div 
-      id="meal-detail-modal-backdrop"
+      id="meal-detail-modal-backdrop" data-dialog-close="window.closeMealDetail()"
       onclick="if(event.target === this) window.closeMealDetail()"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end animate-fade-in"
+      class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end"
       role="dialog"
       aria-modal="true"
       aria-labelledby="meal-modal-title"
     >
       <div 
-        class="w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-slide-up"
+        class="ui-dialog-panel w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col overflow-hidden"
       >
         <!-- Header -->
-        <div class="px-5 pt-3 pb-3 border-b border-outline-variant/20 flex flex-col gap-2 shrink-0 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
-          <div class="w-12 h-1.5 rounded-full bg-outline-variant/40 mx-auto"></div>
+        <div class="ui-dialog-header px-5 pt-3 pb-3 border-b border-outline-variant/20 flex flex-col gap-2 shrink-0 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
           
           <div class="flex flex-wrap items-start justify-between gap-2">
             <div class="flex items-center gap-3">
@@ -86,7 +85,7 @@ export function renderMealDetailModal(): string {
         </div>
 
         <!-- Scrollable Content -->
-        <div class="px-5 py-4 overflow-y-auto flex flex-col gap-4">
+        <div class="ui-dialog-body px-5 py-4 overflow-y-auto flex flex-col gap-4">
           
           <!-- Energy & Core Macros -->
           <section class="flex flex-col gap-2">
@@ -175,7 +174,7 @@ export function renderMealDetailModal(): string {
         </div>
 
         <!-- Footer Actions -->
-        <div class="p-4 border-t border-outline-variant/20 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md flex items-center gap-2">
+        <div class="ui-dialog-footer p-4 border-t border-outline-variant/20 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md flex items-center gap-2">
           <button 
             type="button" 
             onclick="window.deleteMeal(${htmlJsArg(meal.id)}); window.closeMealDetail();"

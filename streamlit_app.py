@@ -103,9 +103,18 @@ st.markdown(
     """
     <style>
       [data-testid="stHeader"], [data-testid="stToolbar"], footer { display: none !important; }
+      html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"],
+      [data-testid="stMain"] { height: 100%; overflow: hidden !important; }
       [data-testid="stMainBlockContainer"] { padding: 0 !important; max-width: none !important; }
       [data-testid="stMain"] { padding-top: 0 !important; }
-      iframe { display: block; width: 100% !important; border: 0 !important; }
+      [data-testid="stVerticalBlock"] { gap: 0 !important; }
+      .stElementContainer:has(iframe[title="NutriAI"]) {
+        margin: 0 !important; height: 100vh !important; height: 100dvh !important;
+      }
+      iframe[title="NutriAI"] {
+        display: block; width: 100% !important; border: 0 !important;
+        height: 100vh !important; height: 100dvh !important;
+      }
     </style>
     """,
     unsafe_allow_html=True,
@@ -125,4 +134,4 @@ except (FileNotFoundError, RuntimeError, subprocess.CalledProcessError) as exc:
     st.exception(exc)
     st.stop()
 
-st.iframe(frontend_html, height=900, alt="NutriAI")
+st.iframe(frontend_html, height="stretch", alt="NutriAI")

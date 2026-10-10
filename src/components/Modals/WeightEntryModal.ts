@@ -40,21 +40,17 @@ export function renderWeightEntryModal(): string {
 
   return `
     <div 
-      id="weight-entry-modal-backdrop"
+      id="weight-entry-modal-backdrop" data-dialog-close="window.closeWeightModal()"
       onclick="if(event.target === this) window.closeWeightModal()"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center animate-fade-in"
+      class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="weight-modal-title"
     >
       <div 
-        class="w-full max-w-md bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden flex flex-col animate-slide-up"
+        class="ui-dialog-panel w-full max-w-md bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden flex flex-col"
         style="padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);"
       >
-        <!-- Pull Handle -->
-        <div class="pt-3 pb-1 flex justify-center shrink-0">
-          <div class="w-10 h-1 rounded-full bg-outline-variant/50"></div>
-        </div>
 
         <!-- Header -->
         <div class="px-5 py-3 flex items-center justify-between border-b border-outline-variant/20 shrink-0">
@@ -78,7 +74,7 @@ export function renderWeightEntryModal(): string {
         </div>
 
         <!-- Form Body -->
-        <form id="weight-entry-form" onsubmit="event.preventDefault(); window.submitWeightEntry();" class="p-5 flex flex-col gap-4 overflow-y-auto">
+        <form id="weight-entry-form" onsubmit="event.preventDefault(); window.submitWeightEntry();" class="ui-dialog-body p-5 flex flex-col gap-4 overflow-y-auto">
           
           <!-- Hidden editing ID -->
           <input type="hidden" id="weight-entry-id" value="${escapeHtml(editing?.id || '')}" />
@@ -95,7 +91,7 @@ export function renderWeightEntryModal(): string {
                   step="0.1" 
                   min="1" 
                   max="500" 
-                  id="weight-input-value"
+                  id="weight-input-value" data-dialog-draft
                   required
                   value="${escapeHtml(initialDisplayWeight)}"
                   placeholder="${trHtml("e.g. 70.5")}"
@@ -122,7 +118,7 @@ export function renderWeightEntryModal(): string {
                   ${trHtml("lb")}
                 </button>
               </div>
-              <input type="hidden" id="weight-input-unit" value="${escapeHtml(userUnit)}" />
+              <input type="hidden" id="weight-input-unit" data-dialog-draft data-dialog-draft-effect="setWeightModalUnit" value="${escapeHtml(userUnit)}" />
             </div>
           </div>
 
@@ -134,7 +130,7 @@ export function renderWeightEntryModal(): string {
               </label>
               <input 
                 type="date" 
-                id="weight-input-date"
+                id="weight-input-date" data-dialog-draft
                 required
                 value="${escapeHtml(initialDate)}"
                 class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
@@ -147,7 +143,7 @@ export function renderWeightEntryModal(): string {
               </label>
               <input 
                 type="time" 
-                id="weight-input-time"
+                id="weight-input-time" data-dialog-draft
                 required
                 value="${escapeHtml(initialTime)}"
                 class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
@@ -162,7 +158,7 @@ export function renderWeightEntryModal(): string {
             </label>
             <input 
               type="text" 
-              id="weight-input-note"
+              id="weight-input-note" data-dialog-draft
               maxlength="100"
               value="${escapeHtml(initialNote)}"
               placeholder="${trHtml("e.g. Morning fasted, post-workout")}"

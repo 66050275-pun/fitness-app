@@ -16,7 +16,9 @@ import './index.css';
 import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';
-import { renderQuickActionModal } from './components/Modals/QuickActionModal';
+import { renderDashboardWidgetDrawer } from './components/Modals/DashboardWidgetDrawer';
+import { renderWeeklyProgramEditorModal } from './components/Fitness/WeeklyProgramEditorModal';
+import { renderPlannerDateDetailModal } from './components/Fitness/PlannerDateDetailModal';
 import { renderQuickAddBottomSheet } from './components/BottomSheets/QuickAddBottomSheet';
 import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
@@ -1014,8 +1016,11 @@ window.addCustomFoodDraftPortion = () => {
     equivalentBaseUnit: baseUnit
   });
 
-  qtyEl.value = '1';
-  equivEl.value = '';
+  // Adding the mapping re-renders the dialog; reset the newly mounted fields.
+  const nextQty = document.getElementById('cf-new-portion-qty') as HTMLInputElement | null;
+  const nextEquiv = document.getElementById('cf-new-portion-equiv') as HTMLInputElement | null;
+  if (nextQty) nextQty.value = '1';
+  if (nextEquiv) nextEquiv.value = '';
 };
 
 window.removeCustomFoodDraftPortion = (index: number) => {
@@ -1212,7 +1217,7 @@ window.setInsightNutrientCategory = (category: NutrientFilterCategory) => {
 
 window.filterNutrientList = (query: string) => {
   const q = query.trim().toLowerCase();
-  const rows = document.querySelectorAll<HTMLElement>('.nutrient-item-row');
+  const rows = document.querySelectorAll<HTMLElement>('#nutrient-detail-modal-backdrop .nutrient-row');
   let visibleCount = 0;
   rows.forEach(row => {
     const name = row.getAttribute('data-nutrient-name')?.toLowerCase() || '';
@@ -1964,6 +1969,7 @@ function goBackFromScreen(): boolean {
 window.addEventListener('keydown', (e) => {
   if (!isVaultUnlocked()) return;
   if (e.key === 'Escape') {
+    if (screenTransitions.closeDialog()) { e.preventDefault(); return; }
     const state = store.getState();
     if (state.profileConfirmModal) {
       store.closeProfileConfirmModal();
@@ -2001,6 +2007,7 @@ window.addEventListener('keydown', (e) => {
 
 document.addEventListener('backbutton', (e) => {
   if (!isVaultUnlocked()) return;
+  if (screenTransitions.closeDialog()) { e.preventDefault(); return; }
   const state = store.getState();
   if (state.profileConfirmModal) {
     e.preventDefault();
@@ -2188,16 +2195,18 @@ function renderApp() {
   const showBottomNav = !isWorkoutActive && !isProfileSubpage && ['dashboard', 'diary', 'insights', 'coach', 'profile'].includes(currentScreen);
 
   screenTransitions.render(app, state, screenHtml, showBottomNav ? renderBottomNav() : '', `
-    ${renderQuickActionModal()}
     ${renderQuickAddBottomSheet()}
-    ${renderDeleteWorkoutModal()}
+    ${renderDashboardWidgetDrawer()}
+    ${renderWeeklyProgramEditorModal()}
+    ${renderPlannerDateDetailModal()}
     ${renderMealDetailModal()}
-    ${renderNutrientDetailModal()}
     ${renderSetPortionModal()}
     ${renderCustomFoodModal()}
     ${renderDiaryCalendarModal()}
-    ${renderProfileConfirmationModal()}
     ${renderWeightEntryModal()}
+    ${renderNutrientDetailModal()}
+    ${renderDeleteWorkoutModal()}
+    ${renderProfileConfirmationModal()}
   `);
 
   if (currentScreen === 'coach') {

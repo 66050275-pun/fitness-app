@@ -3544,7 +3544,7 @@
     "th": "พลังงานสุทธิที่เหลือ"
   },
   "View Diary &rarr;": {
-    "en": "View Diary &rarr;",
+    "en": "View Diary →",
     "th": "ดูบันทึก →"
   },
   "Hydration Level": {
@@ -3784,7 +3784,7 @@
     "th": "สถิติส่วนบุคคล"
   },
   "&times;": {
-    "en": "&times;",
+    "en": "×",
     "th": "×"
   },
   "+{0} kg progression": {
@@ -4012,7 +4012,7 @@
     "th": "ครั้ง"
   },
   "{0}kg &times;": {
-    "en": "{0}kg &times;",
+    "en": "{0}kg ×",
     "th": "{0} กก. ×"
   },
   "Save as Incomplete & Return Home": {
@@ -4280,7 +4280,7 @@
     "th": "กำหนดปริมาณและเพิ่มลงบันทึก"
   },
   "&bull; Barcode: {0}": {
-    "en": "&bull; Barcode: {0}",
+    "en": "• Barcode: {0}",
     "th": "• บาร์โค้ด: {0}"
   },
   "Portions:": {
@@ -4308,11 +4308,11 @@
     "th": "กำหนดปริมาณสำหรับ"
   },
   "Set Portion &rarr;": {
-    "en": "Set Portion &rarr;",
+    "en": "Set Portion →",
     "th": "กำหนดปริมาณ →"
   },
   "&bull; {0}": {
-    "en": "&bull; {0}",
+    "en": "• {0}",
     "th": "• {0}"
   },
   "Period Overview": {
@@ -4464,7 +4464,7 @@
     "th": "ทำท่าที่ใช้น้ำหนักเพื่อสร้างสถิติส่วนบุคคลแรก"
   },
   "kg &times;": {
-    "en": "kg &times;",
+    "en": "kg ×",
     "th": "กก. ×"
   },
   "1RM:": {
@@ -4568,7 +4568,7 @@
     "th": "น้ำหนักสูงสุดหนึ่งครั้งโดยประมาณ"
   },
   "Epley Formula: w &times; (1 + r/30)": {
-    "en": "Epley Formula: w &times; (1 + r/30)",
+    "en": "Epley Formula: w × (1 + r/30)",
     "th": "สูตรเอปลีย์: น้ำหนัก × (1 + จำนวนครั้ง/30)"
   },
   "Progression Delta": {
@@ -4620,7 +4620,7 @@
     "th": "สถิติ"
   },
   "{0}k &times;": {
-    "en": "{0}k &times;",
+    "en": "{0}k ×",
     "th": "{0} พัน ×"
   },
   "Set up your profile": {
@@ -5032,7 +5032,7 @@
     "th": "กิโลแคลอรี •"
   },
   "g Protein • Tap for Details &rarr;": {
-    "en": "g Protein • Tap for Details &rarr;",
+    "en": "g Protein • Tap for Details →",
     "th": "กรัมโปรตีน • แตะเพื่อดูรายละเอียด →"
   },
   "Align packaged barcode within box": {
@@ -5068,7 +5068,7 @@
     "th": "ลบการออกกำลังกายนี้"
   },
   "&ndash;": {
-    "en": "&ndash;",
+    "en": "–",
     "th": "–"
   },
   "Total Duration": {
@@ -5096,7 +5096,7 @@
     "th": "ลบบันทึกการออกกำลังกาย"
   },
   "{0} kg &times;": {
-    "en": "{0} kg &times;",
+    "en": "{0} kg ×",
     "th": "{0} กก. ×"
   },
   "Skipped": {

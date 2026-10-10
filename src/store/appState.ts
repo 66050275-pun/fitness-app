@@ -461,7 +461,6 @@ class Store {
       meals: persisted.meals,
       chatHistory: INITIAL_CHAT,
       lastScannedFood: null,
-      quickActionOpen: false,
       quickAddOpen: false,
       dashboardWidgetOrder: dashboardLayout.order,
       hiddenDashboardWidgets: dashboardLayout.hidden,
@@ -593,13 +592,20 @@ class Store {
 
   public setScreen(screen: ActiveScreen) {
     this.state.currentScreen = screen;
-    this.state.quickActionOpen = false;
     this.state.quickAddOpen = false;
     this.state.selectedMealDetailId = null;
     this.state.activeNutrientModalSource = null;
     this.state.isSetPortionOpen = false;
     this.state.isCustomFoodModalOpen = false;
     this.state.customFoodShowDiscardConfirm = false;
+    this.state.dashboardWidgetDrawerOpen = false;
+    this.state.diaryCalendarOpen = false;
+    this.state.weightModalOpen = false;
+    this.state.plannerWeeklyEditorOpen = false;
+    this.state.plannerDetailModalOpen = false;
+    this.state.plannerConfirmOverwriteMonth = null;
+    this.state.profileConfirmModal = null;
+    this.state.deleteConfirmationWorkoutId = null;
     this.notify();
   }
 
@@ -1331,9 +1337,7 @@ class Store {
   }
 
   public toggleQuickActions(open?: boolean) {
-    this.state.quickActionOpen = typeof open === 'boolean' ? open : !this.state.quickActionOpen;
-    this.state.quickAddOpen = this.state.quickActionOpen;
-    this.notify();
+    this.toggleQuickAdd(open);
   }
 
   public toggleDashboardWidgetDrawer(open?: boolean) {
@@ -1372,7 +1376,6 @@ class Store {
 
   public toggleQuickAdd(open?: boolean) {
     this.state.quickAddOpen = typeof open === 'boolean' ? open : !this.state.quickAddOpen;
-    this.state.quickActionOpen = this.state.quickAddOpen;
     this.notify();
   }
 
@@ -1401,7 +1404,6 @@ class Store {
     this.state.scannerMode = mode;
     this.state.currentScreen = 'scanner';
     this.state.quickAddOpen = false;
-    this.state.quickActionOpen = false;
     this.notify();
   }
 

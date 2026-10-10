@@ -27,14 +27,14 @@ export function renderProfileConfirmationModal(): string {
 
   return `
     <div 
-      id="profile-confirm-modal-backdrop"
+      id="profile-confirm-modal-backdrop" data-dialog-close="window.closeProfileConfirmModal()"
       onclick="if(event.target === this) window.closeProfileConfirmModal()"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+      class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
     >
-      <div class="w-full max-w-sm bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 p-5 shadow-modal flex flex-col gap-4 animate-scale-up">
+      <div class="ui-dialog-panel w-full max-w-sm bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 p-5 shadow-modal flex flex-col gap-4">
         
         <!-- Header -->
         <div class="flex items-start gap-3">
@@ -59,7 +59,7 @@ export function renderProfileConfirmationModal(): string {
             </label>
             <input 
               type="text"
-              id="confirm-typing-input"
+              id="confirm-typing-input" data-dialog-draft data-dialog-draft-effect="input"
               oninput="document.getElementById('confirm-action-button').disabled = (this.value.trim() !== ${htmlJsArg(requireTypingText)})"
               class="w-full px-3 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-mono text-on-surface dark:text-white uppercase focus:border-error focus:outline-none"
               placeholder="${escapeHtml(requireTypingText)}"

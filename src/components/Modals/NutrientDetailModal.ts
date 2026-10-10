@@ -42,19 +42,18 @@ export function renderNutrientDetailModal(): string {
 
   return `
     <div 
-      id="nutrient-detail-modal-backdrop"
+      id="nutrient-detail-modal-backdrop" data-dialog-close="window.closeNutrientModal()"
       onclick="if(event.target === this) window.closeNutrientModal()"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end animate-fade-in"
+      class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end"
       role="dialog"
       aria-modal="true"
       aria-labelledby="nutrient-modal-title"
     >
       <div 
-        class="w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-slide-up"
+        class="ui-dialog-panel w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col overflow-hidden"
       >
         <!-- Drag Handle & Header -->
-        <div class="px-5 pt-3 pb-2.5 border-b border-outline-variant/20 flex flex-col gap-2 shrink-0 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
-          <div class="w-12 h-1.5 rounded-full bg-outline-variant/40 mx-auto"></div>
+        <div class="ui-dialog-header px-5 pt-3 pb-2.5 border-b border-outline-variant/20 flex flex-col gap-2 shrink-0 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
           
           <div class="flex items-center justify-between">
             <div>
@@ -96,7 +95,7 @@ export function renderNutrientDetailModal(): string {
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
             <input 
               type="text" 
-              id="nutrient-modal-search"
+              id="nutrient-modal-search" data-dialog-draft data-dialog-draft-effect="filterNutrientList"
               placeholder="${trHtml("Search vitamins, minerals, fiber...")}"
               oninput="window.filterNutrientList(this.value)"
               class="w-full pl-9 pr-8 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface dark:text-white placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary"
@@ -133,7 +132,7 @@ export function renderNutrientDetailModal(): string {
         </div>
 
         <!-- Scrollable Content Canvas -->
-        <div id="nutrient-modal-scroll-container" class="px-5 py-4 overflow-y-auto flex flex-col gap-4">
+        <div id="nutrient-modal-scroll-container" class="ui-dialog-body px-5 py-4 overflow-y-auto flex flex-col gap-4">
           
           <!-- Macronutrients Section (if calories or macros available) -->
           ${(activeCategory === 'all' && (modalData.calories !== undefined || modalData.protein !== undefined)) ? `
@@ -180,7 +179,7 @@ export function renderNutrientDetailModal(): string {
         </div>
 
         <!-- Footer Dismiss Button -->
-        <div class="p-4 border-t border-outline-variant/20 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
+        <div class="ui-dialog-footer p-4 border-t border-outline-variant/20 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
           <button 
             type="button" 
             onclick="window.closeNutrientModal()" 

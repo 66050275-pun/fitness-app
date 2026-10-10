@@ -54,21 +54,17 @@ export function renderDiaryCalendarModal(): string {
 
   return `
     <div 
-      id="diary-calendar-modal-backdrop"
+      id="diary-calendar-modal-backdrop" data-dialog-close="window.closeDiaryCalendar()"
       onclick="if(event.target === this) window.closeDiaryCalendar()"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center animate-fade-in"
+      class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="calendar-modal-title"
     >
       <div 
-        class="w-full max-w-md max-h-[90vh] bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden flex flex-col animate-slide-up"
+        class="ui-dialog-panel w-full max-w-md bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden flex flex-col"
         style="padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);"
       >
-        <!-- Pull Handle -->
-        <div class="pt-3 pb-1 flex justify-center shrink-0">
-          <div class="w-10 h-1 rounded-full bg-outline-variant/50"></div>
-        </div>
 
         <!-- Header -->
         <div class="px-5 py-3 flex items-center justify-between border-b border-outline-variant/20 shrink-0">
@@ -137,10 +133,10 @@ export function renderDiaryCalendarModal(): string {
         </div>
 
         <!-- Body: Days Grid OR Month/Year Quick Picker -->
-        <div class="flex-1 overflow-y-auto p-4">
+        <div class="ui-dialog-body flex-1 overflow-y-auto p-4">
           ${mode === 'monthYear' ? `
             <!-- Month & Year Quick Selector View -->
-            <div class="flex flex-col gap-4 animate-fade-in">
+            <div class="flex flex-col gap-4">
               <!-- Year horizontal scroll pills -->
               <div>
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 block mb-1.5">
@@ -191,7 +187,7 @@ export function renderDiaryCalendarModal(): string {
             </div>
           ` : `
             <!-- Days Grid View -->
-            <div class="flex flex-col gap-1.5 animate-fade-in">
+            <div class="flex flex-col gap-1.5">
               <!-- Weekday Column Headers (Monday to Sunday) -->
               <div class="grid grid-cols-7 gap-1 text-center mb-1">
                 ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(w => `

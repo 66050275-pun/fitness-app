@@ -49,57 +49,19 @@ export function renderCustomFoodModal(): string {
     'Portions & Review'
   ];
 
+  if (showDiscardConfirm) return renderDiscardDialog();
+
   return `
-    <div id="custom-food-modal-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center animate-fade-in">
+    <div id="custom-food-modal-backdrop" data-dialog-close="window.closeCustomFoodModal()" class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center">
       <div 
-        class="w-full max-w-lg max-h-[92vh] flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden animate-slide-up relative"
+        class="ui-dialog-panel w-full max-w-lg flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden relative"
         role="dialog"
         aria-modal="true"
         aria-labelledby="custom-food-modal-title"
       >
-        <!-- In-UI Discard Confirmation Dialog -->
-        ${showDiscardConfirm ? `
-          <div class="absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-5 animate-fade-in">
-            <div class="w-full max-w-sm bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-5 border border-outline-variant/30 shadow-2xl flex flex-col gap-3 animate-scale-in">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
-                  <span class="material-symbols-outlined text-[24px]">warning</span>
-                </div>
-                <div>
-                  <h3 class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${trHtml("Discard Changes?")}</h3>
-                  <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">
-                    ${trHtml("You have unsaved changes. Leaving now will discard your custom food draft.")}
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-2.5 pt-2">
-                <button 
-                  type="button" 
-                  onclick="window.cancelDiscardCustomFood()"
-                  class="flex-1 py-2.5 rounded-xl border border-outline-variant/40 text-xs font-bold text-on-surface dark:text-white hover:bg-surface-container-low transition-colors"
-                >
-                  ${trHtml("Keep Editing")}
-                </button>
-                <button 
-                  type="button" 
-                  onclick="window.confirmDiscardCustomFood()"
-                  class="flex-1 py-2.5 rounded-xl bg-error text-white text-xs font-bold shadow-xs hover:brightness-105 transition-all"
-                >
-                  ${trHtml("Discard")}
-                </button>
-              </div>
-            </div>
-          </div>
-        ` : ''}
-
-        <!-- Sheet Drag Handle -->
-        <div class="pt-3 pb-1 flex justify-center">
-          <div class="w-10 h-1 rounded-full bg-outline-variant/40"></div>
-        </div>
 
         <!-- Header -->
-        <div class="px-5 py-3 flex items-center justify-between border-b border-outline-variant/20">
+        <div class="ui-dialog-header px-5 py-3 flex items-center justify-between border-b border-outline-variant/20">
           <div>
             <div class="flex items-center gap-2">
               <span class="text-[10px] font-extrabold uppercase tracking-widest text-primary dark:text-primary-container">
@@ -127,7 +89,7 @@ export function renderCustomFoodModal(): string {
         </div>
 
         <!-- 4-Step Progress Indicator -->
-        <div class="px-5 pt-3 pb-2 bg-surface-container-lowest dark:bg-dark-surface-card border-b border-outline-variant/15">
+        <div class="ui-dialog-header px-5 pt-3 pb-2 bg-surface-container-lowest dark:bg-dark-surface-card border-b border-outline-variant/15">
           <div class="grid grid-cols-4 gap-2">
             ${[1, 2, 3, 4].map(stepNum => {
               const isCompleted = stepNum < currentStep;
@@ -165,12 +127,12 @@ export function renderCustomFoodModal(): string {
         </div>
 
         <!-- Step Content (Scrollable Body) -->
-        <div class="px-5 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
+        <div class="ui-dialog-body px-5 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
           ${renderStepContent(currentStep, draft, errors, isEditing, dupWarning)}
         </div>
 
         <!-- Bottom Action Bar -->
-        <div class="px-5 py-3 border-t border-outline-variant/20 bg-surface-container-lowest dark:bg-dark-surface-card flex items-center gap-2.5">
+        <div class="ui-dialog-footer px-5 py-3 border-t border-outline-variant/20 bg-surface-container-lowest dark:bg-dark-surface-card flex items-center gap-2.5">
           ${currentStep > 1 ? `
             <button 
               type="button" 
@@ -247,7 +209,7 @@ function renderStep1(
   return `
     <!-- Duplicate Warning Banner -->
     ${dupWarning ? `
-      <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs flex flex-col gap-2 animate-fade-in">
+      <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs flex flex-col gap-2">
         <div class="flex items-start gap-2.5">
           <span class="material-symbols-outlined text-[20px] text-amber-600 shrink-0 mt-0.5">warning</span>
           <div>
@@ -436,7 +398,7 @@ function renderStep2(
 
       <!-- Specific Fields when Per Serving is Selected -->
       ${basisType === 'per_serving' ? `
-        <div class="p-3.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex flex-col gap-3 animate-fade-in">
+        <div class="p-3.5 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex flex-col gap-3">
           <div class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] text-primary">lunch_dining</span>
             <span class="text-[11px] font-bold text-on-surface dark:text-white">${trHtml("Define This Serving")}</span>
@@ -687,7 +649,7 @@ function renderStep3(
         </div>
 
         ${isStale ? `
-          <div class="p-2 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-400 text-[11px] font-semibold flex items-center justify-between animate-fade-in">
+          <div class="p-2 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-400 text-[11px] font-semibold flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[14px]">sync_problem</span>
               <span>${trHtml("Macros updated — calories out of sync")}</span>
@@ -735,7 +697,7 @@ function renderStep3(
 
       <!-- 4. Inline Calorie Consistency Warning / Acknowledged Banner -->
       ${shouldWarn && !draft.calorieWarningAcknowledged && consistency ? `
-        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col gap-2 animate-fade-in text-xs">
+        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col gap-2 text-xs">
           <div class="flex items-start gap-2">
             <span class="material-symbols-outlined text-[20px] text-amber-600 shrink-0 mt-0.5">warning</span>
             <div class="flex-1">
@@ -776,7 +738,7 @@ function renderStep3(
       ` : ''}
 
       ${shouldWarn && draft.calorieWarningAcknowledged && consistency ? `
-        <div class="px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-between text-xs animate-fade-in">
+        <div class="px-3 py-2 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-between text-xs">
           <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant dark:text-gray-400">
             <span class="material-symbols-outlined text-[14px] text-amber-500">info</span>
             <span>${trHtml("Entered calories kept (")}${formatDisplayNumber(draft.calories)} ${trHtml("kcal,")} <strong class="text-on-surface dark:text-white">${Math.round(consistency.differenceCalories)} ${trHtml("kcal")}</strong> ${trHtml("diff)")}</span>
@@ -942,7 +904,7 @@ function renderStep3(
       </button>
 
       ${draft.isMicronutrientsExpanded ? `
-        <div class="px-4 pb-4 pt-2 border-t border-outline-variant/20 grid grid-cols-2 gap-2.5 animate-fade-in text-xs">
+        <div class="px-4 pb-4 pt-2 border-t border-outline-variant/20 grid grid-cols-2 gap-2.5 text-xs">
           <div>
             <label for="cf-vit-c" class="text-[10px] font-semibold text-on-surface-variant dark:text-gray-400 block mb-1">${trHtml("Vitamin C (mg)")}</label>
             <input 
@@ -1111,7 +1073,7 @@ function renderStep4(
               type="number" 
               step="any"
               inputmode="decimal"
-              id="cf-new-portion-qty"
+              id="cf-new-portion-qty" data-dialog-draft
               placeholder="${trHtml("Qty (1)")}"
               value="1"
               class="w-full px-2 py-1.5 rounded-lg bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white"
@@ -1120,7 +1082,7 @@ function renderStep4(
 
           <div class="col-span-4">
             <select 
-              id="cf-new-portion-unit"
+              id="cf-new-portion-unit" data-dialog-draft
               class="w-full px-2 py-1.5 rounded-lg bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white capitalize"
             >
               <option value="scoop">${trHtml("scoop")}</option>
@@ -1142,7 +1104,7 @@ function renderStep4(
               type="number" 
               step="any"
               inputmode="decimal"
-              id="cf-new-portion-equiv"
+              id="cf-new-portion-equiv" data-dialog-draft
               placeholder="= (${defaultEquivUnit})"
               class="w-full px-2 py-1.5 rounded-lg bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-semibold text-on-surface dark:text-white"
             />
@@ -1277,5 +1239,42 @@ function renderStep4(
         </button>
       </div>
     ` : ''}
+  `;
+}
+
+function renderDiscardDialog(): string {
+  return `
+    <div id="custom-food-discard-backdrop" data-dialog-close="window.cancelDiscardCustomFood()" role="dialog" aria-modal="true" aria-labelledby="custom-food-discard-title" class="ui-dialog-layer fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-5">
+            <div class="ui-dialog-panel w-full max-w-sm bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-5 border border-outline-variant/30 shadow-2xl flex flex-col gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+                  <span class="material-symbols-outlined text-[24px]">warning</span>
+                </div>
+                <div>
+                  <h3 id="custom-food-discard-title" class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${trHtml("Discard Changes?")}</h3>
+                  <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">
+                    ${trHtml("You have unsaved changes. Leaving now will discard your custom food draft.")}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onclick="window.cancelDiscardCustomFood()"
+                  class="flex-1 py-2.5 rounded-xl border border-outline-variant/40 text-xs font-bold text-on-surface dark:text-white hover:bg-surface-container-low transition-colors"
+                >
+                  ${trHtml("Keep Editing")}
+                </button>
+                <button
+                  type="button"
+                  onclick="window.confirmDiscardCustomFood()"
+                  class="flex-1 py-2.5 rounded-xl bg-error text-white text-xs font-bold shadow-xs hover:brightness-105 transition-all"
+                >
+                  ${trHtml("Discard")}
+                </button>
+              </div>
+            </div>
+          </div>
   `;
 }

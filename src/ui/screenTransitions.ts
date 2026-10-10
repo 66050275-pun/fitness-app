@@ -1,4 +1,5 @@
 import type { AppState } from '../types/index.ts';
+import { Dialogs } from './dialogs.ts';
 
 type Route = { key: string; root: string; depth: number };
 function routeFor(state: AppState): Route {
@@ -19,6 +20,7 @@ function routeFor(state: AppState): Route {
 
 /** Animate only the newly mounted view. No screenshots or previous private DOM are retained. */
 export class ScreenTransitions {
+  private dialogs = new Dialogs();
   private current: Route | null = null;
   private history: string[] = [];
   private scrollPositions = new Map<string, number>();
@@ -35,10 +37,12 @@ export class ScreenTransitions {
   }
   private cancel() { this.animations.forEach(animation => animation.cancel()); this.animations = []; }
   reset() {
+    this.dialogs.reset();
     this.cancel(); this.current = null; this.history = []; this.scrollPositions.clear();
     this.screenHtml = ''; this.navigationHtml = ''; this.overlaysHtml = '';
   }
   render(app: HTMLElement, state: AppState, screenHtml: string, navigationHtml: string, overlaysHtml: string) {
+    this.dialogs.capture();
     const route = routeFor(state);
     const changed = route.key !== this.current?.key;
     const reduced = state.userPreferences.reduceMotion || this.media.matches;
@@ -86,6 +90,7 @@ export class ScreenTransitions {
     if (navigationHtml !== this.navigationHtml) { nav.innerHTML = navigationHtml; this.navigationHtml = navigationHtml; }
     const overlays = app.querySelector<HTMLElement>('#app-overlays')!;
     if (overlaysHtml !== this.overlaysHtml) { overlays.innerHTML = overlaysHtml; this.overlaysHtml = overlaysHtml; }
+    this.dialogs.sync(changed);
     if (changed) {
       window.scrollTo({ top: back ? this.scrollPositions.get(route.key) || 0 : 0, behavior: 'instant' as ScrollBehavior });
       const heading = screen.querySelector<HTMLElement>('h1, h2');
@@ -103,4 +108,6 @@ export class ScreenTransitions {
     }
     this.current = route;
   }
+
+  closeDialog() { return this.dialogs.closeTop(); }
 }

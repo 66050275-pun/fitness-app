@@ -51,20 +51,16 @@ export function renderSetPortionModal(): string {
   );
 
   return `
-    <div id="set-portion-modal-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center animate-fade-in">
+    <div id="set-portion-modal-backdrop" data-dialog-close="window.closeSetPortionModal()" class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center">
       <div 
-        class="w-full max-w-lg max-h-[92vh] flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden animate-slide-up"
+        class="ui-dialog-panel w-full max-w-lg flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="set-portion-title"
       >
-        <!-- Modal Handle -->
-        <div class="pt-3 pb-1 flex justify-center">
-          <div class="w-10 h-1 rounded-full bg-outline-variant/40"></div>
-        </div>
 
         <!-- Header -->
-        <div class="px-5 py-3 flex items-start justify-between border-b border-outline-variant/20">
+        <div class="ui-dialog-header px-5 py-3 flex items-start justify-between border-b border-outline-variant/20">
           <div class="flex-1 pr-3">
             <div class="flex items-center gap-2">
               <span class="text-[10px] font-extrabold uppercase tracking-widest text-primary dark:text-primary-container">
@@ -95,7 +91,7 @@ export function renderSetPortionModal(): string {
         </div>
 
         <!-- Scrollable Content -->
-        <div class="px-5 py-4 overflow-y-auto flex flex-col gap-4">
+        <div class="ui-dialog-body px-5 py-4 overflow-y-auto flex flex-col gap-4">
 
           <!-- Quantity & Unit Inputs -->
           <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
@@ -273,7 +269,7 @@ export function renderSetPortionModal(): string {
         </div>
 
         <!-- Footer Action CTA -->
-        <div class="p-4 bg-surface-container-lowest dark:bg-dark-surface-card border-t border-outline-variant/20 flex gap-2.5">
+        <div class="ui-dialog-footer p-4 bg-surface-container-lowest dark:bg-dark-surface-card border-t border-outline-variant/20 flex gap-2.5">
           <button 
             type="button" 
             onclick="window.closeSetPortionModal()" 

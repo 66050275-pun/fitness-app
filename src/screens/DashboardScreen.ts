@@ -8,14 +8,6 @@ import { clampProgressRatio, formatDisplayNumber, formatRemainingCalories, safeR
 import type { DashboardWidgetId } from '../types/index.ts';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 
-const DASHBOARD_WIDGETS: Record<DashboardWidgetId, { label: string; icon: string }> = {
-  energy: { label: 'Daily Energy Budget', icon: 'bolt' },
-  macros: { label: 'Macronutrients', icon: 'donut_large' },
-  hydration: { label: 'Hydration', icon: 'water_drop' },
-  coach: { label: 'AI Nutrition Coach', icon: 'auto_awesome' },
-  meals: { label: 'Today’s Meals', icon: 'restaurant' }
-};
-
 export function renderDashboardScreen(): string {
   const state = store.getState();
   const selectedDate = state.selectedDate;
@@ -301,46 +293,7 @@ export function renderDashboardScreen(): string {
 
       </main>
 
-      ${state.dashboardWidgetDrawerOpen ? `
-        <div class="fixed inset-0 z-[80] flex items-end justify-center bg-black/35 backdrop-blur-[2px]" onclick="window.toggleDashboardWidgetDrawer(false)">
-          <section class="w-full max-w-[430px] rounded-t-[28px] bg-surface dark:bg-dark-surface border-t border-outline-variant/30 shadow-2xl px-5 pt-3 pb-8" onclick="event.stopPropagation()" aria-label="${trHtml("Customize Home widgets")}">
-            <div class="w-10 h-1 rounded-full bg-outline-variant/60 mx-auto mb-4"></div>
-            <div class="flex items-start justify-between mb-4">
-              <div>
-                <h2 class="font-heading text-base font-extrabold text-on-surface dark:text-white">${trHtml("Customize Home")}</h2>
-                <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Move widgets or add and remove them from Home.")}</p>
-              </div>
-              <button onclick="window.toggleDashboardWidgetDrawer(false)" class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant" aria-label="${trHtml("Close widget drawer")}">
-                <span class="material-symbols-outlined text-[18px]">close</span>
-              </button>
-            </div>
 
-            <div class="flex flex-col gap-2">
-              ${state.dashboardWidgetOrder.map((id, index) => {
-                const widget = DASHBOARD_WIDGETS[id];
-                const hidden = state.hiddenDashboardWidgets.includes(id);
-                return `
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border ${hidden ? 'border-dashed border-outline-variant/50 bg-surface-container-low/60 opacity-75' : 'border-outline-variant/30 bg-surface-container-lowest dark:bg-dark-surface-card'}">
-                    <span class="material-symbols-outlined text-[19px] text-primary dark:text-primary-container">${widget.icon}</span>
-                    <span class="flex-1 font-heading text-xs font-bold text-on-surface dark:text-white">${widget.label}</span>
-                    <div class="flex items-center gap-1">
-                      <button onclick="window.moveDashboardWidget(${htmlJsArg(id)}, -1)" ${index === 0 ? 'disabled' : ''} class="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant disabled:opacity-25" aria-label="${trHtml("Move {0} up", widget.label)}">
-                        <span class="material-symbols-outlined text-[17px]">keyboard_arrow_up</span>
-                      </button>
-                      <button onclick="window.moveDashboardWidget(${htmlJsArg(id)}, 1)" ${index === state.dashboardWidgetOrder.length - 1 ? 'disabled' : ''} class="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant disabled:opacity-25" aria-label="${trHtml("Move {0} down", widget.label)}">
-                        <span class="material-symbols-outlined text-[17px]">keyboard_arrow_down</span>
-                      </button>
-                      <button onclick="window.toggleDashboardWidget(${htmlJsArg(id)})" class="h-8 min-w-[64px] px-2 rounded-lg text-[10px] font-bold ${hidden ? 'bg-primary text-white' : 'bg-error/10 text-error'}">
-                        ${hidden ? tr("Add") : tr("Remove")}
-                      </button>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </section>
-        </div>
-      ` : ''}
 
     </div>
   `;

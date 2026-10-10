@@ -81,22 +81,17 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
     <div 
       id="planner-detail-modal-backdrop"
       onclick="if(event.target === this) window.closePlannerDateDetail()"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center animate-fade-in"
+      class="ui-dialog-layer bg-black/60 backdrop-blur-xs"
+      data-dialog-close="window.closePlannerDateDetail()"
       role="dialog"
       aria-modal="true"
       aria-labelledby="planner-detail-modal-title"
     >
       <div 
-        class="w-full max-w-md max-h-[90vh] bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden flex flex-col animate-slide-up"
-        style="padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);"
+        class="ui-dialog-panel bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-modal"
       >
-        <!-- Pull Handle -->
-        <div class="pt-3 pb-1 flex justify-center shrink-0">
-          <div class="w-10 h-1 rounded-full bg-outline-variant/50"></div>
-        </div>
-
         <!-- Header -->
-        <div class="px-5 py-3 flex items-center justify-between border-b border-outline-variant/20 shrink-0">
+        <div class="ui-dialog-header px-5 py-4 flex items-center justify-between gap-3 border-b border-outline-variant/20">
           <div>
             <div class="flex items-center gap-2 mb-1">
               ${statusBadge}
@@ -113,21 +108,21 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
             type="button" 
             onclick="window.closePlannerDateDetail()"
             aria-label="${trHtml("Close date detail")}"
-            class="w-8 h-8 rounded-full bg-surface-container dark:bg-dark-surface-card-high text-on-surface-variant dark:text-gray-300 hover:text-on-surface flex items-center justify-center transition-colors"
+            class="w-8 h-8 shrink-0 rounded-full bg-surface-container dark:bg-dark-surface-card-high text-on-surface-variant dark:text-gray-300 hover:text-on-surface flex items-center justify-center transition-colors"
           >
             <span class="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
         <!-- Scrollable Content -->
-        <div class="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4 no-scrollbar">
+        <div class="ui-dialog-body px-5 py-4 flex flex-col gap-4">
           
           ${completedWorkout ? `
             <!-- Completed Workout Card -->
             <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                  <div class="w-8 h-8 shrink-0 rounded-full bg-emerald-500 text-white flex items-center justify-center">
                     <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check</span>
                   </div>
                   <div>
@@ -252,13 +247,13 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
 
             <!-- Change Workout Preset Dropdown -->
             <div class="p-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex items-center justify-between gap-3">
-              <span class="text-xs font-bold text-on-surface dark:text-white">
+              <span class="min-w-0 text-xs font-bold text-on-surface dark:text-white">
                 ${trHtml("Assign Routine:")}
               </span>
               <select 
                 onchange="if(this.value) window.handleDateWorkoutOverride(${htmlJsArg(dateKey)}, this.value)"
                 aria-label="${trHtml("Change routine for this date")}"
-                class="text-xs font-semibold py-1.5 px-2.5 rounded-lg bg-surface dark:bg-dark-surface border border-outline-variant/40 text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer max-w-[180px]"
+                class="min-w-0 flex-1 text-xs font-semibold py-1.5 px-2.5 rounded-lg bg-surface dark:bg-dark-surface border border-outline-variant/40 text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer max-w-[180px]"
               >
                 <option value="">${trHtml("-- Choose Option --")}</option>
                 <option value="rest">${trHtml("😴 Set as Rest Day")}</option>

@@ -9,8 +9,6 @@ import type { WorkoutPreset, WorkoutExercise, ActiveWorkoutSessionState, Workout
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 import { renderMonthlyFitnessCalendar } from '../components/Fitness/MonthlyFitnessCalendar';
-import { renderWeeklyProgramEditorModal } from '../components/Fitness/WeeklyProgramEditorModal';
-import { renderPlannerDateDetailModal } from '../components/Fitness/PlannerDateDetailModal';
 import { renderTodaysWorkoutCard } from '../components/Fitness/TodaysWorkoutCard';
 
 export function renderFitnessScreen(passedState?: AppState): string {
@@ -237,8 +235,6 @@ function renderWorkoutHomeView(state: AppState): string {
         `}
       </main>
 
-      ${renderWeeklyProgramEditorModal()}
-      ${renderPlannerDateDetailModal()}
       ${state.plannerToastMessage ? `
         <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-surface dark:bg-white dark:text-dark-surface px-4 py-2 rounded-full text-xs font-bold shadow-lg animate-fade-in flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>

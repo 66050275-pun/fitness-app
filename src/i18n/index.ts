@@ -30,7 +30,8 @@ if (typeof document !== 'undefined') document.documentElement.lang = language;
 
 const dictionary: Record<string, { en: string; th: string }> = Object.assign(Object.create(null), messages);
 const labelKeys = new Map(Object.entries(dictionary).flatMap(([key, entry]) => [[entry.en, key], [entry.th, key]] as [string, string][]));
-const templateLabels = Object.entries(dictionary).flatMap(([key, entry]) => [entry.en, entry.th].flatMap(template => {
+// Retain original lookup templates when display labels are corrected or renamed.
+const templateLabels = Object.entries(dictionary).flatMap(([key, entry]) => [...new Set([key, entry.en, entry.th])].flatMap(template => {
   const indices: number[] = [];
   const parts = template.split(/(\{\d+\})/).map(part => {
     if (/^\{\d+\}$/.test(part)) { indices.push(Number(part.slice(1, -1))); return '(.*?)'; }

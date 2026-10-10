@@ -56,7 +56,9 @@ Brand accents in Tailwind:
 - Use the existing spacing scale: 4, 8, 12, 16, 20, 24 and 32px for most layouts.
 - Main cards: **24px** corners (`rounded-2xl` / `--ui-radius`), generally 16–24px internal padding.
 - Primary buttons: typically 16–24px corners. Inputs: approximately 14px corners. Chips and segmented controls use pill shapes.
-- Bottom sheets use **28–32px** top corners, a clear title and a bounded scrollable body.
+- Drawers open as centered dialogs with **24px** corners on all sides, a clear title, a close control and a bounded scrollable body. Use `.ui-dialog-layer`, `.ui-dialog-panel` and `.ui-dialog-body`; keep headers and action bars outside the scroll body where practical.
+- Fit dialogs to the visible viewport, including keyboard and browser bar changes. Reserve the privacy status bar, 12px edge gutters and safe areas. Streamlit uses a viewport-height iframe, with scrolling inside the app rather than in the host page.
+- Show one active dialog at a time; hide and disable any underlying dialog during a drilldown or confirmation, then restore it on close. Preserve form text, focus, selection and internal scroll across data updates. Lock background scrolling while a dialog is open and restore it on close. Escape and the device Back button dismiss the active dialog before navigating; keep the privacy Lock control available.
 - Shared light card shadow: `0 4px 20px -2px rgba(23,32,27,0.04)`; dark equivalent uses `rgba(0,0,0,0.15)`.
 - Preserve the existing fixed bottom navigation, centered action button and sticky headers. Keep content clear of fixed controls.
 - Account for `safe-area-inset-top` and `safe-area-inset-bottom`. The privacy status bar reserves **44px plus the top safe area**; sticky page headers sit below it.
@@ -121,4 +123,5 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - `src/security/vaultUI.ts`: passphrase gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
+- `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.
 - `src/i18n/`: bilingual presentation helpers and messages.

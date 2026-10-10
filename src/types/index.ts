@@ -423,7 +423,6 @@ export interface AppState {
   meals: MealItem[];
   chatHistory: ChatMessage[];
   lastScannedFood: ScannedFood | null;
-  quickActionOpen: boolean;
   quickAddOpen: boolean;
   dashboardWidgetOrder: DashboardWidgetId[];
   hiddenDashboardWidgets: DashboardWidgetId[];

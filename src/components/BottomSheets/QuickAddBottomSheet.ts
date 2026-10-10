@@ -7,8 +7,8 @@ export function renderQuickAddBottomSheet(): string {
 
   return `
     <div 
-      id="quick-add-backdrop"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs transition-opacity animate-fade-in" 
+      id="quick-add-backdrop" data-dialog-close="window.closeQuickAdd()"
+      class="ui-dialog-layer fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs transition-opacity"
       onclick="if(event.target === this) window.closeQuickAdd()"
       role="dialog"
       aria-modal="true"
@@ -16,15 +16,12 @@ export function renderQuickAddBottomSheet(): string {
     >
       <div 
         id="quick-add-sheet"
-        class="w-full max-w-[430px] bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[32px] p-6 shadow-2xl border-t border-outline-variant/30 transform transition-transform animate-slide-up flex flex-col gap-4.5 pb-8 safe-bottom"
+        class="ui-dialog-panel w-full max-w-[430px] bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[32px] p-6 shadow-2xl border-t border-outline-variant/30 transform transition-transform flex flex-col gap-4.5 pb-8 safe-bottom"
         onclick="event.stopPropagation()"
       >
-        
-        <!-- Drag Handle Indicator -->
-        <div class="w-12 h-1.5 bg-outline-variant/60 rounded-full mx-auto -mt-1 cursor-grab"></div>
 
         <!-- Header Row -->
-        <div class="flex items-center justify-between pt-1">
+        <div class="ui-dialog-header flex items-start justify-between gap-3 pt-1">
           <div>
             <h2 id="quick-add-title" class="font-heading text-lg font-bold text-on-surface dark:text-white leading-tight">${trHtml("Quick Add")}</h2>
             <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Log nutrition in the way that works for you")}</p>
@@ -33,14 +30,14 @@ export function renderQuickAddBottomSheet(): string {
             type="button"
             onclick="window.closeQuickAdd()" 
             aria-label="${trHtml("Close Quick Add")}"
-            class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
+            class="shrink-0 w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
           >
             <span class="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         <!-- 4 Primary Action Buttons -->
-        <div class="flex flex-col gap-2.5 pt-1">
+        <div class="ui-dialog-body flex flex-col gap-2.5 pt-1">
           
           <!-- Action A: Scan Food (Camera Lens) -->
           <button 

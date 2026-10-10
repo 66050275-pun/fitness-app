@@ -137,6 +137,38 @@ body { background: var(--ui-panel); color: var(--ui-text); }
 .ui-primary-button:hover { background: #005c2d; }
 .ui-primary-button:active { transform: scale(0.99); }
 
+/* Dialogs fit the visible phone viewport; the page behind them stays still. */
+html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-behavior: none; }
+.ui-dialog-layer {
+  position: fixed; inset: auto 0; top: var(--ui-visible-top, 0px);
+  height: var(--ui-visible-height, 100vh); height: var(--ui-visible-height, 100dvh);
+  z-index: 200; display: flex; flex-direction: row; align-items: center; justify-content: center;
+  box-sizing: border-box; overflow: hidden;
+  padding: calc(var(--vault-bar-height) + 12px) 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  animation: ui-dialog-backdrop 180ms var(--ui-motion-easing);
+}
+.ui-dialog-layer[hidden] { display: none; }
+.ui-dialog-panel {
+  display: flex; flex-direction: column;
+  width: 100%; max-width: 406px; min-width: 0; min-height: 0; max-height: 100%;
+  flex: 0 1 auto; margin: 0; border: 1px solid var(--ui-border); border-radius: var(--ui-radius);
+  overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--ui-border) transparent;
+  animation: ui-dialog-entry 180ms var(--ui-motion-easing);
+}
+.ui-dialog-panel > * { flex-shrink: 0; min-width: 0; }
+.ui-dialog-header, .ui-dialog-footer { flex-shrink: 0; }
+.ui-dialog-body {
+  min-height: 64px; min-width: 0; flex-shrink: 1; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--ui-border) transparent;
+}
+.ui-dialog-body > * { flex-shrink: 0; min-width: 0; }
+.ui-dialog-panel :where(h2, h3, p, label) { overflow-wrap: anywhere; }
+.ui-dialog-panel button:has(> .material-symbols-outlined:only-child) { flex-shrink: 0; }
+.vault-status-bar { top: var(--ui-visible-top, 0px); }
+@keyframes ui-dialog-backdrop { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ui-dialog-entry { from { opacity: 0.4; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+
 /* Numeric readouts may wrap, but never clip or hide the full value. */
 .ui-number { min-width: 0; max-width: 100%; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .ui-number-grid > *, .ui-stat-grid > * { min-width: 0; }

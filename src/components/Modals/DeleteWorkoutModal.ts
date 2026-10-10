@@ -16,17 +16,18 @@ export function renderDeleteWorkoutModal(): string {
 
   return `
     <div 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      id="delete-workout-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-workout-title" data-dialog-close="window.closeDeleteModal()"
+      class="ui-dialog-layer fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onclick="if(event.target === this) window.closeDeleteModal()"
     >
-      <div class="w-full max-w-[340px] bg-surface-container-lowest dark:bg-dark-surface-card rounded-3xl p-5 shadow-2xl border border-outline-variant/30 flex flex-col gap-4 animate-scale-up">
+      <div class="ui-dialog-panel w-full max-w-[340px] bg-surface-container-lowest dark:bg-dark-surface-card rounded-3xl p-5 shadow-2xl border border-outline-variant/30 flex flex-col gap-4">
         
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-error/10 text-error flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-[24px]">delete</span>
           </div>
           <div>
-            <h3 class="font-heading font-extrabold text-sm text-on-surface dark:text-white leading-snug">${title}</h3>
+            <h3 id="delete-workout-title" class="font-heading font-extrabold text-sm text-on-surface dark:text-white leading-snug">${title}</h3>
             <span class="text-[11px] text-error font-semibold">${trHtml("Irreversible action")}</span>
           </div>
         </div>
