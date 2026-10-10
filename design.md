@@ -98,6 +98,14 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - The map communicates affected regions; it does not represent intensity or a personalized medical assessment.
 - Keep artwork, fonts and translation resources local to the app bundle.
 
+### Rest interval clock
+
+- Completing a set opens a focused, centered clock using the shared viewport and dialog infrastructure. Keep the privacy bar and Lock control visible.
+- Use a large 2D circular dial with fine radial ticks, green remaining progress, a prominent tabular **mm:ss** readout and the localized finish time. Apply the existing light/dark surface colors and heading font.
+- Put **+30 seconds** below the dial and large circular Pause/Resume and Skip Rest controls at the bottom. Preserve readable labels and scroll the body on short screens while keeping controls accessible.
+- Back closes the clock while the rest continues; the compact workout timer reopens it. Skip ends the rest. Rest Pause affects the rest countdown; the workout's Pause freezes both timers. Resume Workout resumes the session while preserving any separate rest pause.
+- Derive the rest countdown from its local deadline rather than interval callback counts. Update the dial in place without restarting transitions or moving focus, and close it when the rest finishes. Timer state stays in memory and is cleared when the vault locks.
+
 ## English and Thai
 
 - The selected language applies throughout the app: lock screen, navigation, settings, forms, calendars, validation, exercise names, muscle labels and demo replies.

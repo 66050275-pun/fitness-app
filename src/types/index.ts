@@ -278,6 +278,9 @@ export interface ActiveWorkoutSessionState {
   exercises: WorkoutExercise[];
   restTimerSeconds: number | null;
   restTimerTotal: number;
+  restTimerPaused: boolean;
+  restTimerOpen: boolean;
+  restTimerEndsAt: number | null;
   scheduledDate?: string; // YYYY-MM-DD if started from planned routine
 }
 

@@ -508,17 +508,18 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
           </div>
         </div>
 
-        <!-- Rest Timer Countdown Card (Shows when active) -->
+        <!-- The clock can keep running while the user views their workout. -->
         ${restTimerSeconds !== null ? `
-          <div class="p-3.5 rounded-2xl bg-gradient-to-r from-[#e6f8f5] to-[#effdf4] dark:from-dark-surface-card dark:to-dark-surface-card-high border border-tertiary-container/40 ai-luminescence flex items-center justify-between animate-fade-in">
-            <div class="flex items-center gap-2.5">
-              <span class="material-symbols-outlined text-tertiary text-[24px]" style="font-variation-settings: 'FILL' 1;">timer</span>
-              <div>
-                <span class="text-[10px] uppercase font-bold text-tertiary dark:text-tertiary-fixed tracking-wider block">${trHtml("Rest Interval")}</span>
-                <span id="active-rest-timer-countdown" class="font-display font-extrabold text-lg text-on-surface dark:text-white leading-none">${restTimerSeconds} ${trHtml("s")}</span>
+          <div class="p-3 rounded-2xl bg-primary/5 dark:bg-dark-surface-card border border-primary/25 flex items-center gap-3 animate-fade-in">
+            <button type="button" onclick="window.openRestTimer()" class="min-w-0 flex-1 flex items-center gap-2.5 text-left" aria-label="${trHtml('Open rest timer')}">
+              <span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[24px]" aria-hidden="true">timer</span>
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] uppercase font-bold text-primary dark:text-primary-fixed tracking-wider block">${trHtml(activeWorkout.restTimerPaused || isPaused ? 'Rest paused' : 'Rest Interval')}</span>
+                <span id="active-rest-timer-compact" class="font-display font-extrabold text-lg text-on-surface dark:text-white leading-none tabular-nums">${store.formatTimerString(restTimerSeconds)}</span>
               </div>
-            </div>
-            <button onclick="window.skipRestTimer()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-gray-700 text-tertiary dark:text-white text-xs font-bold shadow-sm active:scale-95 transition-all">
+              <span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[20px]" aria-hidden="true">open_in_full</span>
+            </button>
+            <button type="button" onclick="window.skipRestTimer()" class="shrink-0 px-3 py-2 rounded-xl bg-white dark:bg-dark-surface-card-high text-primary dark:text-primary-fixed text-xs font-bold shadow-sm active:scale-95 transition-all">
               ${trHtml("Skip Rest")}
             </button>
           </div>

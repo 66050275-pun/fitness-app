@@ -3,6 +3,7 @@ import { tr, getLanguage, hasLanguageChoice, setLanguage, getLocale } from '../i
 import { privateStorage } from '../services/privateStorage.ts';
 import type { 
   AppState, 
+  ActiveWorkoutSessionState,
   MealItem, 
   ScannedFood, 
   ChatMessage, 
@@ -441,9 +442,10 @@ class Store {
   private lastDeviceDateKey = getTodayKey();
   private listeners: Set<() => void> = new Set();
   private workoutTimerInterval: ReturnType<typeof setInterval> | null = null;
-  private restTimerInterval: ReturnType<typeof setInterval> | null = null;
+  private workoutTimerLastTick: number | null = null;
+  private workoutTimerListeners = new Set<(workout: ActiveWorkoutSessionState) => void>();
 
-  dispose() { this.disposed = true; this.listeners.clear(); this.stopWorkoutTimers(); this.setProfileImageUrl(null); this.state = null!; }
+  dispose() { this.disposed = true; this.listeners.clear(); this.workoutTimerListeners.clear(); this.stopWorkoutTimers(); this.setProfileImageUrl(null); this.state = null!; }
 
   constructor() {
     const persisted = loadPersistedAppData(INITIAL_MEALS);
@@ -585,6 +587,11 @@ class Store {
     return () => this.listeners.delete(listener);
   }
 
+  public subscribeWorkoutTimer(listener: (workout: ActiveWorkoutSessionState) => void): () => void {
+    this.workoutTimerListeners.add(listener);
+    return () => this.workoutTimerListeners.delete(listener);
+  }
+
   private notify() {
     if (this.disposed) return;
     this.listeners.forEach(cb => cb());
@@ -606,6 +613,7 @@ class Store {
     this.state.plannerConfirmOverwriteMonth = null;
     this.state.profileConfirmModal = null;
     this.state.deleteConfirmationWorkoutId = null;
+    if (this.state.activeWorkout) this.state.activeWorkout.restTimerOpen = false;
     this.notify();
   }
 
@@ -1453,6 +1461,7 @@ class Store {
 
   public setFitnessSubView(view: FitnessSubView) {
     this.state.fitnessSubView = view;
+    if (view !== 'active' && this.state.activeWorkout) this.state.activeWorkout.restTimerOpen = false;
     this.notify();
   }
 
@@ -1744,6 +1753,9 @@ class Store {
       exercises: JSON.parse(JSON.stringify(this.state.draftWorkout)),
       restTimerSeconds: null,
       restTimerTotal: 60,
+      restTimerPaused: false,
+      restTimerOpen: false,
+      restTimerEndsAt: null,
       scheduledDate: this.state.selectedPlannerDate || undefined
     };
 
@@ -1754,28 +1766,49 @@ class Store {
 
   private startWorkoutTimerInterval() {
     this.stopWorkoutTimers();
+    this.workoutTimerLastTick = Date.now();
     this.workoutTimerInterval = setInterval(() => {
-      if (this.state.activeWorkout && !this.state.activeWorkout.isPaused) {
-        this.state.activeWorkout.elapsedSeconds += 1;
-        
-        if (this.state.activeWorkout.restTimerSeconds !== null) {
-          if (this.state.activeWorkout.restTimerSeconds > 1) {
-            this.state.activeWorkout.restTimerSeconds -= 1;
-          } else {
-            this.state.activeWorkout.restTimerSeconds = null;
-          }
-        }
-
-        const timerEl = document.getElementById('active-workout-timer-display');
-        if (timerEl) {
-          timerEl.textContent = this.formatTimerString(this.state.activeWorkout.elapsedSeconds);
-        }
-        const restEl = document.getElementById('active-rest-timer-countdown');
-        if (restEl && this.state.activeWorkout.restTimerSeconds !== null) {
-          restEl.textContent = `${this.state.activeWorkout.restTimerSeconds} ${tr('s')}`;
-        }
-      }
+      const active = this.state.activeWorkout;
+      if (!active) return;
+      const now = Date.now();
+      this.settleWorkoutElapsed(now);
+      const restExpired = this.settleRestTimer(now);
+      const timerEl = document.getElementById('active-workout-timer-display');
+      if (timerEl) timerEl.textContent = this.formatTimerString(active.elapsedSeconds);
+      this.workoutTimerListeners.forEach(listener => listener(active));
+      if (restExpired) this.notify();
     }, 1000);
+  }
+
+  private settleWorkoutElapsed(now: number) {
+    const active = this.state.activeWorkout;
+    if (!active || active.isPaused || this.workoutTimerLastTick === null) {
+      this.workoutTimerLastTick = now;
+      return;
+    }
+    const seconds = Math.max(0, Math.floor((now - this.workoutTimerLastTick) / 1000));
+    active.elapsedSeconds += seconds;
+    this.workoutTimerLastTick += seconds * 1000;
+  }
+
+  private clearRestTimer() {
+    const active = this.state.activeWorkout;
+    if (!active) return;
+    active.restTimerSeconds = null;
+    active.restTimerPaused = false;
+    active.restTimerOpen = false;
+    active.restTimerEndsAt = null;
+  }
+
+  /** Use the deadline so delayed browser callbacks do not lengthen a rest. */
+  private settleRestTimer(now = Date.now()): boolean {
+    const active = this.state.activeWorkout;
+    if (!active || active.restTimerSeconds === null || active.restTimerPaused || active.isPaused) return false;
+    active.restTimerEndsAt ??= now + active.restTimerSeconds * 1000;
+    active.restTimerSeconds = Math.max(0, Math.ceil((active.restTimerEndsAt - now) / 1000));
+    if (active.restTimerSeconds > 0) return false;
+    this.clearRestTimer();
+    return true;
   }
 
   private stopWorkoutTimers() {
@@ -1783,10 +1816,7 @@ class Store {
       clearInterval(this.workoutTimerInterval);
       this.workoutTimerInterval = null;
     }
-    if (this.restTimerInterval) {
-      clearInterval(this.restTimerInterval);
-      this.restTimerInterval = null;
-    }
+    this.workoutTimerLastTick = null;
   }
 
   public formatTimerString(seconds: number): string {
@@ -1797,8 +1827,15 @@ class Store {
   }
 
   public togglePauseActiveWorkout() {
-    if (!this.state.activeWorkout) return;
-    this.state.activeWorkout.isPaused = !this.state.activeWorkout.isPaused;
+    const active = this.state.activeWorkout;
+    if (!active) return;
+    const now = Date.now();
+    this.settleWorkoutElapsed(now);
+    this.settleRestTimer(now);
+    active.isPaused = !active.isPaused;
+    this.workoutTimerLastTick = now;
+    active.restTimerEndsAt = active.restTimerSeconds !== null && !active.isPaused && !active.restTimerPaused
+      ? now + active.restTimerSeconds * 1000 : null;
     this.notify();
   }
 
@@ -1819,11 +1856,15 @@ class Store {
     ex.sets[setIndex].completed = !currentStatus;
 
     if (!currentStatus) {
-      const restTime = ex.restSeconds || 60;
-      this.state.activeWorkout.restTimerSeconds = restTime;
-      this.state.activeWorkout.restTimerTotal = restTime;
+      const restTime = Math.min(3600, Math.max(1, Math.ceil(safeFiniteNumber(ex.restSeconds, 60) || 60)));
+      const active = this.state.activeWorkout;
+      active.restTimerSeconds = restTime;
+      active.restTimerTotal = restTime;
+      active.restTimerPaused = false;
+      active.restTimerOpen = true;
+      active.restTimerEndsAt = active.isPaused ? null : Date.now() + restTime * 1000;
     } else {
-      this.state.activeWorkout.restTimerSeconds = null;
+      this.clearRestTimer();
     }
 
     this.notify();
@@ -1831,7 +1872,55 @@ class Store {
 
   public skipRestTimer() {
     if (!this.state.activeWorkout) return;
-    this.state.activeWorkout.restTimerSeconds = null;
+    this.clearRestTimer();
+    this.notify();
+  }
+
+  public openRestTimer() {
+    const active = this.state.activeWorkout;
+    if (!active) return;
+    this.settleRestTimer();
+    if (active.restTimerSeconds !== null) active.restTimerOpen = true;
+    this.notify();
+  }
+
+  public closeRestTimer() {
+    const active = this.state.activeWorkout;
+    if (!active) return;
+    this.settleRestTimer();
+    active.restTimerOpen = false;
+    this.notify();
+  }
+
+  public toggleRestTimerPause() {
+    const active = this.state.activeWorkout;
+    if (!active || active.restTimerSeconds === null) return;
+    if (active.isPaused) {
+      this.togglePauseActiveWorkout();
+      return;
+    }
+    const now = Date.now();
+    this.settleRestTimer(now);
+    if (active.restTimerSeconds !== null) {
+      active.restTimerPaused = !active.restTimerPaused;
+      active.restTimerEndsAt = active.restTimerPaused ? null : now + active.restTimerSeconds * 1000;
+    }
+    this.notify();
+  }
+
+  public addRestTimerSeconds(seconds: number) {
+    const active = this.state.activeWorkout;
+    if (!active || !Number.isFinite(seconds) || seconds <= 0) return;
+    const now = Date.now();
+    this.settleRestTimer(now);
+    if (active.restTimerSeconds !== null) {
+      const extra = Math.min(3600 - active.restTimerSeconds, Math.floor(seconds));
+      if (extra > 0) {
+        active.restTimerSeconds += extra;
+        active.restTimerTotal += extra;
+        if (active.restTimerEndsAt !== null) active.restTimerEndsAt += extra * 1000;
+      }
+    }
     this.notify();
   }
 
@@ -1839,7 +1928,7 @@ class Store {
     if (!this.state.activeWorkout) return;
     if (this.state.activeWorkout.currentExerciseIndex < this.state.activeWorkout.exercises.length - 1) {
       this.state.activeWorkout.currentExerciseIndex += 1;
-      this.state.activeWorkout.restTimerSeconds = null;
+      this.clearRestTimer();
       this.notify();
     }
   }
@@ -1848,7 +1937,7 @@ class Store {
     if (!this.state.activeWorkout) return;
     if (this.state.activeWorkout.currentExerciseIndex > 0) {
       this.state.activeWorkout.currentExerciseIndex -= 1;
-      this.state.activeWorkout.restTimerSeconds = null;
+      this.clearRestTimer();
       this.notify();
     }
   }

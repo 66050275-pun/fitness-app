@@ -7167,6 +7167,34 @@
     "en": "in",
     "th": "นิ้ว"
   },
+  "Back to workout": {
+    "en": "Back to workout",
+    "th": "กลับไปดูการออกกำลังกาย"
+  },
+  "Rest timer": {
+    "en": "Rest timer",
+    "th": "จับเวลาพัก"
+  },
+  "Rest paused": {
+    "en": "Rest paused",
+    "th": "หยุดเวลาพักชั่วคราว"
+  },
+  "Ends at {0}": {
+    "en": "Ends at {0}",
+    "th": "พักถึง {0}"
+  },
+  "+30 seconds": {
+    "en": "+30 seconds",
+    "th": "+30 วินาที"
+  },
+  "Resume Workout": {
+    "en": "Resume Workout",
+    "th": "ออกกำลังกายต่อ"
+  },
+  "Open rest timer": {
+    "en": "Open rest timer",
+    "th": "เปิดนาฬิกาจับเวลาพัก"
+  },
   "in workout": {
     "en": "in",
     "th": "ในโปรแกรม"

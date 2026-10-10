@@ -19,6 +19,7 @@ import { renderBottomNav } from './components/Navigation/BottomNav';
 import { renderDashboardWidgetDrawer } from './components/Modals/DashboardWidgetDrawer';
 import { renderWeeklyProgramEditorModal } from './components/Fitness/WeeklyProgramEditorModal';
 import { renderPlannerDateDetailModal } from './components/Fitness/PlannerDateDetailModal';
+import { renderRestTimerDialog, updateRestTimerDisplay } from './components/Fitness/RestTimerDialog';
 import { renderQuickAddBottomSheet } from './components/BottomSheets/QuickAddBottomSheet';
 import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
@@ -108,6 +109,10 @@ declare global {
     updateActiveSetInput: (exerciseIndex: number, setIndex: number, weightVal: string | null, repsVal: string | null) => void;
     completeActiveSet: (exerciseIndex: number, setIndex: number) => void;
     skipRestTimer: () => void;
+    openRestTimer: () => void;
+    closeRestTimer: () => void;
+    toggleRestTimerPause: () => void;
+    addRestTimerSeconds: (seconds: number) => void;
     nextActiveExercise: () => void;
     prevActiveExercise: () => void;
     finishActiveWorkout: () => void;
@@ -531,6 +536,11 @@ window.completeActiveSet = (exerciseIndex: number, setIndex: number) => {
 window.skipRestTimer = () => {
   store.skipRestTimer();
 };
+
+window.openRestTimer = () => store.openRestTimer();
+window.closeRestTimer = () => store.closeRestTimer();
+window.toggleRestTimerPause = () => store.toggleRestTimerPause();
+window.addRestTimerSeconds = (seconds: number) => store.addRestTimerSeconds(seconds);
 
 window.nextActiveExercise = () => {
   store.nextActiveExercise();
@@ -2205,6 +2215,7 @@ function renderApp() {
     ${renderDiaryCalendarModal()}
     ${renderWeightEntryModal()}
     ${renderNutrientDetailModal()}
+    ${renderRestTimerDialog()}
     ${renderDeleteWorkoutModal()}
     ${renderProfileConfirmationModal()}
   `);
@@ -2221,5 +2232,6 @@ function renderApp() {
 void startPrivateApp(() => {
   initializeStore();
   store.subscribe(renderApp);
+  store.subscribeWorkoutTimer(updateRestTimerDisplay);
   renderApp();
 }, () => { screenTransitions.reset(); disposeStore(); });
