@@ -9,7 +9,7 @@ Reference date: 2026-10-12. The actual tokens live in `tailwind.config.js` and `
 - A calm, green wellness app for nutrition tracking and fitness, designed for phone browsers.
 - One centered app column, full width on phones and at most **430px** on larger screens.
 - Pale green backgrounds, rounded cards, clear headings, subtle borders and soft shadows. Dark mode uses deep green surfaces with readable light text.
-- Use the same visual language from the passphrase screen through onboarding, the dashboard, profile settings, exercise catalog and workout screens.
+- Use the same visual language from the PIN lock screen through onboarding, the dashboard, profile settings, exercise catalog and workout screens.
 - Green gradients and restrained glows emphasize primary actions and progress. Keep ordinary forms and informational cards quiet.
 
 ## Colors
@@ -139,11 +139,13 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Use `tr`, `trHtml` and the existing localized label helpers with `src/i18n/messages.json`. Escape dynamic values when rendering HTML.
 - Preserve user-entered names, notes, custom food descriptions and messages. Keep brand names, artwork credits and scientific abbreviations in their original form.
 - Update the document language to `en` or `th`. Display dates with `en-US` or `th-TH-u-ca-gregory-nu-latn`; stored date keys remain `YYYY-MM-DD`.
-- Language selection is available at the passphrase gate and Profile → App Settings → Language. Only the non-sensitive language code is kept outside the encrypted vault for startup presentation.
+- Language selection is available at the PIN gate and Profile → App Settings → Language. Only the non-sensitive language code is kept outside the encrypted vault for startup presentation.
 
 ## Privacy and honest product states
 
-- Treat the passphrase gate, save indicator, Lock control and background privacy shield as part of the same green app theme.
+- Treat the PIN gate, save indicator, Lock control and background privacy shield as part of the same green app theme.
+- The lock screen uses six animated dots and a 3 × 4 circular numeric keypad with letter groups, zero and backspace. The sixth digit submits automatically. Creation asks for the PIN twice; mismatches shake and return to the first step. Keep touch targets at 64–72px, use green filled dots, and respect reduced motion.
+- Show verification and persistent lockout countdowns in place. Keypad and language controls are disabled during cryptographic work. Existing passphrase vaults display a migration form before choosing a PIN, preserving their data and explaining original-backup credentials.
 - Distinguish saving, saved and failed states accurately; show actionable storage errors without claiming success.
 - Keep the existing encrypted browser vault and encrypted backup flow. Explain relevant limitations when users make decisions about backup, restore or clearing data.
 - Label scanner and coach preview functionality truthfully. UI copy should match the current capabilities, including the absence of automatic device sync and password recovery.
@@ -155,7 +157,7 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - `src/index.css`: shared light/dark variables, privacy surfaces, imagery, muscle map and reduced motion.
 - `index.html`: mobile viewport and 430px app shell.
 - `src/components/Navigation/`: header and bottom navigation patterns.
-- `src/security/vaultUI.ts`: passphrase gate, status and shield.
+- `src/security/vaultUI.ts`: PIN gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.

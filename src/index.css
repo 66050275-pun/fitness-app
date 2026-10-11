@@ -480,3 +480,45 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 .workout-progression-hint strong { display: block; margin-top: 2px; font-size: 12px; line-height: 1.6; font-variant-numeric: tabular-nums; }
 .workout-progression-hint span:not(.material-symbols-outlined) { display: block; font-size: 11px; line-height: 1.5; }
 .workout-set-target { max-width: 100%; color: var(--ui-muted); font-size: 11px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+
+/* Six-digit passcode gate keeps the shared green palette and native touch sizing. */
+.vault-pin-gate { padding-top: max(20px, env(safe-area-inset-top)); color: var(--ui-text); }
+.vault-pin-card { text-align: center; padding: 18px 16px; }
+.vault-pin-card h1 { font-size: 18px; }
+.vault-pin-lock { margin: 0 auto 14px; border-radius: 50%; width: 48px; height: 48px; }
+.vault-pin-card .vault-language { margin-bottom: 12px; text-align: left; }
+.vault-pin-indicators { display: flex; justify-content: center; align-items: center; gap: 15px; min-height: 32px; margin: 18px 0 20px; }
+.vault-pin-dot { width: 14px; height: 14px; border: 1px solid var(--ui-muted); background: transparent; transition: background 140ms ease, border-color 140ms ease, transform 140ms ease; }
+.vault-pin-dot-filled { background: var(--ui-primary); border-color: var(--ui-primary); transform: scale(1.05); }
+.vault-keypad { width: min(100%, 286px); margin: 0 auto; justify-items: center; gap: 12px 22px; }
+.vault-pin-key { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1px; width: 72px; height: 72px; border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); touch-action: manipulation; transition: background 140ms ease, transform 140ms ease; }
+.vault-pin-key:hover { background: var(--ui-primary-soft); }
+.vault-pin-key:active { background: var(--ui-panel-high); transform: scale(0.94); }
+.vault-pin-key:focus-visible, .vault-pin-restart:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 4px; }
+.vault-pin-key:disabled { opacity: 0.45; cursor: not-allowed; }
+.vault-pin-number { font: 400 30px/1.05 'Inter', sans-serif; font-variant-numeric: tabular-nums; }
+.vault-pin-letters { font: 600 8px/1.4 'Inter', sans-serif; letter-spacing: 2px; min-height: 11px; }
+.vault-pin-delete { border-color: transparent; background: transparent; }
+.vault-pin-delete .material-symbols-outlined { font-size: 25px; }
+.vault-pin-restart { display: inline-block; min-height: 44px; margin-top: 9px; padding: 10px 16px; color: var(--ui-primary); font-size: 12px; font-weight: 600; border-radius: 12px; }
+.vault-pin-card .vault-pin-feedback { min-height: 0; margin: 12px 0 0; font-size: 12px; }
+.vault-pin-feedback:empty { display: none; }
+.vault-pin-card .vault-pin-note { margin-top: 18px; font-size: 10px; }
+.vault-pin-card .vault-security-note { text-align: left; }
+.vault-pin-card .vault-form { text-align: left; }
+.vault-pin-card [hidden] { display: none !important; }
+.vault-pin-shake { animation: shake 360ms ease-in-out; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-9px); }
+  40%, 80% { transform: translateX(9px); }
+}
+@media (max-width: 340px) {
+  .vault-pin-gate { padding-left: 14px; padding-right: 14px; }
+  .vault-keypad { gap: 10px 12px; }
+  .vault-pin-key { width: 64px; height: 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vault-pin-dot, .vault-pin-key { transition: none; }
+  .vault-pin-shake { animation: none; }
+}

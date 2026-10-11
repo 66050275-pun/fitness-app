@@ -1,6 +1,25 @@
 import { tr, trHtml, getLanguage, setLanguage, onLanguageChange } from '../i18n/index.ts';
-import { createPrivateVault, unlockPrivateVault, vaultExists, lockPrivateStorage,
+import { Capacitor, registerPlugin } from '@capacitor/core';
+import { createPrivateVault, unlockPrivateVault, getVaultAccessState, migratePassphraseVault, VaultAttemptError, VaultLockoutError, lockPrivateStorage,
   onSaveStatus, retryPrivateStorage, encryptedBackup, restoreEncryptedBackup } from '../services/privateStorage.ts';
+
+interface NativeHaptics {
+  impact(options: { style: 'LIGHT' }): Promise<void>;
+  notification(options: { type: 'ERROR' }): Promise<void>;
+}
+const nativeHaptics = registerPlugin<NativeHaptics>('Haptics');
+/** Native plugins are optional; browser vibration is a best-effort fallback. */
+function passcodeFeedback(failed = false): void {
+  const vibrate = () => { try { navigator.vibrate?.(failed ? [50, 40, 50] : 50); } catch { /* Optional feedback. */ } };
+  if (Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('Haptics')) {
+    const feedback = failed ? nativeHaptics.notification({ type: 'ERROR' }) : nativeHaptics.impact({ style: 'LIGHT' });
+    void feedback.catch(vibrate);
+  } else vibrate();
+}
+const PIN_KEYS = [
+  ['1', ''], ['2', 'ABC'], ['3', 'DEF'], ['4', 'GHI'], ['5', 'JKL'],
+  ['6', 'MNO'], ['7', 'PQRS'], ['8', 'TUV'], ['9', 'WXYZ'],
+] as const;
 
 function privateError(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
@@ -36,6 +55,8 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
   shield.textContent = tr("ข้อมูลถูกซ่อนไว้ / Private screen hidden");
   document.body.append(shield);
   let active = false;
+  let disposeGate: () => void = () => {};
+  let gateGeneration = 0;
   let lastActivity = Date.now();
   let hiddenAt = 0;
   let locking = false;
@@ -100,82 +121,225 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
   });
 
   async function gate() {
-    let exists: boolean;
-    try { exists = await vaultExists(); }
+    disposeGate();
+    const generation = ++gateGeneration;
+    let access: Awaited<ReturnType<typeof getVaultAccessState>>;
+    try { access = await getVaultAccessState(); }
     catch (error) {
-      app.innerHTML = `<main class="vault-gate"><div class="vault-brand"><span class="vault-brand-mark material-symbols-outlined" aria-hidden="true">nutrition</span><span>NutriAI</span></div><section class="vault-card"><span class="vault-feature-icon material-symbols-outlined" aria-hidden="true">lock</span><h1>${trHtml("Private storage unavailable")}</h1><p>${trHtml((error as Error).message)}</p><p>${trHtml("แอปจะไม่บันทึกข้อมูลส่วนตัวแบบไม่เข้ารหัส กรุณาเปิดผ่าน HTTPS และอนุญาต browser storage")}</p></section></main>`;
+      if (generation !== gateGeneration) return;
+      app.innerHTML = `<main class="vault-gate"><div class="vault-brand"><span class="vault-brand-mark material-symbols-outlined" aria-hidden="true">nutrition</span><span>NutriAI</span></div><section class="vault-card"><span class="vault-feature-icon material-symbols-outlined" aria-hidden="true">lock</span><h1>${trHtml("Private storage unavailable")}</h1><p>${trHtml(privateError(error))}</p><p>${trHtml("แอปจะไม่บันทึกข้อมูลส่วนตัวแบบไม่เข้ารหัส กรุณาเปิดผ่าน HTTPS และอนุญาต browser storage")}</p></section></main>`;
       return;
     }
-    app.innerHTML = `<main class="vault-gate">
+    if (generation !== gateGeneration) return;
+    let digits = '';
+    let firstPin = '';
+    let oldPassphrase = '';
+    let confirmStep = false;
+    let busy = false;
+    let disposed = false;
+    let legacyStep = access.requiresPassphraseMigration;
+    app.innerHTML = `<main class="vault-gate vault-pin-gate">
       <div class="vault-brand"><span class="vault-brand-mark material-symbols-outlined" aria-hidden="true">nutrition</span><div><strong>NutriAI</strong><span>${trHtml("Nutrition & Fitness")}</span></div></div>
-      <section class="vault-card" aria-labelledby="vault-heading">
+      <section class="vault-card vault-pin-card" aria-labelledby="vault-heading">
         <label class="vault-language" for="vault-language">${trHtml("Language")} <select id="vault-language" class="vault-input"><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>${trHtml("English")}</option><option value="th" ${getLanguage() === 'th' ? 'selected' : ''}>${trHtml("Thai")}</option></select></label>
-        <div class="vault-heading-row"><span class="vault-feature-icon material-symbols-outlined" aria-hidden="true">${exists ? 'lock' : 'shield_lock'}</span><span class="vault-badge">${trHtml("เก็บข้อมูลในเครื่อง")}</span></div>
-        <h1 id="vault-heading">${exists ? tr("ยินดีต้อนรับกลับ") : tr("เริ่มต้นอย่างเป็นส่วนตัว")}</h1>
-        <p class="vault-subtitle">${exists ? tr("Unlock NutriAI") : tr("Protect your NutriAI data")}</p>
-        <p>${trHtml("ข้อมูลส่วนตัวเก็บแบบเข้ารหัสใน browser นี้ ไม่มีบัญชีหรือฐานข้อมูลผู้ใช้บนเซิร์ฟเวอร์")}</p>
-        <form id="vault-form" class="vault-form">
-          <label for="vault-password">${trHtml("Passphrase / รหัสผ่าน")}</label>
-          <input id="vault-password" type="password" autocomplete="${exists ? 'current-password' : 'new-password'}" required ${exists ? '' : 'minlength="12"'} aria-describedby="vault-passphrase-help vault-error" class="vault-input">
-          <p id="vault-passphrase-help" class="vault-field-help">${exists ? tr("ใช้รหัสผ่านที่ตั้งไว้ใน browser นี้") : tr("ใช้รหัสผ่านเฉพาะอย่างน้อย 12 ตัวอักษร เช่น วลียาวที่คุณจำได้")}</p>
-          ${exists ? '' : `<label for="vault-confirm">${trHtml("Confirm / ยืนยันรหัสผ่าน")}</label><input id="vault-confirm" type="password" autocomplete="new-password" required class="vault-input">`}
-          <label class="vault-password-toggle"><input id="vault-password-visible" type="checkbox">${trHtml("แสดงรหัสผ่าน")}</label>
-          <p id="vault-error" role="alert" class="vault-error"></p>
-          <button class="ui-primary-button" type="submit">${exists ? tr("Unlock / ปลดล็อก") : tr("Create encrypted vault / เริ่มใช้งาน")}</button>
+        <span class="vault-feature-icon vault-pin-lock material-symbols-outlined" aria-hidden="true">${access.exists ? 'lock' : 'shield_lock'}</span>
+        <h1 id="vault-heading"></h1>
+        <p class="vault-subtitle">${access.exists ? trHtml("Unlock NutriAI") : trHtml("Protect your NutriAI data")}</p>
+        <div id="vault-pin-panel">
+          <div id="vault-pin-indicators" class="vault-pin-indicators" role="img" aria-label="${trHtml("{0} of 6 digits entered", 0)}">${Array.from({ length: 6 }, () => '<span class="vault-pin-dot h-3.5 w-3.5 rounded-full border border-slate-400" aria-hidden="true"></span>').join('')}</div>
+          <p id="vault-pin-progress" class="sr-only" role="status" aria-live="polite"></p>
+          <div id="vault-keypad" class="vault-keypad grid grid-cols-3" role="group" aria-label="${trHtml("Passcode keypad")}">
+            ${PIN_KEYS.map(([digit, letters]) => `<button type="button" data-vault-digit="${digit}" class="vault-pin-key h-[72px] w-[72px] rounded-full border border-slate-300/20 active:bg-white/20 transition" aria-label="${digit}"><span class="vault-pin-number">${digit}</span><span class="vault-pin-letters" aria-hidden="true">${letters || '&nbsp;'}</span></button>`).join('')}
+            <span aria-hidden="true"></span>
+            <button type="button" data-vault-digit="0" class="vault-pin-key h-[72px] w-[72px] rounded-full border border-slate-300/20 active:bg-white/20 transition" aria-label="0"><span class="vault-pin-number">0</span></button>
+            <button type="button" id="vault-delete" class="vault-pin-key vault-pin-delete rounded-full transition" aria-label="${trHtml("Delete last digit")}"><span class="material-symbols-outlined" aria-hidden="true">backspace</span></button>
+          </div>
+          <button id="vault-start-over" type="button" class="vault-pin-restart">${trHtml("Start over")}</button>
+        </div>
+        <form id="vault-legacy-form" class="vault-form" hidden>
+          <p>${trHtml("Enter your current passphrase, then choose a six-digit passcode. Your encrypted data will be preserved.")}</p>
+          <label for="vault-legacy-password">${trHtml("Current passphrase")}</label>
+          <input id="vault-legacy-password" type="password" autocomplete="current-password" required class="vault-input" aria-describedby="vault-error">
+          <button type="submit" class="ui-primary-button">${trHtml("Continue to passcode")}</button>
         </form>
+        <p id="vault-busy" class="vault-pin-feedback" role="status" aria-live="polite"></p>
+        <p id="vault-error" role="alert" class="vault-error vault-pin-feedback"></p>
+        <p id="vault-lockout" class="vault-pin-feedback" role="status" aria-live="polite"></p>
+        <p class="vault-pin-note">${trHtml("ข้อมูลส่วนตัวเก็บแบบเข้ารหัสใน browser นี้ ไม่มีบัญชีหรือฐานข้อมูลผู้ใช้บนเซิร์ฟเวอร์")}</p>
         <div class="vault-security-note"><span class="material-symbols-outlined" aria-hidden="true">encrypted</span><span>${trHtml("ขณะปลดล็อก ผู้ที่ใช้เครื่องนี้เข้าถึงข้อมูลได้ กดล็อกเมื่อใช้เสร็จ แอปล็อกหลังไม่มีการใช้งาน 5 นาที")}</span></div>
       </section>
       <details class="vault-help-card"><summary>${trHtml("การสำรองข้อมูลและความเป็นส่วนตัว")}</summary><div>
-        <p>${trHtml("ไม่มีบริการกู้รหัสผ่าน ลืมรหัส = เปิดข้อมูลไม่ได้ สำรองไฟล์เข้ารหัสจาก Data & Privacy ก่อนล้าง browser เปลี่ยน URL หรือเปลี่ยนโทรศัพท์ ข้อมูลไม่ซิงก์ข้ามเครื่องโดยอัตโนมัติ")}</p>
+        <p>${trHtml("There is no passcode recovery. Keep an encrypted backup before clearing browser storage or changing devices.")}</p>
+        <p>${trHtml("Choose a passcode you do not use elsewhere. Six-digit passcodes have fewer possible combinations than long passphrases.")}</p>
+        <p>${trHtml("Local lockouts cannot prevent offline guessing of an exported vault.")}</p>
         <p>${trHtml("การล็อกจะยกเลิกงานที่ยังไม่ได้กดบันทึก ขณะปลดล็อก สคริปต์ของแอปเข้าถึงข้อมูลได้")}</p>
-        ${exists ? '' : `<p>${trHtml("ข้อมูลเดิมใน browser นี้จะย้ายไปเก็บแบบเข้ารหัสเมื่อสร้าง vault")}</p>`}
+        ${access.exists ? '' : `<p>${trHtml("ข้อมูลเดิมใน browser นี้จะย้ายไปเก็บแบบเข้ารหัสเมื่อสร้าง vault")}</p>`}
         <p>${trHtml("Public repo contains application code, not your browser vault. Hosting services still receive normal page requests and network metadata.")}</p>
       </div></details>
-      ${exists ? '' : `<label class="vault-restore-card" for="vault-restore"><span class="material-symbols-outlined" aria-hidden="true">restore</span><strong>${trHtml("กู้จากไฟล์สำรองเข้ารหัส")}</strong><input id="vault-restore" type="file" accept="application/json,.json" hidden></label>`}
+      ${access.exists ? '' : `<label class="vault-restore-card" for="vault-restore"><span class="material-symbols-outlined" aria-hidden="true">restore</span><strong>${trHtml("กู้จากไฟล์สำรองเข้ารหัส")}</strong><input id="vault-restore" type="file" accept="application/json,.json" hidden></label>`}
     </main>`;
-    document.getElementById('vault-language')!.onchange = async event => {
-      setLanguage((event.target as HTMLSelectElement).value);
-      await gate();
-    };
-    document.getElementById('vault-password-visible')!.onchange = event => {
-      const visible = (event.target as HTMLInputElement).checked;
-      for (const id of ['vault-password', 'vault-confirm']) {
-        const input = document.getElementById(id) as HTMLInputElement | null;
-        if (input) input.type = visible ? 'text' : 'password';
-      }
-    };
-    const form = document.getElementById('vault-form') as HTMLFormElement;
-    form.onsubmit = async event => {
-      event.preventDefault();
-      const input = document.getElementById('vault-password') as HTMLInputElement;
-      const confirm = document.getElementById('vault-confirm') as HTMLInputElement | null;
-      const button = form.querySelector<HTMLButtonElement>('button')!;
-      const languagePicker = document.getElementById('vault-language') as HTMLSelectElement;
-      const error = document.getElementById('vault-error')!;
-      if (confirm && confirm.value !== input.value) { error.textContent = tr("รหัสผ่านไม่ตรงกัน / Passphrases do not match."); return; }
-      button.disabled = true; button.textContent = tr("กำลังเปิดข้อมูล…"); error.textContent = '';
-      languagePicker.disabled = true;
+    const heading = app.querySelector<HTMLElement>('#vault-heading')!;
+    const pinPanel = app.querySelector<HTMLElement>('#vault-pin-panel')!;
+    const indicators = app.querySelector<HTMLElement>('#vault-pin-indicators')!;
+    const progress = app.querySelector<HTMLElement>('#vault-pin-progress')!;
+    const keypad = app.querySelector<HTMLElement>('#vault-keypad')!;
+    const keypadButtons = Array.from(keypad.querySelectorAll<HTMLButtonElement>('button'));
+    const legacyForm = app.querySelector<HTMLFormElement>('#vault-legacy-form')!;
+    const legacyInput = app.querySelector<HTMLInputElement>('#vault-legacy-password')!;
+    const languagePicker = app.querySelector<HTMLSelectElement>('#vault-language')!;
+    const startOver = app.querySelector<HTMLButtonElement>('#vault-start-over')!;
+    const errorLabel = app.querySelector<HTMLElement>('#vault-error')!;
+    const lockoutLabel = app.querySelector<HTMLElement>('#vault-lockout')!;
+    const busyLabel = app.querySelector<HTMLElement>('#vault-busy')!;
+    const restore = app.querySelector<HTMLInputElement>('#vault-restore');
+    const isLockedOut = () => access.lockedUntil > Date.now();
+    function refresh() {
+      if (disposed) return;
+      const locked = isLockedOut();
+      heading.textContent = legacyStep ? tr('Update your existing vault') : confirmStep ? tr('Re-enter your passcode to confirm') : access.exists && !access.requiresPassphraseMigration ? tr('Enter your passcode to unlock') : tr('Enter a 6-digit passcode');
+      pinPanel.hidden = legacyStep;
+      legacyForm.hidden = !legacyStep;
+      indicators.setAttribute('aria-label', tr('{0} of 6 digits entered', digits.length));
+      for (const [index, dot] of Array.from(indicators.children).entries()) dot.classList.toggle('vault-pin-dot-filled', index < digits.length);
+      progress.textContent = tr('{0} of 6 digits entered', digits.length);
+      for (const button of keypadButtons) button.disabled = busy || locked;
+      legacyInput.disabled = busy || locked;
+      legacyForm.querySelector<HTMLButtonElement>('button')!.disabled = busy || locked;
+      languagePicker.disabled = busy;
+      startOver.hidden = !confirmStep && !access.requiresPassphraseMigration;
+      startOver.disabled = busy;
+      if (restore) restore.disabled = busy;
+      const seconds = Math.max(0, Math.ceil((access.lockedUntil - Date.now()) / 1000));
+      lockoutLabel.textContent = seconds ? tr('Try again in {0}.', `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`) : '';
+    }
+    function shake(message: string) {
+      errorLabel.textContent = message;
+      const target = legacyStep ? legacyForm : indicators;
+      target.classList.remove('vault-pin-shake');
+      void target.offsetWidth;
+      target.classList.add('vault-pin-shake');
+      passcodeFeedback(true);
+    }
+    function clearSecrets() { digits = ''; firstPin = ''; oldPassphrase = ''; legacyInput.value = ''; }
+    function reset() {
+      clearSecrets(); confirmStep = false; legacyStep = access.requiresPassphraseMigration;
+      errorLabel.textContent = ''; refresh();
+      if (legacyStep) legacyInput.focus();
+    }
+    async function submitPin(pin: string) {
+      if (busy || isLockedOut() || disposed) return;
+      const migration = access.requiresPassphraseMigration;
+      busy = true;
+      errorLabel.textContent = '';
+      busyLabel.textContent = migration ? tr('Upgrading your encrypted vault…') : access.exists ? tr('Verifying passcode…') : tr('Creating your encrypted vault…');
+      refresh();
       try {
-        if (exists) await unlockPrivateVault(input.value); else await createPrivateVault(input.value);
-        input.value = ''; if (confirm) confirm.value = '';
-        active = true; lastActivity = Date.now(); hiddenAt = 0;
+        if (migration) await migratePassphraseVault(oldPassphrase, pin);
+        else if (access.exists) await unlockPrivateVault(pin);
+        else await createPrivateVault(pin);
+        if (disposed) return;
+        clearSecrets(); disposeGate();
+        active = true; lastActivity = Date.now(); hiddenAt = document.hidden ? Date.now() : 0;
+        if (document.hidden) { shield.textContent = tr('ข้อมูลถูกซ่อนไว้ / Private screen hidden'); shield.style.display = 'grid'; }
         app.classList.add('vault-open'); bar.style.display = 'flex'; activate();
-      } catch (err) {
-        error.textContent = privateError(err);
-        // Migration may already be encrypted and durable; next attempt must unlock it.
-        exists = await vaultExists().catch(() => exists);
-        button.disabled = false; button.textContent = exists ? tr("Unlock / ปลดล็อก") : tr("Create encrypted vault / เริ่มใช้งาน");
-        languagePicker.disabled = false;
+      } catch (error) {
+        if (disposed) return;
+        clearSecrets(); confirmStep = false;
+        if (error instanceof VaultAttemptError || error instanceof VaultLockoutError) {
+          access.failedAttempts = error.failedAttempts;
+          access.lockedUntil = error.lockedUntil;
+        }
+        access = await getVaultAccessState().catch(() => access);
+        if (disposed) return;
+        legacyStep = access.requiresPassphraseMigration;
+        const remaining = Math.max(0, (access.failedAttempts < 3 ? 3 : 5) - access.failedAttempts);
+        shake(error instanceof VaultAttemptError && !isLockedOut()
+          ? tr(migration ? 'Incorrect passphrase. {0} attempts before the next lockout.' : 'Incorrect passcode. {0} attempts before the next lockout.', remaining)
+          : privateError(error));
+      } finally {
+        busy = false;
+        if (!disposed) { busyLabel.textContent = ''; refresh(); }
       }
+    }
+    function enterDigit(digit: string) {
+      if (busy || legacyStep || isLockedOut() || disposed || digits.length >= 6) return;
+      errorLabel.textContent = ''; passcodeFeedback();
+      digits += digit; refresh();
+      if (digits.length !== 6) return;
+      if (!access.exists || access.requiresPassphraseMigration) {
+        if (!confirmStep) { firstPin = digits; digits = ''; confirmStep = true; refresh(); return; }
+        if (digits !== firstPin) {
+          digits = ''; firstPin = ''; confirmStep = false;
+          shake(tr('Your passcodes did not match. Enter a new passcode.')); refresh(); return;
+        }
+      }
+      const pin = digits;
+      firstPin = '';
+      void submitPin(pin);
+    }
+    function deleteDigit() {
+      if (busy || legacyStep || isLockedOut() || disposed) return;
+      if (digits) { digits = digits.slice(0, -1); passcodeFeedback(); refresh(); }
+    }
+    for (const button of keypadButtons) {
+      const digit = button.dataset.vaultDigit;
+      button.onclick = () => { if (digit !== undefined) enterDigit(digit); else deleteDigit(); };
+    }
+    startOver.onclick = reset;
+    languagePicker.onchange = event => { setLanguage((event.target as HTMLSelectElement).value); void gate(); };
+    legacyForm.onsubmit = event => {
+      event.preventDefault();
+      if (busy || isLockedOut() || !legacyInput.value) return;
+      oldPassphrase = legacyInput.value; legacyInput.value = '';
+      legacyStep = false; digits = ''; firstPin = ''; confirmStep = false;
+      errorLabel.textContent = ''; refresh(); keypadButtons[0]?.focus();
     };
-    const restore = document.getElementById('vault-restore') as HTMLInputElement | null;
+    const keyboard = (event: KeyboardEvent) => {
+      if (legacyStep || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.target instanceof HTMLSelectElement) return;
+      if (/^\d$/.test(event.key)) { event.preventDefault(); enterDigit(event.key); }
+      else if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); deleteDigit(); }
+    };
+    document.addEventListener('keydown', keyboard);
+    // Countdown uses only local metadata; switching tabs refreshes authoritative state.
+    let metadataRefreshing = false;
+    const refreshMetadata = () => {
+      if (busy || metadataRefreshing || disposed) return;
+      metadataRefreshing = true;
+      void getVaultAccessState().then(next => {
+        if (disposed || busy) return;
+        if (next.exists !== access.exists || next.requiresPassphraseMigration !== access.requiresPassphraseMigration) { void gate(); return; }
+        access = next; refresh();
+      }).catch(() => {}).finally(() => { metadataRefreshing = false; });
+    };
+    const visibility = () => {
+      if (document.hidden && !busy) reset();
+      else if (!document.hidden) refreshMetadata();
+    };
+    let refreshedExpiry = 0;
+    const countdown = window.setInterval(() => {
+      if (access.lockedUntil > 0 && access.lockedUntil <= Date.now() && refreshedExpiry !== access.lockedUntil) {
+        refreshedExpiry = access.lockedUntil; refreshMetadata();
+      }
+      refresh();
+    }, 1000);
+    window.addEventListener('focus', refreshMetadata);
+    document.addEventListener('visibilitychange', visibility);
+    disposeGate = () => {
+      disposed = true; clearSecrets();
+      clearInterval(countdown); document.removeEventListener('keydown', keyboard);
+      window.removeEventListener('focus', refreshMetadata);
+      document.removeEventListener('visibilitychange', visibility);
+    };
     if (restore) restore.onchange = async () => {
-      const file = restore.files?.[0]; if (!file) return;
+      const file = restore.files?.[0]; if (!file || busy) return;
+      busy = true; errorLabel.textContent = ''; busyLabel.textContent = tr('Restoring encrypted backup…'); refresh();
       try {
-        if (file.size > 30 * 1024 * 1024) throw new Error(tr("Backup file is too large."));
+        if (file.size > 30 * 1024 * 1024) throw new Error(tr('Backup file is too large.'));
         await restoreEncryptedBackup(await file.text()); await gate();
-      } catch (err) { document.getElementById('vault-error')!.textContent = privateError(err); }
+      } catch (error) { if (!disposed) errorLabel.textContent = privateError(error); }
+      finally { busy = false; if (!disposed) { busyLabel.textContent = ''; refresh(); } }
     };
+    refresh();
   }
   await gate();
 }

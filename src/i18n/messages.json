@@ -1676,8 +1676,8 @@
     "th": "ข้อมูลของฉันเก็บไว้ที่ไหน?"
   },
   "Your logs, profile, feedback drafts and photo are saved in a passphrase protected encrypted browser vault. They are not sent to an application user database. Hosting services still receive page requests and network metadata. Export an encrypted backup from Data & Privacy; there is no passphrase recovery or automatic device sync.": {
-    "en": "Your logs, profile, feedback drafts and photo are saved in a passphrase protected encrypted browser vault. They are not sent to an application user database. Hosting services still receive page requests and network metadata. Export an encrypted backup from Data & Privacy; there is no passphrase recovery or automatic device sync.",
-    "th": "บันทึก โปรไฟล์ ร่างข้อเสนอแนะ และรูปถ่ายเก็บในคลังข้อมูลเข้ารหัสของเบราว์เซอร์ที่ป้องกันด้วยรหัสผ่าน ไม่ส่งไปฐานข้อมูลผู้ใช้ของแอป ผู้ให้บริการโฮสต์ยังได้รับคำขอหน้าเว็บและข้อมูลเครือข่ายทั่วไป สำรองไฟล์เข้ารหัสได้จากข้อมูลและความเป็นส่วนตัว ไม่มีบริการกู้รหัสผ่านหรือซิงก์ข้ามเครื่องอัตโนมัติ"
+    "en": "Your logs, profile, feedback drafts and photo are saved in a passcode protected encrypted browser vault. They are not sent to an application user database. Hosting services still receive page requests and network metadata. Export an encrypted backup from Data & Privacy; there is no passcode recovery or automatic device sync.",
+    "th": "บันทึก โปรไฟล์ ร่างข้อเสนอแนะ และรูปถ่ายเก็บในคลังข้อมูลเข้ารหัสของเบราว์เซอร์ที่ป้องกันด้วยรหัสปลดล็อก ไม่ส่งไปฐานข้อมูลผู้ใช้ของแอป ผู้ให้บริการโฮสต์ยังได้รับคำขอหน้าเว็บและข้อมูลเครือข่ายทั่วไป สำรองไฟล์เข้ารหัสได้จากข้อมูลและความเป็นส่วนตัว ไม่มีบริการกู้รหัสปลดล็อกหรือซิงก์ข้ามเครื่องอัตโนมัติ"
   },
   "Scanner": {
     "en": "Scanner",
@@ -1736,8 +1736,8 @@
     "th": "1. การเก็บข้อมูลในอุปกรณ์"
   },
   "NutriAI does not operate a remote user database or authentication cloud in this version. Personal fields and the profile photo are encrypted in browser IndexedDB with a passphrase that is not persisted or sent to the host. Data is decrypted in memory while the app is unlocked.": {
-    "en": "NutriAI does not operate a remote user database or authentication cloud in this version. Personal fields and the profile photo are encrypted in browser IndexedDB with a passphrase that is not persisted or sent to the host. Data is decrypted in memory while the app is unlocked.",
-    "th": "รุ่นนี้ไม่มีฐานข้อมูลผู้ใช้หรือระบบยืนยันตัวตนบนคลาวด์ ข้อมูลส่วนตัวและรูปโปรไฟล์เข้ารหัสใน IndexedDB ของเบราว์เซอร์ด้วยรหัสผ่านที่ไม่ถูกบันทึกหรือส่งไปผู้ให้บริการโฮสต์ ระบบถอดรหัสในหน่วยความจำขณะที่ปลดล็อก"
+    "en": "NutriAI does not operate a remote user database or authentication cloud in this version. Personal fields and the profile photo are encrypted in browser IndexedDB with a passcode that is not persisted or sent to the host. Data is decrypted in memory while the app is unlocked.",
+    "th": "รุ่นนี้ไม่มีฐานข้อมูลผู้ใช้หรือระบบยืนยันตัวตนบนคลาวด์ ข้อมูลส่วนตัวและรูปโปรไฟล์เข้ารหัสใน IndexedDB ของเบราว์เซอร์ด้วยรหัสปลดล็อกที่ไม่ถูกบันทึกหรือส่งไปผู้ให้บริการโฮสต์ ระบบถอดรหัสในหน่วยความจำขณะที่ปลดล็อก"
   },
   "2. Zero Telemetry & Tracking": {
     "en": "2. Zero Telemetry & Tracking",
@@ -5552,12 +5552,12 @@
     "th": "คลังข้อมูลเบราว์เซอร์เข้ารหัส"
   },
   "Passphrase protected • No user cloud database": {
-    "en": "Passphrase protected • No user cloud database",
-    "th": "ป้องกันด้วยรหัสผ่าน • ไม่มีฐานข้อมูลผู้ใช้บนคลาวด์"
+    "en": "Passcode protected • No user cloud database",
+    "th": "ป้องกันด้วยรหัสปลดล็อก • ไม่มีฐานข้อมูลผู้ใช้บนคลาวด์"
   },
   "Your profile, health records, feedback drafts and photo are encrypted before they are saved in this browser. The passphrase is not saved or sent to a server. While unlocked, this app and anyone using your device can access your data. Use Lock when finished. Hosting providers still receive normal page requests and network metadata.": {
-    "en": "Your profile, health records, feedback drafts and photo are encrypted before they are saved in this browser. The passphrase is not saved or sent to a server. While unlocked, this app and anyone using your device can access your data. Use Lock when finished. Hosting providers still receive normal page requests and network metadata.",
-    "th": "โปรไฟล์ ข้อมูลสุขภาพ ร่างข้อเสนอแนะ และรูปถ่ายเข้ารหัสก่อนเก็บในเบราว์เซอร์ รหัสผ่านไม่ถูกบันทึกหรือส่งไปเซิร์ฟเวอร์ ขณะปลดล็อก แอปและผู้ใช้เครื่องนี้เข้าถึงข้อมูลได้ กดล็อกเมื่อใช้เสร็จ ผู้ให้บริการโฮสต์ยังได้รับคำขอหน้าเว็บและข้อมูลเครือข่ายทั่วไป"
+    "en": "Your profile, health records, feedback drafts and photo are encrypted before they are saved in this browser. The passcode is not saved or sent to a server. While unlocked, this app and anyone using your device can access your data. Use Lock when finished. Hosting providers still receive normal page requests and network metadata.",
+    "th": "โปรไฟล์ ข้อมูลสุขภาพ ร่างข้อเสนอแนะ และรูปถ่ายเข้ารหัสก่อนเก็บในเบราว์เซอร์ รหัสปลดล็อกไม่ถูกบันทึกหรือส่งไปเซิร์ฟเวอร์ ขณะปลดล็อก แอปและผู้ใช้เครื่องนี้เข้าถึงข้อมูลได้ กดล็อกเมื่อใช้เสร็จ ผู้ให้บริการโฮสต์ยังได้รับคำขอหน้าเว็บและข้อมูลเครือข่ายทั่วไป"
   },
   "Meals Logged:": {
     "en": "Meals Logged:",
@@ -5580,12 +5580,12 @@
     "th": "ส่งออกไฟล์สำรองในเครื่อง"
   },
   "Download a passphrase protected archive, including your photo": {
-    "en": "Download a passphrase protected archive, including your photo",
-    "th": "ดาวน์โหลดไฟล์สำรองที่ป้องกันด้วยรหัสผ่าน รวมรูปโปรไฟล์"
+    "en": "Download a passcode protected archive, including your photo",
+    "th": "ดาวน์โหลดไฟล์สำรองที่ป้องกันด้วยรหัสปลดล็อก รวมรูปโปรไฟล์"
   },
   "The backup stays encrypted with your current passphrase. Keep the passphrase separately: there is no password recovery. Restore from the unlock screen on a browser without an existing vault. Clearing browser storage, private browsing or changing the app URL can make local data unavailable.": {
-    "en": "The backup stays encrypted with your current passphrase. Keep the passphrase separately: there is no password recovery. Restore from the unlock screen on a browser without an existing vault. Clearing browser storage, private browsing or changing the app URL can make local data unavailable.",
-    "th": "ไฟล์สำรองยังเข้ารหัสด้วยรหัสผ่านปัจจุบัน เก็บรหัสแยกต่างหากเพราะไม่มีบริการกู้รหัส กู้ไฟล์ได้จากหน้าปลดล็อกของเบราว์เซอร์ที่ไม่มีคลังเดิม การล้างข้อมูล โหมดส่วนตัว หรือเปลี่ยน URL ของแอปอาจทำให้ข้อมูลในเครื่องใช้ไม่ได้"
+    "en": "The backup stays encrypted with your current passcode. Keep the passcode separately: there is no passcode recovery. Older backups still need the passphrase used when exported. Restore from the unlock screen on a browser without an existing vault. Clearing browser storage, private browsing or changing the app URL can make local data unavailable.",
+    "th": "ไฟล์สำรองยังเข้ารหัสด้วยรหัสปลดล็อกปัจจุบัน เก็บรหัสแยกต่างหากเพราะไม่มีบริการกู้รหัส ไฟล์สำรองเก่ายังต้องใช้รหัสผ่านตอนส่งออก กู้ไฟล์ได้จากหน้าปลดล็อกของเบราว์เซอร์ที่ไม่มีคลังเดิม การล้างข้อมูล โหมดส่วนตัว หรือเปลี่ยน URL ของแอปอาจทำให้ข้อมูลในเครื่องใช้ไม่ได้"
   },
   "Export Encrypted Backup": {
     "en": "Export Encrypted Backup",
@@ -5596,8 +5596,8 @@
     "th": "จัดการและลบข้อมูล"
   },
   "Selectively clear specific historical records while preserving your profile, or reset all local application data. Your vault passphrase remains in use. Deletions cannot be undone; downloaded backups are not erased.": {
-    "en": "Selectively clear specific historical records while preserving your profile, or reset all local application data. Your vault passphrase remains in use. Deletions cannot be undone; downloaded backups are not erased.",
-    "th": "ลบบันทึกบางส่วนโดยเก็บโปรไฟล์ หรือรีเซ็ตข้อมูลในเครื่องทั้งหมด รหัสผ่านคลังยังใช้อันเดิม การลบย้อนกลับไม่ได้ และไม่ลบไฟล์สำรองที่ดาวน์โหลดแล้ว"
+    "en": "Selectively clear specific historical records while preserving your profile, or reset all local application data. Your vault passcode remains in use. Deletions cannot be undone; downloaded backups are not erased.",
+    "th": "ลบบันทึกบางส่วนโดยเก็บโปรไฟล์ หรือรีเซ็ตข้อมูลในเครื่องทั้งหมด รหัสปลดล็อกคลังยังใช้อันเดิม การลบย้อนกลับไม่ได้ และไม่ลบไฟล์สำรองที่ดาวน์โหลดแล้ว"
   },
   "Delete Food & Diary History (": {
     "en": "Delete Food & Diary History (",
@@ -7566,5 +7566,129 @@
   "Try again": {
     "en": "Try again",
     "th": "ลองอีกครั้ง"
+  },
+  "Enter exactly 6 numeric digits.": {
+    "en": "Enter exactly 6 numeric digits.",
+    "th": "กรุณากรอกตัวเลขให้ครบ 6 หลัก"
+  },
+  "This vault uses a passphrase. Upgrade it to a PIN first.": {
+    "en": "This vault uses a passphrase. Upgrade it to a PIN first.",
+    "th": "คลังข้อมูลนี้ใช้รหัสผ่าน กรุณาเปลี่ยนเป็นรหัส PIN ก่อน"
+  },
+  "This vault already uses a PIN.": {
+    "en": "This vault already uses a PIN.",
+    "th": "คลังข้อมูลนี้ใช้รหัส PIN อยู่แล้ว"
+  },
+  "Incorrect passcode or damaged vault. Your stored data has not been changed.": {
+    "en": "Incorrect passcode or damaged vault. Your stored data has not been changed.",
+    "th": "รหัสปลดล็อกไม่ถูกต้องหรือคลังข้อมูลเสียหาย ข้อมูลที่บันทึกไว้ยังคงเดิม"
+  },
+  "Too many attempts. Try again after the lockout.": {
+    "en": "Too many attempts. Try again after the lockout.",
+    "th": "ลองปลดล็อกเกินจำนวนที่กำหนด กรุณารอให้ครบเวลาล็อกแล้วลองอีกครั้ง"
+  },
+  "Another unlock attempt is in progress.": {
+    "en": "Another unlock attempt is in progress.",
+    "th": "กำลังดำเนินการปลดล็อกอีกครั้งอยู่"
+  },
+  "Vault changed during unlock. Try again.": {
+    "en": "Vault changed during unlock. Try again.",
+    "th": "คลังข้อมูลเปลี่ยนแปลงระหว่างปลดล็อก กรุณาลองอีกครั้ง"
+  },
+  "Unlock attempt expired. Try again.": {
+    "en": "Unlock attempt expired. Try again.",
+    "th": "การปลดล็อกหมดเวลา กรุณาลองอีกครั้ง"
+  },
+  "Enter a 6-digit passcode": {
+    "en": "Enter a 6-digit passcode",
+    "th": "ตั้งรหัสปลดล็อก 6 หลัก"
+  },
+  "Re-enter your passcode to confirm": {
+    "en": "Re-enter your passcode to confirm",
+    "th": "กรอกรหัสปลดล็อกอีกครั้งเพื่อยืนยัน"
+  },
+  "Enter your passcode to unlock": {
+    "en": "Enter your passcode to unlock",
+    "th": "กรอกรหัสเพื่อปลดล็อก"
+  },
+  "Your passcodes did not match. Enter a new passcode.": {
+    "en": "Your passcodes did not match. Enter a new passcode.",
+    "th": "รหัสปลดล็อกไม่ตรงกัน กรุณาตั้งรหัสใหม่"
+  },
+  "{0} of 6 digits entered": {
+    "en": "{0} of 6 digits entered",
+    "th": "กรอกแล้ว {0} จาก 6 หลัก"
+  },
+  "Delete last digit": {
+    "en": "Delete last digit",
+    "th": "ลบตัวเลขหลักสุดท้าย"
+  },
+  "Incorrect passcode. {0} attempts before the next lockout.": {
+    "en": "Incorrect passcode. {0} attempts before the next lockout.",
+    "th": "รหัสปลดล็อกไม่ถูกต้อง ลองได้อีก {0} ครั้งก่อนถูกล็อกชั่วคราว"
+  },
+  "Incorrect passphrase. {0} attempts before the next lockout.": {
+    "en": "Incorrect passphrase. {0} attempts before the next lockout.",
+    "th": "รหัสผ่านไม่ถูกต้อง ลองได้อีก {0} ครั้งก่อนถูกล็อกชั่วคราว"
+  },
+  "Try again in {0}.": {
+    "en": "Try again in {0}.",
+    "th": "ลองอีกครั้งได้ใน {0}"
+  },
+  "Verifying passcode…": {
+    "en": "Verifying passcode…",
+    "th": "กำลังตรวจสอบรหัสปลดล็อก…"
+  },
+  "Creating your encrypted vault…": {
+    "en": "Creating your encrypted vault…",
+    "th": "กำลังสร้างคลังข้อมูลเข้ารหัส…"
+  },
+  "Update your existing vault": {
+    "en": "Update your existing vault",
+    "th": "อัปเดตคลังข้อมูลเดิม"
+  },
+  "Enter your current passphrase, then choose a six-digit passcode. Your encrypted data will be preserved.": {
+    "en": "Enter your current passphrase, then choose a six-digit passcode. Your encrypted data will be preserved.",
+    "th": "กรอกรหัสผ่านเดิม แล้วตั้งรหัสปลดล็อก 6 หลัก ข้อมูลที่เข้ารหัสไว้จะยังอยู่ครบ"
+  },
+  "Current passphrase": {
+    "en": "Current passphrase",
+    "th": "รหัสผ่านเดิม"
+  },
+  "Continue to passcode": {
+    "en": "Continue to passcode",
+    "th": "ไปตั้งรหัสปลดล็อก"
+  },
+  "Start over": {
+    "en": "Start over",
+    "th": "เริ่มใหม่"
+  },
+  "Choose a passcode you do not use elsewhere. Six-digit passcodes have fewer possible combinations than long passphrases.": {
+    "en": "Choose a passcode you do not use elsewhere. Six-digit passcodes have fewer possible combinations than long passphrases.",
+    "th": "เลือกรหัสที่ไม่ใช้กับที่อื่น รหัส 6 หลักมีรูปแบบที่เป็นไปได้น้อยกว่ารหัสผ่านแบบยาว"
+  },
+  "There is no passcode recovery. Keep an encrypted backup before clearing browser storage or changing devices.": {
+    "en": "There is no passcode recovery. Keep an encrypted backup before clearing browser storage or changing devices.",
+    "th": "ไม่มีบริการกู้รหัสปลดล็อก สำรองไฟล์เข้ารหัสก่อนล้างข้อมูลเบราว์เซอร์หรือเปลี่ยนอุปกรณ์"
+  },
+  "Upgrading your encrypted vault…": {
+    "en": "Upgrading your encrypted vault…",
+    "th": "กำลังอัปเดตคลังข้อมูลเข้ารหัส…"
+  },
+  "Passcode keypad": {
+    "en": "Passcode keypad",
+    "th": "แป้นตัวเลขรหัสปลดล็อก"
+  },
+  "Local lockouts cannot prevent offline guessing of an exported vault.": {
+    "en": "Local lockouts cannot prevent offline guessing of an exported vault.",
+    "th": "การล็อกชั่วคราวในเครื่องไม่สามารถป้องกันการลองเดารหัสจากไฟล์คลังข้อมูลที่ส่งออกไปได้"
+  },
+  "Restoring encrypted backup…": {
+    "en": "Restoring encrypted backup…",
+    "th": "กำลังกู้ไฟล์สำรองเข้ารหัส…"
+  },
+  "Lock your private vault before opening it again.": {
+    "en": "Lock your private vault before opening it again.",
+    "th": "กรุณาล็อกคลังข้อมูลส่วนตัวก่อนเปิดอีกครั้ง"
   }
 }

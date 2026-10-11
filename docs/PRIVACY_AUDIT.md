@@ -8,7 +8,7 @@ NutriAI is a TypeScript/Vite nutrition and fitness tracker with a Capacitor Andr
 
 ```mermaid
 flowchart TD
-  A[Local passphrase screen] --> B[Web Crypto key in memory]
+  A[Local six-digit PIN screen] --> B[Web Crypto key in memory]
   B --> C[Decrypt browser vault]
   C --> D[Create application store]
   D --> E[Profile, diary, workouts and preferences]
@@ -42,11 +42,12 @@ Only seven explicitly named legacy NutriAI localStorage keys and `nutriai_profil
 
 ## Protection implemented
 
-- Web Crypto AES-256-GCM with a fresh random 96-bit IV per snapshot and authenticated version context. Passphrase-derived keys use PBKDF2-HMAC-SHA-256, 600,000 iterations and a random 128-bit salt; keys are non-extractable and remain only in memory. Vault format version 1 fixes these parameters.
+- Web Crypto AES-256-GCM with a fresh random 96-bit IV per snapshot and AAD `NutriAI private vault v1`. New six-digit PIN keys use PBKDF2-HMAC-SHA-256 with 800,000 iterations and a random 128-bit salt; keys are non-extractable and remain only in memory. Credential type and bounded KDF iterations are preserved in snapshots and encrypted backups. Original v1 passphrase vaults omit this metadata and retain their 600,000-iteration derivation until migration.
+- Failed authentication is tracked in non-sensitive IndexedDB metadata: three consecutive failures cause a 30-second delay; five cause a five-minute lockout. Successful authentication resets the counter. An atomic transaction reserves each attempt across tabs; abandoned attempts expire after two minutes and count as failures. PINs are never written into metadata.
 - A synchronous memory facade preserves existing state APIs; serialized asynchronous commits write only ciphertext. Storage success is reported after IndexedDB transaction completion. There is no plaintext fallback.
 - Migration commits ciphertext before removing the legacy data and photo. A failed migration remains recoverable; existing encrypted records are never replaced by creating a new vault.
 - Atomic comparison of the previous record during write prevents stale tabs from silently overwriting each other. Conflicts display a save error. The losing tab can export its current in-memory data as an encrypted backup even if saving failed; it must not blindly overwrite the other tab.
-- Wrong passphrases and authentication failures leave stored records untouched. Locks wait for pending writes; failed writes leave a protected recovery screen instead of pretending the lock completed.
+- Wrong PINs/passphrases and authentication failures leave encrypted data untouched; only the attempt metadata changes. Locks wait for pending writes; failed writes leave a protected recovery screen instead of pretending the lock completed.
 - Manual lock and five-minute inactivity lock discard the application store, revoke the profile object URL, stop workout timers, clear personal DOM and remove the in-memory key reference. Backgrounding immediately covers the screen; elapsed time is checked again on return because background timers can be throttled.
 - User text is HTML escaped. Dynamic string arguments in inline event handlers are JSON encoded and then HTML escaped, including names/IDs containing quotes. Coach messages, meal labels, confirmation messages, legacy dates, photo URLs and custom food descriptions were covered.
 - Google-hosted fonts and Unsplash demo images were replaced with bundled fonts and a local illustration. Production iframe CSP permits only the Open Food Facts JSON search endpoint for connections; it blocks other fetch/WebSocket destinations, frames, workers, form submissions and external image/font sources. Existing template event handlers still require `unsafe-inline`; this policy is a supplementary protection, not a replacement for escaping or a guarantee against hostile application code.
@@ -54,15 +55,15 @@ Only seven explicitly named legacy NutriAI localStorage keys and `nutriai_profil
 
 ## Practical limits
 
-- Browser data is scoped to an origin and browser profile. It does not synchronize between devices and may be lost when browser storage is cleared/evicted, private browsing ends, or the app URL changes. Keep a backup and the original passphrase separately.
-- There is no password recovery. A weak passphrase can be guessed offline if someone obtains the vault. Use a unique long passphrase.
+- Browser data is scoped to an origin and browser profile. It does not synchronize between devices and may be lost when browser storage is cleared/evicted, private browsing ends, or the app URL changes. Keep a backup and its original credential separately; backups exported before PIN migration still require the original passphrase.
+- There is no PIN recovery. A six-digit PIN has only one million possibilities and provides less resistance to offline guessing than a strong passphrase. PBKDF2 increases the cost per guess. Client-side lockouts can be bypassed by editing local metadata or guessing against copied ciphertext; they do not provide server-enforced protection.
 - The app and same-origin scripts can read decrypted information while unlocked. Device compromise, extensions, malicious updates and people using the unlocked browser are outside at-rest encryption's protection.
 - Streamlit's surrounding page and the host still handle normal network requests and metadata. The inner iframe CSP does not control hosting-page analytics or provider logging.
 - Browser persistence and mobile lifecycle behavior vary. The automated browser checks below use Chromium with a mobile viewport; physical iPhone/Android browsers and a built Android APK were not independently validated.
-- The passphrase remains associated with the empty encrypted vault after “Delete All Local Data.” Downloaded backups and old exported files are not erased by deletion inside the app.
+- The PIN remains associated with the empty encrypted vault after “Delete All Local Data.” Downloaded backups and old exported files are not erased by deletion inside the app.
 - Standard JavaScript cannot promise immediate zeroization of garbage-collected memory or prevention of screenshots. Locking removes live application references and personal DOM; it is not full-device security.
 
-## Verification
+## Original verification (2026-10-09)
 
 - TypeScript type check and Vite production build.
 - Existing header, planner and onboarding regressions updated for the private storage facade and safe handler arguments.
@@ -189,3 +190,10 @@ Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG a
   the mounted dialog and private store.
 - Validation for this addition uses the production build and local synthetic
   mobile previews. No automated tests were added or run for this change.
+
+## Six-digit PIN refactor
+
+- Strict numeric six-digit validation applies to both create and unlock APIs, preserving leading zeros. The new keypad submits at six digits, confirms new PINs twice, clears buffers on errors/disposal and supports physical keyboards, optional haptics, English/Thai, light/dark themes and reduced motion.
+- Existing passphrase vaults and encrypted archives migrate through a dedicated API: decrypt with the original credential, derive a new PIN key with a fresh salt, and replace the ciphertext only after an atomic comparison and durable commit. A failure before commit preserves the original record. Backups exported earlier are not rewritten.
+- Storage/KDF failures and malformed decrypted payloads do not increment authentication failures. Concurrent attempts and completion tokens are checked with the current encrypted revision; successful authentication resets the counter. Local metadata contains only the salt identifier, attempt count, cooldown deadline and a temporary attempt lease.
+- Validation for this change: TypeScript strict mode and Vite production build. No new or existing automated tests were run for this refactor; the original verification section above describes the earlier passphrase implementation.
