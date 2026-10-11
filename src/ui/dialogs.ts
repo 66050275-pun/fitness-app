@@ -20,8 +20,11 @@ export class Dialogs {
   private backgroundScroll = 0;
   private pendingDismiss: { id: string; timer: number; afterClose: () => void } | null = null;
   private reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  private locking = false;
 
   constructor() {
+    document.addEventListener('nutriai:lock-start', () => { this.locking = true; this.cancelDismiss(); });
+    document.addEventListener('nutriai:lock-end', () => { this.locking = false; });
     const updateViewport = () => {
       const viewport = window.visualViewport;
       let top = viewport?.offsetTop ?? 0;
@@ -140,9 +143,14 @@ export class Dialogs {
   }
 
   /** Keep this mounted sheet and its focus/scroll lock until its exit completes. */
-  dismiss(id: string, afterClose: () => void): boolean {
+  dismiss(id: string, afterClose: () => void, replacePending = false): boolean {
     if (this.active?.id !== id) return false;
-    if (this.pendingDismiss?.id === id) return true;
+    if (this.locking) return true;
+    if (this.pendingDismiss?.id === id) {
+      // An explicit close can cancel a queued drilldown without replaying motion.
+      if (replacePending) this.pendingDismiss.afterClose = afterClose;
+      return true;
+    }
     this.cancelDismiss();
     if (this.reducedMotion.matches || document.documentElement.classList.contains('reduce-motion')) {
       afterClose();

@@ -33,6 +33,7 @@ The typed `QUICK_ADD_ACTIONS` list in
 | `quick-log` | `edit_note` | Quick Log |
 | `create-food` | `add_box` | Create Food |
 | `log-weight` | `monitor_weight` | Log Weight |
+| `more` | `more_horiz` | More (separate full-width row) |
 
 The presentation component maps the list to a grid. Each item has an icon, a
 localized label, an accessible description and an optional capability badge.
@@ -42,6 +43,10 @@ Each item invokes `window.selectQuickAddAction(actionId)`. Its switch in
 `src/main.ts` connects the six IDs to existing app screens and forms. To use a
 different menu, update the ID union, the data list, the dispatcher and translations
 together. Keep labels as translation keys and routing out of the component.
+
+More opens the gated Special Program extension menu. Its saved program state,
+nested navigation and six callback hooks are documented in
+`docs/SPECIAL_PROGRAM_MENU.md`.
 
 ## Dismissal and motion
 

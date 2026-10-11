@@ -451,6 +451,9 @@ export interface AppState {
   chatHistory: ChatMessage[];
   lastScannedFood: ScannedFood | null;
   quickAddOpen: boolean;
+  quickAddView: 'primary' | 'special' | 'tool';
+  selectedSpecialProgramTool: SpecialProgramToolId | null;
+  specialProgramToolError: boolean;
   dashboardWidgetOrder: DashboardWidgetId[];
   hiddenDashboardWidgets: DashboardWidgetId[];
   dashboardWidgetDrawerOpen: boolean;
@@ -533,6 +536,8 @@ export interface AppState {
   // Profile & Settings State
   profileSubpage: ProfileSubpage | null;
   userProfile: UserProfile;
+  weightGoalDraft: WeightGoalDraft | null;
+  weightGoalReturnScreen: ActiveScreen | null;
   userPreferences: UserPreferences;
   weightHistory: WeightEntry[];
   eatingSchedule: EatingSchedule;
@@ -603,6 +608,23 @@ export type ActivityLevel =
   | 'athlete';
 
 export type WeightGoalType = 'lose' | 'maintain' | 'gain';
+export type DietProgram = 'standard' | 'mini_cut' | 'lean_bulk';
+export type SpecialProgramToolId =
+  | 'hidden-fat-scanner'
+  | 'protein-splitter'
+  | 'protein-radar'
+  | 'fat-gauge'
+  | 'phase-cycle'
+  | 'recomp-matrix';
+
+/** Goal edits stay in memory until the user explicitly saves. */
+export interface WeightGoalDraft {
+  dietProgram: DietProgram;
+  weightGoalType: WeightGoalType;
+  targetWeightKg: number | null;
+  targetDate: string | null;
+  weeklyGoalRateKg: number;
+}
 
 // Discrete weekly weight rate values (signed: negative = lose, positive = gain)
 export type WeeklyWeightRate = -0.75 | -0.50 | -0.25 | 0 | 0.25 | 0.50 | 0.75;
@@ -640,6 +662,8 @@ export interface UserProfile {
   heightCm?: number | null;
   currentWeightKg?: number | null;
   weightGoalType?: WeightGoalType | null;
+  /** Saved program determines whether the Special Program menu is unlocked. */
+  dietProgram?: DietProgram;
   targetWeightKg?: number | null;
   targetDate?: string | null;
   /** Signed kg/week: negative for lose, positive for gain, 0 for maintain */

@@ -9,7 +9,8 @@ export type QuickAddActionId =
   | 'search-food'
   | 'quick-log'
   | 'create-food'
-  | 'log-weight';
+  | 'log-weight'
+  | 'more';
 
 export interface QuickAddAction {
   readonly id: QuickAddActionId;
@@ -19,7 +20,7 @@ export interface QuickAddAction {
   readonly badge?: 'Simulation' | 'Prototype';
 }
 
-/** Six real destinations, displayed left-to-right as a two-row, three-column grid. */
+/** Six standard destinations plus a separate full-width More entry. */
 export const QUICK_ADD_ACTIONS: readonly QuickAddAction[] = [
   {
     id: 'scan-food',
@@ -58,5 +59,11 @@ export const QUICK_ADD_ACTIONS: readonly QuickAddAction[] = [
     icon: 'monitor_weight',
     label: 'Log Weight',
     description: 'Record current body weight',
+  },
+  {
+    id: 'more',
+    icon: 'more_horiz',
+    label: 'More',
+    description: 'Explore Special Program tools for Mini Cut and Lean Bulk',
   },
 ];

@@ -2,14 +2,14 @@
 
 This file records the current theme of `fitness-app`. Read it before changing the UI. Keep new screens and components consistent with these patterns, and update this reference when an intentional design change is made.
 
-Reference date: 2026-10-10. The actual tokens live in `tailwind.config.js` and `src/index.css`.
+Reference date: 2026-10-12. The actual tokens live in `tailwind.config.js` and `src/index.css`.
 
 ## Visual direction
 
 - A calm, green wellness app for nutrition tracking and fitness, designed for phone browsers.
 - One centered app column, full width on phones and at most **430px** on larger screens.
 - Pale green backgrounds, rounded cards, clear headings, subtle borders and soft shadows. Dark mode uses deep green surfaces with readable light text.
-- Use the same visual language from the passphrase screen through onboarding, the dashboard, profile settings, exercise catalog and workout screens.
+- Use the same visual language from the PIN lock screen through onboarding, the dashboard, profile settings, exercise catalog and workout screens.
 - Green gradients and restrained glows emphasize primary actions and progress. Keep ordinary forms and informational cards quiet.
 
 ## Colors
@@ -58,6 +58,8 @@ Brand accents in Tailwind:
 - Primary buttons: typically 16–24px corners. Inputs: approximately 14px corners. Chips and segmented controls use pill shapes.
 - Drawers open as centered dialogs with **24px** corners on all sides, a clear title, a close control and a bounded scrollable body. Use `.ui-dialog-layer`, `.ui-dialog-panel` and `.ui-dialog-body`; keep headers and action bars outside the scroll body where practical.
 - **Quick Add** is a bottom sheet above the navigation bar: a **2-row × 3-column** grid of six icon-and-label actions, rounded top corners, a subtle shadow and a dimmed, blurred backdrop. Keep the center Add button available to close the menu, and disable the other navigation buttons until dismissal. Other dialogs retain their centered placement.
+- Put the seventh **More** action in a separate full-width row below that grid. It opens the Special Program menu through the same exit/entry lifecycle; show one sheet at a time. Back returns from a tool preview to the extension grid, then to Quick Add. The backdrop, X and center button close the menu.
+- The extension grid has six actions: Hidden Fat Scanner, Protein Splitter, Protein Radar, Fat Gauge, Phase & Cycle, and Recomp Matrix. Use a lock preview and a fixed **Activate in Goal Settings** footer for standard goals. Label tool placeholders as planned previews until their callbacks connect to real features.
 - Quick Add slides up and fades in over **220ms**, then slides down and fades out over **180ms**. Keep its mounted content and background scroll lock until exit completes. Respect Reduce Motion, cancel pending actions immediately when the vault locks, and keep scanner Simulation/Prototype badges visible.
 - Fit dialogs to the visible viewport, including keyboard and browser bar changes. Reserve the privacy status bar, 12px edge gutters and safe areas. Streamlit uses a viewport-height iframe, with scrolling inside the app rather than in the host page.
 - Show one active dialog at a time; hide and disable any underlying dialog during a drilldown or confirmation, then restore it on close. Preserve form text, focus, selection and internal scroll across data updates. Lock background scrolling while a dialog is open and restore it on close. Escape and the device Back button dismiss the active dialog before navigating; keep the privacy Lock control available.
@@ -123,17 +125,27 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Show distinct loading, unavailable and no-result states. Retain the Open Food Facts product link and ODbL attribution on imported foods. Unknown nutrients display as unavailable and remain null.
 - Query text and unsaved results remain in memory. Logged product definitions and diary snapshots use the existing encrypted browser vault; locking cancels outstanding requests.
 
+## Goal Settings and Special Program
+
+- Standard **Cut / Maintain / Bulk** map to existing `lose / maintain / gain` weight directions. **Mini Cut / Lean Bulk** are saved program choices, with the corresponding lose/gain direction. Derive unlock status from the saved `dietProgram`, rather than persisting a separate boolean that can disagree with it.
+- Keep selections, target weight/date and weekly pace in a memory draft until **Save Goal Settings**. Back discards the draft. Saving a standard goal locks the extension menu; saving a special goal unlocks it. Legacy profiles default to standard.
+- An activation CTA opens Goal Settings and returns to the extension menu on Save or Back. Show the saved program separately from the current draft selection.
+- Program choice uses the existing encrypted profile persistence. Tool registration, navigation and drafts remain in memory and clear when the vault locks. Keep all new labels/descriptions bilingual.
+- Protein splits, daily fat limits and phase durations in the previews are examples of planned tool functions. Selecting a program does not prescribe these values or start scans/phase tracking.
+
 ## English and Thai
 
 - The selected language applies throughout the app: lock screen, navigation, settings, forms, calendars, validation, exercise names, muscle labels and demo replies.
 - Use `tr`, `trHtml` and the existing localized label helpers with `src/i18n/messages.json`. Escape dynamic values when rendering HTML.
 - Preserve user-entered names, notes, custom food descriptions and messages. Keep brand names, artwork credits and scientific abbreviations in their original form.
 - Update the document language to `en` or `th`. Display dates with `en-US` or `th-TH-u-ca-gregory-nu-latn`; stored date keys remain `YYYY-MM-DD`.
-- Language selection is available at the passphrase gate and Profile → App Settings → Language. Only the non-sensitive language code is kept outside the encrypted vault for startup presentation.
+- Language selection is available at the PIN gate and Profile → App Settings → Language. Only the non-sensitive language code is kept outside the encrypted vault for startup presentation.
 
 ## Privacy and honest product states
 
-- Treat the passphrase gate, save indicator, Lock control and background privacy shield as part of the same green app theme.
+- Treat the PIN gate, save indicator, Lock control and background privacy shield as part of the same green app theme.
+- The lock screen uses six animated dots and a 3 × 4 circular numeric keypad with letter groups, zero and backspace. The sixth digit submits automatically. Creation asks for the PIN twice; mismatches shake and return to the first step. Keep touch targets at 64–72px, use green filled dots, and respect reduced motion.
+- Show verification and persistent lockout countdowns in place. Keypad and language controls are disabled during cryptographic work. Existing passphrase vaults display a migration form before choosing a PIN, preserving their data and explaining original-backup credentials.
 - Distinguish saving, saved and failed states accurately; show actionable storage errors without claiming success.
 - Keep the existing encrypted browser vault and encrypted backup flow. Explain relevant limitations when users make decisions about backup, restore or clearing data.
 - Label scanner and coach preview functionality truthfully. UI copy should match the current capabilities, including the absence of automatic device sync and password recovery.
@@ -145,7 +157,7 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - `src/index.css`: shared light/dark variables, privacy surfaces, imagery, muscle map and reduced motion.
 - `index.html`: mobile viewport and 430px app shell.
 - `src/components/Navigation/`: header and bottom navigation patterns.
-- `src/security/vaultUI.ts`: passphrase gate, status and shield.
+- `src/security/vaultUI.ts`: PIN gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.

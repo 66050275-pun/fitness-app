@@ -262,7 +262,9 @@ export function sanitizeUserProfile(raw: any): UserProfile {
   const validGoals = ['lose', 'maintain', 'gain', null];
   const validActivities = ['sedentary', 'light', 'moderate', 'very_active', 'athlete', null];
 
-  const weightGoalType = validGoals.includes(raw.weightGoalType) ? raw.weightGoalType : null;
+  const dietProgram = raw.dietProgram === 'mini_cut' || raw.dietProgram === 'lean_bulk' ? raw.dietProgram : 'standard';
+  const weightGoalType = dietProgram === 'mini_cut' ? 'lose' : dietProgram === 'lean_bulk' ? 'gain'
+    : validGoals.includes(raw.weightGoalType) ? raw.weightGoalType : null;
 
   // --- weeklyGoalRateKg migration (v3→v4) ---
   // Legacy: stored as positive magnitude (e.g., 0.5 for both lose and gain)
@@ -297,6 +299,7 @@ export function sanitizeUserProfile(raw: any): UserProfile {
     heightCm: typeof raw.heightCm === 'number' && raw.heightCm > 0 ? Math.round(raw.heightCm) : null,
     currentWeightKg: typeof raw.currentWeightKg === 'number' && raw.currentWeightKg > 0 ? Math.round(raw.currentWeightKg * 10) / 10 : null,
     weightGoalType,
+    dietProgram,
     targetWeightKg: typeof raw.targetWeightKg === 'number' && raw.targetWeightKg > 0 ? Math.round(raw.targetWeightKg * 10) / 10 : null,
     targetDate: typeof raw.targetDate === 'string' && raw.targetDate.trim() ? raw.targetDate : null,
     weeklyGoalRateKg,

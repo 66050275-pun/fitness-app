@@ -29,6 +29,8 @@ import type {
   CustomFoodDraft,
   FoodPortionOption,
   UserProfile,
+  WeightGoalDraft,
+  SpecialProgramToolId,
   UserPreferences,
   WeightEntry,
   EatingSchedule,
@@ -85,6 +87,8 @@ import {
 import { lbToKg } from '../utils/unitConversions';
 import { loadProfileImageBlob, deleteProfileImageDB } from '../utils/profileImageStorage';
 import { clampNonNegative, safeFiniteNumber } from '../utils/safeNumbers';
+import { createWeightGoalDraft, isSpecialProgramUnlocked } from '../utils/dietPrograms';
+import { SPECIAL_PROGRAM_ACTIONS } from '../components/BottomSheets/specialProgramActions';
 
 const today = getTodayKey();
 const WORKOUT_HISTORY_STORAGE_KEY = 'nutriai_workout_history';
@@ -480,6 +484,9 @@ class Store {
       chatHistory: INITIAL_CHAT,
       lastScannedFood: null,
       quickAddOpen: false,
+      quickAddView: 'primary',
+      selectedSpecialProgramTool: null,
+      specialProgramToolError: false,
       dashboardWidgetOrder: dashboardLayout.order,
       hiddenDashboardWidgets: dashboardLayout.hidden,
       dashboardWidgetDrawerOpen: false,
@@ -560,6 +567,8 @@ class Store {
       // Profile & Settings State
       profileSubpage: null,
       userProfile: persisted.userProfile || { displayName: '' },
+      weightGoalDraft: null,
+      weightGoalReturnScreen: null,
       userPreferences: persisted.userPreferences || sanitizeUserPreferences(null),
       weightHistory: persisted.weightHistory || [],
       eatingSchedule: persisted.eatingSchedule || sanitizeEatingSchedule(null),
@@ -626,6 +635,11 @@ class Store {
     if (screen !== 'foodSearch') this.resetExternalFoodSearch();
     this.state.currentScreen = screen;
     this.state.quickAddOpen = false;
+    this.state.quickAddView = 'primary';
+    this.state.selectedSpecialProgramTool = null;
+    this.state.specialProgramToolError = false;
+    this.state.weightGoalDraft = null;
+    this.state.weightGoalReturnScreen = null;
     this.state.selectedMealDetailId = null;
     this.state.activeNutrientModalSource = null;
     this.state.isSetPortionOpen = false;
@@ -681,12 +695,51 @@ class Store {
   // --- Profile & Subpage Navigation ---
   public setProfileSubpage(subpage: ProfileSubpage | null) {
     this.state.profileSubpage = subpage;
+    this.state.weightGoalDraft = subpage === 'weight_goal' ? createWeightGoalDraft(this.state.userProfile) : null;
+    this.state.weightGoalReturnScreen = null;
     this.notify();
   }
 
   public goBackFromProfileSubpage() {
+    const returnScreen = this.state.weightGoalReturnScreen;
     this.state.profileSubpage = null;
+    this.state.weightGoalDraft = null;
+    this.state.weightGoalReturnScreen = null;
+    if (returnScreen) {
+      this.state.currentScreen = returnScreen;
+      this.state.quickAddOpen = true;
+      this.state.quickAddView = 'special';
+    }
     this.notify();
+  }
+
+  public openSpecialProgramGoalSettings() {
+    const returnScreen = this.state.currentScreen;
+    this.state.currentScreen = 'profile';
+    this.state.profileSubpage = 'weight_goal';
+    this.state.weightGoalDraft = createWeightGoalDraft(this.state.userProfile);
+    this.state.weightGoalReturnScreen = returnScreen;
+    this.state.quickAddOpen = false;
+    this.state.quickAddView = 'primary';
+    this.state.selectedSpecialProgramTool = null;
+    this.state.specialProgramToolError = false;
+    this.notify();
+  }
+
+  public updateWeightGoalDraft(goal: Partial<WeightGoalDraft>, notify = true) {
+    if (this.state.currentScreen !== 'profile' || this.state.profileSubpage !== 'weight_goal') return;
+    this.state.weightGoalDraft = createWeightGoalDraft({
+      ...(this.state.weightGoalDraft ?? this.state.userProfile), ...goal,
+    });
+    if (notify) this.notify();
+  }
+
+  public saveWeightGoalDraft() {
+    if (!this.state.weightGoalDraft || this.state.profileSubpage !== 'weight_goal') return;
+    this.state.userProfile = { ...this.state.userProfile, ...createWeightGoalDraft(this.state.weightGoalDraft) };
+    this.persistState();
+    // Goal Settings entered through More returns to that menu after saving.
+    this.goBackFromProfileSubpage();
   }
 
   public updateUserProfile(profile: Partial<UserProfile>) {
@@ -708,9 +761,13 @@ class Store {
   }
 
   public updateWeightGoal(goal: Partial<UserProfile>) {
+    const normalized = createWeightGoalDraft({
+      ...this.state.userProfile, ...goal,
+      dietProgram: goal.dietProgram ?? (goal.weightGoalType ? 'standard' : this.state.userProfile.dietProgram),
+    });
     this.state.userProfile = {
       ...this.state.userProfile,
-      ...goal
+      ...normalized
     };
     this.persistState();
     this.notify();
@@ -926,6 +983,7 @@ class Store {
       weightGoalType: draft.weightDirection !== null
         ? (draft.weightDirection < 0 ? 'lose' : draft.weightDirection > 0 ? 'gain' : 'maintain')
         : this.state.userProfile.weightGoalType,
+      dietProgram: 'standard',
       weeklyGoalRateKg: draft.weightDirection,
       profileSetupCompleted: true
     };
@@ -1055,6 +1113,12 @@ class Store {
       this.state.workoutHistory = [];
       this.state.weightHistory = [];
       this.state.userProfile = { displayName: '' };
+      this.state.weightGoalDraft = null;
+      this.state.weightGoalReturnScreen = null;
+      this.state.quickAddOpen = false;
+      this.state.quickAddView = 'primary';
+      this.state.selectedSpecialProgramTool = null;
+      this.state.specialProgramToolError = false;
       this.state.userPreferences = sanitizeUserPreferences(null);
       this.state.userPreferences.language = getLanguage();
       this.state.eatingSchedule = sanitizeEatingSchedule(null);
@@ -1409,7 +1473,13 @@ class Store {
   }
 
   public toggleQuickAdd(open?: boolean) {
-    this.state.quickAddOpen = typeof open === 'boolean' ? open : !this.state.quickAddOpen;
+    const nextOpen = typeof open === 'boolean' ? open : !this.state.quickAddOpen;
+    if (!nextOpen || !this.state.quickAddOpen) {
+      this.state.quickAddView = 'primary';
+      this.state.selectedSpecialProgramTool = null;
+      this.state.specialProgramToolError = false;
+    }
+    this.state.quickAddOpen = nextOpen;
     this.notify();
   }
 
@@ -1419,6 +1489,21 @@ class Store {
 
   public closeQuickAdd() {
     this.toggleQuickAdd(false);
+  }
+
+  public isSpecialProgramUnlocked(): boolean {
+    return isSpecialProgramUnlocked(this.state.userProfile);
+  }
+
+  public openQuickAddView(view: AppState['quickAddView'], toolId: SpecialProgramToolId | null = null, toolError = false) {
+    if (this.disposed) return;
+    const validTool = SPECIAL_PROGRAM_ACTIONS.some(action => action.id === toolId);
+    const allowTool = view === 'tool' && this.isSpecialProgramUnlocked() && validTool;
+    this.state.quickAddOpen = true;
+    this.state.quickAddView = view === 'tool' ? allowTool ? 'tool' : 'special' : view === 'special' ? 'special' : 'primary';
+    this.state.selectedSpecialProgramTool = allowTool ? toolId : null;
+    this.state.specialProgramToolError = allowTool && toolError;
+    this.notify();
   }
 
   public setInsightRange(range: 7 | 30 | 90) {
