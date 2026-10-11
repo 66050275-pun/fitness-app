@@ -169,6 +169,62 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 @keyframes ui-dialog-backdrop { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ui-dialog-entry { from { opacity: 0.4; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
 
+/* Quick Add is the one bottom-anchored menu. Other forms stay centered. */
+.ui-bottom-sheet-layer {
+  align-items: flex-end;
+  padding-bottom: max(calc(var(--ui-bottom-nav-height, 0px) + 24px), calc(12px + env(safe-area-inset-bottom, 0px)));
+  background: rgb(8 20 13 / 55%);
+  backdrop-filter: blur(5px);
+  animation: ui-dialog-backdrop 200ms var(--ui-motion-easing) both;
+}
+.ui-bottom-sheet-panel {
+  padding: 20px; gap: 16px;
+  background: var(--ui-card); color: var(--ui-text);
+  border-radius: 28px 28px 24px 24px;
+  box-shadow: 0 -4px 28px rgb(0 0 0 / 12%), 0 16px 40px rgb(0 0 0 / 18%);
+  animation: ui-bottom-sheet-entry 220ms var(--ui-motion-easing) both;
+}
+.quick-add-sheet-handle { width: 36px; height: 4px; border-radius: 999px; background: var(--ui-border); align-self: center; }
+.quick-add-sheet-subtitle { margin-top: 5px; color: var(--ui-muted); font-size: 12px; line-height: 1.5; }
+.quick-add-sheet-close { width: 44px; height: 44px; border-radius: 999px; background: var(--ui-panel); color: var(--ui-muted); }
+.quick-add-sheet-close:hover { background: var(--ui-panel-high); color: var(--ui-text); }
+.quick-add-action-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.quick-add-action-tile {
+  min-width: 0; min-height: 108px; padding: 14px 6px 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px;
+  border: 1px solid var(--ui-border); border-radius: 18px;
+  background: var(--ui-panel); color: var(--ui-text); text-align: center;
+  transition: background var(--ui-motion-duration), border-color var(--ui-motion-duration), transform var(--ui-motion-duration);
+}
+.quick-add-action-tile:hover { background: var(--ui-primary-soft); border-color: var(--ui-primary); }
+.quick-add-action-tile:active { transform: scale(0.97); }
+.quick-add-action-icon {
+  width: 44px; height: 44px; flex-shrink: 0;
+  display: grid; place-items: center; border-radius: 14px;
+  background: var(--ui-primary-soft); color: var(--ui-primary);
+}
+.quick-add-action-icon .material-symbols-outlined { font-size: 25px; }
+.quick-add-action-label { font: 700 12px/1.5 'Plus Jakarta Sans', sans-serif; overflow-wrap: anywhere; }
+.quick-add-action-badge {
+  max-width: 100%; padding: 2px 5px; margin-top: auto;
+  border-radius: 999px; font-size: 9px; line-height: 1.5; font-weight: 700;
+  background: var(--ui-primary-soft); color: var(--ui-primary-label); overflow-wrap: anywhere;
+}
+#app-navigation.ui-quick-add-navigation nav { z-index: 201; }
+.ui-bottom-sheet-closing { pointer-events: none; animation: ui-bottom-sheet-backdrop-exit 180ms ease-in both; }
+.ui-bottom-sheet-closing .ui-bottom-sheet-panel { animation: ui-bottom-sheet-exit 180ms ease-in both; }
+.ui-dialog-retained:not(.ui-bottom-sheet-closing),
+.ui-dialog-retained:not(.ui-bottom-sheet-closing) .ui-dialog-panel { animation: none; }
+@keyframes ui-bottom-sheet-entry {
+  from { opacity: 0; transform: translateY(calc(100% + 24px)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ui-bottom-sheet-exit {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(calc(100% + var(--ui-bottom-nav-height, 0px) + 24px)); }
+}
+@keyframes ui-bottom-sheet-backdrop-exit { from { opacity: 1; } to { opacity: 0; } }
+
 /* Numeric readouts may wrap, but never clip or hide the full value. */
 .ui-number { min-width: 0; max-width: 100%; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .ui-number-grid > *, .ui-stat-grid > * { min-width: 0; }
