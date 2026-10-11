@@ -1,172 +1,184 @@
-import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { tr, trHtml } from '../../i18n/index.ts';
 import { store } from '../../store/appState';
-import { ACTIVITY_MULTIPLIERS, calculateAge, calculateFullGoals, resolveCalculationSex } from '../../utils/goalCalculations';
-import { cmToFtIn, kgToLb } from '../../utils/unitConversions';
-import { htmlJsArg, escapeHtml } from '../../utils/sanitize';
-import { formatWeeklyRate } from '../../utils/safeNumbers';
-import type { ActivityLevel, WeeklyWeightRate } from '../../types/index.ts';
+import { escapeHtml, htmlJsArg } from '../../utils/sanitize';
+import { formatDisplayNumber } from '../../utils/safeNumbers';
+import { ONBOARDING_ACTIVITIES, ONBOARDING_OBJECTIVES, getOnboardingTargets, getOnboardingWaterTarget } from '../../utils/onboardingGoals';
+import type { OnboardingDraft } from '../../types/index.ts';
 
-const RATES: WeeklyWeightRate[] = [-0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75];
+const STEP_COUNT = 4;
 
+/** Screen motion is owned by ScreenTransitions; edits never remount the wizard. */
 function shell(content: string, step: number): string {
-  const progress = Math.round((step / 6) * 100);
+  const state = store.getState();
+  const canExit = state.userProfile.profileSetupCompleted === true;
+  const savePending = state.onboardingState.isCompleted;
+  const backAction = step > 1 ? 'window.onboardingBack()' : 'window.cancelOnboarding()';
+  const backLabel = step > 1 ? 'Back' : 'Exit setup';
   return `
-    <div class="min-h-screen bg-surface dark:bg-dark-surface text-on-surface dark:text-white flex flex-col" style="padding-top: max(1rem, env(safe-area-inset-top)); padding-bottom: max(1rem, env(safe-area-inset-bottom));">
-      <header class="px-screen-gutter pt-2 pb-4">
-        <div class="flex items-center justify-between mb-3">
-          <span class="font-heading font-extrabold text-primary dark:text-primary-container">NutriAI</span>
-          <span class="text-xs font-bold text-on-surface-variant dark:text-gray-400">${trHtml("Step")} ${step} ${trHtml("of 6")}</span>
+    <div class="onboarding-wizard mx-auto w-full max-w-[430px] flex flex-col font-sans">
+      <header class="onboarding-header px-screen-gutter pt-5 pb-4">
+        <div class="flex items-center justify-between gap-3">
+          ${step > 1 || canExit ? `<button id="onboarding-back" type="button" onclick="${backAction}" ${savePending ? 'disabled' : ''} class="onboarding-back inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full" aria-label="${trHtml(backLabel)}"><span class="material-symbols-outlined" aria-hidden="true">arrow_back</span></button>` : '<span class="onboarding-brand-mark inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined" aria-hidden="true">nutrition</span></span>'}
+          <div class="min-w-0 flex-1"><span class="onboarding-brand block font-heading text-lg font-extrabold">NutriAI</span><p class="onboarding-muted text-xs mt-0.5">${trHtml('Personalize your goals')}</p></div>
+          <span class="onboarding-step text-xs font-bold shrink-0">${trHtml('Step {0} of 4', step)}</span>
         </div>
-        <div class="h-1.5 rounded-full bg-surface-container-highest dark:bg-dark-border overflow-hidden" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="${step}" aria-label="${trHtml("Onboarding step")} ${step} ${trHtml("of 6")}">
-          <div class="h-full bg-primary rounded-full transition-all" style="width:${progress}%"></div>
+        <div class="onboarding-progress grid grid-cols-4 gap-2 mt-5" role="progressbar" aria-valuemin="1" aria-valuemax="${STEP_COUNT}" aria-valuenow="${step}" aria-label="${trHtml('Step {0} of 4', step)}">
+          ${Array.from({ length: STEP_COUNT }, (_, index) => `<span class="h-1.5 rounded-full ${index < step ? 'onboarding-progress-filled' : 'onboarding-progress-empty'}"></span>`).join('')}
         </div>
       </header>
-      <main class="flex-1 px-screen-gutter overflow-y-auto">${content}</main>
+      <main class="onboarding-main flex-1 px-screen-gutter pb-3">${content}</main>
+      <footer id="onboarding-actions" class="onboarding-footer px-screen-gutter pt-3 pb-5">
+        <p id="onboarding-error" class="onboarding-error text-xs leading-relaxed empty:hidden mb-3" tabindex="-1" role="alert" aria-live="polite"></p>
+        <button id="onboarding-next" type="button" onclick="window.onboardingNext()" class="ui-primary-button flex items-center justify-center gap-2">
+          <span id="onboarding-next-label">${trHtml(savePending ? 'Retry setup save' : step === STEP_COUNT ? 'Get Started' : 'Continue')}</span><span class="material-symbols-outlined text-xl" aria-hidden="true">${savePending ? 'sync' : step === STEP_COUNT ? 'check' : 'arrow_forward'}</span>
+        </button>
+        ${step === 1 && canExit ? `<button type="button" onclick="window.cancelOnboarding()" class="onboarding-secondary w-full min-h-11 mt-1 text-xs font-semibold rounded-xl">${trHtml('Keep my current goals')}</button>` : ''}
+      </footer>
     </div>`;
 }
 
-function actions(step: number, continueLabel = 'Continue', optional = false): string {
+function heading(title: string, description: string): string {
+  return `<div class="mb-6 pt-2"><h1 class="font-heading text-[26px] leading-tight font-extrabold" tabindex="-1">${trHtml(title)}</h1><p class="onboarding-muted mt-2 text-sm leading-relaxed">${trHtml(description)}</p></div>`;
+}
+
+function renderObjective(): string {
+  const selected = store.getState().onboardingDraft.primaryObjective;
+  return shell(`
+    ${heading('Choose your fitness objective', 'A clear starting point for your nutrition and training.')}
+    <div class="space-y-3" role="radiogroup" aria-label="${trHtml('Choose your fitness objective')}">
+      ${ONBOARDING_OBJECTIVES.map(item => `
+        <button type="button" role="radio" aria-checked="${selected === item.id}" onclick="window.selectOnboardingObjective(${htmlJsArg(item.id)})" class="onboarding-choice ${selected === item.id ? 'is-selected' : ''} flex w-full items-center gap-3 rounded-2xl p-4 text-left">
+          <span class="onboarding-choice-icon inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">${escapeHtml(item.icon)}</span></span>
+          <span class="min-w-0 flex-1"><strong class="block font-heading text-sm leading-relaxed">${trHtml(item.title)}</strong><span class="onboarding-muted block mt-1 text-xs leading-relaxed">${trHtml(item.description)}</span></span>
+          <span class="onboarding-choice-check material-symbols-outlined text-xl shrink-0" aria-hidden="true">${selected === item.id ? 'check_circle' : 'radio_button_unchecked'}</span>
+        </button>`).join('')}
+    </div>
+    <p id="onboarding-error-primaryObjective" class="onboarding-field-error empty:hidden" role="alert"></p>`, 1);
+}
+
+interface NumericFieldOptions {
+  id: string;
+  field: string;
+  label: string;
+  value: number | null;
+  min: number;
+  max: number;
+  step?: string;
+  unit?: string;
+  optional?: boolean;
+  help?: string;
+}
+
+function numericField(options: NumericFieldOptions): string {
+  const { id, field, label, value, min, max, step = '0.1', unit, optional = false, help } = options;
+  const describedBy = `onboarding-error-${field}${help ? ` ${id}-help` : ''}`;
   return `
-    <div class="sticky bottom-0 pt-4 pb-3 bg-gradient-to-t from-surface via-surface dark:from-dark-surface dark:via-dark-surface to-transparent flex gap-2">
-      ${step > 1 ? `<button type="button" onclick="window.onboardingBack()" class="min-h-12 px-5 rounded-2xl border border-outline-variant/40 font-bold">${trHtml("Back")}</button>` : ''}
-      ${optional ? `<button type="button" onclick="window.onboardingSkip()" class="min-h-12 px-4 rounded-2xl text-on-surface-variant font-bold">${trHtml("Skip")}</button>` : ''}
-      <button type="button" onclick="window.onboardingNext()" class="min-h-12 flex-1 rounded-2xl bg-primary text-white font-bold shadow-glow-primary">${trHtml(continueLabel)}</button>
+    <div class="min-w-0">
+      <label for="${id}" class="block text-xs font-bold leading-relaxed">${trHtml(label)}${optional ? `<span class="onboarding-muted font-normal"> ${trHtml('(optional)')}</span>` : ''}</label>
+      <div class="onboarding-input-wrap relative mt-2">
+        <input id="${id}" type="number" inputmode="${step === '1' ? 'numeric' : 'decimal'}" min="${min}" max="${max}" step="${step}" value="${escapeHtml(value ?? '')}" oninput="window.captureOnboardingInput(this)" ${optional ? '' : 'required'} aria-describedby="${describedBy}" class="onboarding-input w-full rounded-xl px-4 py-3 ${unit ? 'pr-16' : ''}">
+        ${unit ? `<span class="onboarding-input-unit absolute right-4 top-1/2 -translate-y-1/2 text-xs" aria-hidden="true">${trHtml(unit)}</span>` : ''}
+      </div>
+      ${help ? `<p id="${id}-help" class="onboarding-muted mt-2 text-xs leading-relaxed">${trHtml(help)}</p>` : ''}
+      <p id="onboarding-error-${field}" class="onboarding-field-error empty:hidden" role="alert"></p>
     </div>`;
 }
 
-function renderWelcome(): string {
-  return shell(`
-    <section class="min-h-[72vh] flex flex-col justify-center text-center">
-      <div class="w-24 h-24 mx-auto rounded-[2rem] bg-gradient-to-tr from-primary to-primary-container text-white flex items-center justify-center shadow-glow-primary mb-7">
-        <span class="material-symbols-outlined text-[48px]">nutrition</span>
-      </div>
-      <h1 class="font-heading text-3xl font-extrabold">${trHtml("Let’s personalize NutriAI")}</h1>
-      <p class="mt-3 text-sm leading-relaxed text-on-surface-variant dark:text-gray-300">${trHtml("Answer a few questions to set up your nutrition and weight goals. You can change these settings later in Profile.")}</p>
-      <p class="mt-5 text-xs text-on-surface-variant dark:text-gray-400">${trHtml("NutriAI provides general estimates, not medical advice.")}</p>
-      <button type="button" onclick="window.onboardingNext()" class="mt-10 min-h-14 rounded-2xl bg-primary text-white font-heading font-bold shadow-glow-primary">${trHtml("Get Started")}</button>
-    </section>`, 1);
+function weightDelta(draft: OnboardingDraft): string {
+  if (draft.currentWeightKg === null || draft.targetWeightKg === null) {
+    return trHtml('Enter your current and target weights to see the difference.');
+  }
+  const delta = draft.targetWeightKg - draft.currentWeightKg;
+  return trHtml('Target change: {0} kg', `${delta > 0 ? '+' : ''}${formatDisplayNumber(delta, 1)}`);
 }
 
-function renderWeightGoal(): string {
-  const state = store.getState();
-  const selected = state.onboardingDraft.weightDirection;
-  const unit = state.onboardingDraft.weightUnit;
-  const labels = ['Lose faster', 'Lose moderately', 'Lose gradually', 'Maintain', 'Gain gradually', 'Gain moderately', 'Gain faster'];
+function renderMetrics(): string {
+  const draft = store.getState().onboardingDraft;
+  const selectedSex = draft.biologicalSex === 'prefer_not_to_say' ? 'other' : draft.biologicalSex;
   return shell(`
-    <section class="pt-6">
-      <p class="text-xs font-extrabold uppercase tracking-wider text-primary">${trHtml("Your goal")}</p>
-      <h1 class="font-heading text-2xl font-extrabold mt-1">${trHtml("What would you like to do?")}</h1>
-      <p class="text-sm text-on-surface-variant dark:text-gray-400 mt-2">${trHtml("Choose a starting pace. Maintain sits in the center.")}</p>
-      <div class="mt-7 grid gap-2" role="radiogroup" aria-label="${trHtml("Weekly weight goal")}">
-        ${RATES.map((rate, index) => `
-          <button type="button" role="radio" aria-checked="${selected === rate}" onclick="window.selectOnboardingRate(${rate})" class="min-h-13 px-4 rounded-2xl border flex items-center justify-between text-left ${selected === rate ? 'border-primary bg-primary/10 ring-1 ring-primary' : 'border-outline-variant/30 bg-surface-container-lowest dark:bg-dark-surface-card'}">
-            <span class="font-bold text-sm">${trHtml(labels[index])}</span>
-            <span class="text-xs ${selected === rate ? 'text-primary dark:text-primary-container font-bold' : 'text-on-surface-variant'}">${rate === 0 ? '0' : tr("{0} {1}/wk", Math.round(Math.abs(rate) * (unit === 'lb' ? 2.20462 : 1) * 100) / 100, tr(unit))}</span>
-          </button>`).join('')}
+    ${heading('Your body metrics', 'Small details make your starting targets more personal.')}
+    <section class="onboarding-card rounded-2xl p-4 space-y-5">
+      <div><label for="onboarding-name" class="block text-xs font-bold">${trHtml('Display name')} <span class="onboarding-muted font-normal">${trHtml('(optional)')}</span></label><input id="onboarding-name" autocomplete="nickname" maxlength="80" value="${escapeHtml(draft.displayName)}" oninput="window.captureOnboardingInput(this)" class="onboarding-input w-full mt-2 rounded-xl px-4 py-3"></div>
+      <fieldset><legend class="text-xs font-bold mb-2">${trHtml('Gender')}</legend>
+        <div class="grid grid-cols-3 gap-2">${(['male', 'female', 'other'] as const).map(sex => `<label data-onboarding-sex="${sex}" class="onboarding-sex-choice relative flex items-center justify-center rounded-xl px-2 py-3 text-xs font-semibold text-center ${selectedSex === sex ? 'is-selected' : ''}"><input class="sr-only" type="radio" name="onboarding-sex" value="${sex}" ${selectedSex === sex ? 'checked' : ''} onchange="window.captureOnboardingInput(this)" aria-describedby="onboarding-error-biologicalSex"><span>${trHtml(sex === 'male' ? 'Male' : sex === 'female' ? 'Female' : 'Other')}</span></label>`).join('')}</div>
+        <p id="onboarding-error-biologicalSex" class="onboarding-field-error empty:hidden" role="alert"></p>
+      </fieldset>
+      <div class="onboarding-metrics-grid grid grid-cols-2 gap-3">
+        ${numericField({ id: 'onboarding-age', field: 'ageYears', label: 'Age', value: draft.ageYears, min: 15, max: 100, step: '1', unit: 'years' })}
+        ${numericField({ id: 'onboarding-height-cm', field: 'heightCm', label: 'Height (cm)', value: draft.heightCm, min: 100, max: 250, unit: 'cm' })}
       </div>
-      ${selected !== null ? `<div class="mt-4 p-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card text-xs"><strong>${formatWeeklyRate(selected, unit)}</strong>${Math.abs(selected) === 0.75 ? `<p class="mt-1 text-on-surface-variant dark:text-gray-400">${trHtml("Faster weight changes may not be appropriate for everyone. Consider a gradual rate or speak with a qualified professional.")}</p>` : ''}</div>` : ''}
-      <p id="onboarding-error" class="min-h-5 mt-2 text-xs text-error" role="alert"></p>
-      ${actions(2)}
+      ${numericField({ id: 'onboarding-current-weight', field: 'currentWeightKg', label: 'Current weight (kg)', value: draft.currentWeightKg, min: 30, max: 250, unit: 'kg' })}
+      ${numericField({ id: 'onboarding-target-weight', field: 'targetWeightKg', label: 'Target weight (kg)', value: draft.targetWeightKg, min: 30, max: 250, unit: 'kg', optional: true, help: 'Choose a target or leave it blank for now.' })}
+      <div class="onboarding-info flex items-start gap-2 rounded-xl p-3"><span class="material-symbols-outlined text-lg shrink-0 mt-0.5" aria-hidden="true">swap_vert</span><p id="onboarding-weight-delta" class="text-xs leading-relaxed" aria-live="polite">${weightDelta(draft)}</p></div>
     </section>`, 2);
 }
 
-function renderPersonalDetails(): string {
-  const d = store.getState().onboardingDraft;
-  const feet = d.heightCm ? cmToFtIn(d.heightCm) : { feet: 0, inches: 0 };
-  const displayWeight = d.currentWeightKg ? (d.weightUnit === 'lb' ? kgToLb(d.currentWeightKg) : d.currentWeightKg) : '';
-  const targetWeight = d.targetWeightKg ? (d.weightUnit === 'lb' ? kgToLb(d.targetWeightKg) : d.targetWeightKg) : '';
-  return shell(`
-    <section class="pt-6">
-      <p class="text-xs font-extrabold uppercase tracking-wider text-primary">${trHtml("Personal details")}</p>
-      <h1 class="font-heading text-2xl font-extrabold mt-1">${trHtml("Tell us about yourself")}</h1>
-      <p class="text-sm text-on-surface-variant dark:text-gray-400 mt-2">${trHtml("These details are used only to estimate energy needs on this device.")}</p>
-      <div class="mt-6 space-y-4">
-        <label class="block"><span class="text-xs font-bold">${trHtml("Display name")} <span class="font-normal text-on-surface-variant">${trHtml("(optional)")}</span></span><input id="onboarding-name" value="${escapeHtml(d.displayName)}" class="mt-1.5 w-full rounded-xl border border-outline-variant/40 bg-white dark:bg-dark-surface-card px-4 py-3" /></label>
-        <fieldset><legend class="text-xs font-bold mb-2">${trHtml("Biological sex")}</legend><div class="grid grid-cols-3 gap-2">${(['female','male','prefer_not_to_say'] as const).map(v => `<label class="rounded-xl border p-3 text-center text-xs cursor-pointer ${d.biologicalSex === v ? 'border-primary bg-primary/10' : 'border-outline-variant/30'}"><input class="sr-only" type="radio" name="onboarding-sex" value="${escapeHtml(v)}" ${d.biologicalSex === v ? 'checked' : ''}><span>${v === 'prefer_not_to_say' ? tr("Prefer not to say") : tr(v[0].toUpperCase()+v.slice(1))}</span></label>`).join('')}</div></fieldset>
-        <label class="block"><span class="text-xs font-bold">${trHtml("Date of birth")} <span class="font-normal text-on-surface-variant">${trHtml("(needed for automatic estimate)")}</span></span><input id="onboarding-dob" type="date" value="${escapeHtml(d.dateOfBirth || '')}" class="mt-1.5 w-full rounded-xl border border-outline-variant/40 bg-white dark:bg-dark-surface-card px-4 py-3" /></label>
-        <div><div class="flex justify-between"><span class="text-xs font-bold">${trHtml("Height")}</span><button type="button" onclick="window.toggleOnboardingHeightUnit()" class="text-xs font-bold text-primary">${d.heightUnit === 'cm' ? tr("Use ft/in") : tr("Use cm")}</button></div>${d.heightUnit === 'cm' ? `<input id="onboarding-height-cm" type="number" inputmode="decimal" value="${escapeHtml(d.heightCm || '')}" placeholder="${trHtml("Height in cm")}" class="mt-1.5 w-full rounded-xl border border-outline-variant/40 bg-white dark:bg-dark-surface-card px-4 py-3" />` : `<div class="grid grid-cols-2 gap-2 mt-1.5"><input id="onboarding-height-ft" type="number" inputmode="numeric" value="${escapeHtml(feet.feet || '')}" placeholder="${trHtml("Feet")}" class="rounded-xl border border-outline-variant/40 bg-white dark:bg-dark-surface-card px-4 py-3"><input id="onboarding-height-in" type="number" inputmode="decimal" value="${escapeHtml(feet.inches || '')}" placeholder="${trHtml("Inches")}" class="rounded-xl border border-outline-variant/40 bg-white dark:bg-dark-surface-card px-4 py-3"></div>`}</div>
-        <div><div class="flex justify-between"><span class="text-xs font-bold">${trHtml("Current weight")}</span><button type="button" onclick="window.toggleOnboardingWeightUnit()" class="text-xs font-bold text-primary">${trHtml("Use")} ${trHtml(d.weightUnit === 'kg' ? 'lb' : 'kg')}</button></div><div class="relative mt-1.5"><input id="onboarding-current-weight" type="number" inputmode="decimal" value="${escapeHtml(displayWeight)}" class="w-full rounded-xl border border-outline-variant/40 bg-white dark:bg-dark-surface-card px-4 py-3 pr-14"><span class="absolute right-4 top-3 text-sm text-on-surface-variant">${trHtml(d.weightUnit)}</span></div></div>
-        <label class="block"><span class="text-xs font-bold">${trHtml("Target weight")} <span class="font-normal text-on-surface-variant">${trHtml("(optional)")}</span></span><div class="relative mt-1.5"><input id="onboarding-target-weight" type="number" inputmode="decimal" value="${escapeHtml(targetWeight)}" class="w-full rounded-xl border border-outline-variant/40 bg-white dark:bg-dark-surface-card px-4 py-3 pr-14"><span class="absolute right-4 top-3 text-sm text-on-surface-variant">${trHtml(d.weightUnit)}</span></div></label>
-      </div>
-      <p id="onboarding-error" class="min-h-5 mt-3 text-xs text-error" role="alert"></p>
-      ${actions(3)}
-    </section>`, 3);
-}
-
 function renderActivity(): string {
-  const selected = store.getState().onboardingDraft.activityLevel;
+  const level = store.getState().onboardingDraft.activityLevel;
+  const selected = level === 'athlete' ? 'very_active' : level;
   return shell(`
-    <section class="pt-6">
-      <p class="text-xs font-extrabold uppercase tracking-wider text-primary">${trHtml("Activity")}</p>
-      <h1 class="font-heading text-2xl font-extrabold mt-1">${trHtml("What is your usual activity level?")}</h1>
-      <div class="mt-6 space-y-2" role="radiogroup">
-        ${(Object.keys(ACTIVITY_MULTIPLIERS) as ActivityLevel[]).map(level => { const item = ACTIVITY_MULTIPLIERS[level]; return `<button type="button" role="radio" aria-checked="${selected === level}" onclick="window.selectOnboardingActivity(${htmlJsArg(level)})" class="w-full min-h-16 rounded-2xl border p-4 text-left ${selected === level ? 'border-primary bg-primary/10 ring-1 ring-primary' : 'border-outline-variant/30 bg-surface-container-lowest dark:bg-dark-surface-card'}"><span class="font-bold text-sm block">${item.label}</span><span class="text-xs text-on-surface-variant dark:text-gray-400">${item.description}</span></button>`; }).join('')}
-      </div>
-      <p id="onboarding-error" class="min-h-5 mt-2 text-xs text-error" role="alert"></p>
-      ${actions(4)}
-    </section>`, 4);
+    ${heading('Your daily movement', 'Think about a typical week, including work and workouts.')}
+    <div class="space-y-3" role="radiogroup" aria-label="${trHtml('Your daily movement')}">
+      ${ONBOARDING_ACTIVITIES.map(item => `
+        <button type="button" role="radio" aria-checked="${selected === item.id}" onclick="window.selectOnboardingActivity(${htmlJsArg(item.id)})" class="onboarding-choice ${selected === item.id ? 'is-selected' : ''} flex w-full items-center gap-3 rounded-2xl p-4 text-left">
+          <span class="onboarding-choice-icon inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">${escapeHtml(item.icon)}</span></span>
+          <span class="min-w-0 flex-1"><strong class="block font-heading text-sm leading-relaxed">${trHtml(item.title)}</strong><span class="onboarding-muted block mt-1 text-xs leading-relaxed">${trHtml(item.description)}</span></span>
+          <span class="onboarding-choice-check material-symbols-outlined text-xl shrink-0" aria-hidden="true">${selected === item.id ? 'check_circle' : 'radio_button_unchecked'}</span>
+        </button>`).join('')}
+    </div>
+    <p id="onboarding-error-activityLevel" class="onboarding-field-error empty:hidden" role="alert"></p>`, 3);
 }
 
+/** Kept as an exported preview for callers that render the saved target review. */
 export function getOnboardingGoalPreview() {
-  const state = store.getState();
-  const d = state.onboardingDraft;
-  const age = calculateAge(d.dateOfBirth);
-  const sex = resolveCalculationSex(d.biologicalSex);
-  const result = d.currentWeightKg && d.heightCm && age !== null && d.activityLevel && d.weightDirection !== null
-    ? calculateFullGoals({ weightKg: d.currentWeightKg, heightCm: d.heightCm, ageYears: age, calculationSex: sex, activityLevel: d.activityLevel, weeklyRateKg: d.weightDirection })
-    : null;
-  return result;
+  return getOnboardingTargets(store.getState().onboardingDraft);
 }
 
 function renderReview(): string {
-  const state = store.getState();
-  const d = state.onboardingDraft;
-  const result = getOnboardingGoalPreview();
-  const goals = result ? { calories: result.reviewedSuggestedCalories, protein: result.protein, carbs: result.carbs, fat: result.fat } : { calories: state.nutritionGoals.calorieTarget, protein: state.nutritionGoals.proteinTarget, carbs: state.nutritionGoals.carbsTarget, fat: state.nutritionGoals.fatTarget };
+  const draft = store.getState().onboardingDraft;
+  const result = getOnboardingTargets(draft);
+  const goals = result?.goals;
+  const objective = ONBOARDING_OBJECTIVES.find(item => item.id === draft.primaryObjective);
+  const isManualProfile = draft.biologicalSex === 'other' || draft.biologicalSex === 'prefer_not_to_say';
+  const waterTarget = goals?.waterTarget ?? getOnboardingWaterTarget(draft.currentWeightKg);
+  const inputCalories = draft.calorieOverride ?? result?.suggestedCalories ?? null;
+  const estimateNote = isManualProfile
+    ? tr('Automatic energy estimates need a female or male calculation profile. Enter your daily calorie target to continue.')
+    : result?.needsReview && result.reviewReason
+      ? result.reviewReason
+      : tr('Estimated locally from your body metrics and activity.');
   return shell(`
-    <section class="pt-6">
-      <p class="text-xs font-extrabold uppercase tracking-wider text-primary">${trHtml("Review")}</p>
-      <h1 class="font-heading text-2xl font-extrabold mt-1">${trHtml("Your starting goals")}</h1>
-      <p class="text-sm text-on-surface-variant dark:text-gray-400 mt-2">${trHtml("These are starting estimates. You can adjust them anytime in Profile.")}</p>
-      ${!result ? `<div class="mt-5 p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-xs"><strong>${trHtml("Automatic estimate unavailable.")}</strong><p class="mt-1">${trHtml("Age and a female/male calculation profile are required for Mifflin–St Jeor. Your current nutrition targets will be kept and can be edited manually.")}</p></div>` : result.needsReview ? `<div class="mt-5 p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-xs">${escapeHtml(result.reviewReason || tr("Please review this estimate."))}</div>` : ''}
-      <div class="mt-5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 divide-y divide-outline-variant/20">
-        <div class="p-4 flex justify-between"><span class="text-sm text-on-surface-variant">${trHtml("Goal")}</span><strong class="text-sm">${d.weightDirection === null ? tr("Not selected") : formatWeeklyRate(d.weightDirection, d.weightUnit)}</strong></div>
-        <div class="p-4 flex justify-between"><span class="text-sm text-on-surface-variant">${trHtml("Activity")}</span><strong class="text-sm">${d.activityLevel ? ACTIVITY_MULTIPLIERS[d.activityLevel].label : tr("Not selected")}</strong></div>
-        <div class="p-4 flex justify-between"><span class="text-sm text-on-surface-variant">${trHtml("Daily calories")}</span><strong class="text-lg text-primary">${formatDisplayNumber(goals.calories, 0)} ${trHtml("kcal")}</strong></div>
-        <div class="p-4 ui-number-grid grid grid-cols-3 text-center gap-2"><div><span class="text-xs text-on-surface-variant block">${trHtml("Protein")}</span><strong>${formatDisplayNumber(goals.protein)} ${trHtml("g")}</strong></div><div><span class="text-xs text-on-surface-variant block">${trHtml("Carbs")}</span><strong>${formatDisplayNumber(goals.carbs)} ${trHtml("g")}</strong></div><div><span class="text-xs text-on-surface-variant block">${trHtml("Fat")}</span><strong>${formatDisplayNumber(goals.fat)} ${trHtml("g")}</strong></div></div>
+    ${heading('Your personalized targets', 'A starting plan you can adjust as your progress changes.')}
+    <section class="onboarding-target-card rounded-3xl p-5">
+      ${objective ? `<span class="onboarding-objective-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold mb-4"><span class="material-symbols-outlined text-base" aria-hidden="true">${escapeHtml(objective.icon)}</span>${trHtml(objective.title)}</span>` : ''}
+      <p class="onboarding-muted text-sm font-medium">${trHtml('Daily calorie target')}</p>
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 mt-1"><strong id="onboarding-summary-calories" class="onboarding-calories font-heading text-[42px] leading-tight font-extrabold tabular-nums">${formatDisplayNumber(goals?.calorieTarget, 0)}</strong><span class="onboarding-muted text-sm">${trHtml('kcal/day')}</span></div>
+      <div class="onboarding-macros grid grid-cols-3 gap-2 mt-5 pt-4">
+        ${([{ id: 'protein', label: 'Protein', value: goals?.proteinTarget }, { id: 'carbs', label: 'Carbs', value: goals?.carbsTarget }, { id: 'fat', label: 'Fat', value: goals?.fatTarget }]).map(item => `<div class="min-w-0"><p class="onboarding-muted text-xs">${trHtml(item.label)}</p><p class="font-heading mt-1 text-lg font-extrabold tabular-nums"><span id="onboarding-summary-${item.id}">${formatDisplayNumber(item.value, 0)}</span> <span class="text-xs font-medium">${trHtml('g')}</span></p></div>`).join('')}
       </div>
-      <p id="onboarding-error" class="min-h-5 mt-3 text-xs text-error" role="alert"></p>
-      ${actions(5, tr("Use These Goals"))}
-    </section>`, 5);
-}
-
-function renderPhoto(): string {
-  const state = store.getState();
-  const image = state.profileImageUrl;
-  return shell(`
-    <section class="pt-8 text-center">
-      <p class="text-xs font-extrabold uppercase tracking-wider text-primary">${trHtml("Profile photo")}</p>
-      <h1 class="font-heading text-2xl font-extrabold mt-1">${trHtml("Make it yours")}</h1>
-      <p class="text-sm text-on-surface-variant dark:text-gray-400 mt-2">${trHtml("Your profile photo is stored on this device unless cloud sync is added in the future.")}</p>
-      <button type="button" onclick="document.getElementById('onboarding-photo-input')?.click()" class="mt-8 mx-auto w-40 h-40 rounded-full overflow-hidden bg-gradient-to-tr from-primary to-primary-container text-white flex items-center justify-center border-4 border-white dark:border-dark-border shadow-glow-primary" aria-label="${trHtml("Choose profile photo")}">
-        ${image ? `<img src="${escapeHtml(image)}" class="w-full h-full object-cover" alt="${trHtml("Selected profile photo")}">` : `<span class="material-symbols-outlined text-[64px]">person</span>`}
-      </button>
-      <input id="onboarding-photo-input" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" onchange="window.handleProfilePhotoSelected(this)">
-      <div class="mt-5 flex justify-center gap-2"><button type="button" onclick="document.getElementById('onboarding-photo-input')?.click()" class="min-h-11 px-4 rounded-xl bg-primary/10 text-primary font-bold">${image ? tr("Replace Photo") : tr("Choose from device")}</button>${image ? `<button type="button" onclick="window.removeProfilePhoto()" class="min-h-11 px-4 rounded-xl border border-outline-variant/40 font-bold">${trHtml("Remove")}</button>` : ''}</div>
-      <p id="profile-photo-error" class="min-h-5 mt-3 text-xs text-error" role="alert"></p>
-      ${actions(6, tr("Finish Setup"), true)}
-    </section>`, 6);
+    </section>
+    <section class="onboarding-card mt-3 p-4 rounded-2xl flex items-center gap-3">
+      <span class="onboarding-choice-icon inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined text-2xl" aria-hidden="true">water_drop</span></span>
+      <div class="min-w-0 flex-1"><h2 class="text-sm font-bold">${trHtml('Daily hydration')}</h2><p class="onboarding-muted text-[11px] mt-0.5 leading-relaxed">${trHtml('32.5 ml per kg of body weight')}</p></div>
+      <p class="shrink-0 text-right"><strong id="onboarding-summary-water" class="block font-heading text-lg font-extrabold tabular-nums">${formatDisplayNumber(waterTarget, 0)}</strong><span class="onboarding-muted text-xs">${trHtml('ml/day')}</span></p>
+    </section>
+    <section class="onboarding-card mt-3 p-4 rounded-2xl">
+      ${numericField({ id: 'onboarding-calories', field: 'calorieOverride', label: 'Edit daily calories', value: inputCalories, min: 800, max: 10000, step: '1', unit: 'kcal' })}
+      <button id="onboarding-reset-calories" type="button" onclick="window.resetOnboardingCalories()" class="onboarding-secondary text-xs font-bold min-h-11 text-left mt-1 ${isManualProfile ? 'hidden' : ''}">${trHtml('Reset to recommended')}</button>
+      <div class="onboarding-estimate mt-3 pt-3">
+        <p class="onboarding-muted text-xs font-bold">${trHtml('Mifflin–St Jeor estimate')}</p>
+        <p id="onboarding-summary-energy" class="text-xs mt-1 leading-relaxed">${result?.bmr !== null && result?.bmr !== undefined && result.tdee !== null ? trHtml('BMR {0} kcal · TDEE {1} kcal', formatDisplayNumber(result.bmr, 0), formatDisplayNumber(result.tdee, 0)) : trHtml('Choose daily calories to preview your macros.')}</p>
+        <p id="onboarding-estimate-note" class="onboarding-muted text-xs leading-relaxed mt-2" aria-live="polite">${escapeHtml(estimateNote)}</p>
+      </div>
+    </section>
+    <p class="onboarding-muted text-[11px] leading-relaxed mt-4 mb-1">${trHtml('Targets are general estimates based on your inputs. Adjust them in Profile anytime.')}</p>`, 4);
 }
 
 export function renderOnboardingScreen(): string {
   switch (store.getState().onboardingState.currentStep) {
-    case 1: return renderWelcome();
-    case 2: return renderWeightGoal();
-    case 3: return renderPersonalDetails();
-    case 4: return renderActivity();
-    case 5: return renderReview();
-    case 6: return renderPhoto();
-    default: return renderWelcome();
+    case 2: return renderMetrics();
+    case 3: return renderActivity();
+    case 4: return renderReview();
+    default: return renderObjective();
   }
 }

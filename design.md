@@ -133,6 +133,17 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Program choice uses the existing encrypted profile persistence. Tool registration, navigation and drafts remain in memory and clear when the vault locks. Keep all new labels/descriptions bilingual.
 - Protein splits, daily fat limits and phase durations in the previews are examples of planned tool functions. Selecting a program does not prescribe these values or start scans/phase tracking.
 
+## Initial onboarding and target review
+
+- Use a four-step wizard in the same green, **430px maximum-width** app column: fitness objective; body metrics; daily activity; personalized target review. Present objectives and activity tiers as selectable icon cards with readable descriptions.
+- Keep a localized **Step X of 4** label and four-segment progress bar at the top. Back returns to the previous step, preserving answers. Use shared screen transitions and a sticky bottom primary action with safe-area padding; errors remain visible beside the action and affected field.
+- Body metrics use canonical **cm / kg** inputs, an integer age (**15–100**), height (**100–250 cm**) and current/optional target weight (**30–250 kg**). Show the target-weight difference immediately. Collect age without inventing a birth date; retain an existing birth date only when it agrees with the entered age. Existing display-unit preferences remain intact.
+- Offer Male, Female and Other. Mifflin–St Jeor uses the entered metrics and one of its defined male/female equations. Other requires a manual calorie target and shows no guessed BMR or TDEE.
+- Review TDEE with a **400 kcal deficit** for Lose Weight, a **250 kcal surplus** for Build Muscle, and maintenance calories for Maintain Weight or General Fitness. Allow a whole-number calorie adjustment and reset to the estimate; explain targets that need review.
+- Display daily calories, rounded gram targets from **30% protein / 40% carbs / 30% fat**, and hydration at **32.5 ml/kg**, rounded to **50 ml**. The review is an estimate; users can change saved targets in Profile.
+- Save draft answers through the encrypted vault without replacing focused inputs. Get Started validates and recalculates the final profile and targets, waits for durable storage, then opens Dashboard. Show saving and retry states accurately; a failed write keeps the review available.
+- Restart Goal Setup pre-fills a draft while retaining the confirmed profile, goals and histories until final confirmation. Returning users can choose Keep my current goals to discard that draft. First-time users complete setup before entering the main app; recording their initial weight is idempotent across save retries.
+
 ## English and Thai
 
 - The selected language applies throughout the app: lock screen, navigation, settings, forms, calendars, validation, exercise names, muscle labels and demo replies.
@@ -161,4 +172,5 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.
+- `src/screens/onboarding/OnboardingScreen.ts`, `onboardingController.ts` and `src/utils/onboardingGoals.ts`: four-step presentation, input lifecycle and shared target validation/calculation.
 - `src/i18n/`: bilingual presentation helpers and messages.

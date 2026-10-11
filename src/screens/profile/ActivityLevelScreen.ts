@@ -1,5 +1,7 @@
 import { trHtml } from '../../i18n/index.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
+import { calculateAge, estimateBasalEnergy, estimateMaintenanceCalories, resolveCalculationSex } from '../../utils/goalCalculations.ts';
+import { getObjective } from '../../utils/onboardingGoals.ts';
 /**
  * Activity Level Sub-Screen
  * 
@@ -16,51 +18,50 @@ interface ActivityOption {
   level: ActivityLevel;
   title: string;
   description: string;
-  multiplier: number;
 }
 
 const ACTIVITY_OPTIONS: ActivityOption[] = [
   {
     level: 'sedentary',
     title: 'Sedentary',
-    description: 'Little or no regular exercise. Mostly sitting at desk or resting.',
-    multiplier: 1.2
+    description: 'Little or no regular exercise. Mostly sitting at desk or resting.'
   },
   {
     level: 'light',
     title: 'Lightly Active',
-    description: 'Light exercise or active hobbies 1 to 3 days per week.',
-    multiplier: 1.375
+    description: 'Light exercise or active hobbies 1 to 3 days per week.'
   },
   {
     level: 'moderate',
     title: 'Moderately Active',
-    description: 'Moderate physical training or cardio sports 3 to 5 days per week.',
-    multiplier: 1.55
+    description: 'Moderate physical training or cardio sports 3 to 5 days per week.'
   },
   {
     level: 'very_active',
     title: 'Very Active',
-    description: 'Hard exercise, heavy strength training, or sports 6 to 7 days per week.',
-    multiplier: 1.725
+    description: 'Hard exercise, heavy strength training, or sports 6 to 7 days per week.'
   },
   {
     level: 'athlete',
     title: 'Athlete / Highly Active',
-    description: 'Extremely rigorous training, professional sports, or intense physical manual labor.',
-    multiplier: 1.9
+    description: 'Extremely rigorous training, professional sports, or intense physical manual labor.'
   }
 ];
 
 export function renderActivityLevelScreen(): string {
   const state = store.getState();
-  const currentLevel = state.userProfile?.activityLevel || 'moderate';
-  const weightKg = state.userProfile?.currentWeightKg || 70;
-  const heightCm = state.userProfile?.heightCm || 175;
-  const currentTarget = state.calorieTarget || 2100;
-
-  // Simple Mifflin-St Jeor rough BMR baseline for preview
-  const estimatedBmr = (10 * weightKg) + (6.25 * heightCm) - (5 * 30) + 5;
+  const profile = state.userProfile;
+  const currentLevel = profile?.activityLevel ?? null;
+  const weightKg = profile?.currentWeightKg;
+  const heightCm = profile?.heightCm;
+  const ageYears = calculateAge(profile?.dateOfBirth) ?? profile?.ageYears;
+  const currentTarget = state.calorieTarget;
+  const calculationSex = resolveCalculationSex(profile?.biologicalSex);
+  const estimatedBmr = typeof weightKg === 'number' && typeof heightCm === 'number' && typeof ageYears === 'number'
+    ? estimateBasalEnergy(weightKg, heightCm, ageYears, calculationSex)
+    : null;
+  const calorieAdjustment = getObjective(profile?.primaryObjective ?? null)?.calorieAdjustment
+    ?? (profile?.weightGoalType === 'lose' ? -400 : profile?.weightGoalType === 'gain' ? 250 : 0);
 
   return `
     <div class="flex flex-col min-h-screen pb-16 bg-surface dark:bg-dark-surface transition-colors animate-fade-in">
@@ -99,41 +100,47 @@ export function renderActivityLevelScreen(): string {
           </p>
         </div>
 
+        ${estimatedBmr === null ? `<p class="px-1 text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">${trHtml('Automatic estimates need your age, height, weight and a female or male calculation profile.')}</p>` : ''}
+
         <!-- Activity Options List -->
         <div class="flex flex-col gap-2.5">
           ${ACTIVITY_OPTIONS.map(opt => {
             const isSelected = currentLevel === opt.level;
-            const suggestedTdee = Math.round(estimatedBmr * opt.multiplier);
+            const maintenanceCalories = estimateMaintenanceCalories(estimatedBmr, opt.level);
+            const suggestedCalories = maintenanceCalories === null ? null
+              : Math.min(10000, Math.max(800, Math.round(maintenanceCalories + calorieAdjustment)));
 
             return `
-              <div 
+              <button
+                type="button"
                 id="activity-card-${opt.level}"
-                onclick="window.selectActivityTier(${htmlJsArg(opt.level)}, ${suggestedTdee})"
-                class="p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 ${isSelected
+                aria-pressed="${isSelected}"
+                onclick="window.selectActivityTier(${htmlJsArg(opt.level)}, ${suggestedCalories})"
+                class="w-full text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 ${isSelected
                     ? 'bg-primary/5 dark:bg-primary/10 border-primary ring-1 ring-primary/40 shadow-ambient' 
                     : 'bg-surface-container-lowest dark:bg-dark-surface-card border-outline-variant/30 hover:border-primary/40'}"
               >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${isSelected ? 'bg-primary text-white' : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant'}">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0 flex flex-1 items-center gap-2.5">
+                    <div class="w-7 h-7 shrink-0 rounded-full flex items-center justify-center ${isSelected ? 'bg-primary text-white' : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant'}">
                       <span class="material-symbols-outlined text-[16px]">
                         ${isSelected ? 'check' : 'radio_button_unchecked'}
                       </span>
                     </div>
-                    <span class="font-heading font-bold text-sm text-on-surface dark:text-white">
+                    <span class="min-w-0 break-words font-heading font-bold text-sm text-on-surface dark:text-white">
                       ${trHtml(opt.title)}
                     </span>
                   </div>
 
-                  <span class="text-[11px] font-mono font-bold text-on-surface-variant dark:text-gray-400">
-                    ~${suggestedTdee} ${trHtml("kcal")}
+                  <span class="max-w-[35%] text-right text-[11px] font-mono font-bold text-on-surface-variant dark:text-gray-400 shrink-0">
+                    ${suggestedCalories === null ? trHtml('Manual target') : `~${suggestedCalories} ${trHtml("kcal")}`}
                   </span>
                 </div>
 
                 <p class="text-xs text-on-surface-variant dark:text-gray-300 pl-9 leading-relaxed">
                   ${trHtml(opt.description)}
                 </p>
-              </div>
+              </button>
             `;
           }).join('')}
         </div>

@@ -632,18 +632,25 @@ export type WeeklyWeightRate = -0.75 | -0.50 | -0.25 | 0 | 0.25 | 0.50 | 0.75;
 export const VALID_WEEKLY_RATES: WeeklyWeightRate[] = [-0.75, -0.50, -0.25, 0, 0.25, 0.50, 0.75];
 
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
+export type FitnessObjective = 'lose_weight' | 'build_muscle' | 'maintain_weight' | 'general_fitness';
 
 export interface OnboardingState {
   status: OnboardingStatus;
-  currentStep: number; // 1–6
+  isCompleted: boolean;
+  /** Distinguishes the current four-step wizard from legacy six-step drafts. */
+  flowVersion: 2;
+  currentStep: number; // 1–4
   completedAt?: string | null;
   /** Stable ID generated when onboarding completes. Used for idempotency of initial weight entry. */
   completionId?: string | null;
 }
 
 export interface OnboardingDraft {
+  primaryObjective: FitnessObjective | null;
+  ageYears: number | null;
+  calorieOverride: number | null;
   weightDirection: WeeklyWeightRate | null;
-  biologicalSex: 'female' | 'male' | 'prefer_not_to_say' | null;
+  biologicalSex: 'female' | 'male' | 'other' | 'prefer_not_to_say' | null;
   heightCm: number | null;
   currentWeightKg: number | null;
   targetWeightKg: number | null;
@@ -657,6 +664,9 @@ export interface OnboardingDraft {
 
 export interface UserProfile {
   displayName: string;
+  primaryObjective?: FitnessObjective | null;
+  /** Explicitly entered age; a date of birth is never inferred from this value. */
+  ageYears?: number | null;
   dateOfBirth?: string | null;
   biologicalSex?: 'female' | 'male' | 'other' | 'prefer_not_to_say' | null;
   heightCm?: number | null;

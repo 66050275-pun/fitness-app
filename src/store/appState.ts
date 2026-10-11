@@ -1,6 +1,6 @@
 import { foodLabel, mealLabel } from '../i18n/foodLabels.ts';
 import { tr, getLanguage, hasLanguageChoice, setLanguage, getLocale } from '../i18n/index.ts';
-import { privateStorage } from '../services/privateStorage.ts';
+import { privateStorage, flushPrivateStorage, retryPrivateStorage, isVaultUnlocked } from '../services/privateStorage.ts';
 import type { 
   AppState, 
   ActiveWorkoutSessionState,
@@ -41,7 +41,7 @@ import type {
   WeightUnit,
   ActivityLevel,
   OnboardingDraft,
-  WeeklyWeightRate,
+  FitnessObjective,
   FitnessPlannerMode,
   WeeklyProgramTemplate,
   PlannedWorkoutType,
@@ -89,6 +89,8 @@ import { loadProfileImageBlob, deleteProfileImageDB } from '../utils/profileImag
 import { clampNonNegative, safeFiniteNumber } from '../utils/safeNumbers';
 import { createWeightGoalDraft, isSpecialProgramUnlocked } from '../utils/dietPrograms';
 import { SPECIAL_PROGRAM_ACTIONS } from '../components/BottomSheets/specialProgramActions';
+import { calculateAge } from '../utils/goalCalculations';
+import { getOnboardingTargets, validateOnboardingDraft } from '../utils/onboardingGoals';
 
 const today = getTodayKey();
 const WORKOUT_HISTORY_STORAGE_KEY = 'nutriai_workout_history';
@@ -578,7 +580,7 @@ class Store {
       editingWeightEntry: null,
 
       // Onboarding State
-      onboardingState: persisted.onboardingState || { status: 'not_started' as const, currentStep: 1 },
+      onboardingState: persisted.onboardingState || { status: 'not_started' as const, isCompleted: false, flowVersion: 2 as const, currentStep: 1 },
       onboardingDraft: persisted.onboardingDraft || createDefaultOnboardingDraft(persisted.userPreferences),
       profileImageUrl: null
     };
@@ -589,6 +591,13 @@ class Store {
     // Route to onboarding if not completed
     if (this.state.onboardingState.status !== 'completed') {
       this.state.currentScreen = 'onboarding';
+      // Old review-step drafts may lack fields introduced by this wizard.
+      for (let step = 1; step < this.state.onboardingState.currentStep; step++) {
+        if (validateOnboardingDraft(this.state.onboardingDraft, step).length) {
+          this.state.onboardingState.currentStep = step;
+          break;
+        }
+      }
     }
 
     // Synchronize calorie & water targets from nutrition goals
@@ -736,18 +745,29 @@ class Store {
 
   public saveWeightGoalDraft() {
     if (!this.state.weightGoalDraft || this.state.profileSubpage !== 'weight_goal') return;
-    this.state.userProfile = { ...this.state.userProfile, ...createWeightGoalDraft(this.state.weightGoalDraft) };
+    const goal = createWeightGoalDraft(this.state.weightGoalDraft);
+    this.state.userProfile = {
+      ...this.state.userProfile,
+      ...goal,
+      primaryObjective: goal.weightGoalType === 'lose' ? 'lose_weight' : goal.weightGoalType === 'gain' ? 'build_muscle'
+        : this.state.userProfile.primaryObjective === 'general_fitness' ? 'general_fitness' : 'maintain_weight'
+    };
     this.persistState();
     // Goal Settings entered through More returns to that menu after saving.
     this.goBackFromProfileSubpage();
   }
 
   public updateUserProfile(profile: Partial<UserProfile>) {
+    const previousDateOfBirth = this.state.userProfile.dateOfBirth;
     this.state.userProfile = {
       ...this.state.userProfile,
       ...profile,
       profileSetupCompleted: true
     };
+    if (profile.dateOfBirth !== undefined && (profile.dateOfBirth || previousDateOfBirth)) {
+      const age = calculateAge(profile.dateOfBirth);
+      this.state.userProfile.ageYears = age !== null && age >= 15 && age <= 100 ? age : null;
+    }
     if (typeof this.state.userProfile.heightCm === 'number') {
       const height = safeFiniteNumber(this.state.userProfile.heightCm, -1);
       this.state.userProfile.heightCm = height > 0 ? Math.round(height) : null;
@@ -767,7 +787,9 @@ class Store {
     });
     this.state.userProfile = {
       ...this.state.userProfile,
-      ...normalized
+      ...normalized,
+      primaryObjective: normalized.weightGoalType === 'lose' ? 'lose_weight' : normalized.weightGoalType === 'gain' ? 'build_muscle'
+        : this.state.userProfile.primaryObjective === 'general_fitness' ? 'general_fitness' : 'maintain_weight'
     };
     this.persistState();
     this.notify();
@@ -918,167 +940,196 @@ class Store {
     this.notify();
   }
 
-  /**
-   * Advances to the next onboarding step (or stays on the last step).
-   * Persists the draft on every step change.
-   */
+  /** Draft changes are durable, but never alter the confirmed profile or targets. */
   public setOnboardingStep(step: number) {
-    const clamped = Math.max(1, Math.min(6, step));
+    if (this.state.currentScreen === 'onboarding' && this.state.onboardingState.status === 'completed') return;
+    const clamped = Number.isFinite(step) ? Math.max(1, Math.min(4, Math.floor(step))) : 1;
     this.state.onboardingState = {
       ...this.state.onboardingState,
       status: 'in_progress',
+      isCompleted: false,
+      flowVersion: 2,
       currentStep: clamped
     };
     this.persistState();
     this.notify();
   }
 
-  /**
-   * Updates onboarding draft fields without touching confirmed profile/goals.
-   */
-  public updateOnboardingDraft(partial: Partial<OnboardingDraft>) {
-    this.state.onboardingDraft = {
-      ...this.state.onboardingDraft,
-      ...partial
-    };
+  /** Suppress notification while editing an input so rendering cannot steal focus. */
+  public updateOnboardingDraft(partial: Partial<OnboardingDraft>, notify = true) {
+    if (this.state.currentScreen === 'onboarding' && this.state.onboardingState.status === 'completed') return;
+    const next = { ...this.state.onboardingDraft, ...partial };
+    if (partial.ageYears !== undefined && partial.ageYears !== calculateAge(next.dateOfBirth)) {
+      // Keep an existing, accurate DOB; never invent a birthday from an age.
+      next.dateOfBirth = null;
+    }
+    this.state.onboardingDraft = next;
     this.persistState();
-    this.notify();
+    if (notify) this.notify();
   }
 
   /**
-   * Completes onboarding: applies draft to UserProfile and NutritionGoals.
-   *
-   * Idempotency:
-   * - Generates a stable completionId on first call
-   * - If called again with the same completionId, skips weight entry creation
-   * - Checks for existing weight entry matching the completionId
+   * Validate and derive targets again at commit time. A stale UI preview cannot
+   * inject inconsistent goals. The optional argument keeps older callers compatible.
    */
-  public completeOnboarding(
-    confirmedGoals: { calorieTarget: number; proteinTarget: number; carbsTarget: number; fatTarget: number; waterTarget: number },
-    skipWeightEntry: boolean = false
-  ) {
+  public async completeOnboarding(_confirmedGoals?: NutritionGoals, skipWeightEntry = false): Promise<boolean> {
+    if (this.disposed || !isVaultUnlocked()) return false;
+    if (this.state.onboardingState.status === 'completed') {
+      if (this.state.currentScreen !== 'onboarding') return true;
+      // A failed write keeps the wizard and draft visible. Retry the same snapshot.
+      if (!this.persistState()) throw new Error('Private app data could not be saved.');
+      await retryPrivateStorage();
+      if (this.disposed) return false;
+      this.finishOnboardingNavigation();
+      return true;
+    }
     const draft = this.state.onboardingDraft;
+    if (validateOnboardingDraft(draft).length > 0) return false;
+    const preview = getOnboardingTargets(draft);
+    if (!preview) return false;
+    const goals = preview.goals;
     const isRestart = this.state.userProfile.profileSetupCompleted === true;
-
-    // Generate stable completion ID if not already set
+    const objective = draft.primaryObjective;
+    const weightGoalType = objective === 'lose_weight' ? 'lose' : objective === 'build_muscle' ? 'gain' : 'maintain';
+    const adjustment = preview.calorieAdjustment;
+    const directionMatches = adjustment !== null && (weightGoalType === 'lose' ? adjustment < 0
+      : weightGoalType === 'gain' ? adjustment > 0 : Math.abs(adjustment) <= 1);
+    // This remains a rough energy-equivalence estimate, never a guessed rate for a manual profile.
+    const weeklyRate = directionMatches ? weightGoalType === 'maintain' ? 0 : adjustment! * 7 / 7700 : null;
     const completionId = this.state.onboardingState.completionId
-      || `onboarding-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      || `onboarding-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-    // Check idempotency: if this completionId already exists, don't duplicate
-    const alreadyCompleted = this.state.onboardingState.status === 'completed'
-      && this.state.onboardingState.completionId === completionId;
-
-    if (alreadyCompleted) return;
-
-    // Apply draft to UserProfile (only now, not during review)
-    const updatedProfile: UserProfile = {
+    this.state.userProfile = {
       ...this.state.userProfile,
-      displayName: draft.displayName || this.state.userProfile.displayName,
-      biologicalSex: draft.biologicalSex || this.state.userProfile.biologicalSex,
-      heightCm: draft.heightCm || this.state.userProfile.heightCm,
-      currentWeightKg: draft.currentWeightKg || this.state.userProfile.currentWeightKg,
-      targetWeightKg: draft.targetWeightKg || this.state.userProfile.targetWeightKg,
-      dateOfBirth: draft.dateOfBirth || this.state.userProfile.dateOfBirth,
-      activityLevel: draft.activityLevel || this.state.userProfile.activityLevel,
-      weightGoalType: draft.weightDirection !== null
-        ? (draft.weightDirection < 0 ? 'lose' : draft.weightDirection > 0 ? 'gain' : 'maintain')
-        : this.state.userProfile.weightGoalType,
+      displayName: draft.displayName.trim() || this.state.userProfile.displayName,
+      primaryObjective: objective,
+      ageYears: draft.ageYears,
+      biologicalSex: draft.biologicalSex,
+      heightCm: draft.heightCm,
+      currentWeightKg: draft.currentWeightKg,
+      targetWeightKg: draft.targetWeightKg,
+      dateOfBirth: draft.dateOfBirth,
+      activityLevel: draft.activityLevel,
+      weightGoalType,
       dietProgram: 'standard',
-      weeklyGoalRateKg: draft.weightDirection,
+      targetDate: null,
+      weeklyGoalRateKg: weeklyRate,
       profileSetupCompleted: true
     };
+    this.state.nutritionGoals = { ...goals };
+    this.state.calorieTarget = goals.calorieTarget;
+    this.state.waterTarget = Math.round(goals.waterTarget / 250);
 
-    this.state.userProfile = updatedProfile;
-
-    // Apply confirmed nutrition goals
-    this.state.nutritionGoals = {
-      ...this.state.nutritionGoals,
-      ...confirmedGoals
-    };
-    this.state.calorieTarget = confirmedGoals.calorieTarget;
-    this.state.waterTarget = Math.round(confirmedGoals.waterTarget / 250);
-
-    // Add initial weight entry ONLY if:
-    // 1. Weight was provided
-    // 2. Not explicitly skipped
-    // 3. No existing entry with note matching this completionId
-    if (!skipWeightEntry && !isRestart && draft.currentWeightKg && draft.currentWeightKg > 0) {
-      const hasExisting = this.state.weightHistory.some(
-        w => w.note === `onboarding:${completionId}`
-      );
-      if (!hasExisting) {
-        const entry: WeightEntry = {
-          id: `weight-onboarding-${Date.now()}`,
-          weightKg: Math.round(draft.currentWeightKg * 10) / 10,
-          date: new Date().toISOString().split('T')[0],
-          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-          recordedAt: new Date().toISOString(),
-          note: `onboarding:${completionId}`
-        };
-        this.state.weightHistory = [entry, ...this.state.weightHistory].sort((a, b) => {
-          const cmp = b.date.localeCompare(a.date);
-          if (cmp !== 0) return cmp;
-          return b.time.localeCompare(a.time);
-        });
-        this.state.userProfile.currentWeightKg = this.state.weightHistory[0].weightKg;
-      }
+    // Initial weight is recorded once, using the user's local calendar day.
+    if (!skipWeightEntry && !isRestart && draft.currentWeightKg !== null
+      && !this.state.weightHistory.some(entry => entry.note === `onboarding:${completionId}`)) {
+      const now = new Date();
+      this.state.weightHistory = [{
+        id: `weight-${completionId}`,
+        weightKg: Math.round(draft.currentWeightKg * 10) / 10,
+        date: getTodayKey(),
+        time: `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`,
+        recordedAt: now.toISOString(),
+        note: `onboarding:${completionId}`
+      }, ...this.state.weightHistory].sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
     }
 
-    // Update profile image ref
-    if (draft.profileImageRef) {
-      this.state.onboardingDraft.profileImageRef = draft.profileImageRef;
-    }
-
-    // Mark onboarding completed
     this.state.onboardingState = {
       status: 'completed',
-      currentStep: 6,
+      isCompleted: true,
+      flowVersion: 2,
+      currentStep: 4,
       completedAt: new Date().toISOString(),
       completionId
     };
+    if (!this.persistState()) throw new Error('Private app data could not be saved.');
+    await flushPrivateStorage();
+    if (this.disposed) return false;
+    this.finishOnboardingNavigation();
+    return true;
+  }
 
+  /** Durable completion is the only path from the final review to the dashboard. */
+  private finishOnboardingNavigation() {
     this.state.onboardingDraft = createDefaultOnboardingDraft(this.state.userPreferences);
+    this.state.profileSubpage = null;
+    this.state.profileConfirmModal = null;
+    this.state.weightGoalDraft = null;
+    this.state.weightGoalReturnScreen = null;
+    this.state.quickAddOpen = false;
+    this.state.quickAddView = 'primary';
+    this.state.selectedSpecialProgramTool = null;
+    this.state.specialProgramToolError = false;
     this.state.currentScreen = 'dashboard';
+    this.notify();
+  }
+
+  /** Existing users can review new targets without losing history or saved goals. */
+  public restartGoalSetup() {
+    const profile = this.state.userProfile;
+    const prefs = this.state.userPreferences;
+    const primaryObjective: FitnessObjective | null = profile.primaryObjective
+      ?? (profile.weightGoalType === 'lose' ? 'lose_weight' : profile.weightGoalType === 'gain' ? 'build_muscle'
+        : profile.weightGoalType === 'maintain' ? 'maintain_weight' : null);
+    const currentAge = calculateAge(profile.dateOfBirth) ?? profile.ageYears ?? null;
+    this.state.onboardingDraft = {
+      ...createDefaultOnboardingDraft(prefs),
+      primaryObjective,
+      ageYears: currentAge,
+      calorieOverride: null,
+      weightDirection: profile.weeklyGoalRateKg === 0 ? 0
+        : profile.weightGoalType === 'lose' ? -0.5 : profile.weightGoalType === 'gain' ? 0.25 : null,
+      biologicalSex: profile.biologicalSex === 'prefer_not_to_say' ? 'other' : profile.biologicalSex ?? null,
+      heightCm: profile.heightCm ?? null,
+      currentWeightKg: profile.currentWeightKg ?? null,
+      targetWeightKg: profile.targetWeightKg ?? null,
+      dateOfBirth: profile.dateOfBirth ?? null,
+      displayName: profile.displayName || '',
+      activityLevel: profile.activityLevel === 'athlete' ? 'very_active' : profile.activityLevel ?? null,
+      profileImageRef: this.state.profileImageUrl ? 'current_profile_photo' : null
+    };
+    // Keep the previous completion metadata so cancel also works after a reload.
+    this.state.onboardingState = {
+      ...this.state.onboardingState,
+      status: 'in_progress',
+      isCompleted: false,
+      flowVersion: 2,
+      currentStep: 1
+    };
+    this.state.profileConfirmModal = null;
+    this.state.quickAddOpen = false;
+    this.state.quickAddView = 'primary';
+    this.state.selectedSpecialProgramTool = null;
+    this.state.specialProgramToolError = false;
+    this.state.currentScreen = 'onboarding';
     this.persistState();
     this.notify();
   }
 
-  /**
-   * Restarts goal setup: opens onboarding with prefilled draft.
-   * Does NOT delete history, meals, or workouts.
-   * Does NOT add initial weight entry.
-   * New goals apply only after user confirms.
-   */
-  public restartGoalSetup() {
-    const profile = this.state.userProfile;
-    const prefs = this.state.userPreferences;
-
-    // Create prefilled draft from current profile
-    this.state.onboardingDraft = {
-      weightDirection: profile.weeklyGoalRateKg === 0 ? 0 : ((profile.weeklyGoalRateKg as WeeklyWeightRate) ?? null),
-      biologicalSex: (profile.biologicalSex === 'female' || profile.biologicalSex === 'male' || profile.biologicalSex === 'prefer_not_to_say')
-        ? profile.biologicalSex : null,
-      heightCm: profile.heightCm || null,
-      currentWeightKg: profile.currentWeightKg || null,
-      targetWeightKg: profile.targetWeightKg || null,
-      dateOfBirth: profile.dateOfBirth || null,
-      displayName: profile.displayName || '',
-      activityLevel: profile.activityLevel || null,
-      profileImageRef: this.state.profileImageUrl ? 'current_profile_photo' : null,
-      heightUnit: prefs.heightUnit || 'cm',
-      weightUnit: prefs.weightUnit || 'kg'
-    };
-
+  /** Fresh accounts must finish setup; returning users may discard draft edits. */
+  public cancelGoalSetup(): boolean {
+    if (!this.state.userProfile.profileSetupCompleted) return false;
+    if (this.state.onboardingState.status === 'completed' && this.state.currentScreen === 'onboarding') return false;
     this.state.onboardingState = {
-      status: 'in_progress',
-      currentStep: 2, // Skip welcome, go to weight direction
-      completedAt: null,
-      completionId: null // New completion ID will be generated on confirm
+      ...this.state.onboardingState,
+      status: 'completed',
+      isCompleted: true,
+      flowVersion: 2,
+      currentStep: 4
     };
-
-    this.state.currentScreen = 'onboarding';
+    this.state.onboardingDraft = createDefaultOnboardingDraft(this.state.userPreferences);
+    this.state.currentScreen = 'profile';
+    this.state.profileSubpage = 'data_privacy';
+    this.state.profileConfirmModal = null;
+    this.state.weightGoalDraft = null;
+    this.state.weightGoalReturnScreen = null;
+    this.state.quickAddOpen = false;
+    this.state.quickAddView = 'primary';
+    this.state.selectedSpecialProgramTool = null;
+    this.state.specialProgramToolError = false;
     this.persistState();
     this.notify();
+    return true;
   }
 
 
@@ -1125,7 +1176,7 @@ class Store {
       this.state.nutritionGoals = sanitizeNutritionGoals(null);
       this.state.calorieTarget = 2100;
       this.state.waterTarget = 8;
-      this.state.onboardingState = { status: 'not_started', currentStep: 1 };
+      this.state.onboardingState = { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 };
       this.state.onboardingDraft = createDefaultOnboardingDraft(this.state.userPreferences);
       this.state.currentScreen = 'onboarding';
       if (this.state.profileImageUrl) {
@@ -1310,7 +1361,7 @@ class Store {
   }
 
   private persistState() {
-    savePersistedAppData({
+    return savePersistedAppData({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       customFoods: this.state.customFoods,
       recentFoods: this.state.recentFoods,

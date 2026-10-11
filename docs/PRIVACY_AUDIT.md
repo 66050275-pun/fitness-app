@@ -28,7 +28,7 @@ There is no application user database, login service, real food-recognition endp
 | Data | Before | Now |
 | --- | --- | --- |
 | Lock-screen language choice (`en` / `th` only) | Not previously available | Non-sensitive `nutriai_ui_language` localStorage flag |
-| Name, birth date, sex, height, current/target weight, weight goal, activity level | Plaintext localStorage | Encrypted vault |
+| Name, birth date or entered age, sex, height, current/target weight, fitness objective, weight goal, activity level | Plaintext localStorage | Encrypted vault |
 | Onboarding answers and draft, nutrition targets, eating schedule, preferences, consent | Plaintext localStorage | Encrypted vault |
 | Meal diary, custom foods, portions, water and burned calories by date | Plaintext localStorage | Encrypted vault |
 | Workout history, weekly routines, scheduled workouts, records derived from history | Plaintext localStorage | Encrypted vault |
@@ -109,7 +109,7 @@ The table below lists every screen/component source and its input controls. All 
 | `src/screens/QuickLogScreen.ts` | `renderQuickLogScreen`; fields: `ql-food-name`, `ql-quantity`, `ql-unit`, `ql-serving`, `ql-save-to-my-foods`, `ql-calories`, `ql-protein`, `ql-carbs`, `ql-fat`, `ql-date`, `ql-time` |
 | `src/screens/ScannerScreen.ts` | `renderScannerScreen`; renders navigation, records, summaries or actions |
 | `src/screens/WorkoutDetailScreen.ts` | `renderWorkoutDetailScreen`; renders navigation, records, summaries or actions |
-| `src/screens/onboarding/OnboardingScreen.ts` | `getOnboardingGoalPreview`, `renderOnboardingScreen`; fields: `onboarding-name`, `onboarding-dob`, `onboarding-height-cm`, `onboarding-height-ft`, `onboarding-height-in`, `onboarding-current-weight`, `onboarding-target-weight`, `onboarding-photo-input` |
+| `src/screens/onboarding/OnboardingScreen.ts` | `getOnboardingGoalPreview`, `renderOnboardingScreen`; four-step wizard; fields: `onboarding-name`, `onboarding-age`, `onboarding-height-cm`, `onboarding-current-weight`, `onboarding-target-weight`, `onboarding-calories`; sex radio group `onboarding-sex`; objective/activity selection cards |
 | `src/screens/profile/ActivityLevelScreen.ts` | `renderActivityLevelScreen`; renders navigation, records, summaries or actions |
 | `src/screens/profile/AppSettingsScreen.ts` | `renderAppSettingsScreen`; fields: `app-language-select` |
 | `src/screens/profile/DataPrivacyScreen.ts` | `renderDataPrivacyScreen`; renders navigation, records, summaries or actions |
@@ -130,7 +130,9 @@ The table below lists every screen/component source and its input controls. All 
 | Module | Responsibility |
 | --- | --- |
 | `src/main.ts` | Screen routing, form capture, validation and explicit clipboard/download actions; starts the store only after unlock |
-| `src/store/appState.ts` | Application state, persisted fields, workout timers and store disposal |
+| `src/store/appState.ts` | Application state, persisted fields, durable onboarding completion/retry, workout timers and store disposal |
+| `src/screens/onboarding/onboardingController.ts` | Captures and validates draft inputs, updates review feedback without replacing focused controls, coordinates async completion and blocks actions during vault locking |
+| `src/utils/onboardingGoals.ts` | Shared objective/activity definitions, metric validation and local calorie/macro/hydration preview; no network or independent storage writes |
 | `src/security/vaultUI.ts` | Create/unlock screen, save indicator, lock, background shield, recovery and backup restore |
 | `src/services/privateStorage.ts` | Encryption, migration, transaction commit, concurrency, encrypted backup/restore |
 | `src/services/storagePersistence.ts` | Versioned app schema, legacy migration and field sanitizers |
@@ -197,3 +199,11 @@ Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG a
 - Existing passphrase vaults and encrypted archives migrate through a dedicated API: decrypt with the original credential, derive a new PIN key with a fresh salt, and replace the ciphertext only after an atomic comparison and durable commit. A failure before commit preserves the original record. Backups exported earlier are not rewritten.
 - Storage/KDF failures and malformed decrypted payloads do not increment authentication failures. Concurrent attempts and completion tokens are checked with the current encrypted revision; successful authentication resets the counter. Local metadata contains only the salt identifier, attempt count, cooldown deadline and a temporary attempt lease.
 - Validation for this change: TypeScript strict mode and Vite production build. No new or existing automated tests were run for this refactor; the original verification section above describes the earlier passphrase implementation.
+
+## Four-step onboarding update — 2026-10-12
+
+- The wizard collects a fitness objective, optional display name, sex, age, metric body measurements and activity tier, then calculates targets locally. Drafts, final profile, goals and completion metadata use the existing encrypted snapshot; no new external service or personal-data request is introduced.
+- Age is stored explicitly when no matching birth date exists. The flow does not infer a birthday or substitute a male/female equation for Other. That selection requires a manual calorie target; macros and hydration still derive locally from the supplied values.
+- UI previews and final store validation share the same calculation. Get Started waits for the encrypted write to commit before Dashboard navigation. Failed saves retain the review for retry; a stable completion identifier prevents duplicate initial weight entries. In-flight UI callbacks are blocked or invalidated when vault locking starts.
+- Restarting setup preserves the confirmed profile, nutrition goals and histories until confirmation. Returning users can cancel the draft; first-time users must finish setup. Legacy drafts migrate to the four-step shape and resume at an earlier step when required new answers are missing.
+- This entry documents source behavior. It makes no additional claim about automated tests, physical-device verification or independent security testing.
