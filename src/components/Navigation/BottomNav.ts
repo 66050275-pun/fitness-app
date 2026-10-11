@@ -54,6 +54,9 @@ export function renderBottomNav(): string {
           data-action="quick-add"
           onclick="window.toggleQuickAdd()" 
           aria-label="${quickAddOpen ? tr("Close Quick Add") : tr("Open Quick Add")}"
+          aria-haspopup="dialog"
+          aria-expanded="${quickAddOpen}"
+          aria-controls="quick-add-backdrop"
           class="w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center scan-fab-glow hover:scale-105 active:scale-95 transition-transform border-4 border-surface dark:border-dark-surface shadow-xl"
         >
           <span class="material-symbols-outlined text-[30px] transition-transform duration-200 ${quickAddOpen ? 'rotate-45' : ''}">add</span>

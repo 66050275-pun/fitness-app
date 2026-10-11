@@ -18,6 +18,8 @@ export class Dialogs {
   private pendingOpener: HTMLElement | null = null;
   private openerAction: string | null = null;
   private backgroundScroll = 0;
+  private pendingDismiss: { id: string; timer: number; afterClose: () => void } | null = null;
+  private reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   constructor() {
     const updateViewport = () => {
@@ -37,6 +39,7 @@ export class Dialogs {
       } catch { /* Cross-origin embeds keep the local viewport fallback. */ }
       document.documentElement.style.setProperty('--ui-visible-height', `${height}px`);
       document.documentElement.style.setProperty('--ui-visible-top', `${top}px`);
+      this.measureNavigationHeight();
       requestAnimationFrame(() => {
         const focused = document.activeElement;
         if (!(focused instanceof HTMLInputElement || focused instanceof HTMLTextAreaElement || focused instanceof HTMLSelectElement)
@@ -70,6 +73,9 @@ export class Dialogs {
         }, { once: true });
       }
     } catch { /* Parent access is optional outside Streamlit. */ }
+    this.reducedMotion.addEventListener('change', () => {
+      if (this.reducedMotion.matches) this.finishDismiss();
+    });
     document.addEventListener('keydown', event => {
       if (!this.active || event.key !== 'Tab') return;
       const targets = this.focusable();
@@ -81,20 +87,70 @@ export class Dialogs {
       }
     });
     document.addEventListener('focusin', event => {
-      if (this.active && !this.active.contains(event.target as Node) && (event.target as HTMLElement).id !== 'vault-lock') {
+      if (this.active && !this.active.contains(event.target as Node) && !this.isAllowedOutsideControl(event.target)) {
         this.focusable()[0]?.focus({ preventScroll: true });
       }
     });
   }
 
   private panel() { return this.active?.querySelector<HTMLElement>('.ui-dialog-panel'); }
+  private isAllowedOutsideControl(target: EventTarget | null) {
+    return target instanceof HTMLElement && (target.id === 'vault-lock'
+      || (this.active?.id === 'quick-add-backdrop' && target.id === 'nav-fab-quick-add'));
+  }
+  private measureNavigationHeight() {
+    const nav = document.querySelector<HTMLElement>('#app-navigation nav');
+    document.documentElement.style.setProperty('--ui-bottom-nav-height', `${nav?.getBoundingClientRect().height ?? 0}px`);
+  }
+  private syncNavigation(active: HTMLElement | null) {
+    const navigation = document.getElementById('app-navigation');
+    if (!navigation) return;
+    const quickAdd = active?.id === 'quick-add-backdrop';
+    navigation.classList.toggle('ui-quick-add-navigation', quickAdd);
+    navigation.inert = !!active && !quickAdd;
+    // The center FAB remains a close toggle; background destinations stay disabled.
+    for (const button of navigation.querySelectorAll<HTMLButtonElement>('button')) {
+      button.inert = quickAdd && button.id !== 'nav-fab-quick-add';
+    }
+    this.measureNavigationHeight();
+  }
   private focusable() {
     const targets = Array.from(this.active?.querySelectorAll<HTMLElement>(controls) ?? [])
       .filter(element => element.getClientRects().length && !element.closest('[hidden], [inert]'));
     // The privacy Lock control stays available even while a form is open.
     const lock = document.getElementById('vault-lock');
     if (lock?.getClientRects().length) targets.push(lock);
+    const fab = this.active?.id === 'quick-add-backdrop' ? document.getElementById('nav-fab-quick-add') : null;
+    if (fab?.getClientRects().length && !fab.closest('[hidden], [inert]')) targets.push(fab);
     return targets;
+  }
+
+  private cancelDismiss() {
+    if (this.pendingDismiss) window.clearTimeout(this.pendingDismiss.timer);
+    this.pendingDismiss = null;
+    document.querySelectorAll('#app-overlays .ui-bottom-sheet-closing')
+      .forEach(layer => layer.classList.remove('ui-bottom-sheet-closing'));
+  }
+  private finishDismiss() {
+    const pending = this.pendingDismiss;
+    if (!pending) return;
+    const stillActive = this.active?.id === pending.id && this.activeKey === pending.id;
+    this.cancelDismiss();
+    if (stillActive) pending.afterClose();
+  }
+
+  /** Keep this mounted sheet and its focus/scroll lock until its exit completes. */
+  dismiss(id: string, afterClose: () => void): boolean {
+    if (this.active?.id !== id) return false;
+    if (this.pendingDismiss?.id === id) return true;
+    this.cancelDismiss();
+    if (this.reducedMotion.matches || document.documentElement.classList.contains('reduce-motion')) {
+      afterClose();
+      return true;
+    }
+    this.active.classList.add('ui-bottom-sheet-closing');
+    this.pendingDismiss = { id, afterClose, timer: window.setTimeout(() => this.finishDismiss(), 200) };
+    return true;
   }
 
   capture() {
@@ -115,7 +171,7 @@ export class Dialogs {
         scroll: Array.from(layer.querySelectorAll<HTMLElement>('.ui-dialog-panel, .ui-dialog-body')).map(element => element.scrollTop),
         details: Array.from(layer.querySelectorAll('details')).map(element => element.open),
         drafts: Array.from(drafts.values()),
-        focus: focus && layer.contains(focus) ? {
+        focus: focus && (layer.contains(focus) || (layer === this.active && this.isAllowedOutsideControl(focus))) ? {
           id: focus.id, action: focus.getAttribute('onclick'), index: fields.indexOf(focus),
           start: focus instanceof HTMLInputElement || focus instanceof HTMLTextAreaElement ? focus.selectionStart : null,
           end: focus instanceof HTMLInputElement || focus instanceof HTMLTextAreaElement ? focus.selectionEnd : null,
@@ -128,6 +184,7 @@ export class Dialogs {
     const layers = Array.from(document.querySelectorAll<HTMLElement>('#app-overlays .ui-dialog-layer'));
     const next = layers.at(-1) ?? null;
     const key = next?.id ?? '';
+    if (this.pendingDismiss && this.pendingDismiss.id !== key) this.cancelDismiss();
     if (next && !this.active) {
       this.opener = this.pendingOpener;
       this.openerAction = this.opener?.getAttribute('onclick') ?? null;
@@ -145,6 +202,9 @@ export class Dialogs {
       panel.removeAttribute('role'); panel.removeAttribute('aria-modal'); panel.tabIndex = -1;
       layer.hidden = layer !== next;
       layer.inert = layer !== next;
+      // A notification may replace the same sheet's markup; it must not replay entry.
+      layer.classList.toggle('ui-dialog-retained', layer.id === 'quick-add-backdrop' && layer === next && key === this.activeKey);
+      layer.classList.toggle('ui-bottom-sheet-closing', this.pendingDismiss?.id === layer.id);
       const saved = this.snapshots.get(layer.id);
       if (saved) {
         for (const draft of saved.drafts) {
@@ -169,10 +229,9 @@ export class Dialogs {
       }
     }
     document.documentElement.classList.toggle('ui-dialog-open', !!next);
-    for (const id of ['app-screen', 'app-navigation']) {
-      const element = document.getElementById(id);
-      if (element) element.inert = !!next;
-    }
+    const screen = document.getElementById('app-screen');
+    if (screen) screen.inert = !!next;
+    this.syncNavigation(next);
     const retained = new Set(layers.map(layer => layer.id));
     if (retained.has('custom-food-discard-backdrop')) retained.add('custom-food-modal-backdrop');
     if (retained.has('planner-overwrite-modal-backdrop')) retained.add('weekly-program-modal-backdrop');
@@ -181,7 +240,7 @@ export class Dialogs {
     }
     if (next) {
       const saved = this.snapshots.get(key)?.focus;
-      const fields = Array.from(next.querySelectorAll<HTMLElement>(controls));
+      const fields = this.focusable();
       const target = saved?.id ? fields.find(element => element.id === saved.id)
         : saved?.action ? fields.find(element => element.getAttribute('onclick') === saved.action)
           : saved ? fields[saved.index] : null;
@@ -190,7 +249,7 @@ export class Dialogs {
         if ((target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) && saved?.start !== null && saved?.end !== null) {
           try { target.setSelectionRange(saved!.start, saved!.end); } catch { /* Number/date fields have no text selection. */ }
         }
-      } else if (key !== this.activeKey || (!next.contains(document.activeElement) && document.activeElement?.id !== 'vault-lock')) {
+      } else if (key !== this.activeKey || (!next.contains(document.activeElement) && !this.isAllowedOutsideControl(document.activeElement))) {
         // Focus the title/close control rather than automatically opening the phone keyboard.
         (fields[0] ?? this.panel())?.focus({ preventScroll: true });
       }
@@ -206,6 +265,11 @@ export class Dialogs {
       this.opener = null; this.pendingOpener = null; this.openerAction = null; this.snapshots.clear();
     }
     this.activeKey = key;
+    if (this.pendingDismiss && (this.reducedMotion.matches || document.documentElement.classList.contains('reduce-motion'))) {
+      // A preference change can notify while rendering; finish after sync settles.
+      const pending = this.pendingDismiss;
+      queueMicrotask(() => { if (this.pendingDismiss === pending) this.finishDismiss(); });
+    }
   }
 
   closeTop(): boolean {
@@ -220,10 +284,12 @@ export class Dialogs {
   }
 
   reset() {
+    this.cancelDismiss();
     this.active = null; this.activeKey = ''; this.opener = null; this.pendingOpener = null; this.openerAction = null; this.snapshots.clear();
     document.documentElement.classList.remove('ui-dialog-open');
     for (const id of ['app-screen', 'app-navigation']) {
       const element = document.getElementById(id); if (element) element.inert = false;
     }
+    this.syncNavigation(null);
   }
 }

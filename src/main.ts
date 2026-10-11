@@ -22,6 +22,7 @@ import { renderPlannerDateDetailModal } from './components/Fitness/PlannerDateDe
 import { renderRestTimerDialog, updateRestTimerDisplay } from './components/Fitness/RestTimerDialog';
 import { updateWorkoutAssistantTip } from './components/Fitness/WorkoutAssistantTip';
 import { renderQuickAddBottomSheet } from './components/BottomSheets/QuickAddBottomSheet';
+import { QUICK_ADD_ACTIONS, type QuickAddActionId } from './components/BottomSheets/quickAddActions';
 import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
 import { renderFoodResultScreen } from './screens/FoodResultScreen';
@@ -157,6 +158,7 @@ declare global {
     toggleQuickAdd: (open?: boolean) => void;
     openQuickAdd: () => void;
     closeQuickAdd: () => void;
+    selectQuickAddAction: (actionId: QuickAddActionId) => void;
 
     // Insights Screen handlers
     setInsightRange: (range: 7 | 30 | 90) => void;
@@ -392,7 +394,7 @@ window.logCurrentFood = () => {
 };
 
 window.toggleQuickActions = (open?: boolean) => {
-  store.toggleQuickActions(open);
+  window.toggleQuickAdd(open);
 };
 
 window.toggleDashboardWidgetDrawer = (open?: boolean) => {
@@ -713,7 +715,9 @@ window.confirmResetAllFitnessPrograms = () => {
 // QUICK ADD & BOTTOM SHEET BINDINGS
 // ==========================================
 window.toggleQuickAdd = (open?: boolean) => {
-  store.toggleQuickAdd(open);
+  const shouldOpen = open ?? !store.getState().quickAddOpen;
+  if (shouldOpen) store.openQuickAdd();
+  else window.closeQuickAdd();
 };
 
 window.openQuickAdd = () => {
@@ -721,7 +725,25 @@ window.openQuickAdd = () => {
 };
 
 window.closeQuickAdd = () => {
-  store.closeQuickAdd();
+  // Keep the sheet mounted until its exit animation finishes.
+  screenTransitions.dismissDialog('quick-add-backdrop', () => store.closeQuickAdd());
+};
+
+window.selectQuickAddAction = (actionId: QuickAddActionId) => {
+  if (!store.getState().quickAddOpen || !QUICK_ADD_ACTIONS.some(action => action.id === actionId)) return;
+  // A single dispatcher makes it easy to replace the menu's actions without
+  // putting navigation logic into the presentation component.
+  screenTransitions.dismissDialog('quick-add-backdrop', () => {
+    store.closeQuickAdd();
+    switch (actionId) {
+      case 'scan-food': store.openScannerMode('food'); break;
+      case 'scan-barcode': store.openScannerMode('barcode'); break;
+      case 'search-food': store.setScreen('foodSearch'); break;
+      case 'quick-log': store.setScreen('quickLog'); break;
+      case 'create-food': store.openCreateCustomFoodModal(); break;
+      case 'log-weight': store.openWeightModal(); break;
+    }
+  });
 };
 
 // ==========================================

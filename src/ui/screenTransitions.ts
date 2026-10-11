@@ -110,4 +110,7 @@ export class ScreenTransitions {
   }
 
   closeDialog() { return this.dialogs.closeTop(); }
+
+  /** The close binding commits its state change after the mounted sheet exits. */
+  dismissDialog(id: string, afterClose: () => void) { return this.dialogs.dismiss(id, afterClose); }
 }
