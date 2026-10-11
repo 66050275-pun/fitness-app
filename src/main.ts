@@ -14,7 +14,7 @@ import { startPrivateApp, downloadEncryptedBackup } from './security/vaultUI.ts'
 import { privateStorage, isVaultUnlocked } from './services/privateStorage.ts';
 import './index.css';
 import { store, initializeStore, disposeStore } from './store/appState';
-import { ActiveScreen, DashboardWidgetId, MealType } from './types/index.ts';
+import { ActiveScreen, DashboardWidgetId, FitnessObjective, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';
 import { renderDashboardWidgetDrawer } from './components/Modals/DashboardWidgetDrawer';
 import { renderWeeklyProgramEditorModal } from './components/Fitness/WeeklyProgramEditorModal';
@@ -81,7 +81,8 @@ import {
 import { lbToKg, kgToLb, ftInToCm } from './utils/unitConversions';
 import { calculateCaloriesFromMacros } from './utils/calorieCalculations';
 import { APP_METADATA, HELP_CENTER_FAQS } from './data/appConfig';
-import { renderOnboardingScreen, getOnboardingGoalPreview } from './screens/onboarding/OnboardingScreen';
+import { renderOnboardingScreen } from './screens/onboarding/OnboardingScreen';
+import { bindOnboardingHandlers, refreshOnboardingFeedback } from './screens/onboarding/onboardingController.ts';
 import { deleteProfileImage, resizeProfileImage, saveProfileImage, validateProfileImage } from './utils/profileImageStorage';
 
 // Declare global window functions for HTML click handlers
@@ -272,7 +273,7 @@ declare global {
     confirmResetNutritionGoals: () => void;
 
     // Activity Level
-    selectActivityTier: (level: ActivityLevel, suggestedTdee: number) => void;
+    selectActivityTier: (level: ActivityLevel, suggestedTdee: number | null) => void;
     dismissActivitySuggestion: () => void;
     applySuggestedCalorieTarget: () => void;
     saveActivityLevel: () => void;
@@ -327,11 +328,11 @@ declare global {
     // First-launch onboarding & profile photo
     onboardingNext: () => void;
     onboardingBack: () => void;
-    onboardingSkip: () => void;
-    selectOnboardingRate: (rate: number) => void;
+    selectOnboardingObjective: (objective: FitnessObjective) => void;
+    captureOnboardingInput: (input: HTMLInputElement) => void;
+    resetOnboardingCalories: () => void;
+    cancelOnboarding: () => void;
     selectOnboardingActivity: (level: ActivityLevel) => void;
-    toggleOnboardingHeightUnit: () => void;
-    toggleOnboardingWeightUnit: () => void;
     handleProfilePhotoSelected: (input: HTMLInputElement) => void;
     removeProfilePhoto: () => void;
     restartGoalSetup: () => void;
@@ -1498,22 +1499,29 @@ window.confirmResetNutritionGoals = () => {
 let pendingActivityLevel: ActivityLevel | null = null;
 let pendingSuggestedTdee: number | null = null;
 
-window.selectActivityTier = (level: ActivityLevel, suggestedTdee: number) => {
+window.selectActivityTier = (level: ActivityLevel, suggestedTdee: number | null) => {
   pendingActivityLevel = level;
   pendingSuggestedTdee = suggestedTdee;
 
   document.querySelectorAll<HTMLElement>('[id^="activity-card-"]').forEach(card => {
+    card.setAttribute('aria-pressed', 'false');
     card.classList.remove('bg-primary/5', 'dark:bg-primary/10', 'border-primary', 'ring-1', 'ring-primary/40', 'shadow-ambient');
     card.classList.add('bg-surface-container-lowest', 'dark:bg-dark-surface-card', 'border-outline-variant/30');
   });
   const selectedEl = document.getElementById(`activity-card-${level}`);
   if (selectedEl) {
+    selectedEl.setAttribute('aria-pressed', 'true');
     selectedEl.classList.remove('bg-surface-container-lowest', 'dark:bg-dark-surface-card', 'border-outline-variant/30');
     selectedEl.classList.add('bg-primary/5', 'dark:bg-primary/10', 'border-primary', 'ring-1', 'ring-primary/40', 'shadow-ambient');
   }
 
   const suggestionCard = document.getElementById('activity-suggestion-card');
   const suggestionText = document.getElementById('activity-suggestion-text');
+  if (suggestedTdee === null || !Number.isFinite(suggestedTdee)) {
+    pendingSuggestedTdee = null;
+    suggestionCard?.classList.add('hidden');
+    return;
+  }
   if (suggestionCard && suggestionText) {
     const currentCal = store.getState().calorieTarget;
     suggestionText.innerHTML = `${trHtml("Your current daily target is")} <strong>${currentCal} ${trHtml("kcal")}</strong>${trHtml(". Based on")} ${trHtml(ACTIVITY_MULTIPLIERS[level].label)} ${trHtml("activity, your suggested target is")} <strong>${suggestedTdee} ${trHtml("kcal")}</strong>${trHtml(". Would you like to recalibrate?")}`;
@@ -1527,7 +1535,7 @@ window.dismissActivitySuggestion = () => {
 };
 
 window.applySuggestedCalorieTarget = () => {
-  if (pendingSuggestedTdee) {
+  if (pendingSuggestedTdee !== null && Number.isFinite(pendingSuggestedTdee)) {
     store.updateNutritionGoals({ calorieTarget: pendingSuggestedTdee });
   }
   const suggestionCard = document.getElementById('activity-suggestion-card');
@@ -1879,96 +1887,7 @@ window.executeProfileConfirmModalAction = () => {
 // ==========================================
 // FIRST-LAUNCH ONBOARDING & PROFILE PHOTO
 // ==========================================
-function showOnboardingError(message: string) {
-  const el = document.getElementById('onboarding-error');
-  if (el) el.textContent = message;
-}
-
-function capturePersonalDetails(validate: boolean = true): boolean {
-  const state = store.getState();
-  const draft = state.onboardingDraft;
-  const name = (document.getElementById('onboarding-name') as HTMLInputElement | null)?.value.trim() || '';
-  const dob = (document.getElementById('onboarding-dob') as HTMLInputElement | null)?.value || null;
-  const sex = (document.querySelector('input[name="onboarding-sex"]:checked') as HTMLInputElement | null)?.value as 'female' | 'male' | 'prefer_not_to_say' | undefined;
-  let heightCm: number | null = null;
-  if (draft.heightUnit === 'cm') {
-    const raw = Number((document.getElementById('onboarding-height-cm') as HTMLInputElement | null)?.value);
-    heightCm = Number.isFinite(raw) && raw > 0 ? Math.round(raw) : null;
-  } else {
-    const feet = Number((document.getElementById('onboarding-height-ft') as HTMLInputElement | null)?.value || 0);
-    const inches = Number((document.getElementById('onboarding-height-in') as HTMLInputElement | null)?.value || 0);
-    heightCm = feet > 0 || inches > 0 ? ftInToCm(feet, inches) : null;
-  }
-  const rawWeight = Number((document.getElementById('onboarding-current-weight') as HTMLInputElement | null)?.value);
-  const rawTarget = Number((document.getElementById('onboarding-target-weight') as HTMLInputElement | null)?.value);
-  const currentWeightKg = Number.isFinite(rawWeight) && rawWeight > 0 ? (draft.weightUnit === 'lb' ? lbToKg(rawWeight) : Math.round(rawWeight * 10) / 10) : null;
-  const targetWeightKg = Number.isFinite(rawTarget) && rawTarget > 0 ? (draft.weightUnit === 'lb' ? lbToKg(rawTarget) : Math.round(rawTarget * 10) / 10) : null;
-  if (validate && !sex) { showOnboardingError(tr("Choose a calculation profile or Prefer not to say.")); return false; }
-  if (validate && (!heightCm || heightCm < 50 || heightCm > 300)) { showOnboardingError(tr("Enter a valid height between 50 and 300 cm.")); return false; }
-  if (validate && (!currentWeightKg || currentWeightKg < 15 || currentWeightKg > 500)) { showOnboardingError(tr("Enter a valid current weight.")); return false; }
-  if (validate && draft.weightDirection !== null && targetWeightKg && currentWeightKg) {
-    if (draft.weightDirection < 0 && targetWeightKg >= currentWeightKg) { showOnboardingError(tr("For a loss goal, target weight should be below current weight.")); return false; }
-    if (draft.weightDirection > 0 && targetWeightKg <= currentWeightKg) { showOnboardingError(tr("For a gain goal, target weight should be above current weight.")); return false; }
-  }
-  store.updateOnboardingDraft({ displayName: name, dateOfBirth: dob, biologicalSex: sex, heightCm, currentWeightKg, targetWeightKg });
-  return true;
-}
-
-window.selectOnboardingRate = (rate: number) => {
-  const allowed = [-0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75];
-  if (allowed.includes(rate)) store.updateOnboardingDraft({ weightDirection: rate as any });
-};
-
-window.selectOnboardingActivity = (level: ActivityLevel) => store.updateOnboardingDraft({ activityLevel: level });
-
-window.toggleOnboardingHeightUnit = () => {
-  capturePersonalDetails(false);
-  const current = store.getState().onboardingDraft.heightUnit;
-  store.updateOnboardingDraft({ heightUnit: current === 'cm' ? 'ft_in' : 'cm' });
-};
-
-window.toggleOnboardingWeightUnit = () => {
-  capturePersonalDetails(false);
-  const current = store.getState().onboardingDraft.weightUnit;
-  store.updateOnboardingDraft({ weightUnit: current === 'kg' ? 'lb' : 'kg' });
-};
-
-window.onboardingNext = () => {
-  const state = store.getState();
-  const step = state.onboardingState.currentStep;
-  if (step === 1) { store.setOnboardingStep(2); return; }
-  if (step === 2) {
-    if (state.onboardingDraft.weightDirection === null) { showOnboardingError(tr("Choose a weight goal to continue.")); return; }
-    store.setOnboardingStep(3); return;
-  }
-  if (step === 3) {
-    if (!capturePersonalDetails()) return;
-    store.setOnboardingStep(4); return;
-  }
-  if (step === 4) {
-    if (!state.onboardingDraft.activityLevel) { showOnboardingError(tr("Choose your usual activity level.")); return; }
-    store.setOnboardingStep(5); return;
-  }
-  if (step === 5) { store.setOnboardingStep(6); return; }
-  const preview = getOnboardingGoalPreview();
-  const current = store.getState().nutritionGoals;
-  store.completeOnboarding(preview ? {
-    calorieTarget: preview.reviewedSuggestedCalories,
-    proteinTarget: preview.protein,
-    carbsTarget: preview.carbs,
-    fatTarget: preview.fat,
-    waterTarget: current.waterTarget
-  } : current);
-};
-
-window.onboardingBack = () => {
-  const step = store.getState().onboardingState.currentStep;
-  if (step > 1) store.setOnboardingStep(step - 1);
-};
-
-window.onboardingSkip = () => {
-  if (store.getState().onboardingState.currentStep === 6) window.onboardingNext();
-};
+bindOnboardingHandlers();
 
 window.handleProfilePhotoSelected = async (input: HTMLInputElement) => {
   const file = input.files?.[0];
@@ -2024,8 +1943,9 @@ window.addEventListener('keydown', (e) => {
     const state = store.getState();
     if (state.profileConfirmModal) {
       store.closeProfileConfirmModal();
-    } else if (state.currentScreen === 'onboarding' && state.onboardingState.currentStep > 1) {
-      store.setOnboardingStep(state.onboardingState.currentStep - 1);
+    } else if (state.currentScreen === 'onboarding') {
+      e.preventDefault();
+      window.onboardingBack();
     } else if (state.weightModalOpen) {
       store.closeWeightModal();
     } else if (state.currentScreen === 'profile' && state.profileSubpage) {
@@ -2067,7 +1987,7 @@ document.addEventListener('backbutton', (e) => {
   }
   if (state.currentScreen === 'onboarding') {
     e.preventDefault();
-    if (state.onboardingState.currentStep > 1) store.setOnboardingStep(state.onboardingState.currentStep - 1);
+    window.onboardingBack();
     return;
   }
   if (state.weightModalOpen) {
@@ -2260,6 +2180,8 @@ function renderApp() {
     ${renderDeleteWorkoutModal()}
     ${renderProfileConfirmationModal()}
   `);
+
+  if (currentScreen === 'onboarding') refreshOnboardingFeedback();
 
   if (currentScreen === 'coach') {
     const container = document.getElementById('chat-messages-container');

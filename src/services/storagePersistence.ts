@@ -9,6 +9,7 @@ import { privateStorage } from './privateStorage.ts';
  * 4. Item-by-item sanitization so partial corruption never wipes the entire database.
  * 5. Strict safety against exceptions and JSON parsing failures.
  * 6. Schema v4: OnboardingState, OnboardingDraft, signed weeklyGoalRateKg, profileSetupCompleted.
+ * 7. Schema v6: four-step onboarding, explicit objective/age, and calorie adjustment.
  */
 
 import type { 
@@ -27,16 +28,28 @@ import type {
   WorkoutHistoryEntry,
   OnboardingState,
   OnboardingDraft,
+  FitnessObjective,
   WeeklyWeightRate,
   WeeklyProgramTemplate,
   ScheduledWorkout,
   PlannedWorkoutType,
   WeekdayNumber
 } from '../types/index.ts';
+import { calculateAge } from '../utils/goalCalculations';
 
 export const APP_STORAGE_KEY = 'nutriai_app_data_v2';
 export const LEGACY_MEALS_KEY = 'nutriai_meals';
-export const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_SCHEMA_VERSION = 6;
+
+const FITNESS_OBJECTIVES: FitnessObjective[] = ['lose_weight', 'build_muscle', 'maintain_weight', 'general_fitness'];
+
+function boundedNumber(value: unknown, min: number, max: number): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max ? value : null;
+}
+
+function objectiveFromWeightGoal(value: unknown): FitnessObjective | null {
+  return value === 'lose' ? 'lose_weight' : value === 'gain' ? 'build_muscle' : value === 'maintain' ? 'maintain_weight' : null;
+}
 
 const DEMO_MEAL_IDS = new Set([
   'meal-today-1',
@@ -266,12 +279,18 @@ export function sanitizeUserProfile(raw: any): UserProfile {
   const weightGoalType = dietProgram === 'mini_cut' ? 'lose' : dietProgram === 'lean_bulk' ? 'gain'
     : validGoals.includes(raw.weightGoalType) ? raw.weightGoalType : null;
 
+  const primaryObjective: FitnessObjective | null = FITNESS_OBJECTIVES.includes(raw.primaryObjective)
+    ? raw.primaryObjective as FitnessObjective : objectiveFromWeightGoal(weightGoalType);
+  const age = boundedNumber(raw.ageYears, 15, 100) ?? boundedNumber(calculateAge(raw.dateOfBirth), 15, 100);
+
   // --- weeklyGoalRateKg migration (v3→v4) ---
   // Legacy: stored as positive magnitude (e.g., 0.5 for both lose and gain)
   // v4: stored as signed (negative for lose, positive for gain, 0 for maintain)
   let weeklyGoalRateKg: number | null = null;
   if (typeof raw.weeklyGoalRateKg === 'number' && isFinite(raw.weeklyGoalRateKg) && !isNaN(raw.weeklyGoalRateKg)) {
     const absRate = Math.abs(raw.weeklyGoalRateKg);
+    // Four-step profiles use continuous energy-derived rates; keep these precise.
+    const hasModernObjective = FITNESS_OBJECTIVES.includes(raw.primaryObjective);
     // Snap to nearest valid discrete rate
     const validRates: WeeklyWeightRate[] = [-0.75, -0.50, -0.25, 0, 0.25, 0.50, 0.75];
     
@@ -279,11 +298,11 @@ export function sanitizeUserProfile(raw: any): UserProfile {
       // Legacy positive rate for lose → make negative
       const targetRate = -absRate;
       const closest = validRates.reduce((a, b) => Math.abs(b - targetRate) < Math.abs(a - targetRate) ? b : a);
-      weeklyGoalRateKg = closest;
+      weeklyGoalRateKg = hasModernObjective ? targetRate : closest;
     } else if (weightGoalType === 'gain') {
       // Legacy positive rate for gain → keep positive
       const closest = validRates.reduce((a, b) => Math.abs(b - absRate) < Math.abs(a - absRate) ? b : a);
-      weeklyGoalRateKg = closest;
+      weeklyGoalRateKg = hasModernObjective ? absRate : closest;
     } else if (weightGoalType === 'maintain') {
       weeklyGoalRateKg = 0;
     } else {
@@ -294,13 +313,15 @@ export function sanitizeUserProfile(raw: any): UserProfile {
 
   return {
     displayName: typeof raw.displayName === 'string' ? raw.displayName.trim() : '',
+    primaryObjective,
+    ageYears: age === null || !Number.isInteger(age) ? null : age,
     dateOfBirth: typeof raw.dateOfBirth === 'string' && raw.dateOfBirth.trim() ? raw.dateOfBirth : null,
     biologicalSex: validSexes.includes(raw.biologicalSex) ? raw.biologicalSex : null,
-    heightCm: typeof raw.heightCm === 'number' && raw.heightCm > 0 ? Math.round(raw.heightCm) : null,
-    currentWeightKg: typeof raw.currentWeightKg === 'number' && raw.currentWeightKg > 0 ? Math.round(raw.currentWeightKg * 10) / 10 : null,
+    heightCm: boundedNumber(raw.heightCm, 50, 300) === null ? null : Math.round(raw.heightCm),
+    currentWeightKg: boundedNumber(raw.currentWeightKg, 15, 500) === null ? null : Math.round(raw.currentWeightKg * 10) / 10,
     weightGoalType,
     dietProgram,
-    targetWeightKg: typeof raw.targetWeightKg === 'number' && raw.targetWeightKg > 0 ? Math.round(raw.targetWeightKg * 10) / 10 : null,
+    targetWeightKg: boundedNumber(raw.targetWeightKg, 20, 500) === null ? null : Math.round(raw.targetWeightKg * 10) / 10,
     targetDate: typeof raw.targetDate === 'string' && raw.targetDate.trim() ? raw.targetDate : null,
     weeklyGoalRateKg,
     activityLevel: validActivities.includes(raw.activityLevel) ? raw.activityLevel : null,
@@ -415,6 +436,9 @@ export function sanitizeNutritionGoals(raw: any): NutritionGoals {
  */
 export function createDefaultOnboardingDraft(prefs?: UserPreferences): OnboardingDraft {
   return {
+    primaryObjective: null,
+    ageYears: null,
+    calorieOverride: null,
     weightDirection: null,
     biologicalSex: null,
     heightCm: null,
@@ -433,35 +457,41 @@ export function createDefaultOnboardingDraft(prefs?: UserPreferences): Onboardin
  * Sanitizes OnboardingDraft from storage.
  * Each field is individually validated; corrupt optional fields become null.
  */
-export function sanitizeOnboardingDraft(raw: any, prefs?: UserPreferences): OnboardingDraft {
+export function sanitizeOnboardingDraft(raw: any, prefs?: UserPreferences, userProfile?: UserProfile): OnboardingDraft {
   const defaults = createDefaultOnboardingDraft(prefs);
   if (!raw || typeof raw !== 'object') return defaults;
 
   const validRates: number[] = [-0.75, -0.50, -0.25, 0, 0.25, 0.50, 0.75];
-  const validSexes = ['female', 'male', 'prefer_not_to_say'];
+  const validSexes = ['female', 'male', 'other', 'prefer_not_to_say'];
   const validActivities = ['sedentary', 'light', 'moderate', 'very_active', 'athlete'];
+  const direction = typeof raw.weightDirection === 'number' && validRates.includes(raw.weightDirection)
+    ? raw.weightDirection as WeeklyWeightRate : null;
+  const legacyObjective = direction === null ? objectiveFromWeightGoal(userProfile?.weightGoalType)
+    : direction < 0 ? 'lose_weight' : direction > 0 ? 'build_muscle' : 'maintain_weight';
+  const primaryObjective: FitnessObjective | null = FITNESS_OBJECTIVES.includes(raw.primaryObjective)
+    ? raw.primaryObjective as FitnessObjective : legacyObjective;
+  const age = boundedNumber(raw.ageYears, 15, 100) ?? boundedNumber(calculateAge(raw.dateOfBirth), 15, 100);
+  const height = boundedNumber(raw.heightCm, 100, 250);
+  const currentWeight = boundedNumber(raw.currentWeightKg, 30, 250);
+  const targetWeight = boundedNumber(raw.targetWeightKg, 30, 250);
+  const calorieOverride = boundedNumber(raw.calorieOverride, 800, 10000);
 
   return {
-    weightDirection: typeof raw.weightDirection === 'number' && validRates.includes(raw.weightDirection)
-      ? raw.weightDirection as WeeklyWeightRate
-      : null,
-    biologicalSex: typeof raw.biologicalSex === 'string' && validSexes.includes(raw.biologicalSex)
-      ? raw.biologicalSex as 'female' | 'male' | 'prefer_not_to_say'
-      : null,
-    heightCm: typeof raw.heightCm === 'number' && isFinite(raw.heightCm) && raw.heightCm > 0
-      ? Math.round(raw.heightCm)
-      : null,
-    currentWeightKg: typeof raw.currentWeightKg === 'number' && isFinite(raw.currentWeightKg) && raw.currentWeightKg > 0
-      ? Math.round(raw.currentWeightKg * 10) / 10
-      : null,
-    targetWeightKg: typeof raw.targetWeightKg === 'number' && isFinite(raw.targetWeightKg) && raw.targetWeightKg > 0
-      ? Math.round(raw.targetWeightKg * 10) / 10
-      : null,
+    primaryObjective,
+    ageYears: age === null || !Number.isInteger(age) ? null : age,
+    calorieOverride: calorieOverride === null || !Number.isInteger(calorieOverride) ? null : calorieOverride,
+    weightDirection: direction,
+    biologicalSex: raw.biologicalSex === 'prefer_not_to_say' ? 'other'
+      : typeof raw.biologicalSex === 'string' && validSexes.includes(raw.biologicalSex)
+        ? raw.biologicalSex as OnboardingDraft['biologicalSex'] : null,
+    heightCm: height === null ? null : Math.round(height * 10) / 10,
+    currentWeightKg: currentWeight === null ? null : Math.round(currentWeight * 10) / 10,
+    targetWeightKg: targetWeight === null ? null : Math.round(targetWeight * 10) / 10,
     dateOfBirth: typeof raw.dateOfBirth === 'string' && raw.dateOfBirth.trim() ? raw.dateOfBirth.trim() : null,
     displayName: typeof raw.displayName === 'string' ? raw.displayName.trim() : '',
-    activityLevel: typeof raw.activityLevel === 'string' && validActivities.includes(raw.activityLevel)
-      ? raw.activityLevel as any
-      : null,
+    activityLevel: raw.activityLevel === 'athlete' ? 'very_active'
+      : typeof raw.activityLevel === 'string' && validActivities.includes(raw.activityLevel)
+        ? raw.activityLevel as OnboardingDraft['activityLevel'] : null,
     profileImageRef: typeof raw.profileImageRef === 'string' ? raw.profileImageRef : null,
     heightUnit: raw.heightUnit === 'ft_in' ? 'ft_in' : (prefs?.heightUnit || 'cm'),
     weightUnit: raw.weightUnit === 'lb' ? 'lb' : (prefs?.weightUnit || 'kg')
@@ -483,29 +513,22 @@ export function sanitizeOnboardingDraft(raw: any, prefs?: UserPreferences): Onbo
 export function sanitizeOnboardingState(raw: any, userProfile?: UserProfile): OnboardingState {
   if (raw && typeof raw === 'object') {
     const validStatuses = ['not_started', 'in_progress', 'completed'];
-    const status = validStatuses.includes(raw.status) ? raw.status : 'not_started';
-    const currentStep = typeof raw.currentStep === 'number' && raw.currentStep >= 1 && raw.currentStep <= 6
-      ? Math.floor(raw.currentStep)
-      : 1;
+    const status: OnboardingState['status'] = raw.status === 'completed' || raw.isCompleted === true ? 'completed'
+      : validStatuses.includes(raw.status) ? raw.status : 'not_started';
+    const savedStep = boundedNumber(raw.currentStep, 1, raw.flowVersion === 2 ? 4 : 6);
+    const oldStep = savedStep === null ? 1 : Math.floor(savedStep);
+    const currentStep = status === 'completed' ? 4 : raw.flowVersion === 2 ? oldStep
+      : oldStep <= 2 ? 1 : oldStep === 3 ? 2 : oldStep === 4 ? 3 : 4;
     const completedAt = typeof raw.completedAt === 'string' ? raw.completedAt : null;
     const completionId = typeof raw.completionId === 'string' ? raw.completionId : null;
-
-    return { status, currentStep, completedAt, completionId };
+    return { status, isCompleted: status === 'completed', flowVersion: 2, currentStep, completedAt, completionId };
   }
 
-  // No persisted onboarding state — this is a v3→v4 migration or fresh install
-  // Only skip onboarding if the user explicitly completed profile setup
+  // Only explicit profile completion lets legacy users skip first-time setup.
   if (userProfile?.profileSetupCompleted === true) {
-    return {
-      status: 'completed',
-      currentStep: 6,
-      completedAt: null, // Unknown when they completed (before onboarding existed)
-      completionId: null
-    };
+    return { status: 'completed', isCompleted: true, flowVersion: 2, currentStep: 4, completedAt: null, completionId: null };
   }
-
-  // All other cases (including demo data with profile fields populated): not_started
-  return { status: 'not_started', currentStep: 1 };
+  return { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 };
 }
 
 /**
@@ -595,7 +618,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
         weightHistory: [],
         eatingSchedule: sanitizeEatingSchedule(null),
         nutritionGoals: sanitizeNutritionGoals(null),
-        onboardingState: { status: 'not_started', currentStep: 1 },
+        onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 },
         onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null))
       };
     }
@@ -654,7 +677,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
           nutritionGoals,
           workoutHistory,
           onboardingState: sanitizeOnboardingState(parsed.onboardingState, userProfile),
-          onboardingDraft: sanitizeOnboardingDraft(parsed.onboardingDraft, userPreferences),
+          onboardingDraft: sanitizeOnboardingDraft(parsed.onboardingDraft, userPreferences, userProfile),
           weeklyFitnessTemplate: sanitizeWeeklyProgramTemplate(parsed.weeklyFitnessTemplate),
           scheduledWorkouts: sanitizeScheduledWorkoutsMap(parsed.scheduledWorkouts)
         };
@@ -687,7 +710,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
       weightHistory: [],
       eatingSchedule: sanitizeEatingSchedule(null),
       nutritionGoals: sanitizeNutritionGoals(null),
-      onboardingState: { status: 'not_started', currentStep: 1 },
+      onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 },
       onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null)),
       weeklyFitnessTemplate: null,
       scheduledWorkouts: {}
@@ -710,7 +733,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
       weightHistory: [],
       eatingSchedule: sanitizeEatingSchedule(null),
       nutritionGoals: sanitizeNutritionGoals(null),
-      onboardingState: { status: 'not_started', currentStep: 1 },
+      onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 },
       onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null)),
       weeklyFitnessTemplate: null,
       scheduledWorkouts: {}
@@ -721,12 +744,14 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
 /**
  * Saves persisted app data safely to privateStorage.
  */
-export function savePersistedAppData(data: PersistedAppData): void {
+export function savePersistedAppData(data: PersistedAppData): boolean {
   try {
-    if (typeof privateStorage === 'undefined') return;
+    if (typeof privateStorage === 'undefined') return false;
     privateStorage.setItem(APP_STORAGE_KEY, JSON.stringify(data));
+    return true;
   } catch {
     console.warn('Private app data could not be saved.');
+    return false;
   }
 }
 

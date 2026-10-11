@@ -7690,5 +7690,277 @@
   "Lock your private vault before opening it again.": {
     "en": "Lock your private vault before opening it again.",
     "th": "กรุณาล็อกคลังข้อมูลส่วนตัวก่อนเปิดอีกครั้ง"
+  },
+  "Build Muscle": {
+    "en": "Build Muscle",
+    "th": "เพิ่มกล้ามเนื้อ"
+  },
+  "General Fitness": {
+    "en": "General Fitness",
+    "th": "เพิ่มความฟิต"
+  },
+  "Build sustainable habits and reduce body fat.": {
+    "en": "Build sustainable habits and reduce body fat.",
+    "th": "สร้างนิสัยที่ทำได้ต่อเนื่องและลดไขมันในร่างกาย"
+  },
+  "Support strength training with a moderate calorie surplus.": {
+    "en": "Support strength training with a moderate calorie surplus.",
+    "th": "สนับสนุนการฝึกกล้ามเนื้อด้วยพลังงานส่วนเกินในระดับพอเหมาะ"
+  },
+  "Keep your weight steady with balanced nutrition.": {
+    "en": "Keep your weight steady with balanced nutrition.",
+    "th": "ดูแลน้ำหนักให้คงที่ด้วยโภชนาการที่สมดุล"
+  },
+  "Improve everyday energy, movement and overall fitness.": {
+    "en": "Improve everyday energy, movement and overall fitness.",
+    "th": "เพิ่มพลังในชีวิตประจำวัน การเคลื่อนไหว และความฟิตโดยรวม"
+  },
+  "Mostly seated work with little regular exercise.": {
+    "en": "Mostly seated work with little regular exercise.",
+    "th": "นั่งทำงานเป็นหลักและออกกำลังกายน้อยมาก"
+  },
+  "Regular walking or light exercise 1–3 days per week.": {
+    "en": "Regular walking or light exercise 1–3 days per week.",
+    "th": "เดินเป็นประจำหรือออกกำลังกายเบา ๆ 1–3 วันต่อสัปดาห์"
+  },
+  "Training or active movement 3–5 days per week.": {
+    "en": "Training or active movement 3–5 days per week.",
+    "th": "ออกกำลังกายหรือเคลื่อนไหวอย่างกระฉับกระเฉง 3–5 วันต่อสัปดาห์"
+  },
+  "Hard training or an active routine 6–7 days per week.": {
+    "en": "Hard training or an active routine 6–7 days per week.",
+    "th": "ออกกำลังกายหนักหรือทำกิจกรรมมากเป็นประจำ 6–7 วันต่อสัปดาห์"
+  },
+  "Choose your primary fitness objective.": {
+    "en": "Choose your primary fitness objective.",
+    "th": "เลือกเป้าหมายหลักในการดูแลสุขภาพและความฟิต"
+  },
+  "Choose Male, Female or Other.": {
+    "en": "Choose Male, Female or Other.",
+    "th": "เลือกชาย หญิง หรืออื่น ๆ"
+  },
+  "Enter a whole-number age between 15 and 100.": {
+    "en": "Enter a whole-number age between 15 and 100.",
+    "th": "กรอกอายุเป็นจำนวนเต็มระหว่าง 15 ถึง 100 ปี"
+  },
+  "Enter a height between 100 and 250 cm.": {
+    "en": "Enter a height between 100 and 250 cm.",
+    "th": "กรอกส่วนสูงระหว่าง 100 ถึง 250 ซม."
+  },
+  "Enter a current weight between 30 and 250 kg.": {
+    "en": "Enter a current weight between 30 and 250 kg.",
+    "th": "กรอกน้ำหนักปัจจุบันระหว่าง 30 ถึง 250 กก."
+  },
+  "Enter a target weight between 30 and 250 kg.": {
+    "en": "Enter a target weight between 30 and 250 kg.",
+    "th": "กรอกน้ำหนักเป้าหมายระหว่าง 30 ถึง 250 กก."
+  },
+  "For weight loss, choose a target below your current weight.": {
+    "en": "For weight loss, choose a target below your current weight.",
+    "th": "สำหรับการลดน้ำหนัก เลือกเป้าหมายที่ต่ำกว่าน้ำหนักปัจจุบัน"
+  },
+  "For muscle gain, choose a target above your current weight.": {
+    "en": "For muscle gain, choose a target above your current weight.",
+    "th": "สำหรับการเพิ่มกล้ามเนื้อ เลือกเป้าหมายที่สูงกว่าน้ำหนักปัจจุบัน"
+  },
+  "For maintenance or general fitness, leave the target blank or match your current weight.": {
+    "en": "For maintenance or general fitness, leave the target blank or match your current weight.",
+    "th": "สำหรับการรักษาน้ำหนักหรือเพิ่มความฟิต เว้นน้ำหนักเป้าหมายไว้หรือใช้ค่าเท่ากับน้ำหนักปัจจุบัน"
+  },
+  "Choose your usual daily activity level.": {
+    "en": "Choose your usual daily activity level.",
+    "th": "เลือกระดับกิจกรรมในชีวิตประจำวันที่ทำเป็นประจำ"
+  },
+  "Enter a daily calorie target between 800 and 10000 kcal.": {
+    "en": "Enter a daily calorie target between 800 and 10000 kcal.",
+    "th": "กรอกเป้าหมายพลังงานต่อวันระหว่าง 800 ถึง 10000 กิโลแคลอรี"
+  },
+  "For Other, enter a calorie target manually; Mifflin–St Jeor only defines male and female equations.": {
+    "en": "For Other, enter a calorie target manually; Mifflin–St Jeor only defines male and female equations.",
+    "th": "หากเลือกอื่น ๆ ให้กรอกเป้าหมายพลังงานเอง เพราะสูตร Mifflin–St Jeor มีสมการสำหรับชายและหญิงเท่านั้น"
+  },
+  "This calorie estimate is outside the usual review range. Check your inputs or adjust the target.": {
+    "en": "This calorie estimate is outside the usual review range. Check your inputs or adjust the target.",
+    "th": "ค่าพลังงานที่ประเมินอยู่นอกช่วงปกติ กรุณาตรวจสอบข้อมูลหรือปรับเป้าหมาย"
+  },
+  "Your target has been adjusted to the usable input range. Review it before continuing.": {
+    "en": "Your target has been adjusted to the usable input range. Review it before continuing.",
+    "th": "เป้าหมายถูกปรับให้อยู่ในช่วงที่กรอกได้ กรุณาตรวจสอบก่อนดำเนินการต่อ"
+  },
+  "Personalize your goals": {
+    "en": "Personalize your goals",
+    "th": "ตั้งเป้าหมายให้เหมาะกับคุณ"
+  },
+  "Step {0} of 4": {
+    "en": "Step {0} of 4",
+    "th": "ขั้นตอนที่ {0} จาก 4"
+  },
+  "Choose your fitness objective": {
+    "en": "Choose your fitness objective",
+    "th": "เลือกเป้าหมายสุขภาพและความฟิต"
+  },
+  "A clear starting point for your nutrition and training.": {
+    "en": "A clear starting point for your nutrition and training.",
+    "th": "เริ่มต้นดูแลโภชนาการและการออกกำลังกายด้วยเป้าหมายที่ชัดเจน"
+  },
+  "Your body metrics": {
+    "en": "Your body metrics",
+    "th": "ข้อมูลร่างกายของคุณ"
+  },
+  "Small details make your starting targets more personal.": {
+    "en": "Small details make your starting targets more personal.",
+    "th": "ข้อมูลเหล่านี้ช่วยกำหนดเป้าหมายเริ่มต้นให้เหมาะกับคุณมากขึ้น"
+  },
+  "Gender": {
+    "en": "Gender",
+    "th": "เพศ"
+  },
+  "Age": {
+    "en": "Age",
+    "th": "อายุ"
+  },
+  "years": {
+    "en": "years",
+    "th": "ปี"
+  },
+  "Height (cm)": {
+    "en": "Height (cm)",
+    "th": "ส่วนสูง (ซม.)"
+  },
+  "Current weight (kg)": {
+    "en": "Current weight (kg)",
+    "th": "น้ำหนักปัจจุบัน (กก.)"
+  },
+  "Target weight (kg)": {
+    "en": "Target weight (kg)",
+    "th": "น้ำหนักเป้าหมาย (กก.)"
+  },
+  "Choose a target or leave it blank for now.": {
+    "en": "Choose a target or leave it blank for now.",
+    "th": "ระบุน้ำหนักเป้าหมายหรือเว้นไว้ก่อน"
+  },
+  "Enter your current and target weights to see the difference.": {
+    "en": "Enter your current and target weights to see the difference.",
+    "th": "กรอกน้ำหนักปัจจุบันและน้ำหนักเป้าหมายเพื่อดูส่วนต่าง"
+  },
+  "Target change: {0} kg": {
+    "en": "Target change: {0} kg",
+    "th": "น้ำหนักที่ต้องเปลี่ยน: {0} กก."
+  },
+  "Your daily movement": {
+    "en": "Your daily movement",
+    "th": "กิจกรรมในชีวิตประจำวัน"
+  },
+  "Think about a typical week, including work and workouts.": {
+    "en": "Think about a typical week, including work and workouts.",
+    "th": "นึกถึงสัปดาห์ทั่วไปของคุณ ทั้งการทำงานและการออกกำลังกาย"
+  },
+  "Your personalized targets": {
+    "en": "Your personalized targets",
+    "th": "เป้าหมายที่เหมาะกับคุณ"
+  },
+  "A starting plan you can adjust as your progress changes.": {
+    "en": "A starting plan you can adjust as your progress changes.",
+    "th": "แผนเริ่มต้นที่ปรับได้ตามความก้าวหน้าของคุณ"
+  },
+  "Daily calorie target": {
+    "en": "Daily calorie target",
+    "th": "เป้าหมายพลังงานต่อวัน"
+  },
+  "kcal/day": {
+    "en": "kcal/day",
+    "th": "กิโลแคลอรี/วัน"
+  },
+  "Daily hydration": {
+    "en": "Daily hydration",
+    "th": "น้ำดื่มต่อวัน"
+  },
+  "ml/day": {
+    "en": "ml/day",
+    "th": "มล./วัน"
+  },
+  "Edit daily calories": {
+    "en": "Edit daily calories",
+    "th": "ปรับพลังงานต่อวัน"
+  },
+  "Reset to recommended": {
+    "en": "Reset to recommended",
+    "th": "กลับไปใช้ค่าที่แนะนำ"
+  },
+  "Mifflin–St Jeor estimate": {
+    "en": "Mifflin–St Jeor estimate",
+    "th": "ค่าประเมินจากสูตร Mifflin–St Jeor"
+  },
+  "BMR": {
+    "en": "BMR",
+    "th": "BMR"
+  },
+  "TDEE": {
+    "en": "TDEE",
+    "th": "TDEE"
+  },
+  "BMR {0} kcal · TDEE {1} kcal": {
+    "en": "BMR {0} kcal · TDEE {1} kcal",
+    "th": "BMR {0} กิโลแคลอรี · TDEE {1} กิโลแคลอรี"
+  },
+  "Automatic energy estimates need a female or male calculation profile. Enter your daily calorie target to continue.": {
+    "en": "Automatic energy estimates need a female or male calculation profile. Enter your daily calorie target to continue.",
+    "th": "การประเมินพลังงานอัตโนมัติต้องใช้ข้อมูลคำนวณสำหรับหญิงหรือชาย กรอกเป้าหมายพลังงานต่อวันเพื่อดำเนินการต่อ"
+  },
+  "Choose daily calories to preview your macros.": {
+    "en": "Choose daily calories to preview your macros.",
+    "th": "ระบุพลังงานต่อวันเพื่อดูตัวอย่างเป้าหมายสารอาหารหลัก"
+  },
+  "Targets are general estimates based on your inputs. Adjust them in Profile anytime.": {
+    "en": "Targets are general estimates based on your inputs. Adjust them in Profile anytime.",
+    "th": "เป้าหมายเป็นค่าประเมินทั่วไปจากข้อมูลที่คุณกรอก และปรับได้ในหน้าโปรไฟล์ทุกเมื่อ"
+  },
+  "Saving your setup…": {
+    "en": "Saving your setup…",
+    "th": "กำลังบันทึกการตั้งค่า…"
+  },
+  "Exit setup": {
+    "en": "Exit setup",
+    "th": "ออกจากการตั้งค่า"
+  },
+  "Keep my current goals": {
+    "en": "Keep my current goals",
+    "th": "ใช้เป้าหมายปัจจุบันต่อ"
+  },
+  "32.5 ml per kg of body weight": {
+    "en": "32.5 ml per kg of body weight",
+    "th": "32.5 มล. ต่อน้ำหนักตัว 1 กก."
+  },
+  "Review recommended targets": {
+    "en": "Review recommended targets",
+    "th": "ตรวจสอบเป้าหมายที่แนะนำ"
+  },
+  "Estimated locally from your body metrics and activity.": {
+    "en": "Estimated locally from your body metrics and activity.",
+    "th": "คำนวณในอุปกรณ์จากข้อมูลร่างกายและระดับกิจกรรมของคุณ"
+  },
+  "Add an optional target to see your weight change.": {
+    "en": "Add an optional target to see your weight change.",
+    "th": "ระบุน้ำหนักเป้าหมายเพิ่มเติมเพื่อดูว่าน้ำหนักจะเปลี่ยนไปเท่าใด"
+  },
+  "Macros are based on your manual calorie target.": {
+    "en": "Macros are based on your manual calorie target.",
+    "th": "สารอาหารหลักคำนวณจากเป้าหมายพลังงานที่คุณกำหนดเอง"
+  },
+  "Your setup could not be saved. Keep this tab open and retry.": {
+    "en": "Your setup could not be saved. Keep this tab open and retry.",
+    "th": "บันทึกการตั้งค่าไม่สำเร็จ โปรดเปิดแท็บนี้ไว้แล้วลองอีกครั้ง"
+  },
+  "Retry setup save": {
+    "en": "Retry setup save",
+    "th": "ลองบันทึกการตั้งค่าอีกครั้ง"
+  },
+  "Manual target": {
+    "en": "Manual target",
+    "th": "เป้าหมายที่กำหนดเอง"
+  },
+  "Automatic estimates need your age, height, weight and a female or male calculation profile.": {
+    "en": "Automatic estimates need your age, height, weight and a female or male calculation profile.",
+    "th": "การประเมินอัตโนมัติต้องใช้อายุ ส่วนสูง น้ำหนัก และข้อมูลคำนวณสำหรับหญิงหรือชาย"
   }
 }

@@ -522,3 +522,66 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
   .vault-pin-dot, .vault-pin-key { transition: none; }
   .vault-pin-shake { animation: none; }
 }
+
+/* Four-step onboarding follows the same green cards and 430px app shell. */
+.onboarding-wizard {
+  min-width: 0; min-height: calc(100svh - var(--vault-bar-height));
+  background: var(--ui-surface); color: var(--ui-text);
+}
+.onboarding-wizard :where(h1, h2, p, label, strong) { overflow-wrap: anywhere; }
+.onboarding-header { background: var(--ui-surface); }
+.onboarding-brand, .onboarding-step, .onboarding-secondary { color: var(--ui-primary); }
+.onboarding-muted { color: var(--ui-muted); }
+.onboarding-back { background: var(--ui-card); color: var(--ui-text); border: 1px solid var(--ui-border); }
+.onboarding-brand-mark, .onboarding-choice-icon { background: var(--ui-primary-soft); color: var(--ui-primary); }
+.onboarding-progress-filled { background: var(--ui-primary); transition: background var(--ui-motion-duration); }
+.onboarding-progress-empty { background: var(--ui-panel-high); }
+.onboarding-card, .onboarding-choice {
+  background: var(--ui-card); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow);
+}
+.onboarding-choice {
+  min-height: 88px; color: var(--ui-text);
+  transition: border-color var(--ui-motion-duration), background var(--ui-motion-duration), transform var(--ui-motion-duration);
+}
+.onboarding-choice:hover { background: var(--ui-panel); }
+.onboarding-choice:active { transform: scale(0.99); }
+.onboarding-choice.is-selected { border-color: var(--ui-primary); background: var(--ui-primary-soft); box-shadow: inset 0 0 0 1px var(--ui-primary); }
+.onboarding-choice.is-selected .onboarding-choice-icon { background: var(--ui-card); }
+.onboarding-choice-check { color: var(--ui-border); }
+.onboarding-choice.is-selected .onboarding-choice-check { color: var(--ui-primary); }
+.onboarding-input {
+  min-height: 48px; min-width: 0; background: var(--ui-panel); border: 1px solid var(--ui-border);
+  color: var(--ui-text); font-size: 16px; line-height: 1.5; font-variant-numeric: tabular-nums;
+}
+.onboarding-input-unit { color: var(--ui-muted); pointer-events: none; }
+.onboarding-input[aria-invalid="true"] { border-color: var(--ui-error); }
+.onboarding-sex-choice { min-height: 48px; cursor: pointer; color: var(--ui-text); background: var(--ui-panel); border: 1px solid var(--ui-border); }
+.onboarding-sex-choice:has(input:checked) { background: var(--ui-primary-soft); border-color: var(--ui-primary); color: var(--ui-primary); box-shadow: inset 0 0 0 1px var(--ui-primary); }
+.onboarding-sex-choice:has(input:focus-visible) { outline: 2px solid var(--ui-primary); outline-offset: 3px; }
+.onboarding-sex-choice:has(input:disabled) { opacity: 0.6; cursor: wait; }
+.onboarding-field-error { color: var(--ui-error); font-size: 12px; line-height: 1.6; margin-top: 8px; }
+.onboarding-error { color: var(--ui-error); }
+.onboarding-info { color: var(--ui-primary-label); background: var(--ui-primary-soft); }
+.onboarding-target-card {
+  border: 1px solid var(--ui-border); background: linear-gradient(140deg, var(--ui-card), var(--ui-primary-soft));
+  box-shadow: var(--ui-shadow); color: var(--ui-text);
+}
+.onboarding-objective-pill { color: var(--ui-primary-label); background: var(--ui-primary-soft); }
+.onboarding-calories { color: var(--ui-primary); }
+.onboarding-macros, .onboarding-estimate { border-top: 1px solid var(--ui-border); }
+.onboarding-footer {
+  position: sticky; bottom: 0; z-index: 5; flex-shrink: 0;
+  background: var(--ui-surface); border-top: 1px solid var(--ui-border);
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+}
+.onboarding-footer .ui-primary-button { min-height: 52px; }
+@media (max-width: 350px) {
+  .onboarding-metrics-grid { grid-template-columns: minmax(0, 1fr); }
+  .onboarding-header, .onboarding-main, .onboarding-footer { padding-left: 16px; padding-right: 16px; }
+  .onboarding-choice { padding: 14px 12px; gap: 10px; }
+  .onboarding-choice-icon { width: 40px; height: 40px; }
+  .onboarding-input { padding-left: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-choice, .onboarding-progress-filled { transition: none; }
+}
