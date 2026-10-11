@@ -62,6 +62,8 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
   const lock = async () => {
     if (!active || locking) return;
     locking = true; shield.style.display = 'grid';
+    // Cancel delayed UI actions before awaiting encryption/storage flush.
+    document.dispatchEvent(new Event('nutriai:lock-start'));
     try {
       await lockPrivateStorage();
       deactivate(); active = false; app.replaceChildren(); bar.style.display = 'none'; app.classList.remove('vault-open');
@@ -77,7 +79,7 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
       const backup = document.createElement('button'); backup.textContent = tr("Return to app to recover");
       backup.onclick = () => { shield.style.display = 'none'; lastActivity = Date.now(); };
       shield.append(message, retryLock, exportButton, backup);
-    } finally { locking = false; }
+    } finally { locking = false; document.dispatchEvent(new Event('nutriai:lock-end')); }
   };
   bar.querySelector<HTMLButtonElement>('#vault-lock')!.onclick = () => { void lock(); };
   for (const event of ['pointerdown', 'keydown', 'input', 'touchstart']) {

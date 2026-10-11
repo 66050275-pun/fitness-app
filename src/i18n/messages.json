@@ -7394,5 +7394,177 @@
   "No local matches. Try another name, search online, or create a food.": {
     "en": "No local matches. Try another name, search online, or create a food.",
     "th": "ไม่พบอาหารในเครื่อง ลองชื่ออื่น ค้นหาออนไลน์ หรือสร้างอาหารใหม่"
+  },
+  "Goal Settings": {
+    "en": "Goal Settings",
+    "th": "ตั้งค่าเป้าหมาย"
+  },
+  "Standard Goals": {
+    "en": "Standard Goals",
+    "th": "เป้าหมายทั่วไป"
+  },
+  "Cut": {
+    "en": "Cut",
+    "th": "ลดไขมัน"
+  },
+  "Bulk": {
+    "en": "Bulk",
+    "th": "เพิ่มน้ำหนักและกล้ามเนื้อ"
+  },
+  "Special Program": {
+    "en": "Special Program",
+    "th": "โปรแกรมพิเศษ"
+  },
+  "Mini Cut": {
+    "en": "Mini Cut",
+    "th": "ลดไขมันระยะสั้น"
+  },
+  "Lean Bulk": {
+    "en": "Lean Bulk",
+    "th": "เพิ่มกล้ามเนื้อแบบคุมไขมัน"
+  },
+  "Phasic Dieting": {
+    "en": "Phasic Dieting",
+    "th": "โภชนาการแบบแบ่งช่วง"
+  },
+  "Alternate Mini Cut and Lean Bulk phases with dedicated tracking tools.": {
+    "en": "Alternate Mini Cut and Lean Bulk phases with dedicated tracking tools.",
+    "th": "สลับช่วงลดไขมันระยะสั้นกับช่วงเพิ่มกล้ามเนื้อแบบคุมไขมัน พร้อมเครื่องมือติดตามเฉพาะโปรแกรม"
+  },
+  "Save to unlock Phasic Recomp tools from More in Quick Add.": {
+    "en": "Save to unlock Phasic Recomp tools from More in Quick Add.",
+    "th": "บันทึกเพื่อปลดล็อกเครื่องมือปรับสัดส่วนแบบแบ่งช่วงในเมนูเพิ่มเติมของหน้าเพิ่มรายการ"
+  },
+  "Selected: {0}": {
+    "en": "Selected: {0}",
+    "th": "เลือกแล้ว: {0}"
+  },
+  "Active program: {0}": {
+    "en": "Active program: {0}",
+    "th": "โปรแกรมที่ใช้อยู่: {0}"
+  },
+  "Special tools unlock after you save a Mini Cut or Lean Bulk goal.": {
+    "en": "Special tools unlock after you save a Mini Cut or Lean Bulk goal.",
+    "th": "เครื่องมือพิเศษจะปลดล็อกเมื่อคุณบันทึกเป้าหมายลดไขมันระยะสั้นหรือเพิ่มกล้ามเนื้อแบบคุมไขมัน"
+  },
+  "Save Goal Settings": {
+    "en": "Save Goal Settings",
+    "th": "บันทึกการตั้งค่าเป้าหมาย"
+  },
+  "More": {
+    "en": "More",
+    "th": "เพิ่มเติม"
+  },
+  "Explore Special Program tools for Mini Cut and Lean Bulk": {
+    "en": "Explore Special Program tools for Mini Cut and Lean Bulk",
+    "th": "ดูเครื่องมือโปรแกรมพิเศษสำหรับลดไขมันระยะสั้นและเพิ่มกล้ามเนื้อแบบคุมไขมัน"
+  },
+  "Special Program: Phasic Recomp Tools": {
+    "en": "Special Program: Phasic Recomp Tools",
+    "th": "โปรแกรมพิเศษ: เครื่องมือปรับสัดส่วนแบบแบ่งช่วง"
+  },
+  "Mini Cut / Lean Bulk extension menu": {
+    "en": "Mini Cut / Lean Bulk extension menu",
+    "th": "เมนูเสริมสำหรับลดไขมันระยะสั้น / เพิ่มกล้ามเนื้อแบบคุมไขมัน"
+  },
+  "Hidden Fat Scanner": {
+    "en": "Hidden Fat Scanner",
+    "th": "สแกนไขมันแฝง"
+  },
+  "Detect and flag hidden cooking fats in street foods.": {
+    "en": "Detect and flag hidden cooking fats in street foods.",
+    "th": "ตรวจหาและแจ้งเตือนไขมันแฝงจากการปรุงอาหารตามร้านริมทาง"
+  },
+  "Protein Splitter": {
+    "en": "Protein Splitter",
+    "th": "แบ่งสัดส่วนโปรตีน"
+  },
+  "Example split: 60 g from shakes plus 110–120 g from whole foods toward a 170–180 g protein target.": {
+    "en": "Example split: 60 g from shakes plus 110–120 g from whole foods toward a 170–180 g protein target.",
+    "th": "ตัวอย่างการแบ่งโปรตีน: 60 กรัมจากโปรตีนเชค รวมกับ 110–120 กรัมจากอาหาร เพื่อให้ถึงเป้าหมายโปรตีน 170–180 กรัม"
+  },
+  "Protein Radar": {
+    "en": "Protein Radar",
+    "th": "เรดาร์โปรตีน"
+  },
+  "Find quick low-fat, high-protein options at convenience stores.": {
+    "en": "Find quick low-fat, high-protein options at convenience stores.",
+    "th": "ค้นหาอาหารโปรตีนสูง ไขมันต่ำที่หาซื้อได้รวดเร็วจากร้านสะดวกซื้อ"
+  },
+  "Fat Gauge": {
+    "en": "Fat Gauge",
+    "th": "มาตรวัดไขมัน"
+  },
+  "Track a configured daily fat limit, such as 40–45 g, with warning thresholds.": {
+    "en": "Track a configured daily fat limit, such as 40–45 g, with warning thresholds.",
+    "th": "ติดตามไขมันตามขีดจำกัดรายวันที่ตั้งไว้ เช่น 40–45 กรัม พร้อมระดับแจ้งเตือน"
+  },
+  "Phase & Cycle": {
+    "en": "Phase & Cycle",
+    "th": "ช่วงและรอบโปรแกรม"
+  },
+  "Follow phase progress, such as Mini Cut week 2 of 4, with a countdown and phase switching.": {
+    "en": "Follow phase progress, such as Mini Cut week 2 of 4, with a countdown and phase switching.",
+    "th": "ติดตามความคืบหน้าของแต่ละช่วง เช่น ลดไขมันระยะสั้น สัปดาห์ที่ 2 จาก 4 พร้อมนับถอยหลังและเปลี่ยนช่วงโปรแกรม"
+  },
+  "Recomp Matrix": {
+    "en": "Recomp Matrix",
+    "th": "ตารางปรับสัดส่วนร่างกาย"
+  },
+  "Compare body fat percentage and lean mass trends during recomposition.": {
+    "en": "Compare body fat percentage and lean mass trends during recomposition.",
+    "th": "เปรียบเทียบแนวโน้มเปอร์เซ็นต์ไขมันและมวลร่างกายไร้ไขมันระหว่างปรับสัดส่วนร่างกาย"
+  },
+  "Planned tools": {
+    "en": "Planned tools",
+    "th": "เครื่องมือที่วางแผนไว้"
+  },
+  "Choose a tool to view its planned function.": {
+    "en": "Choose a tool to view its planned function.",
+    "th": "เลือกเครื่องมือเพื่อดูฟังก์ชันที่วางแผนไว้"
+  },
+  "Built for Mini Cut / Lean Bulk": {
+    "en": "Built for Mini Cut / Lean Bulk",
+    "th": "สำหรับลดไขมันระยะสั้น / เพิ่มกล้ามเนื้อแบบคุมไขมัน"
+  },
+  "Select Special Program in Goal Settings to unlock this extension menu.": {
+    "en": "Select Special Program in Goal Settings to unlock this extension menu.",
+    "th": "เลือกโปรแกรมพิเศษในหน้าตั้งค่าเป้าหมายเพื่อปลดล็อกเมนูเสริมนี้"
+  },
+  "Special Program tool preview": {
+    "en": "Special Program tool preview",
+    "th": "ตัวอย่างเครื่องมือโปรแกรมพิเศษ"
+  },
+  "Planned tools. Activating the program unlocks this menu; tool functions are still previews.": {
+    "en": "Planned tools. Activating the program unlocks this menu; tool functions are still previews.",
+    "th": "เครื่องมือที่วางแผนไว้ การเปิดใช้งานโปรแกรมจะปลดล็อกเมนูนี้ ส่วนฟังก์ชันของเครื่องมือยังเป็นเพียงตัวอย่าง"
+  },
+  "Tool preview": {
+    "en": "Tool preview",
+    "th": "ตัวอย่างเครื่องมือ"
+  },
+  "This tool is a preview. No scan or tracking action has run.": {
+    "en": "This tool is a preview. No scan or tracking action has run.",
+    "th": "เครื่องมือนี้เป็นเพียงตัวอย่าง ยังไม่มีการสแกนหรือบันทึกข้อมูลติดตาม"
+  },
+  "Activate in Goal Settings": {
+    "en": "Activate in Goal Settings",
+    "th": "เปิดใช้งานในหน้าตั้งค่าเป้าหมาย"
+  },
+  "Back to Special Program tools": {
+    "en": "Back to Special Program tools",
+    "th": "กลับไปยังเครื่องมือโปรแกรมพิเศษ"
+  },
+  "Back to Quick Add": {
+    "en": "Back to Quick Add",
+    "th": "กลับไปหน้าเพิ่มรายการ"
+  },
+  "This tool could not open. Please try again.": {
+    "en": "This tool could not open. Please try again.",
+    "th": "เปิดเครื่องมือนี้ไม่ได้ กรุณาลองอีกครั้ง"
+  },
+  "Try again": {
+    "en": "Try again",
+    "th": "ลองอีกครั้ง"
   }
 }

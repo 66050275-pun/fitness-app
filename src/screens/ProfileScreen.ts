@@ -28,9 +28,11 @@ export function renderProfileScreen(): string {
   const displayName = hasName ? profile.displayName.trim() : tr("Set up your profile");
   
   let goalLabel = tr("No goal set");
-  if (profile?.weightGoalType === 'lose') goalLabel = tr("Lose Weight");
-  else if (profile?.weightGoalType === 'maintain') goalLabel = tr("Maintain Weight");
-  else if (profile?.weightGoalType === 'gain') goalLabel = tr("Gain Weight");
+  if (profile?.dietProgram === 'mini_cut') goalLabel = tr('Mini Cut');
+  else if (profile?.dietProgram === 'lean_bulk') goalLabel = tr('Lean Bulk');
+  else if (profile?.weightGoalType === 'lose') goalLabel = tr('Cut');
+  else if (profile?.weightGoalType === 'maintain') goalLabel = tr('Maintain');
+  else if (profile?.weightGoalType === 'gain') goalLabel = tr('Bulk');
 
   const calorieTarget = state.calorieTarget || 2100;
   const weightCount = state.weightHistory?.length || 0;
@@ -58,7 +60,7 @@ export function renderProfileScreen(): string {
     }),
     renderProfileMenuRow({
       id: 'weight-goal',
-      label: tr("Weight Goal"),
+      label: tr("Goal Settings"),
       description: goalLabel,
       icon: 'flag',
       status: goalLabel,

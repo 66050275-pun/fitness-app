@@ -2,7 +2,7 @@
 
 This file records the current theme of `fitness-app`. Read it before changing the UI. Keep new screens and components consistent with these patterns, and update this reference when an intentional design change is made.
 
-Reference date: 2026-10-10. The actual tokens live in `tailwind.config.js` and `src/index.css`.
+Reference date: 2026-10-12. The actual tokens live in `tailwind.config.js` and `src/index.css`.
 
 ## Visual direction
 
@@ -58,6 +58,8 @@ Brand accents in Tailwind:
 - Primary buttons: typically 16–24px corners. Inputs: approximately 14px corners. Chips and segmented controls use pill shapes.
 - Drawers open as centered dialogs with **24px** corners on all sides, a clear title, a close control and a bounded scrollable body. Use `.ui-dialog-layer`, `.ui-dialog-panel` and `.ui-dialog-body`; keep headers and action bars outside the scroll body where practical.
 - **Quick Add** is a bottom sheet above the navigation bar: a **2-row × 3-column** grid of six icon-and-label actions, rounded top corners, a subtle shadow and a dimmed, blurred backdrop. Keep the center Add button available to close the menu, and disable the other navigation buttons until dismissal. Other dialogs retain their centered placement.
+- Put the seventh **More** action in a separate full-width row below that grid. It opens the Special Program menu through the same exit/entry lifecycle; show one sheet at a time. Back returns from a tool preview to the extension grid, then to Quick Add. The backdrop, X and center button close the menu.
+- The extension grid has six actions: Hidden Fat Scanner, Protein Splitter, Protein Radar, Fat Gauge, Phase & Cycle, and Recomp Matrix. Use a lock preview and a fixed **Activate in Goal Settings** footer for standard goals. Label tool placeholders as planned previews until their callbacks connect to real features.
 - Quick Add slides up and fades in over **220ms**, then slides down and fades out over **180ms**. Keep its mounted content and background scroll lock until exit completes. Respect Reduce Motion, cancel pending actions immediately when the vault locks, and keep scanner Simulation/Prototype badges visible.
 - Fit dialogs to the visible viewport, including keyboard and browser bar changes. Reserve the privacy status bar, 12px edge gutters and safe areas. Streamlit uses a viewport-height iframe, with scrolling inside the app rather than in the host page.
 - Show one active dialog at a time; hide and disable any underlying dialog during a drilldown or confirmation, then restore it on close. Preserve form text, focus, selection and internal scroll across data updates. Lock background scrolling while a dialog is open and restore it on close. Escape and the device Back button dismiss the active dialog before navigating; keep the privacy Lock control available.
@@ -122,6 +124,14 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Keep local search immediate. Open Food Facts Thailand search requires the visible **Search online** action and explains that the search text is sent to that provider.
 - Show distinct loading, unavailable and no-result states. Retain the Open Food Facts product link and ODbL attribution on imported foods. Unknown nutrients display as unavailable and remain null.
 - Query text and unsaved results remain in memory. Logged product definitions and diary snapshots use the existing encrypted browser vault; locking cancels outstanding requests.
+
+## Goal Settings and Special Program
+
+- Standard **Cut / Maintain / Bulk** map to existing `lose / maintain / gain` weight directions. **Mini Cut / Lean Bulk** are saved program choices, with the corresponding lose/gain direction. Derive unlock status from the saved `dietProgram`, rather than persisting a separate boolean that can disagree with it.
+- Keep selections, target weight/date and weekly pace in a memory draft until **Save Goal Settings**. Back discards the draft. Saving a standard goal locks the extension menu; saving a special goal unlocks it. Legacy profiles default to standard.
+- An activation CTA opens Goal Settings and returns to the extension menu on Save or Back. Show the saved program separately from the current draft selection.
+- Program choice uses the existing encrypted profile persistence. Tool registration, navigation and drafts remain in memory and clear when the vault locks. Keep all new labels/descriptions bilingual.
+- Protein splits, daily fat limits and phase durations in the previews are examples of planned tool functions. Selecting a program does not prescribe these values or start scans/phase tracking.
 
 ## English and Thai
 

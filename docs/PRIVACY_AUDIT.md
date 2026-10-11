@@ -175,3 +175,17 @@ Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG a
 - Queries and unsaved results remain in memory. Navigation, query changes and locking cancel outstanding requests; disposed stores cannot apply late results. Logging a community product retains its definition and source attribution in the existing encrypted browser vault for recents/reload.
 - Weight recommendations derive locally from completed sets and saved workout history. Automatic fills preserve manual and completed set entries, and each suggestion is shown in the workout and rest clock. Stable rep brackets are stored with saved exercises; suggestion wording and undo snapshots stay in session memory and are discarded on lock.
 - Build verification is recorded separately from the earlier regression results above. No new test suite or live Open Food Facts API verification was run for this addition.
+## Special Program menu addition (2026-10-12)
+
+- The saved `dietProgram` lives in the existing encrypted user profile. The
+  unlock boolean is derived from that choice; legacy/unknown values load as
+  standard. Goal edits remain in memory until Save.
+- Menu view, tool selection, callback registrations and goal drafts use memory
+  only. The six tools are explicitly labeled previews unless a developer
+  registers their callbacks. This menu adds no network destination or scan.
+- Vault locking cancels pending sheet actions synchronously before awaiting
+  storage flush. It blocks new delayed dismiss actions during that flush and
+  clears registered tool closures on deactivation. Failed-save recovery retains
+  the mounted dialog and private store.
+- Validation for this addition uses the production build and local synthetic
+  mobile previews. No automated tests were added or run for this change.

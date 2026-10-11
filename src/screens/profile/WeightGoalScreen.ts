@@ -6,7 +6,8 @@ import { htmlJsArg } from '../../utils/sanitize.ts';
  * 
  * Manages:
  * - Current weight preview
- * - Goal type: Lose, Maintain, Gain
+ * - Standard goals: Cut, Maintain, Bulk
+ * - Saved special program selection: Mini Cut or Lean Bulk
  * - Target weight (with unit conversion)
  * - Target date (optional)
  * - Preferred weekly rate (optional)
@@ -17,18 +18,26 @@ import { htmlJsArg } from '../../utils/sanitize.ts';
 import { store } from '../../store/appState';
 import { kgToLb, formatWeight } from '../../utils/unitConversions';
 import { formatWeightChange } from '../../utils/safeNumbers';
+import { getTodayKey } from '../../utils/dateUtils';
 
 export function renderWeightGoalScreen(): string {
   const state = store.getState();
   const profile = state.userProfile;
+  // Unsaved selections live in the goal draft; current weight remains a saved measurement.
+  const goal = state.weightGoalDraft ?? profile;
   const unit = state.userPreferences?.weightUnit || 'kg';
 
   const currentKg = profile.currentWeightKg || null;
-  const goalType = profile.weightGoalType || 'maintain';
-  const targetKg = profile.targetWeightKg || null;
-  const targetDate = profile.targetDate || '';
-  const weeklyRateKg = profile.weeklyGoalRateKg ?? 0;
+  const goalType = goal.weightGoalType || 'maintain';
+  const dietProgram = goal.dietProgram || 'standard';
+  const targetKg = goal.targetWeightKg ?? null;
+  const targetDate = goal.targetDate || '';
+  const weeklyRateKg = goal.weeklyGoalRateKg ?? 0;
   const weeklyRateMagnitude = Math.abs(weeklyRateKg);
+  const selectedLabel = dietProgram === 'mini_cut' ? tr('Mini Cut')
+    : dietProgram === 'lean_bulk' ? tr('Lean Bulk')
+    : tr(goalType === 'lose' ? 'Cut' : goalType === 'gain' ? 'Bulk' : 'Maintain');
+  const savedSpecialProgram = profile.dietProgram === 'mini_cut' || profile.dietProgram === 'lean_bulk';
 
   let targetDisplay = '';
   if (targetKg) {
@@ -59,7 +68,7 @@ export function renderWeightGoalScreen(): string {
           >
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Weight Goal")}</h1>
+          <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Goal Settings")}</h1>
         </div>
 
         <button 
@@ -96,30 +105,70 @@ export function renderWeightGoalScreen(): string {
           <!-- Goal Type Selection -->
           <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
             <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
-              ${trHtml("Primary Objective")}
+              ${trHtml("Standard Goals")}
             </span>
 
             <div class="grid grid-cols-3 gap-2">
               ${[
-                { type: 'lose', icon: 'trending_down', label: tr("Lose Weight") },
-                { type: 'maintain', icon: 'horizontal_rule', label: tr("Maintain") },
-                { type: 'gain', icon: 'trending_up', label: tr("Gain Weight") }
+                { type: 'lose', icon: 'trending_down', label: 'Cut' },
+                { type: 'maintain', icon: 'horizontal_rule', label: 'Maintain' },
+                { type: 'gain', icon: 'trending_up', label: 'Bulk' }
               ].map(opt => `
                 <button
                   type="button"
                   onclick="window.selectWeightGoalType(${htmlJsArg(opt.type)})"
-                  class="p-3 rounded-xl border flex flex-col items-center justify-center text-center gap-1.5 transition-all ${
-                    goalType === opt.type 
+                  aria-pressed="${dietProgram === 'standard' && goalType === opt.type}"
+                  class="min-h-[76px] p-3 rounded-xl border flex flex-col items-center justify-center text-center gap-1.5 transition-all ${
+                    dietProgram === 'standard' && goalType === opt.type
                       ? 'bg-primary/10 border-primary text-primary dark:text-primary-container shadow-xs font-bold' 
                       : 'bg-surface-container-low dark:bg-dark-surface-card-high border-outline-variant/30 text-on-surface dark:text-gray-300'
                   }"
                 >
-                  <span class="material-symbols-outlined text-[22px]">${opt.icon}</span>
-                  <span class="text-xs">${opt.label}</span>
+                  <span class="material-symbols-outlined text-[22px]" aria-hidden="true">${opt.icon}</span>
+                  <span class="text-xs">${trHtml(opt.label)}</span>
                 </button>
               `).join('')}
             </div>
             <input type="hidden" id="weight-goal-type-input" value="${escapeHtml(goalType)}" />
+            <input type="hidden" id="diet-program-input" value="${escapeHtml(dietProgram)}" />
+          </div>
+
+          <!-- Special selections change the draft; saving activates the tools. -->
+          <section aria-labelledby="special-program-heading" class="rounded-2xl p-4 border border-primary/30 bg-primary/5 dark:bg-dark-surface-card shadow-ambient flex flex-col gap-3">
+            <div class="flex items-start gap-2.5">
+              <span class="material-symbols-outlined text-primary dark:text-primary-container text-[24px] shrink-0" aria-hidden="true">auto_awesome</span>
+              <div class="min-w-0">
+                <h2 id="special-program-heading" class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml('Special Program')}</h2>
+                <p class="text-xs text-primary dark:text-primary-container mt-0.5 font-semibold">${trHtml('Phasic Dieting')}</p>
+              </div>
+            </div>
+            <p class="text-xs leading-relaxed text-on-surface-variant dark:text-gray-300">${trHtml('Alternate Mini Cut and Lean Bulk phases with dedicated tracking tools.')}</p>
+            <div class="grid grid-cols-2 gap-2">
+              ${[
+                { program: 'mini_cut', label: 'Mini Cut', icon: 'trending_down' },
+                { program: 'lean_bulk', label: 'Lean Bulk', icon: 'trending_up' }
+              ].map(opt => `
+                <button
+                  type="button"
+                  onclick="window.selectDietProgram(${htmlJsArg(opt.program)})"
+                  aria-pressed="${dietProgram === opt.program}"
+                  class="min-h-[76px] p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 text-center transition-all ${dietProgram === opt.program
+                    ? 'bg-primary text-white border-primary shadow-xs font-bold'
+                    : 'bg-surface-container-lowest dark:bg-dark-surface-card-high border-outline-variant/30 text-on-surface dark:text-gray-300'}"
+                >
+                  <span class="material-symbols-outlined text-[22px]" aria-hidden="true">${opt.icon}</span>
+                  <span class="text-xs font-bold">${trHtml(opt.label)}</span>
+                </button>
+              `).join('')}
+            </div>
+            <p class="text-xs leading-relaxed text-on-surface-variant dark:text-gray-300">${trHtml('Save to unlock Phasic Recomp tools from More in Quick Add.')}</p>
+          </section>
+
+          <div class="rounded-xl px-3.5 py-3 bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex flex-col gap-1" role="status" aria-live="polite">
+            <p class="text-xs font-bold text-on-surface dark:text-white">${trHtml('Selected: {0}', selectedLabel)}</p>
+            <p class="text-xs leading-relaxed text-on-surface-variant dark:text-gray-300">${savedSpecialProgram
+              ? trHtml('Active program: {0}', tr(profile.dietProgram === 'mini_cut' ? 'Mini Cut' : 'Lean Bulk'))
+              : trHtml('Special tools unlock after you save a Mini Cut or Lean Bulk goal.')}</p>
           </div>
 
           <!-- Target Weight & Date -->
@@ -137,8 +186,8 @@ export function renderWeightGoalScreen(): string {
                 <input 
                   type="number" 
                   step="0.1"
-                  min="20"
-                  max="500"
+                  min="${unit === 'lb' ? kgToLb(20) : 20}"
+                  max="${unit === 'lb' ? kgToLb(500) : 500}"
                   id="weight-target-input"
                   value="${escapeHtml(targetDisplay)}"
                   placeholder="${currentKg ? (unit === 'lb' ? String(kgToLb(currentKg)) : String(currentKg)) : 'e.g. 68.0'}"
@@ -161,7 +210,8 @@ export function renderWeightGoalScreen(): string {
                 type="date" 
                 id="weight-target-date-input"
                 value="${escapeHtml(targetDate)}"
-                min="${new Date().toISOString().split('T')[0]}"
+                min="${getTodayKey()}"
+                oninput="window.updateWeightGoalPreview()"
                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:border-primary focus:outline-none"
               />
             </div>
@@ -236,7 +286,7 @@ export function renderWeightGoalScreen(): string {
             type="submit" 
             class="w-full py-3 rounded-xl bg-primary text-white text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all text-center mt-1"
           >
-            ${trHtml("Save Weight Goal")}
+            ${trHtml("Save Goal Settings")}
           </button>
 
         </form>

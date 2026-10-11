@@ -23,6 +23,8 @@ import { renderRestTimerDialog, updateRestTimerDisplay } from './components/Fitn
 import { updateWorkoutAssistantTip } from './components/Fitness/WorkoutAssistantTip';
 import { renderQuickAddBottomSheet } from './components/BottomSheets/QuickAddBottomSheet';
 import { QUICK_ADD_ACTIONS, type QuickAddActionId } from './components/BottomSheets/quickAddActions';
+import { getSpecialProgramAction } from './components/BottomSheets/specialProgramActions';
+import { runSpecialProgramToolCallback, resetSpecialProgramToolCallbacks } from './services/specialProgramToolCallbacks';
 import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
 import { renderFoodResultScreen } from './screens/FoodResultScreen';
@@ -72,7 +74,9 @@ import {
   ActivityLevel,
   WeightGoalType,
   FitnessPlannerMode,
-  WeekdayNumber
+  WeekdayNumber,
+  DietProgram,
+  SpecialProgramToolId
 } from './types/index.ts';
 import { lbToKg, kgToLb, ftInToCm } from './utils/unitConversions';
 import { calculateCaloriesFromMacros } from './utils/calorieCalculations';
@@ -159,6 +163,9 @@ declare global {
     openQuickAdd: () => void;
     closeQuickAdd: () => void;
     selectQuickAddAction: (actionId: QuickAddActionId) => void;
+    backQuickAddMenu: () => void;
+    selectSpecialProgramTool: (toolId: SpecialProgramToolId) => void;
+    openSpecialProgramGoalSettings: () => void;
 
     // Insights Screen handlers
     setInsightRange: (range: 7 | 30 | 90) => void;
@@ -254,6 +261,7 @@ declare global {
 
     // Weight Goal
     selectWeightGoalType: (type: WeightGoalType) => void;
+    selectDietProgram: (program: DietProgram) => void;
     selectWeeklyRate: (rate: number) => void;
     updateWeightGoalPreview: () => void;
     submitWeightGoal: () => void;
@@ -726,11 +734,13 @@ window.openQuickAdd = () => {
 
 window.closeQuickAdd = () => {
   // Keep the sheet mounted until its exit animation finishes.
-  screenTransitions.dismissDialog('quick-add-backdrop', () => store.closeQuickAdd());
+  screenTransitions.dismissDialog('quick-add-backdrop', () => store.closeQuickAdd(), true);
 };
 
 window.selectQuickAddAction = (actionId: QuickAddActionId) => {
-  if (!store.getState().quickAddOpen || !QUICK_ADD_ACTIONS.some(action => action.id === actionId)) return;
+  const state = store.getState();
+  if (!state.quickAddOpen || state.quickAddView !== 'primary' || !QUICK_ADD_ACTIONS.some(action => action.id === actionId)) return;
+  if (actionId === 'more') { transitionQuickAddMenu('special'); return; }
   // A single dispatcher makes it easy to replace the menu's actions without
   // putting navigation logic into the presentation component.
   screenTransitions.dismissDialog('quick-add-backdrop', () => {
@@ -742,6 +752,48 @@ window.selectQuickAddAction = (actionId: QuickAddActionId) => {
       case 'quick-log': store.setScreen('quickLog'); break;
       case 'create-food': store.openCreateCustomFoodModal(); break;
       case 'log-weight': store.openWeightModal(); break;
+    }
+  });
+};
+
+/** Exit and reopen through the shared dialog lifecycle, keeping one active sheet. */
+function transitionQuickAddMenu(view: 'primary' | 'special' | 'tool', toolId: SpecialProgramToolId | null = null) {
+  screenTransitions.dismissDialog('quick-add-backdrop', () => {
+    store.closeQuickAdd();
+    store.openQuickAddView(view, toolId);
+  });
+}
+
+window.backQuickAddMenu = () => {
+  const { quickAddOpen, quickAddView } = store.getState();
+  if (!quickAddOpen) return;
+  if (quickAddView === 'primary') window.closeQuickAdd();
+  else transitionQuickAddMenu(quickAddView === 'tool' ? 'special' : 'primary');
+};
+
+window.openSpecialProgramGoalSettings = () => {
+  const state = store.getState();
+  if (!state.quickAddOpen || state.quickAddView !== 'special' || store.isSpecialProgramUnlocked()) return;
+  screenTransitions.dismissDialog('quick-add-backdrop', () => {
+    store.closeQuickAdd();
+    store.openSpecialProgramGoalSettings();
+  });
+};
+
+window.selectSpecialProgramTool = (toolId: SpecialProgramToolId) => {
+  const state = store.getState();
+  if (!state.quickAddOpen || !['special', 'tool'].includes(state.quickAddView)
+    || !store.isSpecialProgramUnlocked() || !getSpecialProgramAction(toolId)) return;
+  screenTransitions.dismissDialog('quick-add-backdrop', () => {
+    // Recheck the saved goal at invocation time, rather than trusting the menu.
+    if (!store.isSpecialProgramUnlocked()) {
+      store.closeQuickAdd(); store.openQuickAddView('special'); return;
+    }
+    store.closeQuickAdd();
+    try {
+      if (!runSpecialProgramToolCallback(toolId)) store.openQuickAddView('tool', toolId);
+    } catch {
+      store.openQuickAddView('tool', toolId, true);
     }
   });
 };
@@ -1336,52 +1388,50 @@ window.submitPersonalInfo = () => {
 
 // --- Weight Goal ---
 window.selectWeightGoalType = (type: WeightGoalType) => {
-  const hiddenInput = document.getElementById('weight-goal-type-input') as HTMLInputElement | null;
-  if (hiddenInput) hiddenInput.value = type;
-  const magnitude = Math.abs(store.getState().userProfile.weeklyGoalRateKg ?? 0.25);
-  store.updateWeightGoal({ weightGoalType: type, weeklyGoalRateKg: type === 'lose' ? -magnitude : type === 'gain' ? magnitude : 0 });
+  if (!['lose', 'maintain', 'gain'].includes(type)) return;
+  captureWeightGoalForm();
+  const magnitude = Math.abs(store.getState().weightGoalDraft?.weeklyGoalRateKg ?? 0) || 0.25;
+  store.updateWeightGoalDraft({ dietProgram: 'standard', weightGoalType: type,
+    weeklyGoalRateKg: type === 'lose' ? -magnitude : type === 'gain' ? magnitude : 0 });
+};
+
+window.selectDietProgram = (program: DietProgram) => {
+  if (program !== 'mini_cut' && program !== 'lean_bulk') return;
+  captureWeightGoalForm();
+  const magnitude = Math.abs(store.getState().weightGoalDraft?.weeklyGoalRateKg ?? 0) || 0.25;
+  store.updateWeightGoalDraft({ dietProgram: program, weightGoalType: program === 'mini_cut' ? 'lose' : 'gain',
+    weeklyGoalRateKg: program === 'mini_cut' ? -magnitude : magnitude });
 };
 
 window.selectWeeklyRate = (rate: number) => {
-  const hiddenInput = document.getElementById('weekly-rate-input') as HTMLInputElement | null;
-  if (hiddenInput) hiddenInput.value = String(rate);
-  store.updateWeightGoal({ weeklyGoalRateKg: rate });
+  if (![-0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75].includes(rate)) return;
+  captureWeightGoalForm();
+  store.updateWeightGoalDraft({ weeklyGoalRateKg: rate });
 };
 
-window.updateWeightGoalPreview = () => {
-  const targetInput = document.getElementById('weight-target-input') as HTMLInputElement | null;
-  if (!targetInput) return;
-  const val = parseFloat(targetInput.value);
-  if (isNaN(val) || val <= 0) return;
-};
-
-window.submitWeightGoal = () => {
-  const typeInput = document.getElementById('weight-goal-type-input') as HTMLInputElement | null;
+/** Commit input values to the draft without remounting the focused form. */
+function captureWeightGoalForm(): boolean {
+  if (!document.getElementById('weight-goal-form')) return false;
   const targetInput = document.getElementById('weight-target-input') as HTMLInputElement | null;
   const dateInput = document.getElementById('weight-target-date-input') as HTMLInputElement | null;
-  const rateInput = document.getElementById('weekly-rate-input') as HTMLInputElement | null;
-
-  const goalType = (typeInput?.value as WeightGoalType) || store.getState().userProfile.weightGoalType || 'maintain';
   let targetKg: number | null = null;
-  if (targetInput && targetInput.value) {
-    const val = parseFloat(targetInput.value);
-    if (!isNaN(val) && val > 0) {
+  if (targetInput?.value) {
+    const val = Number(targetInput.value);
+    if (Number.isFinite(val) && val > 0) {
       const unit = store.getState().userPreferences.weightUnit;
       targetKg = unit === 'lb' ? lbToKg(val) : Math.round(val * 10) / 10;
     }
   }
+  store.updateWeightGoalDraft({ targetWeightKg: targetKg, targetDate: dateInput?.value.trim() || null }, false);
+  return true;
+}
 
-  const targetDate = dateInput?.value.trim() || null;
-  const weeklyRateKg = goalType === 'maintain' ? 0 : (rateInput && rateInput.value ? parseFloat(rateInput.value) : (store.getState().userProfile.weeklyGoalRateKg ?? (goalType === 'lose' ? -0.25 : 0.25)));
+window.updateWeightGoalPreview = () => { captureWeightGoalForm(); };
 
-  store.updateWeightGoal({
-    weightGoalType: goalType,
-    targetWeightKg: targetKg,
-    targetDate,
-    weeklyGoalRateKg: weeklyRateKg
-  });
-
-  store.goBackFromProfileSubpage();
+window.submitWeightGoal = () => {
+  const form = document.getElementById('weight-goal-form') as HTMLFormElement | null;
+  if (!form?.reportValidity() || !captureWeightGoalForm()) return;
+  store.saveWeightGoalDraft();
 };
 
 // --- Nutrition Goals ---
@@ -2226,4 +2276,4 @@ void startPrivateApp(() => {
   store.subscribeWorkoutTimer(updateRestTimerDisplay);
   store.subscribeFoodSearch(updateFoodSearchContent);
   renderApp();
-}, () => { screenTransitions.reset(); disposeStore(); });
+}, () => { screenTransitions.reset(); resetSpecialProgramToolCallbacks(); disposeStore(); });
