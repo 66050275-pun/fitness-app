@@ -168,6 +168,7 @@ export interface PersistedAppData {
   weightHistory?: WeightEntry[];
   eatingSchedule?: EatingSchedule;
   nutritionGoals?: NutritionGoals;
+  phasicTools?: PhasicToolsState;
   workoutHistory?: WorkoutHistoryEntry[];
   onboardingState?: OnboardingState;
   onboardingDraft?: OnboardingDraft;
@@ -201,6 +202,8 @@ export interface MealItem {
   ingredients?: string[];
   imageUrl?: string;
   micronutrients?: MicronutrientProfile;
+  /** Preset counts identify explicit cooking-fat estimates, independent of their display name. */
+  hiddenFatEstimate?: HiddenFatEstimateCounts;
 }
 
 export interface MacroTarget {
@@ -542,6 +545,7 @@ export interface AppState {
   weightHistory: WeightEntry[];
   eatingSchedule: EatingSchedule;
   nutritionGoals: NutritionGoals;
+  phasicTools: PhasicToolsState;
   profileConfirmModal: ProfileConfirmModalState | null;
   weightModalOpen: boolean;
   editingWeightEntry: WeightEntry | null;
@@ -609,6 +613,25 @@ export type ActivityLevel =
 
 export type WeightGoalType = 'lose' | 'maintain' | 'gain';
 export type DietProgram = 'standard' | 'mini_cut' | 'lean_bulk';
+
+export interface HiddenFatEstimateCounts {
+  oil: number;
+  coconut: number;
+  dressing: number;
+}
+
+export interface PhasicCycle {
+  program: 'mini_cut' | 'lean_bulk';
+  startDate: string; // Local YYYY-MM-DD calendar key
+  lengthWeeks: number;
+  refeedExtraCalories: number;
+}
+
+/** These preferences and schedules are saved only inside the encrypted vault. */
+export interface PhasicToolsState {
+  proteinMealCount: 4 | 5;
+  phaseCycle: PhasicCycle | null;
+}
 export type SpecialProgramToolId =
   | 'hidden-fat-scanner'
   | 'protein-splitter'

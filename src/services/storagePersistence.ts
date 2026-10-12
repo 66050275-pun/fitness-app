@@ -10,6 +10,7 @@ import { privateStorage } from './privateStorage.ts';
  * 5. Strict safety against exceptions and JSON parsing failures.
  * 6. Schema v4: OnboardingState, OnboardingDraft, signed weeklyGoalRateKg, profileSetupCompleted.
  * 7. Schema v7: introduction plus four steps, explicit objective/age and special-program targets.
+ * 8. Schema v8: encrypted phasic-tool preferences, cycles and cooking-fat estimate metadata.
  */
 
 import type { 
@@ -25,6 +26,9 @@ import type {
   WeightEntry,
   EatingSchedule,
   NutritionGoals,
+  PhasicCycle,
+  PhasicToolsState,
+  HiddenFatEstimateCounts,
   WorkoutHistoryEntry,
   OnboardingState,
   OnboardingDraft,
@@ -36,15 +40,55 @@ import type {
   WeekdayNumber
 } from '../types/index.ts';
 import { calculateAge } from '../utils/goalCalculations';
+import { getPhaseCycleProgress, isValidCalendarKey } from './phasicRecompService';
 
 export const APP_STORAGE_KEY = 'nutriai_app_data_v2';
 export const LEGACY_MEALS_KEY = 'nutriai_meals';
-export const CURRENT_SCHEMA_VERSION = 7;
+export const CURRENT_SCHEMA_VERSION = 8;
 
 const FITNESS_OBJECTIVES: FitnessObjective[] = ['lose_weight', 'build_muscle', 'maintain_weight', 'general_fitness', 'mini_cut', 'lean_bulk'];
 
 function boundedNumber(value: unknown, min: number, max: number): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max ? value : null;
+}
+
+function boundedInteger(value: unknown, min: number, max: number): number | null {
+  const number = boundedNumber(value, min, max);
+  return number !== null && Number.isInteger(number) ? number : null;
+}
+
+export function sanitizeHiddenFatEstimate(raw: unknown): HiddenFatEstimateCounts | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const record = raw as Record<string, unknown>;
+  const oil = boundedInteger(record.oil, 0, 20);
+  const coconut = boundedInteger(record.coconut, 0, 20);
+  const dressing = boundedInteger(record.dressing, 0, 20);
+  if (oil === null || coconut === null || dressing === null || oil + coconut + dressing === 0) return undefined;
+  return { oil, coconut, dressing };
+}
+
+export function sanitizePhasicCycle(raw: unknown): PhasicCycle | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const record = raw as Record<string, unknown>;
+  const program = record.program;
+  if (program !== 'mini_cut' && program !== 'lean_bulk') return null;
+  if (typeof record.startDate !== 'string' || !isValidCalendarKey(record.startDate)) return null;
+  const lengthWeeks = boundedInteger(record.lengthWeeks, 3, program === 'mini_cut' ? 6 : 24);
+  const refeedExtraCalories = boundedInteger(record.refeedExtraCalories, 300, 500);
+  if (lengthWeeks === null || refeedExtraCalories === null) return null;
+  const cycle: PhasicCycle = { program, startDate: record.startDate, lengthWeeks, refeedExtraCalories };
+  try { getPhaseCycleProgress(cycle, cycle.startDate); }
+  catch { return null; }
+  return cycle;
+}
+
+export function sanitizePhasicTools(raw: unknown): PhasicToolsState {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { proteinMealCount: 4, phaseCycle: null };
+  const record = raw as Record<string, unknown>;
+  return {
+    proteinMealCount: record.proteinMealCount === 5 ? 5 : 4,
+    phaseCycle: sanitizePhasicCycle(record.phaseCycle)
+  };
 }
 
 function objectiveFromWeightGoal(value: unknown): FitnessObjective | null {
@@ -168,7 +212,8 @@ export function migrateLegacyMealItem(raw: any): MealItem | null {
       confidence: typeof raw.confidence === 'number' ? raw.confidence : undefined,
       ingredients: Array.isArray(raw.ingredients) ? raw.ingredients.filter((i: any) => typeof i === 'string') : [],
       imageUrl: typeof raw.imageUrl === 'string' ? raw.imageUrl : undefined,
-      micronutrients: nutritionSnapshot.micronutrients
+      micronutrients: nutritionSnapshot.micronutrients,
+      hiddenFatEstimate: sanitizeHiddenFatEstimate(raw.hiddenFatEstimate)
     };
   } catch {
     console.warn('Invalid meal record was skipped.');
@@ -622,6 +667,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
         weightHistory: [],
         eatingSchedule: sanitizeEatingSchedule(null),
         nutritionGoals: sanitizeNutritionGoals(null),
+        phasicTools: sanitizePhasicTools(null),
         onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 },
         onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null))
       };
@@ -679,6 +725,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
           weightHistory,
           eatingSchedule,
           nutritionGoals,
+          phasicTools: sanitizePhasicTools(parsed.phasicTools),
           workoutHistory,
           onboardingState: sanitizeOnboardingState(parsed.onboardingState, userProfile),
           onboardingDraft: sanitizeOnboardingDraft(parsed.onboardingDraft, userPreferences, userProfile),
@@ -714,6 +761,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
       weightHistory: [],
       eatingSchedule: sanitizeEatingSchedule(null),
       nutritionGoals: sanitizeNutritionGoals(null),
+      phasicTools: sanitizePhasicTools(null),
       onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 },
       onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null)),
       weeklyFitnessTemplate: null,
@@ -737,6 +785,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
       weightHistory: [],
       eatingSchedule: sanitizeEatingSchedule(null),
       nutritionGoals: sanitizeNutritionGoals(null),
+      phasicTools: sanitizePhasicTools(null),
       onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 },
       onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null)),
       weeklyFitnessTemplate: null,

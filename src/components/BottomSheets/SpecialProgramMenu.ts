@@ -1,9 +1,7 @@
 import { trHtml } from '../../i18n/index.ts';
 import {
   SPECIAL_PROGRAM_ACTIONS,
-  getSpecialProgramAction,
   type SpecialProgramAction,
-  type SpecialProgramToolId,
 } from './specialProgramActions';
 
 function renderToolAction(action: SpecialProgramAction): string {
@@ -48,8 +46,8 @@ export function renderSpecialProgramMenu(isUnlocked: boolean): string {
         <div class="special-program-status">
           <span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>
           <div>
-            <p class="special-program-status-label">${trHtml('Planned tools')}</p>
-            <p>${trHtml('Choose a tool to view its planned function.')}</p>
+            <p class="special-program-status-label">${trHtml('Your program tools')}</p>
+            <p>${trHtml('Use today’s diary and your saved program targets.')}</p>
           </div>
         </div>
         <div class="quick-add-action-grid special-program-action-grid">
@@ -69,35 +67,7 @@ export function renderSpecialProgramMenu(isUnlocked: boolean): string {
       <ul class="quick-add-action-grid special-program-preview-grid" aria-label="${trHtml('Special Program tool preview')}">
         ${SPECIAL_PROGRAM_ACTIONS.map(renderLockedTool).join('')}
       </ul>
-      <p class="special-program-preview-note">${trHtml('Planned tools. Activating the program unlocks this menu; tool functions are still previews.')}</p>
-    </div>
-  `;
-}
-
-/** A truthful placeholder destination for each of the six callback hooks. */
-export function renderSpecialProgramToolPreview(toolId: SpecialProgramToolId | null, hasError = false): string {
-  const action = getSpecialProgramAction(toolId);
-  if (!action) return renderSpecialProgramMenu(true);
-
-  return `
-    <div class="special-program-tool-preview" data-special-program-preview="${action.id}">
-      <span class="quick-add-action-icon special-program-tool-icon" aria-hidden="true">
-        <span class="material-symbols-outlined">${action.icon}</span>
-      </span>
-      <p class="special-program-tool-status">${trHtml('Tool preview')}</p>
-      <h3>${trHtml(action.label)}</h3>
-      <p>${trHtml(action.description)}</p>
-      <div class="special-program-status">
-        <span class="material-symbols-outlined" aria-hidden="true">info</span>
-        ${hasError
-          ? `<p role="alert" class="special-program-tool-error">${trHtml('This tool could not open. Please try again.')}</p>`
-          : `<p>${trHtml('This tool is a preview. No scan or tracking action has run.')}</p>`}
-      </div>
-      ${hasError ? `
-        <button type="button" class="ui-primary-button special-program-tool-retry" onclick="window.selectSpecialProgramTool('${action.id}')">
-          ${trHtml('Try again')}
-        </button>
-      ` : ''}
+      <p class="special-program-preview-note">${trHtml('Activate Mini Cut or Lean Bulk to use these tools.')}</p>
     </div>
   `;
 }

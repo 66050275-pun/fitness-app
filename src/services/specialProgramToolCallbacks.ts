@@ -1,8 +1,8 @@
 import type { SpecialProgramToolId } from '../types/index.ts';
 
 /**
- * Connect a real tool screen here when that feature is implemented. These
- * callbacks intentionally receive no profile, diary or workout data.
+ * Optional host overrides for the built-in tool dialogs. These callbacks
+ * intentionally receive no profile, diary or workout data.
  */
 export interface SpecialProgramToolCallbacks {
   onHiddenFatScanner: () => void;
@@ -61,7 +61,7 @@ export function registerSpecialProgramToolCallbacks(
 
 /**
  * The caller must check the current Special Program unlock state first.
- * Return false for an unimplemented tool so the UI can open its honest preview.
+ * Return false when no override is registered so the UI opens its built-in tool.
  */
 export function runSpecialProgramToolCallback(toolId: SpecialProgramToolId): boolean {
   const toolRegistrations = registrations.get(toolId);

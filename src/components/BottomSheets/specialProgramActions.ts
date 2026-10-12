@@ -1,6 +1,5 @@
 /**
- * App-owned extension menu definitions. These are callback destinations, not
- * implementations of food scanning, macro prescriptions or body composition.
+ * App-owned extension menu definitions for the six local planning tools.
  * Labels and descriptions are translation keys in the app's EN/TH dictionary.
  */
 import type { SpecialProgramToolId } from '../../types/index.ts';
@@ -19,37 +18,37 @@ export const SPECIAL_PROGRAM_ACTIONS: readonly SpecialProgramAction[] = [
     id: 'hidden-fat-scanner',
     icon: 'manage_search',
     label: 'Hidden Fat Scanner',
-    description: 'Detect and flag hidden cooking fats in street foods.',
+    description: 'Estimate cooking oil, coconut milk and dressing fats.',
   },
   {
     id: 'protein-splitter',
     icon: 'account_tree',
     label: 'Protein Splitter',
-    description: 'Example split: 60 g from shakes plus 110–120 g from whole foods toward a 170–180 g protein target.',
+    description: 'Split your daily protein target across four or five meals.',
   },
   {
     id: 'protein-radar',
     icon: 'radar',
     label: 'Protein Radar',
-    description: 'Find quick low-fat, high-protein options at convenience stores.',
+    description: 'See today’s logged protein across meal groups.',
   },
   {
     id: 'fat-gauge',
     icon: 'speed',
     label: 'Fat Gauge',
-    description: 'Track a configured daily fat limit, such as 40–45 g, with warning thresholds.',
+    description: 'Track your fat allowance and the Mini Cut weight-based ceiling.',
   },
   {
     id: 'phase-cycle',
     icon: 'cycle',
     label: 'Phase & Cycle',
-    description: 'Follow phase progress, such as Mini Cut week 2 of 4, with a countdown and phase switching.',
+    description: 'Set phase dates and weekly high-carb refeed targets.',
   },
   {
     id: 'recomp-matrix',
     icon: 'monitoring',
     label: 'Recomp Matrix',
-    description: 'Compare body fat percentage and lean mass trends during recomposition.',
+    description: 'Compare weight trends with comparable workout strength.',
   },
 ];
 

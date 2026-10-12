@@ -79,6 +79,13 @@ The table below lists every screen/component source and its input controls. All 
 | Component | Role / controls |
 | --- | --- |
 | `src/components/BottomSheets/QuickAddBottomSheet.ts` | `renderQuickAddBottomSheet`; renders navigation, records, summaries or actions |
+| `src/components/PhasicTools/HiddenFatScanner.ts` | Cooking-fat calculator and today-only estimate list; `phasic-fat-oil`, `phasic-fat-coconut`, `phasic-fat-dressing`, `phasic-fat-meal` |
+| `src/components/PhasicTools/ProteinSplitter.ts` | Saved four/five interval choice and rounded target allocation |
+| `src/components/PhasicTools/ProteinRadar.ts` | Today’s known meal-group protein chart and incomplete-data states |
+| `src/components/PhasicTools/FatGauge.ts` | Known logged fat and weight-based ceiling, including uncertainty |
+| `src/components/PhasicTools/PhaseCycleTracker.ts` | Cycle calendar and refeed allowances; `phasic-cycle-start`, `phasic-cycle-weeks`, `phasic-cycle-refeed` |
+| `src/components/PhasicTools/RecompMatrix.ts` | Paired seven-day weight and supported workout strength summaries |
+| `src/components/PhasicTools/PhasicRecompTools.ts` | Built-in tool dispatcher inside the shared dialog lifecycle |
 | `src/components/Fitness/MonthlyFitnessCalendar.ts` | `renderMonthlyFitnessCalendar`; renders navigation, records, summaries or actions |
 | `src/components/Fitness/PlannerDateDetailModal.ts` | `renderPlannerDateDetailModal`; renders navigation, records, summaries or actions |
 | `src/components/Fitness/TodaysWorkoutCard.ts` | `renderTodaysWorkoutCard`; renders navigation, records, summaries or actions |
@@ -131,6 +138,8 @@ The table below lists every screen/component source and its input controls. All 
 | --- | --- |
 | `src/main.ts` | Screen routing, form capture, validation and explicit clipboard/download actions; starts the store only after unlock |
 | `src/store/appState.ts` | Application state, persisted fields, durable onboarding completion/retry, workout timers and store disposal |
+| `src/components/PhasicTools/phasicToolController.ts` | Validates active/unlocked tool actions, captures unsaved controls without persistent drafts, refreshes local day views and clears timers on disposal |
+| `src/services/phasicRecompService.ts` | Pure preset, split, radar, gauge, calendar and matched trend calculations; no network or storage calls |
 | `src/screens/onboarding/onboardingController.ts` | Captures and validates draft inputs, updates review feedback without replacing focused controls, coordinates async completion and blocks actions during vault locking |
 | `src/utils/onboardingGoals.ts` | Shared objective/activity definitions, metric validation and local calorie/macro/hydration preview; no network or independent storage writes |
 | `src/services/nutritionPlanService.ts` | Six pure Mini Cut/Lean Bulk planning functions; validates calorie/macro feasibility and returns targets, duration metadata or a weight-trend recommendation without network/storage writes |
@@ -212,3 +221,13 @@ Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG a
 - UI previews and final store validation share the same calculation. Get Started waits for the encrypted write to commit before Dashboard navigation. Failed saves retain the review for retry; a stable completion identifier prevents duplicate initial weight entries. In-flight UI callbacks are blocked or invalidated when vault locking starts.
 - Restarting setup preserves the confirmed profile, nutrition goals and histories until confirmation. Returning users can cancel the draft; first-time users must finish setup. Version-2 four-step drafts and older six-step drafts retain their valid resume position under flow version 3, returning to an earlier step when required answers are missing. Existing completed users remain completed.
 - This entry documents source behavior. It makes no additional claim about automated tests, physical-device verification or independent security testing.
+
+
+## Functional Phasic Recomp tools — 2026-10-12
+
+- All six extension cards now open built-in centered dialogs with local calculations. The earlier preview descriptions above refer to their initial release. No image upload, remote scan, analytics endpoint or external chart library is added.
+- Cooking-fat estimates are explicitly added as normal diary records, tagged with validated preset counts. Fat and its calorie energy are counted once; removing a tagged entry uses the diary deletion pipeline. Unknown nutrient snapshots stay unknown in the radar and fat gauge.
+- Schema 8 stores protein interval count and a bounded phase schedule in the existing encrypted snapshot. Inputs, counts, date keys and phase identifiers are sanitized. A changed saved program clears an incompatible cycle. Refeed dates alter calorie/carbohydrate allowances, not consumed food or saved baseline goals; no background write is needed at midnight.
+- Mutation controls verify the unlocked vault, saved Special Program and active tool. Accepted diary drafts reset to prevent accidental duplicate additions; later storage failures use the existing vault save indicator and retry flow. Private callbacks, chart views and dialog snapshots clear on lock/disposal.
+- Protein uses a planning benchmark rather than a measured leucine threshold. Recomposition uses daily mean weights and matched supported exercise estimates, with explicit insufficient-data states; it does not infer body fat or lean mass.
+- Validation for this update consists of strict TypeScript/Vite build, source review and passive synthetic mobile layouts. No automated tests were added or run.

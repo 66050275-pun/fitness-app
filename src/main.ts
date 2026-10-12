@@ -25,6 +25,7 @@ import { renderQuickAddBottomSheet } from './components/BottomSheets/QuickAddBot
 import { QUICK_ADD_ACTIONS, type QuickAddActionId } from './components/BottomSheets/quickAddActions';
 import { getSpecialProgramAction } from './components/BottomSheets/specialProgramActions';
 import { runSpecialProgramToolCallback, resetSpecialProgramToolCallbacks } from './services/specialProgramToolCallbacks';
+import { activatePhasicTools, bindPhasicToolHandlers, deactivatePhasicTools, refreshPhasicToolFeedback } from './components/PhasicTools/phasicToolController';
 import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
 import { renderFoodResultScreen } from './screens/FoodResultScreen';
@@ -1905,6 +1906,7 @@ window.executeProfileConfirmModalAction = () => {
 // FIRST-LAUNCH ONBOARDING & PROFILE PHOTO
 // ==========================================
 bindOnboardingHandlers();
+bindPhasicToolHandlers();
 
 window.handleProfilePhotoSelected = async (input: HTMLInputElement) => {
   const file = input.files?.[0];
@@ -2199,6 +2201,7 @@ function renderApp() {
   `);
 
   if (currentScreen === 'onboarding') refreshOnboardingFeedback();
+  refreshPhasicToolFeedback();
 
   if (currentScreen === 'coach') {
     const container = document.getElementById('chat-messages-container');
@@ -2211,8 +2214,9 @@ function renderApp() {
 // Initialize health/profile state only after the local vault is unlocked.
 void startPrivateApp(() => {
   initializeStore();
+  activatePhasicTools();
   store.subscribe(renderApp);
   store.subscribeWorkoutTimer(updateRestTimerDisplay);
   store.subscribeFoodSearch(updateFoodSearchContent);
   renderApp();
-}, () => { screenTransitions.reset(); resetSpecialProgramToolCallbacks(); disposeStore(); });
+}, () => { deactivatePhasicTools(); screenTransitions.reset(); resetSpecialProgramToolCallbacks(); disposeStore(); });
