@@ -632,14 +632,14 @@ export type WeeklyWeightRate = -0.75 | -0.50 | -0.25 | 0 | 0.25 | 0.50 | 0.75;
 export const VALID_WEEKLY_RATES: WeeklyWeightRate[] = [-0.75, -0.50, -0.25, 0, 0.25, 0.50, 0.75];
 
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
-export type FitnessObjective = 'lose_weight' | 'build_muscle' | 'maintain_weight' | 'general_fitness';
+export type FitnessObjective = 'lose_weight' | 'build_muscle' | 'maintain_weight' | 'general_fitness' | 'mini_cut' | 'lean_bulk';
 
 export interface OnboardingState {
   status: OnboardingStatus;
   isCompleted: boolean;
-  /** Distinguishes the current four-step wizard from legacy six-step drafts. */
-  flowVersion: 2;
-  currentStep: number; // 1–4
+  /** Introduction (0), then the four setup steps; legacy drafts keep their answers. */
+  flowVersion: 3;
+  currentStep: number; // 0–4
   completedAt?: string | null;
   /** Stable ID generated when onboarding completes. Used for idempotency of initial weight entry. */
   completionId?: string | null;
