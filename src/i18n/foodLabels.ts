@@ -9,6 +9,7 @@ function appFoodText(text: string): string {
 }
 export function mealDescription(meal: MealItem): string {
   if (!meal.category) return tr(meal.mealType);
+  if (meal.hiddenFatEstimate && meal.category === 'Cooking fat estimate') return tr(meal.category);
   return meal.foodSource === 'built_in' || meal.foodSource === 'demo'
     ? meal.category.split(' • ').map(appFoodText).join(' • ') : meal.category;
 }
@@ -16,6 +17,7 @@ export function foodLabel(food: Pick<FoodDefinition, 'source'>, text: string): s
   return food.source === 'built_in' || food.source === 'demo' ? appFoodText(text) : text;
 }
 export function mealLabel(meal: MealItem, text: string): string {
+  if (meal.hiddenFatEstimate && (text === 'Hidden cooking fat estimate' || text === 'Cooking fat estimate')) return tr(text);
   return meal.foodSource === 'built_in' || meal.foodSource === 'demo' ? appFoodText(text) : text;
 }
 /** Translate generated quantity/unit prefixes while preserving custom serving descriptions. */

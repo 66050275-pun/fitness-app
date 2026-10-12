@@ -8142,5 +8142,1121 @@
   "Your calorie target is entered manually; no BMR or TDEE has been inferred.": {
     "en": "Your calorie target is entered manually; no BMR or TDEE has been inferred.",
     "th": "คุณกำหนดเป้าหมายพลังงานเอง ระบบไม่ได้คาดคะเนค่า BMR หรือ TDEE"
+  },
+  "Cooking oil": {
+    "en": "Cooking oil",
+    "th": "น้ำมันปรุงอาหาร"
+  },
+  "Coconut milk": {
+    "en": "Coconut milk",
+    "th": "กะทิ"
+  },
+  "Fatty dressing": {
+    "en": "Fatty dressing",
+    "th": "น้ำสลัดที่มีไขมัน"
+  },
+  "Breakfast": {
+    "en": "Breakfast",
+    "th": "มื้อเช้า"
+  },
+  "Lunch": {
+    "en": "Lunch",
+    "th": "มื้อกลางวัน"
+  },
+  "Pre/post-workout": {
+    "en": "Pre/post-workout",
+    "th": "ก่อน/หลังออกกำลังกาย"
+  },
+  "Dinner": {
+    "en": "Dinner",
+    "th": "มื้อเย็น"
+  },
+  "Pre-workout": {
+    "en": "Pre-workout",
+    "th": "ก่อนออกกำลังกาย"
+  },
+  "Post-workout": {
+    "en": "Post-workout",
+    "th": "หลังออกกำลังกาย"
+  },
+  "Limit exceeded": {
+    "en": "Limit exceeded",
+    "th": "เกินเพดาน"
+  },
+  "Caution": {
+    "en": "Caution",
+    "th": "ใกล้ถึงเพดาน"
+  },
+  "Safe": {
+    "en": "Safe",
+    "th": "อยู่ในเกณฑ์"
+  },
+  "Incomplete fat data": {
+    "en": "Incomplete fat data",
+    "th": "ข้อมูลไขมันไม่ครบ"
+  },
+  "{0} g consumed of a {1} g fat ceiling": {
+    "en": "{0} g consumed of a {1} g fat ceiling",
+    "th": "รับไขมันแล้ว {0} กรัม จากเพดาน {1} กรัม"
+  },
+  "Today’s fat intake, including saved cooking-fat estimates.": {
+    "en": "Today’s fat intake, including saved cooking-fat estimates.",
+    "th": "ไขมันที่รับวันนี้ รวมค่าประเมินไขมันจากการปรุงที่บันทึกไว้"
+  },
+  "Daily ceiling: {0} g": {
+    "en": "Daily ceiling: {0} g",
+    "th": "เพดานต่อวัน: {0} กรัม"
+  },
+  "{0} g over the ceiling": {
+    "en": "{0} g over the ceiling",
+    "th": "เกินเพดาน {0} กรัม"
+  },
+  "{0} g remaining": {
+    "en": "{0} g remaining",
+    "th": "เหลือ {0} กรัม"
+  },
+  "Fat gauge thresholds": {
+    "en": "Fat gauge thresholds",
+    "th": "เกณฑ์เตือนปริมาณไขมัน"
+  },
+  "Below 80%": {
+    "en": "Below 80%",
+    "th": "ต่ำกว่า 80%"
+  },
+  "80–100%": {
+    "en": "80–100%",
+    "th": "80–100%"
+  },
+  "Above 100%": {
+    "en": "Above 100%",
+    "th": "มากกว่า 100%"
+  },
+  "Some logged foods have unknown fat. The total is a known minimum, so a safe status cannot be confirmed.": {
+    "en": "Some logged foods have unknown fat. The total is a known minimum, so a safe status cannot be confirmed.",
+    "th": "อาหารบางรายการไม่มีข้อมูลไขมัน ยอดรวมจึงเป็นเพียงปริมาณขั้นต่ำที่ทราบ และยังยืนยันไม่ได้ว่าอยู่ในเกณฑ์"
+  },
+  "Set a valid current weight and daily fat target in Profile to calculate the ceiling.": {
+    "en": "Set a valid current weight and daily fat target in Profile to calculate the ceiling.",
+    "th": "ตั้งค่าน้ำหนักปัจจุบันและเป้าหมายไขมันต่อวันที่ถูกต้องในโปรไฟล์เพื่อคำนวณเพดาน"
+  },
+  "Mini Cut uses the lower of your saved fat target and 0.6 g/kg of current body weight. This ceiling does not change your saved nutrition plan.": {
+    "en": "Mini Cut uses the lower of your saved fat target and 0.6 g/kg of current body weight. This ceiling does not change your saved nutrition plan.",
+    "th": "การลดไขมันระยะสั้นใช้ค่าที่ต่ำกว่าระหว่างเป้าหมายไขมันที่บันทึกไว้กับ 0.6 กรัมต่อน้ำหนักปัจจุบัน 1 กก. เพดานนี้ไม่ได้เปลี่ยนแผนโภชนาการที่บันทึกไว้"
+  },
+  "Lean Bulk uses your saved daily fat target. Cooking-fat estimates are included once through your diary.": {
+    "en": "Lean Bulk uses your saved daily fat target. Cooking-fat estimates are included once through your diary.",
+    "th": "การเพิ่มกล้ามเนื้อแบบคุมไขมันใช้เป้าหมายไขมันต่อวันที่บันทึกไว้ ค่าประเมินไขมันจากการปรุงถูกนับครั้งเดียวผ่านบันทึกอาหาร"
+  },
+  "{0} × {1}": {
+    "en": "{0} × {1}",
+    "th": "{0} × {1}"
+  },
+  "Cooking-fat estimate": {
+    "en": "Cooking-fat estimate",
+    "th": "ค่าประเมินไขมันจากการปรุง"
+  },
+  "{0} g fat · {1} kcal": {
+    "en": "{0} g fat · {1} kcal",
+    "th": "ไขมัน {0} กรัม · {1} กิโลแคลอรี"
+  },
+  "Remove cooking-fat estimate": {
+    "en": "Remove cooking-fat estimate",
+    "th": "ลบค่าประเมินไขมันจากการปรุง"
+  },
+  "Estimate extra cooking fat that your logged meal may not include.": {
+    "en": "Estimate extra cooking fat that your logged meal may not include.",
+    "th": "ประเมินไขมันจากการปรุงเพิ่มเติมที่อาจยังไม่รวมในมื้ออาหารที่บันทึกไว้"
+  },
+  "These are adjustable estimates, not a camera scan. Add only fat missing from the meal to avoid counting it twice.": {
+    "en": "These are adjustable estimates, not a camera scan. Add only fat missing from the meal to avoid counting it twice.",
+    "th": "ค่าประเมินเหล่านี้ปรับได้และไม่ได้มาจากการสแกนด้วยกล้อง เพิ่มเฉพาะไขมันที่ยังไม่รวมในมื้ออาหารเพื่อไม่ให้นับซ้ำ"
+  },
+  "Estimated additions": {
+    "en": "Estimated additions",
+    "th": "รายการเพิ่มเติมที่ประเมิน"
+  },
+  "+{0} g fat each": {
+    "en": "+{0} g fat each",
+    "th": "เพิ่มไขมันครั้งละ {0} กรัม"
+  },
+  "{0} additions": {
+    "en": "{0} additions",
+    "th": "จำนวนที่เพิ่มสำหรับ{0}"
+  },
+  "Add one {0} estimate": {
+    "en": "Add one {0} estimate",
+    "th": "เพิ่มค่าประเมิน{0} 1 ครั้ง"
+  },
+  "Attach estimate to meal": {
+    "en": "Attach estimate to meal",
+    "th": "เลือกมื้ออาหารสำหรับค่าประเมิน"
+  },
+  "Cooking-fat estimate summary": {
+    "en": "Cooking-fat estimate summary",
+    "th": "สรุปค่าประเมินไขมันจากการปรุง"
+  },
+  "Added fat": {
+    "en": "Added fat",
+    "th": "ไขมันที่เพิ่ม"
+  },
+  "{0} g": {
+    "en": "{0} g",
+    "th": "{0} กรัม"
+  },
+  "Added energy": {
+    "en": "Added energy",
+    "th": "พลังงานที่เพิ่ม"
+  },
+  "Strict allowance after this estimate": {
+    "en": "Strict allowance after this estimate",
+    "th": "โควตาคงเหลือหลังเพิ่มค่าประเมินนี้"
+  },
+  "Some logged fat values are unknown. Remaining allowance may be lower.": {
+    "en": "Some logged fat values are unknown. Remaining allowance may be lower.",
+    "th": "รายการที่บันทึกบางรายการไม่มีข้อมูลไขมัน โควตาคงเหลือจริงอาจน้อยกว่านี้"
+  },
+  "Add estimate to today": {
+    "en": "Add estimate to today",
+    "th": "เพิ่มค่าประเมินในวันนี้"
+  },
+  "Saving adds fat and its energy to today’s diary. Your daily allowance updates immediately.": {
+    "en": "Saving adds fat and its energy to today’s diary. Your daily allowance updates immediately.",
+    "th": "เมื่อบันทึก ไขมันและพลังงานจะถูกเพิ่มในบันทึกอาหารวันนี้ และโควตาต่อวันจะอัปเดตทันที"
+  },
+  "Today’s cooking-fat estimates": {
+    "en": "Today’s cooking-fat estimates",
+    "th": "ค่าประเมินไขมันจากการปรุงวันนี้"
+  },
+  "No cooking-fat estimates added today.": {
+    "en": "No cooking-fat estimates added today.",
+    "th": "ยังไม่มีค่าประเมินไขมันจากการปรุงในวันนี้"
+  },
+  "{0} g known fat of a {1} g ceiling": {
+    "en": "{0} g known fat of a {1} g ceiling",
+    "th": "ไขมันที่ทราบ {0} กรัม จากเพดาน {1} กรัม"
+  },
+  "{0} g remaining from known entries": {
+    "en": "{0} g remaining from known entries",
+    "th": "เหลือ {0} กรัม จากรายการที่มีข้อมูล"
+  },
+  "Add your current weight in Profile to apply the Mini Cut weight-based cap. The meter currently uses your saved fat target.": {
+    "en": "Add your current weight in Profile to apply the Mini Cut weight-based cap. The meter currently uses your saved fat target.",
+    "th": "เพิ่มน้ำหนักปัจจุบันในโปรไฟล์เพื่อใช้เพดานตามน้ำหนักตัวสำหรับการลดไขมันระยะสั้น ขณะนี้มาตรวัดใช้เป้าหมายไขมันที่บันทึกไว้"
+  },
+  "Upcoming cycle": {
+    "en": "Upcoming cycle",
+    "th": "รอบที่กำลังจะเริ่ม"
+  },
+  "Cycle completed": {
+    "en": "Cycle completed",
+    "th": "รอบสิ้นสุดแล้ว"
+  },
+  "Active cycle": {
+    "en": "Active cycle",
+    "th": "รอบปัจจุบัน"
+  },
+  "Starts in {0} days": {
+    "en": "Starts in {0} days",
+    "th": "เริ่มในอีก {0} วัน"
+  },
+  "Week {0} of {1}": {
+    "en": "Week {0} of {1}",
+    "th": "สัปดาห์ที่ {0} จาก {1}"
+  },
+  "Day {0} of {1}": {
+    "en": "Day {0} of {1}",
+    "th": "วันที่ {0} จาก {1}"
+  },
+  "Cycle progress": {
+    "en": "Cycle progress",
+    "th": "ความคืบหน้าของรอบ"
+  },
+  "{0} to {1}": {
+    "en": "{0} to {1}",
+    "th": "{0} ถึง {1}"
+  },
+  "{0} days remaining, including today": {
+    "en": "{0} days remaining, including today",
+    "th": "เหลือ {0} วัน รวมวันนี้"
+  },
+  "Today is a scheduled refeed day": {
+    "en": "Today is a scheduled refeed day",
+    "th": "วันนี้เป็นวันรีฟีดตามกำหนด"
+  },
+  "Today’s allowance: {0} kcal and {1} g carbs": {
+    "en": "Today’s allowance: {0} kcal and {1} g carbs",
+    "th": "โควตาวันนี้: {0} กิโลแคลอรี และคาร์โบไฮเดรต {1} กรัม"
+  },
+  "+{0} kcal from +{1} g carbs": {
+    "en": "+{0} kcal from +{1} g carbs",
+    "th": "เพิ่ม {0} กิโลแคลอรีจากคาร์โบไฮเดรต {1} กรัม"
+  },
+  "This schedule has ended. Your saved nutrition targets remain active until you change goals or save a new cycle.": {
+    "en": "This schedule has ended. Your saved nutrition targets remain active until you change goals or save a new cycle.",
+    "th": "กำหนดการนี้สิ้นสุดแล้ว เป้าหมายโภชนาการที่บันทึกไว้ยังคงใช้ต่อจนกว่าคุณจะเปลี่ยนเป้าหมายหรือบันทึกรอบใหม่"
+  },
+  "Choose Mini Cut or Lean Bulk in Goal Settings to use phase tracking.": {
+    "en": "Choose Mini Cut or Lean Bulk in Goal Settings to use phase tracking.",
+    "th": "เลือกการลดไขมันระยะสั้นหรือเพิ่มกล้ามเนื้อแบบคุมไขมันในตั้งค่าเป้าหมายเพื่อใช้การติดตามช่วงโปรแกรม"
+  },
+  "Set a cycle for your saved program. Weekly refeeds add a day-specific carbohydrate allowance without changing your baseline targets.": {
+    "en": "Set a cycle for your saved program. Weekly refeeds add a day-specific carbohydrate allowance without changing your baseline targets.",
+    "th": "กำหนดรอบสำหรับโปรแกรมที่บันทึกไว้ วันรีฟีดประจำสัปดาห์เพิ่มโควตาคาร์โบไฮเดรตเฉพาะวันโดยไม่เปลี่ยนเป้าหมายพื้นฐาน"
+  },
+  "No cycle is scheduled yet. Save the dates below to start tracking.": {
+    "en": "No cycle is scheduled yet. Save the dates below to start tracking.",
+    "th": "ยังไม่ได้กำหนดรอบ บันทึกวันที่ด้านล่างเพื่อเริ่มติดตาม"
+  },
+  "Cycle start date": {
+    "en": "Cycle start date",
+    "th": "วันที่เริ่มรอบ"
+  },
+  "Cycle length in weeks": {
+    "en": "Cycle length in weeks",
+    "th": "ระยะเวลารอบเป็นสัปดาห์"
+  },
+  "Choose 3–6 weeks for Mini Cut. The schedule stops at the end of the selected cycle.": {
+    "en": "Choose 3–6 weeks for Mini Cut. The schedule stops at the end of the selected cycle.",
+    "th": "เลือก 3–6 สัปดาห์สำหรับการลดไขมันระยะสั้น กำหนดการจะหยุดเมื่อสิ้นสุดรอบที่เลือก"
+  },
+  "Choose 3–24 weeks for Lean Bulk. Weekly refeed allowances are only scheduled during Mini Cut.": {
+    "en": "Choose 3–24 weeks for Lean Bulk. Weekly refeed allowances are only scheduled during Mini Cut.",
+    "th": "เลือก 3–24 สัปดาห์สำหรับเพิ่มกล้ามเนื้อแบบคุมไขมัน โควตารีฟีดรายสัปดาห์จะกำหนดเฉพาะช่วงลดไขมันระยะสั้น"
+  },
+  "Weekly refeed extra calories": {
+    "en": "Weekly refeed extra calories",
+    "th": "พลังงานที่เพิ่มในวันรีฟีดประจำสัปดาห์"
+  },
+  "Add 300–500 kcal from carbohydrates on days 7, 14 and each following week. This increases the budget; food still needs to be logged.": {
+    "en": "Add 300–500 kcal from carbohydrates on days 7, 14 and each following week. This increases the budget; food still needs to be logged.",
+    "th": "เพิ่มพลังงานจากคาร์โบไฮเดรต 300–500 กิโลแคลอรีในวันที่ 7, 14 และทุกสัปดาห์ถัดไป เป็นการเพิ่มโควตาเท่านั้น ยังต้องบันทึกอาหารที่กิน"
+  },
+  "Save cycle changes": {
+    "en": "Save cycle changes",
+    "th": "บันทึกการปรับรอบ"
+  },
+  "Start cycle": {
+    "en": "Start cycle",
+    "th": "เริ่มรอบ"
+  },
+  "Clear cycle": {
+    "en": "Clear cycle",
+    "th": "ล้างรอบ"
+  },
+  "Stop cycle": {
+    "en": "Stop cycle",
+    "th": "หยุดรอบ"
+  },
+  "Weekly refeed schedule": {
+    "en": "Weekly refeed schedule",
+    "th": "กำหนดวันรีฟีดประจำสัปดาห์"
+  },
+  "Past refeed date": {
+    "en": "Past refeed date",
+    "th": "วันรีฟีดที่ผ่านมา"
+  },
+  "Scheduled": {
+    "en": "Scheduled",
+    "th": "กำหนดไว้แล้ว"
+  },
+  "+{0} kcal · +{1} g carbs": {
+    "en": "+{0} kcal · +{1} g carbs",
+    "th": "เพิ่ม {0} กิโลแคลอรี · คาร์โบไฮเดรต {1} กรัม"
+  },
+  "Allowance: {0} kcal": {
+    "en": "Allowance: {0} kcal",
+    "th": "โควตา: {0} กิโลแคลอรี"
+  },
+  "Past dates indicate a completed calendar interval, not proof that a refeed was eaten. Protein and fat targets stay unchanged on refeed days.": {
+    "en": "Past dates indicate a completed calendar interval, not proof that a refeed was eaten. Protein and fat targets stay unchanged on refeed days.",
+    "th": "วันที่ผ่านไปแสดงเพียงช่วงเวลาที่สิ้นสุด ไม่ได้ยืนยันว่ากินตามแผนรีฟีดแล้ว เป้าหมายโปรตีนและไขมันคงเดิมในวันรีฟีด"
+  },
+  "Spread your saved protein target across four or five meal intervals.": {
+    "en": "Spread your saved protein target across four or five meal intervals.",
+    "th": "แบ่งเป้าหมายโปรตีนที่บันทึกไว้เป็น 4 หรือ 5 ช่วงมื้ออาหาร"
+  },
+  "Daily protein target": {
+    "en": "Daily protein target",
+    "th": "เป้าหมายโปรตีนต่อวัน"
+  },
+  "Your saved target stays unchanged.": {
+    "en": "Your saved target stays unchanged.",
+    "th": "เป้าหมายที่บันทึกไว้ยังคงเดิม"
+  },
+  "Number of protein intervals": {
+    "en": "Number of protein intervals",
+    "th": "จำนวนช่วงมื้อโปรตีน"
+  },
+  "{0} intervals": {
+    "en": "{0} intervals",
+    "th": "{0} ช่วง"
+  },
+  "Each interval reaches the {0} g protein planning benchmark.": {
+    "en": "Each interval reaches the {0} g protein planning benchmark.",
+    "th": "แต่ละช่วงถึงเกณฑ์โปรตีนสำหรับวางแผน {0} กรัม"
+  },
+  "Your {0} g target cannot provide {1} g across {2} intervals. This plan divides the actual target without increasing it.": {
+    "en": "Your {0} g target cannot provide {1} g across {2} intervals. This plan divides the actual target without increasing it.",
+    "th": "เป้าหมาย {0} กรัมไม่เพียงพอสำหรับช่วงละ {1} กรัมใน {2} ช่วง แผนนี้แบ่งตามเป้าหมายจริงโดยไม่เพิ่มยอดรวม"
+  },
+  "Suggested protein intervals": {
+    "en": "Suggested protein intervals",
+    "th": "ช่วงมื้อโปรตีนที่แนะนำ"
+  },
+  "Interval {0}": {
+    "en": "Interval {0}",
+    "th": "ช่วงที่ {0}"
+  },
+  "Benchmark met": {
+    "en": "Benchmark met",
+    "th": "ถึงเกณฑ์วางแผน"
+  },
+  "Below planning benchmark": {
+    "en": "Below planning benchmark",
+    "th": "ต่ำกว่าเกณฑ์วางแผน"
+  },
+  "Planned daily total": {
+    "en": "Planned daily total",
+    "th": "ยอดรวมตามแผนต่อวัน"
+  },
+  "Whole-gram allocations add up to the rounded daily target. Intervals are a plan; no meals are logged automatically.": {
+    "en": "Whole-gram allocations add up to the rounded daily target. Intervals are a plan; no meals are logged automatically.",
+    "th": "โปรตีนที่แบ่งเป็นจำนวนเต็มกรัมรวมกันเท่ากับเป้าหมายต่อวันที่ปัดแล้ว ช่วงเหล่านี้เป็นแผนเท่านั้น ไม่มีการบันทึกมื้ออาหารอัตโนมัติ"
+  },
+  "The 30 g protein benchmark does not measure leucine. Food sources and individual needs vary.": {
+    "en": "The 30 g protein benchmark does not measure leucine. Food sources and individual needs vary.",
+    "th": "เกณฑ์โปรตีน 30 กรัมสำหรับวางแผนไม่ได้วัดปริมาณลิวซีน แหล่งอาหารและความต้องการของแต่ละคนแตกต่างกัน"
+  },
+  "A meal group can include several foods or snacks. The 30 g protein benchmark does not measure leucine or prove muscle growth.": {
+    "en": "A meal group can include several foods or snacks. The 30 g protein benchmark does not measure leucine or prove muscle growth.",
+    "th": "กลุ่มมื้อหนึ่งอาจมีอาหารหรือของว่างหลายรายการ เกณฑ์โปรตีน 30 กรัมไม่ได้วัดลิวซีนหรือยืนยันการเพิ่มกล้ามเนื้อ"
+  },
+  "Activate Mini Cut or Lean Bulk to use these tools.": {
+    "en": "Activate Mini Cut or Lean Bulk to use these tools.",
+    "th": "เปิดใช้โปรแกรมลดไขมันระยะสั้นหรือเพิ่มกล้ามเนื้อแบบคุมไขมันเพื่อใช้เครื่องมือเหล่านี้"
+  },
+  "Average weight change": {
+    "en": "Average weight change",
+    "th": "การเปลี่ยนแปลงน้ำหนักเฉลี่ย"
+  },
+  "Broadly stable": {
+    "en": "Broadly stable",
+    "th": "โดยรวมค่อนข้างคงที่"
+  },
+  "Change": {
+    "en": "Change",
+    "th": "การเปลี่ยนแปลง"
+  },
+  "Choose at least one cooking-fat addition.": {
+    "en": "Choose at least one cooking-fat addition.",
+    "th": "เลือกไขมันจากการปรุงอาหารอย่างน้อยหนึ่งรายการ"
+  },
+  "Comparable estimated strength declined. Review recovery and training alongside your weight trend.": {
+    "en": "Comparable estimated strength declined. Review recovery and training alongside your weight trend.",
+    "th": "แรงโดยประมาณของท่าที่เปรียบเทียบกันลดลง ทบทวนการฟื้นตัวและการฝึกควบคู่กับแนวโน้มน้ำหนัก"
+  },
+  "Comparable estimated strength increased. Check the weight trend alongside your goal.": {
+    "en": "Comparable estimated strength increased. Check the weight trend alongside your goal.",
+    "th": "แรงโดยประมาณของท่าที่เปรียบเทียบกันเพิ่มขึ้น พิจารณาแนวโน้มน้ำหนักควบคู่กับเป้าหมาย"
+  },
+  "Comparable exercise strength": {
+    "en": "Comparable exercise strength",
+    "th": "แรงของท่าออกกำลังกายที่เปรียบเทียบกัน"
+  },
+  "Comparable strength change": {
+    "en": "Comparable strength change",
+    "th": "การเปลี่ยนแปลงแรงของท่าที่เปรียบเทียบกัน"
+  },
+  "Compare the latest seven days with the previous seven days using your weight diary and completed workouts.": {
+    "en": "Compare the latest seven days with the previous seven days using your weight diary and completed workouts.",
+    "th": "เปรียบเทียบ 7 วันล่าสุดกับ 7 วันก่อนหน้า โดยใช้บันทึกน้ำหนักและการออกกำลังกายที่จบแล้ว"
+  },
+  "Compare weight trends with comparable workout strength.": {
+    "en": "Compare weight trends with comparable workout strength.",
+    "th": "เปรียบเทียบแนวโน้มน้ำหนักกับแรงของท่าออกกำลังกายที่เหมือนกัน"
+  },
+  "Complete the same loaded exercise in both windows. Bodyweight or unmatched exercises cannot provide a comparable 1RM trend.": {
+    "en": "Complete the same loaded exercise in both windows. Bodyweight or unmatched exercises cannot provide a comparable 1RM trend.",
+    "th": "บันทึกท่าที่ใช้น้ำหนักเดียวกันในทั้งสองช่วง ท่าที่ใช้น้ำหนักตัวหรือไม่ตรงกันยังใช้เปรียบเทียบแนวโน้ม 1RM ไม่ได้"
+  },
+  "Cooking-fat estimate removed from today’s diary.": {
+    "en": "Cooking-fat estimate removed from today’s diary.",
+    "th": "นำรายการประมาณไขมันจากการปรุงอาหารออกจากบันทึกวันนี้แล้ว"
+  },
+  "Cycle cleared. Your baseline targets are unchanged.": {
+    "en": "Cycle cleared. Your baseline targets are unchanged.",
+    "th": "ล้างรอบแล้ว เป้าหมายพื้นฐานของคุณยังคงเดิม"
+  },
+  "Cycle updated. Scheduled days adjust your daily allowance automatically.": {
+    "en": "Cycle updated. Scheduled days adjust your daily allowance automatically.",
+    "th": "อัปเดตรอบแล้ว วันที่กำหนดไว้จะปรับงบพลังงานของวันนั้นโดยอัตโนมัติ"
+  },
+  "Enter a valid start date and 3–24 whole weeks.": {
+    "en": "Enter a valid start date and 3–24 whole weeks.",
+    "th": "กรอกวันเริ่มต้นที่ถูกต้องและจำนวนสัปดาห์เต็มระหว่าง 3–24 สัปดาห์"
+  },
+  "Enter a valid start date, 3–6 whole weeks and 300–500 extra refeed calories.": {
+    "en": "Enter a valid start date, 3–6 whole weeks and 300–500 extra refeed calories.",
+    "th": "กรอกวันเริ่มต้นที่ถูกต้อง ระยะเวลาเต็ม 3–6 สัปดาห์ และพลังงานเพิ่มในวันรีฟีด 300–500 กิโลแคลอรี"
+  },
+  "Enter whole preset counts between 0 and 20.": {
+    "en": "Enter whole preset counts between 0 and 20.",
+    "th": "กรอกจำนวนรายการเป็นจำนวนเต็มระหว่าง 0 ถึง 20"
+  },
+  "Estimate added to today’s diary. Use the save indicator to confirm storage.": {
+    "en": "Estimate added to today’s diary. Use the save indicator to confirm storage.",
+    "th": "เพิ่มค่าประมาณในบันทึกวันนี้แล้ว ตรวจสอบสถานะการบันทึกเพื่อยืนยันว่าเก็บข้อมูลสำเร็จ"
+  },
+  "Estimate cooking oil, coconut milk and dressing fats.": {
+    "en": "Estimate cooking oil, coconut milk and dressing fats.",
+    "th": "ประมาณไขมันจากน้ำมันปรุงอาหาร กะทิ และน้ำราดที่มีไขมัน"
+  },
+  "Known daily protein progress": {
+    "en": "Known daily protein progress",
+    "th": "ความคืบหน้าโปรตีนต่อวันจากค่าที่ทราบ"
+  },
+  "Known protein today": {
+    "en": "Known protein today",
+    "th": "โปรตีนวันนี้จากค่าที่ทราบ"
+  },
+  "Latest seven days": {
+    "en": "Latest seven days",
+    "th": "7 วันล่าสุด"
+  },
+  "Log today’s meals in the diary to build your protein radar.": {
+    "en": "Log today’s meals in the diary to build your protein radar.",
+    "th": "บันทึกอาหารวันนี้เพื่อสร้างแผนภาพการกระจายโปรตีนของคุณ"
+  },
+  "Log weight on at least 3 days in each seven-day window and complete comparable loaded exercises in both windows.": {
+    "en": "Log weight on at least 3 days in each seven-day window and complete comparable loaded exercises in both windows.",
+    "th": "บันทึกน้ำหนักอย่างน้อย 3 วันในแต่ละช่วง 7 วัน และจบท่าที่ใช้น้ำหนักและเปรียบเทียบกันได้ในทั้งสองช่วง"
+  },
+  "Logged protein by meal group": {
+    "en": "Logged protein by meal group",
+    "th": "โปรตีนที่บันทึกแยกตามกลุ่มมื้อ"
+  },
+  "Matrix has no point until there is enough comparable weight and strength data.": {
+    "en": "Matrix has no point until there is enough comparable weight and strength data.",
+    "th": "แผนภาพจะแสดงจุดเมื่อมีข้อมูลน้ำหนักและแรงที่เปรียบเทียบกันได้เพียงพอ"
+  },
+  "Mini Cut uses a daily fat ceiling of {0} g; saved nutrition targets stay unchanged.": {
+    "en": "Mini Cut uses a daily fat ceiling of {0} g; saved nutrition targets stay unchanged.",
+    "th": "โปรแกรมลดไขมันระยะสั้นใช้เพดานไขมันต่อวัน {0} กรัม โดยเป้าหมายโภชนาการที่บันทึกไว้ยังคงเดิม"
+  },
+  "More weigh-in days are needed before classifying the trend.": {
+    "en": "More weigh-in days are needed before classifying the trend.",
+    "th": "ต้องบันทึกน้ำหนักเพิ่มอีกหลายวันก่อนสรุปแนวโน้ม"
+  },
+  "No comparable loaded exercises yet.": {
+    "en": "No comparable loaded exercises yet.",
+    "th": "ยังไม่มีท่าที่ใช้น้ำหนักและเปรียบเทียบกันได้"
+  },
+  "No completed workouts": {
+    "en": "No completed workouts",
+    "th": "ยังไม่มีการออกกำลังกายที่จบแล้ว"
+  },
+  "No entries in this meal group.": {
+    "en": "No entries in this meal group.",
+    "th": "ยังไม่มีรายการในกลุ่มมื้อนี้"
+  },
+  "Not enough comparable data": {
+    "en": "Not enough comparable data",
+    "th": "ข้อมูลที่เปรียบเทียบกันได้ยังไม่เพียงพอ"
+  },
+  "Not logged": {
+    "en": "Not logged",
+    "th": "ยังไม่บันทึก"
+  },
+  "Optimal Recomp": {
+    "en": "Optimal Recomp",
+    "th": "แนวโน้มปรับองค์ประกอบร่างกายที่เหมาะสม"
+  },
+  "Optimal Recomp is a training trend label, not a measurement of fat loss or muscle gain. Weight varies with hydration, and estimated 1RM is not a tested maximum.": {
+    "en": "Optimal Recomp is a training trend label, not a measurement of fat loss or muscle gain. Weight varies with hydration, and estimated 1RM is not a tested maximum.",
+    "th": "ผลนี้เป็นชื่อแนวโน้มการฝึก ไม่ใช่ค่าที่วัดการลดไขมันหรือเพิ่มกล้ามเนื้อ น้ำหนักเปลี่ยนได้ตามน้ำในร่างกาย และ 1RM ที่ประมาณไม่ใช่น้ำหนักสูงสุดที่ทดสอบจริง"
+  },
+  "Planning thresholds: weight down more than {0}%; strength maintained within {1}% of the previous window.": {
+    "en": "Planning thresholds: weight down more than {0}%; strength maintained within {1}% of the previous window.",
+    "th": "เกณฑ์วางแผน: น้ำหนักลดมากกว่า {0}% และแรงลดไม่เกิน {1}% เมื่อเทียบกับช่วงก่อนหน้า"
+  },
+  "Previous and latest best estimated 1RM by exercise": {
+    "en": "Previous and latest best estimated 1RM by exercise",
+    "th": "ค่า 1RM โดยประมาณที่ดีที่สุดของแต่ละท่าในช่วงก่อนหน้าและล่าสุด"
+  },
+  "Previous seven days": {
+    "en": "Previous seven days",
+    "th": "7 วันก่อนหน้า"
+  },
+  "Refeed day: +{0} kcal and +{1} g carbs. Log meals as usual.": {
+    "en": "Refeed day: +{0} kcal and +{1} g carbs. Log meals as usual.",
+    "th": "วันรีฟีด: เพิ่ม {0} กิโลแคลอรีและคาร์โบไฮเดรต {1} กรัม บันทึกอาหารตามปกติ"
+  },
+  "See today’s logged protein across meal groups.": {
+    "en": "See today’s logged protein across meal groups.",
+    "th": "ดูโปรตีนที่บันทึกวันนี้แยกตามกลุ่มมื้อ"
+  },
+  "Set phase dates and weekly high-carb refeed targets.": {
+    "en": "Set phase dates and weekly high-carb refeed targets.",
+    "th": "ตั้งวันที่ของรอบและเป้าหมายวันรีฟีดที่เพิ่มคาร์โบไฮเดรตทุกสัปดาห์"
+  },
+  "Split your daily protein target across four or five meals.": {
+    "en": "Split your daily protein target across four or five meals.",
+    "th": "แบ่งเป้าหมายโปรตีนต่อวันเป็นสี่หรือห้ามื้อ"
+  },
+  "Strength trending down": {
+    "en": "Strength trending down",
+    "th": "แนวโน้มแรงลดลง"
+  },
+  "Strength trending up": {
+    "en": "Strength trending up",
+    "th": "แนวโน้มแรงเพิ่มขึ้น"
+  },
+  "The change could not be queued. Keep this tab open and retry.": {
+    "en": "The change could not be queued. Keep this tab open and retry.",
+    "th": "ยังส่งข้อมูลเพื่อบันทึกไม่ได้ เปิดแท็บนี้ไว้แล้วลองอีกครั้ง"
+  },
+  "The custom tool could not open. The built-in tool is available below.": {
+    "en": "The custom tool could not open. The built-in tool is available below.",
+    "th": "เปิดเครื่องมือที่เชื่อมต่อเพิ่มไม่ได้ ใช้เครื่องมือในแอปด้านล่างได้"
+  },
+  "The outer ring marks 30 g per meal group. Spokes show known protein; missing groups stay undrawn. Values above 30 g remain visible below.": {
+    "en": "The outer ring marks 30 g per meal group. Spokes show known protein; missing groups stay undrawn. Values above 30 g remain visible below.",
+    "th": "วงนอกแสดงเกณฑ์ 30 กรัมต่อกลุ่มมื้อ เส้นแสดงโปรตีนจากค่าที่ทราบ กลุ่มที่ยังไม่บันทึกจะไม่มีเส้น ค่าที่เกิน 30 กรัมแสดงครบด้านล่าง"
+  },
+  "The point reaches the chart boundary. Exact changes are shown below.": {
+    "en": "The point reaches the chart boundary. Exact changes are shown below.",
+    "th": "จุดอยู่ที่ขอบแผนภาพ ดูค่าการเปลี่ยนแปลงเต็มด้านล่าง"
+  },
+  "The weight trend is rising while comparable strength is broadly maintained.": {
+    "en": "The weight trend is rising while comparable strength is broadly maintained.",
+    "th": "แนวโน้มน้ำหนักเพิ่มขึ้น ขณะที่แรงของท่าที่เปรียบเทียบกันโดยรวมคงที่"
+  },
+  "Today’s protein distribution": {
+    "en": "Today’s protein distribution",
+    "th": "การกระจายโปรตีนวันนี้"
+  },
+  "Track your fat allowance and the Mini Cut weight-based ceiling.": {
+    "en": "Track your fat allowance and the Mini Cut weight-based ceiling.",
+    "th": "ติดตามงบไขมันและเพดานตามน้ำหนักตัวในโปรแกรมลดไขมันระยะสั้น"
+  },
+  "Unknown nutrients are excluded. Today’s actual protein may be higher.": {
+    "en": "Unknown nutrients are excluded. Today’s actual protein may be higher.",
+    "th": "ไม่รวมสารอาหารที่ไม่ทราบค่า โปรตีนจริงของวันนี้อาจมากกว่านี้"
+  },
+  "Use today’s diary and your saved program targets.": {
+    "en": "Use today’s diary and your saved program targets.",
+    "th": "ใช้บันทึกวันนี้และเป้าหมายโปรแกรมที่คุณบันทึกไว้"
+  },
+  "Vertical axis: change in estimated strength. Green area: weight down with strength maintained or increased.": {
+    "en": "Vertical axis: change in estimated strength. Green area: weight down with strength maintained or increased.",
+    "th": "แกนตั้งคือการเปลี่ยนแปลงแรงโดยประมาณ พื้นที่สีเขียวคือน้ำหนักลดขณะที่แรงคงที่หรือเพิ่มขึ้น"
+  },
+  "Volume sums completed sets: external load × actual reps. Exercise selection and set count can change volume, so it is context rather than the strength score.": {
+    "en": "Volume sums completed sets: external load × actual reps. Exercise selection and set count can change volume, so it is context rather than the strength score.",
+    "th": "ปริมาณฝึกรวมจากเซ็ตที่จบ: น้ำหนักที่ใช้ × จำนวนครั้งจริง การเลือกท่าและจำนวนเซ็ตทำให้ค่านี้เปลี่ยนได้ จึงใช้เป็นข้อมูลประกอบแทนคะแนนแรง"
+  },
+  "Weight and comparable strength are broadly stable over these windows.": {
+    "en": "Weight and comparable strength are broadly stable over these windows.",
+    "th": "น้ำหนักและแรงของท่าที่เปรียบเทียบกันโดยรวมคงที่ในสองช่วงนี้"
+  },
+  "Weight change {0}%; comparable strength change {1}%. {2}.": {
+    "en": "Weight change {0}%; comparable strength change {1}%. {2}.",
+    "th": "น้ำหนักเปลี่ยน {0}% แรงของท่าที่เปรียบเทียบกันเปลี่ยน {1}% ผล: {2}"
+  },
+  "Weight down": {
+    "en": "Weight down",
+    "th": "น้ำหนักลด"
+  },
+  "Weight is trending down while comparable exercise strength is maintained or higher.": {
+    "en": "Weight is trending down while comparable exercise strength is maintained or higher.",
+    "th": "น้ำหนักมีแนวโน้มลด ขณะที่แรงของท่าที่เปรียบเทียบกันคงที่หรือเพิ่มขึ้น"
+  },
+  "Weight requires at least {0} recorded days per window. Strength uses the median change in matched exercises’ best Epley estimated 1RM.": {
+    "en": "Weight requires at least {0} recorded days per window. Strength uses the median change in matched exercises’ best Epley estimated 1RM.",
+    "th": "น้ำหนักต้องมีอย่างน้อย {0} วันที่บันทึกต่อช่วง แรงใช้ค่ามัธยฐานของการเปลี่ยนแปลง 1RM ที่ดีที่สุดโดยประมาณด้วยสูตร Epley ของท่าที่ตรงกัน"
+  },
+  "Weight trend vs comparable strength": {
+    "en": "Weight trend vs comparable strength",
+    "th": "แนวโน้มน้ำหนักเทียบกับแรงของท่าที่ตรงกัน"
+  },
+  "Weight trending up": {
+    "en": "Weight trending up",
+    "th": "แนวโน้มน้ำหนักเพิ่มขึ้น"
+  },
+  "Weight up": {
+    "en": "Weight up",
+    "th": "น้ำหนักเพิ่ม"
+  },
+  "Workout volume context": {
+    "en": "Workout volume context",
+    "th": "ข้อมูลปริมาณการฝึก"
+  },
+  "Your program tools": {
+    "en": "Your program tools",
+    "th": "เครื่องมือสำหรับโปรแกรมของคุณ"
+  },
+  "Your diary and program targets": {
+    "en": "Your diary and program targets",
+    "th": "บันทึกอาหารและเป้าหมายโปรแกรมของคุณ"
+  },
+  "{0} / {1} g": {
+    "en": "{0} / {1} g",
+    "th": "{0} / {1} กรัม"
+  },
+  "{0} entries have unknown protein. This is a partial total.": {
+    "en": "{0} entries have unknown protein. This is a partial total.",
+    "th": "มี {0} รายการที่ไม่ทราบโปรตีน ค่านี้เป็นยอดรวมเฉพาะข้อมูลที่ทราบ"
+  },
+  "{0} g known": {
+    "en": "{0} g known",
+    "th": "ทราบค่า {0} กรัม"
+  },
+  "{0} kg·reps across {1} workouts": {
+    "en": "{0} kg·reps across {1} workouts",
+    "th": "{0} กก. × ครั้ง จากการออกกำลังกาย {1} ครั้ง"
+  },
+  "{0} logged entries": {
+    "en": "{0} logged entries",
+    "th": "บันทึกแล้ว {0} รายการ"
+  },
+  "{0} weigh-in days": {
+    "en": "{0} weigh-in days",
+    "th": "ชั่งน้ำหนัก {0} วัน"
+  },
+  "{0}% of known daily protein": {
+    "en": "{0}% of known daily protein",
+    "th": "{0}% ของโปรตีนต่อวันที่ทราบค่า"
+  },
+  "{0}: {1} g known protein toward the 30 g benchmark": {
+    "en": "{0}: {1} g known protein toward the 30 g benchmark",
+    "th": "{0}: ทราบโปรตีน {1} กรัม เทียบกับเกณฑ์ 30 กรัม"
+  },
+  "Protein incomplete": {
+    "en": "Protein incomplete",
+    "th": "ข้อมูลโปรตีนไม่ครบ"
+  },
+  "Below 30 g benchmark": {
+    "en": "Below 30 g benchmark",
+    "th": "ต่ำกว่าเกณฑ์ 30 กรัม"
+  },
+  "Hidden cooking fat estimate": {
+    "en": "Hidden cooking fat estimate",
+    "th": "ค่าประมาณไขมันจากการปรุงอาหารที่ตกหล่น"
+  },
+  "Cooking fat estimate": {
+    "en": "Cooking fat estimate",
+    "th": "ค่าประมาณไขมันจากการปรุงอาหาร"
+  },
+  "Only supported loaded repetition sets are compared; assisted, timed and bodyweight movements are excluded.": {
+    "en": "Only supported loaded repetition sets are compared; assisted, timed and bodyweight movements are excluded.",
+    "th": "เปรียบเทียบเฉพาะเซ็ตแบบนับครั้งที่ใช้น้ำหนักและรองรับการคำนวณ ไม่รวมท่าที่มีแรงช่วย ท่าจับเวลา และท่าน้ำหนักตัว"
+  },
+  "No supported loaded workouts": {
+    "en": "No supported loaded workouts",
+    "th": "ยังไม่มีการฝึกแบบนับครั้งที่ใช้น้ำหนักและรองรับการคำนวณ"
+  },
+  "Invalid food analysis response.": {
+    "en": "Invalid food analysis response.",
+    "th": "ข้อมูลผลวิเคราะห์อาหารไม่ถูกต้อง"
+  },
+  "Enter valid, non-negative nutrition values.": {
+    "en": "Enter valid, non-negative nutrition values.",
+    "th": "กรอกสารอาหารเป็นตัวเลขที่ถูกต้องและไม่ติดลบ"
+  },
+  "Cooking fat must be part of the total fat.": {
+    "en": "Cooking fat must be part of the total fat.",
+    "th": "ไขมันจากการปรุงต้องรวมอยู่ในไขมันทั้งหมดและไม่เกินไขมันรวม"
+  },
+  "Add a food name and serving description.": {
+    "en": "Add a food name and serving description.",
+    "th": "กรอกชื่ออาหารและรายละเอียดหน่วยบริโภค"
+  },
+  "Enter the calories before saving this meal.": {
+    "en": "Enter the calories before saving this meal.",
+    "th": "กรอกแคลอรีก่อนบันทึกมื้ออาหารนี้"
+  },
+  "Choose a meal interval.": {
+    "en": "Choose a meal interval.",
+    "th": "เลือกมื้ออาหาร"
+  },
+  "This photo could not be opened. Try another image.": {
+    "en": "This photo could not be opened. Try another image.",
+    "th": "เปิดรูปนี้ไม่ได้ ลองเลือกรูปอื่น"
+  },
+  "Choose a JPEG, PNG or WebP photo.": {
+    "en": "Choose a JPEG, PNG or WebP photo.",
+    "th": "เลือกรูปชนิด JPEG, PNG หรือ WebP"
+  },
+  "Choose a photo smaller than 12 MB.": {
+    "en": "Choose a photo smaller than 12 MB.",
+    "th": "เลือกรูปที่มีขนาดไม่เกิน 12 MB"
+  },
+  "This photo is too large to process. Choose a smaller image.": {
+    "en": "This photo is too large to process. Choose a smaller image.",
+    "th": "รูปนี้ใหญ่เกินกว่าจะประมวลผลได้ กรุณาเลือกรูปขนาดเล็กลง"
+  },
+  "Add total fat to preview today’s allowance.": {
+    "en": "Add total fat to preview today’s allowance.",
+    "th": "กรอกไขมันรวมเพื่อดูโควตาไขมันที่เหลือวันนี้"
+  },
+  "Not estimated": {
+    "en": "Not estimated",
+    "th": "ยังไม่มีค่าประมาณ"
+  },
+  "{0} g included in total fat": {
+    "en": "{0} g included in total fat",
+    "th": "รวมอยู่ในไขมันทั้งหมด {0} กรัม"
+  },
+  "Calories and macros differ considerably. Review the values before saving.": {
+    "en": "Calories and macros differ considerably. Review the values before saving.",
+    "th": "แคลอรีกับสารอาหารหลักต่างกันมาก กรุณาตรวจสอบก่อนบันทึก"
+  },
+  "Enter a cooking-fat estimate within the total fat allowance.": {
+    "en": "Enter a cooking-fat estimate within the total fat allowance.",
+    "th": "กรอกไขมันจากการปรุงให้ถูกต้อง โดยต้องเป็นส่วนหนึ่งของไขมันรวม"
+  },
+  "AI analysis is awaiting backend setup.": {
+    "en": "AI analysis is awaiting backend setup.",
+    "th": "การวิเคราะห์ AI กำลังรอเชื่อมต่อบริการ"
+  },
+  "Confirm photo processing before analysis.": {
+    "en": "Confirm photo processing before analysis.",
+    "th": "ยืนยันการส่งรูปเพื่อประมวลผลก่อนวิเคราะห์"
+  },
+  "Analysis took too long. Retry or enter the meal manually.": {
+    "en": "Analysis took too long. Retry or enter the meal manually.",
+    "th": "การวิเคราะห์ใช้เวลานานเกินไป ลองใหม่หรือกรอกข้อมูลมื้ออาหารเอง"
+  },
+  "The analysis returned incomplete or invalid data. Retry or enter the meal manually.": {
+    "en": "The analysis returned incomplete or invalid data. Retry or enter the meal manually.",
+    "th": "ผลวิเคราะห์มีข้อมูลไม่ครบหรือไม่ถูกต้อง ลองใหม่หรือกรอกข้อมูลเอง"
+  },
+  "Food analysis failed. Retry or enter the meal manually.": {
+    "en": "Food analysis failed. Retry or enter the meal manually.",
+    "th": "วิเคราะห์อาหารไม่สำเร็จ ลองใหม่หรือกรอกข้อมูลเอง"
+  },
+  "Review your meal before logging it.": {
+    "en": "Review your meal before logging it.",
+    "th": "ตรวจสอบมื้ออาหารก่อนบันทึก"
+  },
+  "Scanner mode": {
+    "en": "Scanner mode",
+    "th": "โหมดการสแกน"
+  },
+  "Food photo": {
+    "en": "Food photo",
+    "th": "รูปอาหาร"
+  },
+  "Food photo preview": {
+    "en": "Food photo preview",
+    "th": "ตัวอย่างรูปอาหาร"
+  },
+  "Selected food photo": {
+    "en": "Selected food photo",
+    "th": "รูปอาหารที่เลือก"
+  },
+  "Start with a food photo": {
+    "en": "Start with a food photo",
+    "th": "เริ่มด้วยรูปอาหาร"
+  },
+  "Keep the whole portion visible and use good lighting.": {
+    "en": "Keep the whole portion visible and use good lighting.",
+    "th": "ถ่ายให้เห็นอาหารทั้งจานและใช้แสงที่เพียงพอ"
+  },
+  "Preparing photo locally…": {
+    "en": "Preparing photo locally…",
+    "th": "กำลังเตรียมรูปบนอุปกรณ์…"
+  },
+  "Analyzing food and cooking fats…": {
+    "en": "Analyzing food and cooking fats…",
+    "th": "กำลังวิเคราะห์อาหารและไขมันจากการปรุง…"
+  },
+  "Take photo": {
+    "en": "Take photo",
+    "th": "ถ่ายรูป"
+  },
+  "Choose photo": {
+    "en": "Choose photo",
+    "th": "เลือกรูป"
+  },
+  "AI food analysis": {
+    "en": "AI food analysis",
+    "th": "วิเคราะห์อาหารด้วย AI"
+  },
+  "Your photo will be processed by {0}.": {
+    "en": "Your photo will be processed by {0}.",
+    "th": "รูปของคุณจะได้รับการประมวลผลโดย {0}"
+  },
+  "You can prepare a photo and enter nutrition yourself. AI results will become available when the service is connected.": {
+    "en": "You can prepare a photo and enter nutrition yourself. AI results will become available when the service is connected.",
+    "th": "คุณเตรียมรูปและกรอกสารอาหารเองได้ ผล AI จะพร้อมใช้เมื่อเชื่อมต่อบริการแล้ว"
+  },
+  "Photos stay in memory for this scan and are discarded when you leave or lock the app. Saved meals contain nutrition results, not photos.": {
+    "en": "Photos stay in memory for this scan and are discarded when you leave or lock the app. Saved meals contain nutrition results, not photos.",
+    "th": "แอปเก็บรูปไว้ในหน่วยความจำระหว่างสแกน และล้างเมื่อออกจากหน้าสแกนหรือล็อกแอป มื้อที่บันทึกจะเก็บผลโภชนาการโดยไม่เก็บรูป"
+  },
+  "I agree to send this food photo for analysis.": {
+    "en": "I agree to send this food photo for analysis.",
+    "th": "ฉันยินยอมให้ส่งรูปอาหารนี้เพื่อวิเคราะห์"
+  },
+  "Analyze this photo": {
+    "en": "Analyze this photo",
+    "th": "วิเคราะห์รูปนี้"
+  },
+  "Review current result": {
+    "en": "Review current result",
+    "th": "ตรวจสอบผลปัจจุบัน"
+  },
+  "Enter nutrition manually": {
+    "en": "Enter nutrition manually",
+    "th": "กรอกสารอาหารเอง"
+  },
+  "Discard photo and result": {
+    "en": "Discard photo and result",
+    "th": "ล้างรูปและผลวิเคราะห์"
+  },
+  "Photo analysis estimates portions and cooking fats. Check the values before saving; hidden oil quantities may be uncertain.": {
+    "en": "Photo analysis estimates portions and cooking fats. Check the values before saving; hidden oil quantities may be uncertain.",
+    "th": "การวิเคราะห์รูปเป็นการประมาณหน่วยบริโภคและไขมันจากการปรุง กรุณาตรวจสอบก่อนบันทึก เพราะปริมาณน้ำมันแฝงอาจไม่แน่นอน"
+  },
+  "Food scan review": {
+    "en": "Food scan review",
+    "th": "ตรวจสอบผลสแกนอาหาร"
+  },
+  "No food analysis to review": {
+    "en": "No food analysis to review",
+    "th": "ยังไม่มีผลวิเคราะห์อาหารให้ตรวจสอบ"
+  },
+  "One confirmed meal updates your daily totals.": {
+    "en": "One confirmed meal updates your daily totals.",
+    "th": "ยืนยันมื้ออาหารครั้งเดียวเพื่ออัปเดตยอดรวมของวัน"
+  },
+  "Manual nutrition entry": {
+    "en": "Manual nutrition entry",
+    "th": "สารอาหารที่กรอกเอง"
+  },
+  "Demo estimate": {
+    "en": "Demo estimate",
+    "th": "ค่าตัวอย่าง"
+  },
+  "Analysis confidence: {0}%": {
+    "en": "Analysis confidence: {0}%",
+    "th": "ความมั่นใจในการวิเคราะห์: {0}%"
+  },
+  "Enter nutrition for the entire portion. Blank macro values stay unknown.": {
+    "en": "Enter nutrition for the entire portion. Blank macro values stay unknown.",
+    "th": "กรอกสารอาหารสำหรับหน่วยบริโภคทั้งหมด ช่องสารอาหารที่เว้นว่างจะคงสถานะไม่ทราบ"
+  },
+  "Check the portion, nutrition and cooking-fat assumptions before saving.": {
+    "en": "Check the portion, nutrition and cooking-fat assumptions before saving.",
+    "th": "ตรวจสอบหน่วยบริโภค สารอาหาร และข้อสันนิษฐานเรื่องไขมันจากการปรุงก่อนบันทึก"
+  },
+  "Food and portion": {
+    "en": "Food and portion",
+    "th": "อาหารและหน่วยบริโภค"
+  },
+  "Food name": {
+    "en": "Food name",
+    "th": "ชื่ออาหาร"
+  },
+  "Serving description": {
+    "en": "Serving description",
+    "th": "รายละเอียดหน่วยบริโภค"
+  },
+  "All nutrition values below describe this entire portion.": {
+    "en": "All nutrition values below describe this entire portion.",
+    "th": "สารอาหารทั้งหมดด้านล่างเป็นค่าของหน่วยบริโภคนี้ทั้งส่วน"
+  },
+  "Estimated portion weight: {0} g": {
+    "en": "Estimated portion weight: {0} g",
+    "th": "น้ำหนักหน่วยบริโภคโดยประมาณ: {0} กรัม"
+  },
+  "Review nutrition": {
+    "en": "Review nutrition",
+    "th": "ตรวจสอบสารอาหาร"
+  },
+  "Total fat (g)": {
+    "en": "Total fat (g)",
+    "th": "ไขมันรวม (กรัม)"
+  },
+  "Total fat already includes the cooking-fat estimate. Adjust the portion and totals together if needed.": {
+    "en": "Total fat already includes the cooking-fat estimate. Adjust the portion and totals together if needed.",
+    "th": "ไขมันรวมมีค่าประมาณไขมันจากการปรุงอยู่แล้ว หากเปลี่ยนหน่วยบริโภคให้ปรับยอดสารอาหารตามด้วย"
+  },
+  "Cooking fat is part of the meal’s total fat.": {
+    "en": "Cooking fat is part of the meal’s total fat.",
+    "th": "ไขมันจากการปรุงเป็นส่วนหนึ่งของไขมันรวมในมื้ออาหาร"
+  },
+  "AI cooking-fat estimate: {0} g": {
+    "en": "AI cooking-fat estimate: {0} g",
+    "th": "ไขมันจากการปรุงที่ AI ประมาณ: {0} กรัม"
+  },
+  "Cooking fat was not estimated. You may enter the included amount yourself.": {
+    "en": "Cooking fat was not estimated. You may enter the included amount yourself.",
+    "th": "ยังไม่มีค่าประมาณไขมันจากการปรุง คุณระบุส่วนที่รวมอยู่ในไขมันทั้งหมดเองได้"
+  },
+  "Estimated range: {0}–{1} g": {
+    "en": "Estimated range: {0}–{1} g",
+    "th": "ช่วงที่ประมาณ: {0}–{1} กรัม"
+  },
+  "Cooking-fat confidence: {0}%": {
+    "en": "Cooking-fat confidence: {0}%",
+    "th": "ความมั่นใจเรื่องไขมันจากการปรุง: {0}%"
+  },
+  "Likely cooking-fat sources": {
+    "en": "Likely cooking-fat sources",
+    "th": "แหล่งไขมันจากการปรุงที่คาดการณ์"
+  },
+  "Analysis assumptions": {
+    "en": "Analysis assumptions",
+    "th": "ข้อสันนิษฐานในการวิเคราะห์"
+  },
+  "Cooking fat included in total (g)": {
+    "en": "Cooking fat included in total (g)",
+    "th": "ไขมันจากการปรุงที่รวมอยู่แล้ว (กรัม)"
+  },
+  "Adjust cooking-fat estimate": {
+    "en": "Adjust cooking-fat estimate",
+    "th": "ปรับค่าประมาณไขมันจากการปรุง"
+  },
+  "Less oil": {
+    "en": "Less oil",
+    "th": "น้ำมันน้อย"
+  },
+  "Original estimate": {
+    "en": "Original estimate",
+    "th": "ค่าเดิม"
+  },
+  "More oil": {
+    "en": "More oil",
+    "th": "น้ำมันมาก"
+  },
+  "Changing a known cooking-fat amount adjusts total fat by the difference and calories by 9 kcal per gram. When no amount is known, enter total fat first and identify the included part.": {
+    "en": "Changing a known cooking-fat amount adjusts total fat by the difference and calories by 9 kcal per gram. When no amount is known, enter total fat first and identify the included part.",
+    "th": "การเปลี่ยนค่าไขมันจากการปรุงที่ทราบแล้วจะปรับไขมันรวมตามส่วนต่าง และปรับพลังงาน 9 kcal ต่อกรัม หากยังไม่ทราบค่า ให้กรอกไขมันรวมก่อนแล้วระบุส่วนที่เป็นไขมันจากการปรุง"
+  },
+  "Cooking-fat adjustments are available in Special Program.": {
+    "en": "Cooking-fat adjustments are available in Special Program.",
+    "th": "ปรับไขมันจากการปรุงได้เมื่อเปิดใช้โปรแกรมพิเศษ"
+  },
+  "Meal totals to save": {
+    "en": "Meal totals to save",
+    "th": "ยอดสารอาหารที่จะบันทึก"
+  },
+  "Today’s strict fat allowance after this meal": {
+    "en": "Today’s strict fat allowance after this meal",
+    "th": "โควตาไขมันแบบจำกัดที่เหลือวันนี้หลังมื้อนี้"
+  },
+  "Today’s fat allowance after this meal": {
+    "en": "Today’s fat allowance after this meal",
+    "th": "โควตาไขมันที่เหลือวันนี้หลังมื้อนี้"
+  },
+  "Unknown fat in other logged meals may reduce the remaining allowance.": {
+    "en": "Unknown fat in other logged meals may reduce the remaining allowance.",
+    "th": "ไขมันที่ยังไม่ทราบค่าในมื้ออื่นอาจทำให้โควตาที่เหลือจริงน้อยลง"
+  },
+  "Confirm and log today’s meal": {
+    "en": "Confirm and log today’s meal",
+    "th": "ยืนยันและบันทึกมื้ออาหารวันนี้"
+  },
+  "Saves one meal with the reviewed totals and analysis history in your encrypted vault. Check the save indicator for storage completion.": {
+    "en": "Saves one meal with the reviewed totals and analysis history in your encrypted vault. Check the save indicator for storage completion.",
+    "th": "บันทึกมื้ออาหารหนึ่งรายการพร้อมยอดที่ตรวจสอบและประวัติการวิเคราะห์ในคลังเข้ารหัส ดูสถานะการบันทึกเพื่อยืนยันว่าเก็บข้อมูลสำเร็จ"
+  },
+  "Scan a meal, review likely cooking fats, and confirm the full nutrition before logging it.": {
+    "en": "Scan a meal, review likely cooking fats, and confirm the full nutrition before logging it.",
+    "th": "สแกนอาหาร ตรวจสอบไขมันจากการปรุงที่คาดการณ์ และยืนยันสารอาหารทั้งหมดก่อนบันทึก"
+  },
+  "Scan food and review cooking fat": {
+    "en": "Scan food and review cooking fat",
+    "th": "สแกนอาหารและตรวจสอบไขมันจากการปรุง"
+  },
+  "AI analysis is awaiting backend setup. You can prepare a photo and enter nutrition manually.": {
+    "en": "AI analysis is awaiting backend setup. You can prepare a photo and enter nutrition manually.",
+    "th": "การวิเคราะห์ AI กำลังรอเชื่อมต่อบริการ คุณเตรียมรูปและกรอกสารอาหารเองได้"
+  },
+  "Today’s reviewed food scans": {
+    "en": "Today’s reviewed food scans",
+    "th": "ผลสแกนอาหารที่ตรวจสอบและบันทึกวันนี้"
+  },
+  "Total fat: {0} g": {
+    "en": "Total fat: {0} g",
+    "th": "ไขมันรวม: {0} กรัม"
+  },
+  "Cooking fat: not estimated": {
+    "en": "Cooking fat: not estimated",
+    "th": "ไขมันจากการปรุง: ยังไม่มีค่าประมาณ"
+  },
+  "{0} g cooking fat included": {
+    "en": "{0} g cooking fat included",
+    "th": "มีไขมันจากการปรุงรวมอยู่ {0} กรัม"
+  },
+  "View saved analysis": {
+    "en": "View saved analysis",
+    "th": "ดูผลวิเคราะห์ที่บันทึก"
+  },
+  "No reviewed food scans logged today.": {
+    "en": "No reviewed food scans logged today.",
+    "th": "วันนี้ยังไม่มีผลสแกนอาหารที่ตรวจสอบและบันทึก"
+  },
+  "Manual extra-fat estimate": {
+    "en": "Manual extra-fat estimate",
+    "th": "ประมาณไขมันที่ตกหล่นด้วยตัวเอง"
+  },
+  "Use these additions only for fat missing from another meal. Reviewed scan totals already include their cooking fat.": {
+    "en": "Use these additions only for fat missing from another meal. Reviewed scan totals already include their cooking fat.",
+    "th": "ใช้ส่วนเพิ่มนี้เฉพาะไขมันที่ตกหล่นจากมื้ออื่น ยอดของผลสแกนที่ตรวจสอบแล้วมีไขมันจากการปรุงรวมอยู่แล้ว"
+  },
+  "Review cooking-fat estimates from food scans before logging.": {
+    "en": "Review cooking-fat estimates from food scans before logging.",
+    "th": "ตรวจสอบไขมันจากการปรุงในผลสแกนอาหารก่อนบันทึก"
+  },
+  "Setup pending": {
+    "en": "Setup pending",
+    "th": "รอเชื่อมต่อ"
+  },
+  "Saved scan analysis": {
+    "en": "Saved scan analysis",
+    "th": "ผลวิเคราะห์จากการสแกนที่บันทึก"
+  },
+  "Cooking fat is included in the recorded total, with no separate addition.": {
+    "en": "Cooking fat is included in the recorded total, with no separate addition.",
+    "th": "ไขมันจากการปรุงรวมอยู่ในยอดที่บันทึกแล้ว โดยไม่มีรายการเพิ่มแยก"
+  },
+  "Original AI total fat: {0} g": {
+    "en": "Original AI total fat: {0} g",
+    "th": "ไขมันรวมที่ AI ประมาณเดิม: {0} กรัม"
+  },
+  "Original AI cooking fat: {0} g": {
+    "en": "Original AI cooking fat: {0} g",
+    "th": "ไขมันจากการปรุงที่ AI ประมาณเดิม: {0} กรัม"
+  },
+  "Edited before saving: {0}": {
+    "en": "Edited before saving: {0}",
+    "th": "แก้ไขก่อนบันทึก: {0}"
+  },
+  "AI ESTIMATE": {
+    "en": "AI ESTIMATE",
+    "th": "ประมาณจาก AI"
+  },
+  "MANUAL": {
+    "en": "MANUAL",
+    "th": "กรอกเอง"
+  },
+  "Original AI portion: {0}": {
+    "en": "Original AI portion: {0}",
+    "th": "หน่วยบริโภคที่ AI วิเคราะห์เดิม: {0}"
+  },
+  "Original estimate and saved nutrition": {
+    "en": "Original estimate and saved nutrition",
+    "th": "ค่าประมาณเดิมและสารอาหารที่บันทึก"
+  },
+  "Nutrient": {
+    "en": "Nutrient",
+    "th": "สารอาหาร"
+  },
+  "Micronutrients refer to the original analyzed portion and were not rescaled after editing.": {
+    "en": "Micronutrients refer to the original analyzed portion and were not rescaled after editing.",
+    "th": "สารอาหารรองอ้างอิงหน่วยบริโภคที่วิเคราะห์เดิม โดยไม่ได้ปรับสัดส่วนหลังแก้ไข"
   }
 }

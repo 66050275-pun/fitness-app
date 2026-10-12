@@ -168,6 +168,7 @@ export interface PersistedAppData {
   weightHistory?: WeightEntry[];
   eatingSchedule?: EatingSchedule;
   nutritionGoals?: NutritionGoals;
+  phasicTools?: PhasicToolsState;
   workoutHistory?: WorkoutHistoryEntry[];
   onboardingState?: OnboardingState;
   onboardingDraft?: OnboardingDraft;
@@ -186,7 +187,7 @@ export interface MealItem {
   foodName: string;
   portion: LoggedFoodPortion;
   nutritionSnapshot: NutritionValues;
-  foodSource?: 'built_in' | 'custom' | 'database' | 'demo' | 'quick_log';
+  foodSource?: 'built_in' | 'custom' | 'database' | 'demo' | 'quick_log' | 'ai_estimate';
   loggedAt: string;
 
   // Preserved for backwards compatibility with existing views
@@ -201,6 +202,10 @@ export interface MealItem {
   ingredients?: string[];
   imageUrl?: string;
   micronutrients?: MicronutrientProfile;
+  /** Preset counts identify explicit cooking-fat estimates, independent of their display name. */
+  hiddenFatEstimate?: HiddenFatEstimateCounts;
+  /** Cooking fat is included in nutritionSnapshot.fat, never an additional diary entry. */
+  scanAnalysis?: ScanMealAnalysis;
 }
 
 export interface MacroTarget {
@@ -379,16 +384,22 @@ export interface ChatMessage {
 }
 
 export interface ScannedFood {
+  scanId: string;
+  source: 'ai_estimate' | 'manual' | 'demo';
+  analyzedAt: string;
   name: string;
   subtitle: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  confidence: number;
-  glycemicIndex: 'Low' | 'Medium' | 'High';
+  calories: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
+  confidence: number | null;
+  glycemicIndex: 'Low' | 'Medium' | 'High' | null;
   ingredients: string[];
   suggestedMealType: MealType;
+  servingWeightGrams: number | null;
+  cookingFat: CookingFatAnalysis | null;
+  warnings: string[];
   imageUrl?: string;
   micronutrients?: MicronutrientProfile;
 }
@@ -423,9 +434,59 @@ export interface FoodAnalysisResult {
   carbs: number | null;
   fat: number | null;
   ingredients: string[];
-  micronutrients: MicronutrientProfile;
+  micronutrients?: MicronutrientProfile;
   overallConfidence?: number | null;
   warnings?: string[];
+  /** Estimated cooking fat ALREADY INCLUDED in the total fat and calories above. */
+  cookingFat?: CookingFatAnalysis | null;
+}
+
+export interface CookingFatAnalysis {
+  estimatedGrams: number | null;
+  rangeMinGrams: number | null;
+  rangeMaxGrams: number | null;
+  confidence: number | null;
+  sources: string[];
+  assumptions: string[];
+}
+
+export type FoodScanReviewField = 'name' | 'servingDescription' | 'calories' | 'protein' | 'carbs' | 'fat' | 'cookingFatGrams';
+export interface FoodScanReview {
+  name: string;
+  servingDescription: string;
+  calories: string;
+  protein: string;
+  carbs: string;
+  fat: string;
+  cookingFatGrams: string;
+  /** Uncommitted typing is separate so rerenders cannot lose the previous amount used for delta accounting. */
+  cookingFatInput: string;
+  mealType: MealType;
+}
+
+/** Ephemeral: image URLs, consent and unfinished edits never enter the vault snapshot. */
+export interface FoodScanState {
+  status: 'idle' | 'preparing' | 'ready' | 'analyzing' | 'error';
+  photoUrl: string | null;
+  consent: boolean;
+  error: string | null;
+  review: FoodScanReview | null;
+}
+
+export interface ScanMealAnalysis {
+  version: 1;
+  scanId: string;
+  source: ScannedFood['source'];
+  analyzedAt: string;
+  originalFoodName: string;
+  originalServingDescription: string;
+  originalServingWeightGrams: number | null;
+  originalNutrition: Pick<NutritionValues, 'calories' | 'protein' | 'carbs' | 'fat'>;
+  originalCookingFat: CookingFatAnalysis | null;
+  reviewedCookingFatGrams: number | null;
+  confidence: number | null;
+  warnings: string[];
+  editedFields: FoodScanReviewField[];
 }
 
 export type FitnessSubView = 'home' | 'setup' | 'active' | 'summary';
@@ -450,6 +511,7 @@ export interface AppState {
   meals: MealItem[];
   chatHistory: ChatMessage[];
   lastScannedFood: ScannedFood | null;
+  foodScan: FoodScanState;
   quickAddOpen: boolean;
   quickAddView: 'primary' | 'special' | 'tool';
   selectedSpecialProgramTool: SpecialProgramToolId | null;
@@ -542,6 +604,7 @@ export interface AppState {
   weightHistory: WeightEntry[];
   eatingSchedule: EatingSchedule;
   nutritionGoals: NutritionGoals;
+  phasicTools: PhasicToolsState;
   profileConfirmModal: ProfileConfirmModalState | null;
   weightModalOpen: boolean;
   editingWeightEntry: WeightEntry | null;
@@ -609,6 +672,25 @@ export type ActivityLevel =
 
 export type WeightGoalType = 'lose' | 'maintain' | 'gain';
 export type DietProgram = 'standard' | 'mini_cut' | 'lean_bulk';
+
+export interface HiddenFatEstimateCounts {
+  oil: number;
+  coconut: number;
+  dressing: number;
+}
+
+export interface PhasicCycle {
+  program: 'mini_cut' | 'lean_bulk';
+  startDate: string; // Local YYYY-MM-DD calendar key
+  lengthWeeks: number;
+  refeedExtraCalories: number;
+}
+
+/** These preferences and schedules are saved only inside the encrypted vault. */
+export interface PhasicToolsState {
+  proteinMealCount: 4 | 5;
+  phaseCycle: PhasicCycle | null;
+}
 export type SpecialProgramToolId =
   | 'hidden-fat-scanner'
   | 'protein-splitter'

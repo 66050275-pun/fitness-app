@@ -593,6 +593,37 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
   min-width: 0; color: var(--ui-text); background: var(--ui-primary-soft); border: 1px solid var(--ui-border);
 }
 .onboarding-program-fact { min-width: 0; background: var(--ui-card); color: var(--ui-primary-label); }
+
+/* Functional Phasic Recomp forms share the centered, scrollable dialog shell. */
+:root { --phasic-caution: #926300; }
+.dark { --phasic-caution: #fbbf24; }
+.phasic-tool-dialog-panel { padding: 20px; gap: 16px; background: var(--ui-card); color: var(--ui-text); overflow: hidden; }
+.phasic-tool-dialog-layer { padding-bottom: max(calc(var(--ui-bottom-nav-height, 0px) + 12px), calc(12px + env(safe-area-inset-bottom, 0px))); }
+.ui-bottom-sheet-closing .phasic-tool-dialog-panel { animation: phasic-tool-exit 180ms var(--ui-motion-easing) both; }
+@keyframes phasic-tool-exit { to { opacity: 0; transform: translateY(8px) scale(0.98); } }
+.phasic-tool-content { font-size: 14px; line-height: 1.6; color: var(--ui-text); }
+.phasic-tool-content :where(p, strong, span, label, th, td) { overflow-wrap: anywhere; }
+.phasic-tool-card { padding: 16px; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-panel); min-width: 0; }
+.phasic-tool-muted { color: var(--ui-muted); }
+.phasic-tool-input { min-height: 48px; min-width: 0; padding: 10px 12px; border: 1px solid var(--ui-border); border-radius: 12px; background: var(--ui-card); color: var(--ui-text); font-size: 16px; }
+.phasic-tool-note { padding: 12px; border-radius: 14px; background: var(--ui-primary-soft); color: var(--ui-primary-label); line-height: 1.6; }
+.phasic-tool-error { color: var(--ui-error); }
+.phasic-tool-success { color: var(--ui-primary); }
+.food-scan-screen { color: var(--ui-text); background: var(--ui-surface); padding-bottom: max(32px, env(safe-area-inset-bottom, 0px)); }
+.food-scan-screen :where(p, label, h1, h2, h3, li, button) { overflow-wrap: anywhere; }
+.food-scan-screen :where(input, section) { scroll-margin-top: calc(var(--vault-bar-height, 44px) + 12px); }
+.food-scan-screen header .phasic-tool-secondary { border-radius: 9999px; }
+.food-scan-photo { height: 280px; border: 1px solid var(--ui-border); background: var(--ui-panel); }
+.food-result-photo { max-height: 240px; background: var(--ui-panel); border: 1px solid var(--ui-border); }
+.food-scan-modes > button { min-height: 48px; min-width: 0; flex: 1; padding: 10px 12px; border: 1px solid var(--ui-border); border-radius: 14px; background: var(--ui-card); color: var(--ui-text); font-weight: 700; font-size: 14px; }
+.food-scan-modes > button[aria-pressed="true"] { background: var(--ui-primary-soft); border-color: var(--ui-primary); color: var(--ui-primary-label); }
+.food-scan-modes > button:active { transform: scale(0.99); }
+.food-scan-caution { color: #926300; }
+.dark .food-scan-caution { color: #fbbf24; }
+@media (max-width: 350px) { .food-scan-photo { height: 240px; } .food-scan-modes > button { padding: 10px 8px; } }
+.phasic-tool-secondary { min-height: 44px; padding: 10px; border: 1px solid var(--ui-border); border-radius: 12px; background: var(--ui-card); color: var(--ui-primary); }
+.phasic-tool-dialog-panel .ui-primary-button { display: flex; align-items: center; justify-content: center; gap: 8px; }
+@media (max-width: 350px) { .phasic-tool-dialog-panel { padding: 14px; } .phasic-tool-card { padding: 12px; } .phasic-tool-input { padding: 10px 8px; } .phasic-tool-content fieldset .phasic-tool-card > .material-symbols-outlined { display: none; } }
 @media (max-width: 350px) {
   .onboarding-metrics-grid { grid-template-columns: minmax(0, 1fr); }
   .onboarding-header, .onboarding-main, .onboarding-footer { padding-left: 16px; padding-right: 16px; }

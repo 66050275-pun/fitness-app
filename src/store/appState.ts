@@ -6,6 +6,8 @@ import type {
   ActiveWorkoutSessionState,
   MealItem, 
   ScannedFood, 
+  FoodScanState,
+  FoodScanReview,
   ChatMessage, 
   ActiveScreen, 
   WorkoutExercise, 
@@ -35,6 +37,8 @@ import type {
   WeightEntry,
   EatingSchedule,
   NutritionGoals,
+  PhasicCycle,
+  HiddenFatEstimateCounts,
   ProfileSubpage,
   ProfileConfirmModalState,
   ThemePreference,
@@ -82,6 +86,9 @@ import {
   sanitizeUserPreferences,
   sanitizeEatingSchedule,
   sanitizeNutritionGoals,
+  sanitizePhasicTools,
+  sanitizePhasicCycle,
+  sanitizeHiddenFatEstimate,
   createDefaultOnboardingDraft
 } from '../services/storagePersistence';
 import { lbToKg } from '../utils/unitConversions';
@@ -91,7 +98,9 @@ import { createWeightGoalDraft, isSpecialProgramUnlocked } from '../utils/dietPr
 import { SPECIAL_PROGRAM_ACTIONS } from '../components/BottomSheets/specialProgramActions';
 import { calculateAge, estimateBasalEnergy, estimateMaintenanceCalories, resolveCalculationSex } from '../utils/goalCalculations';
 import { NutritionPlanService } from '../services/nutritionPlanService';
+import { estimateHiddenFat, getPhaseCycleProgress } from '../services/phasicRecompService';
 import { getOnboardingTargets, getOnboardingWaterTarget, validateOnboardingDraft } from '../utils/onboardingGoals';
+import { buildScanMealAnalysis, createScanReview, resolveCookingFatDraft, reviewedNutrition, sanitizeScanMealAnalysis, validateScanReview } from '../services/foodScanService.ts';
 
 const today = getTodayKey();
 const WORKOUT_HISTORY_STORAGE_KEY = 'nutriai_workout_history';
@@ -486,6 +495,7 @@ class Store {
       meals: persisted.meals,
       chatHistory: INITIAL_CHAT,
       lastScannedFood: null,
+      foodScan: { status: 'idle', photoUrl: null, consent: false, error: null, review: null },
       quickAddOpen: false,
       quickAddView: 'primary',
       selectedSpecialProgramTool: null,
@@ -576,6 +586,7 @@ class Store {
       weightHistory: persisted.weightHistory || [],
       eatingSchedule: persisted.eatingSchedule || sanitizeEatingSchedule(null),
       nutritionGoals: persisted.nutritionGoals || sanitizeNutritionGoals(null),
+      phasicTools: persisted.phasicTools || sanitizePhasicTools(null),
       profileConfirmModal: null,
       weightModalOpen: false,
       editingWeightEntry: null,
@@ -585,6 +596,8 @@ class Store {
       onboardingDraft: persisted.onboardingDraft || createDefaultOnboardingDraft(persisted.userPreferences),
       profileImageUrl: null
     };
+
+    this.clearIncompatiblePhasicCycle();
 
     // A choice made at the lock screen takes precedence over the encrypted preference.
     this.state.userPreferences.language = setLanguage(hasLanguageChoice() ? getLanguage() : this.state.userPreferences.language);
@@ -753,6 +766,7 @@ class Store {
       primaryObjective: goal.dietProgram !== 'standard' ? goal.dietProgram : goal.weightGoalType === 'lose' ? 'lose_weight' : goal.weightGoalType === 'gain' ? 'build_muscle'
         : this.state.userProfile.primaryObjective === 'general_fitness' ? 'general_fitness' : 'maintain_weight'
     };
+    this.clearIncompatiblePhasicCycle();
     this.persistState();
     // Goal Settings entered through More returns to that menu after saving.
     this.goBackFromProfileSubpage();
@@ -777,6 +791,7 @@ class Store {
       const weight = safeFiniteNumber(this.state.userProfile.currentWeightKg, -1);
       this.state.userProfile.currentWeightKg = weight > 0 ? Math.round(weight * 10) / 10 : null;
     }
+    this.clearIncompatiblePhasicCycle();
     this.persistState();
     this.notify();
   }
@@ -792,6 +807,7 @@ class Store {
       primaryObjective: normalized.dietProgram !== 'standard' ? normalized.dietProgram : normalized.weightGoalType === 'lose' ? 'lose_weight' : normalized.weightGoalType === 'gain' ? 'build_muscle'
         : this.state.userProfile.primaryObjective === 'general_fitness' ? 'general_fitness' : 'maintain_weight'
     };
+    this.clearIncompatiblePhasicCycle();
     this.persistState();
     this.notify();
   }
@@ -805,6 +821,122 @@ class Store {
     this.state.waterTarget = Math.round(this.state.nutritionGoals.waterTarget / 250);
     this.persistState();
     this.notify();
+  }
+
+  /** A refeed changes the view for that calendar day; saved baseline goals stay intact. */
+  public getEffectiveNutritionGoals(dateKey: string = getTodayKey()): NutritionGoals {
+    const goals = { ...this.state.nutritionGoals };
+    const cycle = this.state.phasicTools.phaseCycle;
+    if (this.state.userProfile.dietProgram !== 'mini_cut' || cycle?.program !== 'mini_cut') return goals;
+    try {
+      const progress = getPhaseCycleProgress(cycle, dateKey, goals.calorieTarget);
+      if (progress.active && progress.isRefeedDay) {
+        goals.calorieTarget += progress.extraCalories;
+        goals.carbsTarget += progress.extraCarbsGrams;
+      }
+    } catch {
+      // Invalid legacy/imported dates must never alter the user's baseline targets.
+    }
+    return goals;
+  }
+
+  public getEffectiveCalorieTarget(dateKey: string = getTodayKey()): number {
+    return this.getEffectiveNutritionGoals(dateKey).calorieTarget;
+  }
+
+  public refreshPhasicDay(previousDay: string): void {
+    if (this.disposed || !isVaultUnlocked()) return;
+    const currentDay = getTodayKey();
+    this.lastDeviceDateKey = currentDay;
+    if (this.state.selectedDate === previousDay) { this.selectDate(currentDay); return; }
+    this.notify();
+  }
+
+  private clearIncompatiblePhasicCycle(): void {
+    const cycle = this.state.phasicTools.phaseCycle;
+    if (cycle && cycle.program !== this.state.userProfile.dietProgram) {
+      this.state.phasicTools = { ...this.state.phasicTools, phaseCycle: null };
+    }
+  }
+
+  public setProteinMealCount(count: 4 | 5): boolean {
+    if (this.disposed || !isVaultUnlocked() || !this.isSpecialProgramUnlocked() || (count !== 4 && count !== 5)) return false;
+    const previous = this.state.phasicTools;
+    this.state.phasicTools = { ...previous, proteinMealCount: count };
+    const queued = this.persistState();
+    if (!queued) this.state.phasicTools = previous;
+    this.notify();
+    return queued;
+  }
+
+  public savePhasicCycle(cycle: PhasicCycle): boolean {
+    if (this.disposed || !isVaultUnlocked() || !this.isSpecialProgramUnlocked()) return false;
+    const sanitized = sanitizePhasicCycle(cycle);
+    if (!sanitized || sanitized.program !== this.state.userProfile.dietProgram) return false;
+    try {
+      getPhaseCycleProgress(sanitized, getTodayKey());
+    } catch {
+      return false;
+    }
+    const previous = this.state.phasicTools;
+    this.state.phasicTools = { ...previous, phaseCycle: sanitized };
+    const queued = this.persistState();
+    if (!queued) this.state.phasicTools = previous;
+    this.notify();
+    return queued;
+  }
+
+  public clearPhasicCycle(): boolean {
+    if (this.disposed || !isVaultUnlocked() || !this.isSpecialProgramUnlocked()) return false;
+    const previous = this.state.phasicTools;
+    this.state.phasicTools = { ...previous, phaseCycle: null };
+    const queued = this.persistState();
+    if (!queued) this.state.phasicTools = previous;
+    this.notify();
+    return queued;
+  }
+
+  /** Log an explicit estimate once; later persistence retries must retry the vault write. */
+  public logHiddenFatEstimate(counts: HiddenFatEstimateCounts, mealType: MealType): boolean {
+    if (this.disposed || !isVaultUnlocked() || !this.isSpecialProgramUnlocked()
+      || !['breakfast', 'lunch', 'dinner', 'snack'].includes(mealType)) return false;
+    const sanitized = sanitizeHiddenFatEstimate(counts);
+    if (!sanitized) return false;
+    try {
+      const estimate = estimateHiddenFat(sanitized);
+      const previousMeals = [...this.state.meals];
+      const queued = this.logMeal({
+        name: 'Hidden cooking fat estimate',
+        category: 'Cooking fat estimate',
+        mealType,
+        date: getTodayKey(),
+        calories: estimate.calories,
+        protein: 0,
+        carbs: 0,
+        fat: estimate.fatGrams,
+        nutritionSnapshot: {
+          calories: estimate.calories,
+          protein: 0,
+          carbs: 0,
+          fat: estimate.fatGrams,
+          fiber: null,
+          sugar: null,
+          sodium: null,
+          calorieSource: 'manual'
+        },
+        foodSource: 'quick_log',
+        icon: 'oil_barrel',
+        ingredients: [],
+        hiddenFatEstimate: sanitized
+      });
+      if (!queued) {
+        this.state.meals = previousMeals;
+        this.notify();
+      }
+      return queued;
+    } catch {
+      return false;
+    }
   }
 
   public setActivityLevel(level: ActivityLevel) {
@@ -1051,6 +1183,7 @@ class Store {
       weeklyGoalRateKg: weeklyRate,
       profileSetupCompleted: true
     };
+    this.clearIncompatiblePhasicCycle();
     this.state.nutritionGoals = { ...goals };
     this.state.calorieTarget = goals.calorieTarget;
     this.state.waterTarget = Math.round(goals.waterTarget / 250);
@@ -1209,6 +1342,7 @@ class Store {
       this.state.userPreferences.language = getLanguage();
       this.state.eatingSchedule = sanitizeEatingSchedule(null);
       this.state.nutritionGoals = sanitizeNutritionGoals(null);
+      this.state.phasicTools = sanitizePhasicTools(null);
       this.state.calorieTarget = 2100;
       this.state.waterTarget = 8;
       this.state.onboardingState = { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 };
@@ -1378,7 +1512,7 @@ class Store {
   public getNetRemainingCalories(dateKey: string = this.state.selectedDate): number {
     const consumed = this.getConsumedCalories(dateKey);
     const burned = this.getBurnedCalories(dateKey);
-    const net = this.state.calorieTarget - consumed + burned;
+    const net = this.getEffectiveCalorieTarget(dateKey) - consumed + burned;
     return safeFiniteNumber(net);
   }
 
@@ -1408,6 +1542,7 @@ class Store {
       weightHistory: this.state.weightHistory,
       eatingSchedule: this.state.eatingSchedule,
       nutritionGoals: this.state.nutritionGoals,
+      phasicTools: this.state.phasicTools,
       workoutHistory: this.state.workoutHistory,
       onboardingState: this.state.onboardingState,
       onboardingDraft: this.state.onboardingState.status === 'completed' ? undefined : this.state.onboardingDraft,
@@ -1416,7 +1551,7 @@ class Store {
     });
   }
 
-  public logMeal(meal: Partial<MealItem> & { name: string; calories: number; mealType: MealType; date?: string }) {
+  public logMeal(meal: Partial<MealItem> & { name: string; calories: number; mealType: MealType; date?: string }): boolean {
     const targetDate = meal.date || this.state.selectedDate;
     const foodName = meal.name;
     const time = meal.time || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -1468,15 +1603,18 @@ class Store {
       confidence: meal.confidence,
       ingredients: meal.ingredients || [],
       imageUrl: meal.imageUrl,
-      micronutrients: meal.micronutrients
+      micronutrients: meal.micronutrients,
+      hiddenFatEstimate: sanitizeHiddenFatEstimate(meal.hiddenFatEstimate),
+      scanAnalysis: sanitizeScanMealAnalysis(meal.scanAnalysis, nutritionSnapshot.fat)
     };
 
     this.state.meals.unshift(newMeal);
     if (meal.foodId) {
       this.updateRecentFood(portion, meal.mealType);
     }
-    this.persistState();
+    const queued = this.persistState();
     this.notify();
+    return queued;
   }
 
   public deleteMeal(id: string) {
@@ -1485,9 +1623,56 @@ class Store {
     this.notify();
   }
 
-  public setScannedFood(food: ScannedFood | null) {
+  public setScannedFood(food: ScannedFood | null, notify = true) {
+    if (this.disposed || !isVaultUnlocked()) return;
     this.state.lastScannedFood = food;
-    this.notify();
+    this.state.foodScan.review = food ? createScanReview(food) : null;
+    if (notify) this.notify();
+  }
+
+  public updateFoodScan(patch: Partial<FoodScanState>, notify = true): void {
+    if (this.disposed || !isVaultUnlocked()) return;
+    Object.assign(this.state.foodScan, patch);
+    if (notify) this.notify();
+  }
+
+  /** Unsaved strings stay in memory and preserve focused fields during rerenders. */
+  public updateFoodScanReview(patch: Partial<FoodScanReview>): void {
+    if (this.disposed || !isVaultUnlocked() || !this.state.foodScan.review) return;
+    Object.assign(this.state.foodScan.review, patch);
+  }
+
+  public logReviewedScannedFood(): boolean {
+    if (this.disposed || !isVaultUnlocked() || this.state.currentScreen !== 'foodResult') return false;
+    const food = this.state.lastScannedFood;
+    const draft = this.state.foodScan.review;
+    if (!food || !draft || validateScanReview(draft)) return false;
+    const review = resolveCookingFatDraft(draft);
+    if (this.state.meals.some(meal => meal.scanAnalysis?.scanId === food.scanId)) return false;
+    const nutrition = reviewedNutrition(review);
+    const analysis = buildScanMealAnalysis(food, review);
+    if (!sanitizeScanMealAnalysis(analysis, nutrition.fat)) return false;
+    const previousMeals = [...this.state.meals];
+    const accepted = this.logMeal({
+      name: review.name.trim().slice(0, 200), category: review.servingDescription.trim().slice(0, 300),
+      date: getTodayKey(), mealType: review.mealType,
+      calories: nutrition.calories ?? 0, protein: nutrition.protein ?? 0, carbs: nutrition.carbs ?? 0, fat: nutrition.fat ?? 0,
+      nutritionSnapshot: { ...nutrition, calorieSource: food.source === 'manual' || analysis.editedFields.includes('calories') ? 'manual' : food.source,
+        micronutrients: food.micronutrients },
+      portion: { foodId: `scan-${food.scanId}`, quantity: 1, unit: 'serving', baseAmount: 1, baseUnit: 'serving',
+        servingDescription: review.servingDescription.trim().slice(0, 300) },
+      foodSource: food.source === 'manual' ? 'quick_log' : food.source, confidence: food.confidence ?? undefined,
+      ingredients: food.ingredients, micronutrients: food.micronutrients, scanAnalysis: analysis, icon: 'restaurant'
+      // Photo bytes and transient object URLs are deliberately never persisted.
+    });
+    if (!accepted) {
+      this.state.meals = previousMeals;
+      this.notify();
+      return false;
+    }
+    this.state.lastScannedFood = null;
+    this.state.foodScan.review = null;
+    return true;
   }
 
   public sendChatMessage(text: string) {
@@ -3601,10 +3786,10 @@ class Store {
     sourceBadge: string;
     profile: MicronutrientProfile | undefined;
     ingredients?: string[];
-    calories?: number;
-    protein?: number;
-    carbs?: number;
-    fat?: number;
+    calories?: number | null;
+    protein?: number | null;
+    carbs?: number | null;
+    fat?: number | null;
   } | null {
     const source = this.state.activeNutrientModalSource;
     if (!source) return null;
@@ -3612,9 +3797,9 @@ class Store {
     if (source.type === 'scanned') {
       const food = this.state.lastScannedFood;
       return {
-        title: tr(food?.name || 'Scanned Food'),
-        subtitle: tr(food?.subtitle || 'Instant Lens Preview'),
-        sourceBadge: 'DEMO ESTIMATE',
+        title: food?.name || tr('Scanned Food'),
+        subtitle: food?.subtitle || tr('Food scan review'),
+        sourceBadge: food?.source === 'ai_estimate' ? 'AI ESTIMATE' : food?.source === 'manual' ? 'MANUAL' : 'DEMO ESTIMATE',
         profile: food?.micronutrients,
         ingredients: food?.ingredients,
         calories: food?.calories,
@@ -3631,7 +3816,7 @@ class Store {
       return {
         title: mealLabel(meal, meal.name),
         subtitle: tr("{0} • {1} at {2}", tr(meal.mealType), meal.date, meal.time),
-        sourceBadge: isDemo ? 'DEMO' : 'DATABASE',
+        sourceBadge: isDemo ? 'DEMO' : meal.scanAnalysis?.source === 'ai_estimate' ? 'AI ESTIMATE' : meal.scanAnalysis?.source === 'manual' ? 'MANUAL' : 'DATABASE',
         profile: meal.nutritionSnapshot?.micronutrients || meal.micronutrients,
         ingredients: meal.ingredients,
         calories: meal.calories,

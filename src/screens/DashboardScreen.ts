@@ -8,6 +8,7 @@ import { clampProgressRatio, formatDisplayNumber, formatRemainingCalories, safeR
 import { getMealNutrientForDisplay } from '../utils/mealNutritionDisplay.ts';
 import type { DashboardWidgetId } from '../types/index.ts';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
+import { getFatGauge } from '../services/phasicRecompService.ts';
 
 export function renderDashboardScreen(): string {
   const state = store.getState();
@@ -19,10 +20,17 @@ export function renderDashboardScreen(): string {
   const remaining = store.getNetRemainingCalories(selectedDate);
   const remainingDisplay = formatRemainingCalories(remaining);
   const totals = store.getTotals(selectedDate);
-  const goal = state.calorieTarget;
+  const goals = store.getEffectiveNutritionGoals(selectedDate);
+  const goal = goals.calorieTarget;
   const burned = store.getBurnedCalories(selectedDate);
   const waterGlasses = store.getWaterGlasses(selectedDate);
   const dayMeals = store.getMealsForDate(selectedDate);
+  const refeedCalories = Math.max(0, goal - state.nutritionGoals.calorieTarget);
+  const refeedCarbs = Math.max(0, goals.carbsTarget - state.nutritionGoals.carbsTarget);
+  const fatGauge = Number.isFinite(goals.fatTarget) && goals.fatTarget > 0
+    ? getFatGauge(dayMeals, selectedDate, goals.fatTarget,
+      state.userProfile.dietProgram ?? 'standard', state.userProfile.currentWeightKg)
+    : null;
 
   // Calorie ring calculation
   const radius = 66;
@@ -31,18 +39,19 @@ export function renderDashboardScreen(): string {
   const strokeDashoffset = circumference * (1 - progressRatio);
 
   // Macro progress percentages from dynamic nutrition goals
-  const proteinGoal = state.nutritionGoals?.proteinTarget || 145;
-  const carbsGoal = state.nutritionGoals?.carbsTarget || 220;
-  const fatGoal = state.nutritionGoals?.fatTarget || 70;
+  const proteinGoal = goals.proteinTarget;
+  const carbsGoal = goals.carbsTarget;
+  const fatGoal = fatGauge?.ceilingGrams ?? goals.fatTarget;
+  const consumedFat = fatGauge?.consumedKnownGrams ?? totals.fat;
   const proteinPct = Math.round(clampProgressRatio(safeRatio(totals.protein, proteinGoal)) * 100);
   const carbsPct = Math.round(clampProgressRatio(safeRatio(totals.carbs, carbsGoal)) * 100);
-  const fatPct = Math.round(clampProgressRatio(safeRatio(totals.fat, fatGoal)) * 100);
+  const fatPct = Math.round(clampProgressRatio(safeRatio(consumedFat, fatGoal)) * 100);
   const macroCards = [
     { label: 'Protein', amount: totals.protein, target: proteinGoal, percent: proteinPct,
       text: 'text-primary dark:text-primary-container', bar: 'bg-primary' },
     { label: 'Carbs', amount: totals.carbs, target: carbsGoal, percent: carbsPct,
       text: 'text-tertiary dark:text-tertiary-fixed', bar: 'bg-tertiary dark:bg-tertiary-fixed' },
-    { label: 'Fat', amount: totals.fat, target: fatGoal, percent: fatPct,
+    { label: 'Fat', amount: consumedFat, target: fatGoal, percent: fatPct,
       text: 'text-amber-500', bar: 'bg-amber-500' },
   ];
   const proteinRemaining = Math.max(0, Math.round(proteinGoal - totals.protein));
@@ -102,6 +111,12 @@ export function renderDashboardScreen(): string {
               ${trHtml("Goal:")} ${formatDisplayNumber(goal, 0)} ${trHtml("kcal")}
             </span>
           </div>
+
+          ${refeedCalories > 0 ? `
+            <p class="text-xs leading-relaxed text-primary dark:text-primary-container rounded-xl bg-primary/10 p-3 mt-3">
+              ${trHtml('Refeed day: +{0} kcal and +{1} g carbs. Log meals as usual.', formatDisplayNumber(refeedCalories, 0), formatDisplayNumber(refeedCarbs))}
+            </p>
+          ` : ''}
 
           <!-- Circular Progress Ring SVG -->
           <div class="flex flex-col items-center justify-center my-3">
@@ -167,6 +182,11 @@ export function renderDashboardScreen(): string {
               <span class="text-[9px] text-primary/80 dark:text-primary-container/80">${trHtml("kcal")}</span>
             </div>
           </div>
+          ${fatGauge?.usedWeightCap ? `
+            <p class="text-xs leading-relaxed text-on-surface-variant dark:text-gray-400">
+              ${trHtml('Mini Cut uses a daily fat ceiling of {0} g; saved nutrition targets stay unchanged.', formatDisplayNumber(fatGoal))}
+            </p>
+          ` : ''}
         </section>
 
         <!-- Macronutrients Breakdown Section -->

@@ -1,15 +1,17 @@
 import { trHtml } from '../../i18n/index.ts';
+import { getFoodAnalysisBackend } from '../../services/foodAnalysisBackend.ts';
 import { store } from '../../store/appState';
 import { QUICK_ADD_ACTIONS, type QuickAddAction } from './quickAddActions';
 import {
   renderSpecialProgramActivationFooter,
   renderSpecialProgramMenu,
-  renderSpecialProgramToolPreview,
 } from './SpecialProgramMenu';
 import { getSpecialProgramAction } from './specialProgramActions';
+import { renderPhasicRecompTool } from '../PhasicTools/PhasicRecompTools';
 
 /** Icons and routes come exclusively from the app-owned action definitions. */
 function renderAction(action: QuickAddAction): string {
+  const badge = action.id === 'scan-food' && getFoodAnalysisBackend() ? undefined : action.badge;
   return `
     <button
       type="button"
@@ -22,7 +24,7 @@ function renderAction(action: QuickAddAction): string {
         <span class="material-symbols-outlined">${action.icon}</span>
       </span>
       <span class="quick-add-action-label">${trHtml(action.label)}</span>
-      ${action.badge ? `<span class="quick-add-action-badge">${trHtml(action.badge)}</span>` : ''}
+      ${badge ? `<span class="quick-add-action-badge">${trHtml(badge)}</span>` : ''}
       <span id="quick-add-description-${action.id}" class="sr-only">${trHtml(action.description)}</span>
     </button>
   `;
@@ -69,20 +71,20 @@ export function renderQuickAddBottomSheet(): string {
   const tool = view === 'tool' && isUnlocked ? getSpecialProgramAction(state.selectedSpecialProgramTool) : undefined;
   const title = tool?.label ?? (isSpecialView ? 'Special Program: Phasic Recomp Tools' : 'Quick Add');
   const subtitle = tool
-    ? 'Tool preview'
+    ? 'Your diary and program targets'
     : isSpecialView
       ? 'Mini Cut / Lean Bulk extension menu'
       : 'Log nutrition in the way that works for you';
   const content = !isSpecialView
     ? renderPrimaryMenu()
     : tool
-      ? renderSpecialProgramToolPreview(tool.id, state.specialProgramToolError)
+      ? renderPhasicRecompTool(tool.id, state.specialProgramToolError)
       : renderSpecialProgramMenu(isUnlocked);
 
   return `
     <div
       id="quick-add-backdrop"
-      class="ui-dialog-layer ui-bottom-sheet-layer fixed inset-0 z-50 flex justify-center bg-black/60 backdrop-blur-xs"
+      class="ui-dialog-layer ${tool ? 'phasic-tool-dialog-layer' : 'ui-bottom-sheet-layer'} fixed inset-0 z-50 flex justify-center bg-black/60 backdrop-blur-xs"
       data-dialog-close="${isSpecialView ? 'window.backQuickAddMenu()' : 'window.closeQuickAdd()'}"
       onclick="if(event.target === this) window.closeQuickAdd()"
       role="dialog"
@@ -93,10 +95,10 @@ export function renderQuickAddBottomSheet(): string {
       <div
         id="quick-add-sheet"
         data-quick-add-view="${view}"
-        class="ui-dialog-panel ui-bottom-sheet-panel w-full max-w-[430px] flex flex-col shadow-2xl"
+        class="ui-dialog-panel ${tool ? 'phasic-tool-dialog-panel' : 'ui-bottom-sheet-panel'} w-full max-w-[430px] flex flex-col shadow-2xl"
         onclick="event.stopPropagation()"
       >
-        <span class="quick-add-sheet-handle" aria-hidden="true"></span>
+        ${tool ? '' : '<span class="quick-add-sheet-handle" aria-hidden="true"></span>'}
         <div class="ui-dialog-header quick-add-sheet-header flex items-start justify-between gap-3">
           ${isSpecialView ? `
             <button type="button" class="quick-add-sheet-back shrink-0" onclick="window.backQuickAddMenu()" aria-label="${trHtml(tool ? 'Back to Special Program tools' : 'Back to Quick Add')}">

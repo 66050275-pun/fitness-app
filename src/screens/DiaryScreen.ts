@@ -24,6 +24,7 @@ import {
 import { aggregateDailyMicronutrients } from '../utils/nutrientCalculations';
 import { renderCalorieProgressRing } from '../components/Nutrition/CalorieProgressRing';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
+import { getFatGauge } from '../services/phasicRecompService.ts';
 
 export function renderDiaryScreen(): string {
   const state = store.getState();
@@ -33,7 +34,16 @@ export function renderDiaryScreen(): string {
   const consumed = store.getConsumedCalories(selectedDate);
   const dayMeals = store.getMealsForDate(selectedDate);
   const waterGlasses = store.getWaterGlasses(selectedDate);
-  const calorieTarget = state.calorieTarget || 2100;
+  const goals = store.getEffectiveNutritionGoals(selectedDate);
+  const calorieTarget = goals.calorieTarget;
+  const refeedCalories = Math.max(0, calorieTarget - state.nutritionGoals.calorieTarget);
+  const refeedCarbs = Math.max(0, goals.carbsTarget - state.nutritionGoals.carbsTarget);
+  const fatGauge = Number.isFinite(goals.fatTarget) && goals.fatTarget > 0
+    ? getFatGauge(dayMeals, selectedDate, goals.fatTarget,
+      state.userProfile.dietProgram ?? 'standard', state.userProfile.currentWeightKg)
+    : null;
+  const fatTarget = fatGauge?.ceilingGrams ?? goals.fatTarget;
+  const consumedFat = fatGauge?.consumedKnownGrams ?? totals.fat;
 
   // Weekly Date Strip powered by visibleDiaryWeekStart (anchored to selectedDate)
   const visibleWeekStart = state.visibleDiaryWeekStart || selectedDate;
@@ -69,11 +79,12 @@ export function renderDiaryScreen(): string {
           ${weekDays.map(day => {
             const isSelected = day.dateKey === selectedDate;
             const dayConsumed = dailyCalories[day.dateKey] || 0;
+            const dayTarget = store.getEffectiveCalorieTarget(day.dateKey);
 
             const dayAriaLabel = `${day.dayName}, ${day.monthName} ${day.dayNum}, ${day.year}. ${
               dayConsumed > 0 
-                ? tr("{0} of {1} calories logged", formatDisplayNumber(dayConsumed, 0), formatDisplayNumber(calorieTarget, 0))
-                : (calorieTarget > 0 ? tr("0 of {0} calories logged", formatDisplayNumber(calorieTarget, 0)) : tr("calorie target unavailable"))
+                ? tr("{0} of {1} calories logged", formatDisplayNumber(dayConsumed, 0), formatDisplayNumber(dayTarget, 0))
+                : (dayTarget > 0 ? tr("0 of {0} calories logged", formatDisplayNumber(dayTarget, 0)) : tr("calorie target unavailable"))
             }${day.isToday ? tr(". Today") : ''}${isSelected ? tr(". Selected") : ''}`;
 
             return `
@@ -97,7 +108,7 @@ export function renderDiaryScreen(): string {
                 <!-- Calorie Progress Ring wrapping Day Number (No % shown) -->
                 ${renderCalorieProgressRing({
                   consumed: dayConsumed,
-                  target: calorieTarget,
+                  target: dayTarget,
                   size: 38,
                   strokeWidth: 3,
                   isSelected: false, // keep progress ring colorful
@@ -167,25 +178,39 @@ export function renderDiaryScreen(): string {
             </div>
           </div>
 
+          ${refeedCalories > 0 ? `
+            <p class="text-xs leading-relaxed text-primary dark:text-primary-container rounded-xl bg-primary/10 p-3 mt-3">
+              ${trHtml('Refeed day: +{0} kcal and +{1} g carbs. Log meals as usual.', formatDisplayNumber(refeedCalories, 0), formatDisplayNumber(refeedCarbs))}
+            </p>
+          ` : ''}
+
           <!-- Mini Macro Progress Grid -->
           <div class="ui-stat-grid grid grid-cols-4 gap-2 mt-3">
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-primary dark:text-primary-container block">${trHtml("Protein")}</span>
               <p class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(totals.protein)} ${trHtml("g")}</p>
+              <p class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400 mt-1">/ ${formatDisplayNumber(goals.proteinTarget)} ${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-tertiary dark:text-tertiary-fixed block">${trHtml("Carbs")}</span>
               <p class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(totals.carbs)} ${trHtml("g")}</p>
+              <p class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400 mt-1">/ ${formatDisplayNumber(goals.carbsTarget)} ${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-amber-500 block">${trHtml("Fat")}</span>
-              <p class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(totals.fat)} ${trHtml("g")}</p>
+              <p class="ui-number font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(consumedFat)} ${trHtml("g")}</p>
+              <p class="ui-number text-[10px] text-on-surface-variant dark:text-gray-400 mt-1">/ ${formatDisplayNumber(fatTarget)} ${trHtml("g")}</p>
             </div>
             <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-2.5 rounded-xl text-center">
               <span class="text-[10px] font-bold text-blue-500 block">${trHtml("Water")}</span>
               <p class="font-heading font-extrabold text-sm text-on-surface dark:text-white mt-0.5">${waterGlasses * 250}${trHtml("ml")}</p>
             </div>
           </div>
+          ${fatGauge?.usedWeightCap ? `
+            <p class="text-xs leading-relaxed text-on-surface-variant dark:text-gray-400 mt-3">
+              ${trHtml('Mini Cut uses a daily fat ceiling of {0} g; saved nutrition targets stay unchanged.', formatDisplayNumber(fatTarget))}
+            </p>
+          ` : ''}
         </section>
 
         <!-- Daily Micronutrient Summary -->
