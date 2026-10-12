@@ -11,6 +11,7 @@ import { privateStorage } from './privateStorage.ts';
  * 6. Schema v4: OnboardingState, OnboardingDraft, signed weeklyGoalRateKg, profileSetupCompleted.
  * 7. Schema v7: introduction plus four steps, explicit objective/age and special-program targets.
  * 8. Schema v8: encrypted phasic-tool preferences, cycles and cooking-fat estimate metadata.
+ * 9. Schema v9: reviewed scan provenance and cooking-fat amounts included in meal totals.
  */
 
 import type { 
@@ -41,10 +42,11 @@ import type {
 } from '../types/index.ts';
 import { calculateAge } from '../utils/goalCalculations';
 import { getPhaseCycleProgress, isValidCalendarKey } from './phasicRecompService';
+import { sanitizeScanMealAnalysis } from './foodScanService.ts';
 
 export const APP_STORAGE_KEY = 'nutriai_app_data_v2';
 export const LEGACY_MEALS_KEY = 'nutriai_meals';
-export const CURRENT_SCHEMA_VERSION = 8;
+export const CURRENT_SCHEMA_VERSION = 9;
 
 const FITNESS_OBJECTIVES: FitnessObjective[] = ['lose_weight', 'build_muscle', 'maintain_weight', 'general_fitness', 'mini_cut', 'lean_bulk'];
 
@@ -174,6 +176,8 @@ export function migrateLegacyMealItem(raw: any): MealItem | null {
         fiber: typeof raw.nutritionSnapshot.fiber === 'number' ? raw.nutritionSnapshot.fiber : null,
         sugar: typeof raw.nutritionSnapshot.sugar === 'number' ? raw.nutritionSnapshot.sugar : null,
         sodium: typeof raw.nutritionSnapshot.sodium === 'number' ? raw.nutritionSnapshot.sodium : null,
+        calorieSource: ['manual', 'calculated_from_macros', 'nutrition_label', 'database', 'ai_estimate', 'demo'].includes(raw.nutritionSnapshot.calorieSource)
+          ? raw.nutritionSnapshot.calorieSource : undefined,
         micronutrients: raw.nutritionSnapshot.micronutrients || raw.micronutrients || undefined
       };
     } else {
@@ -213,7 +217,8 @@ export function migrateLegacyMealItem(raw: any): MealItem | null {
       ingredients: Array.isArray(raw.ingredients) ? raw.ingredients.filter((i: any) => typeof i === 'string') : [],
       imageUrl: typeof raw.imageUrl === 'string' ? raw.imageUrl : undefined,
       micronutrients: nutritionSnapshot.micronutrients,
-      hiddenFatEstimate: sanitizeHiddenFatEstimate(raw.hiddenFatEstimate)
+      hiddenFatEstimate: sanitizeHiddenFatEstimate(raw.hiddenFatEstimate),
+      scanAnalysis: sanitizeScanMealAnalysis(raw.scanAnalysis, nutritionSnapshot.fat)
     };
   } catch {
     console.warn('Invalid meal record was skipped.');

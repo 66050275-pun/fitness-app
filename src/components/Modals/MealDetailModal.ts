@@ -31,7 +31,7 @@ export function renderMealDetailModal(): string {
 
   const safeName = escapeHtml(mealLabel(meal, meal.name));
   const profile = getMealMicronutrientsForDisplay(meal);
-  const isDemo = profile?.vitamins.some(v => v.source === 'demo');
+  const isDemo = meal.foodSource === 'demo' || profile?.vitamins.some(v => v.source === 'demo');
 
   const vitamins = profile?.vitamins.filter(v => v.amount !== null) || [];
   const minerals = profile?.minerals.filter(m => m.amount !== null) || [];
@@ -65,7 +65,7 @@ export function renderMealDetailModal(): string {
                   <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${isDemo
                       ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30' 
                       : 'bg-primary/10 text-primary dark:text-primary-container border-primary/20'}">
-                    ${isDemo ? 'DEMO' : tr("LOGGED MEAL")}
+                    ${isDemo ? trHtml('DEMO') : trHtml(meal.scanAnalysis?.source === 'ai_estimate' ? 'AI ESTIMATE' : meal.scanAnalysis?.source === 'manual' ? 'MANUAL' : 'LOGGED MEAL')}
                   </span>
                 </div>
                 <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5 capitalize">
@@ -112,6 +112,34 @@ export function renderMealDetailModal(): string {
               </div>
             </div>
           </section>
+
+          ${meal.scanAnalysis ? `
+            <section class="phasic-tool-card flex flex-col gap-3">
+              <h3 class="font-heading font-bold text-base">${trHtml('Saved scan analysis')}</h3>
+              <p class="phasic-tool-muted text-sm">${trHtml('Cooking fat is included in the recorded total, with no separate addition.')}</p>
+              <p class="text-sm">${meal.scanAnalysis.reviewedCookingFatGrams === null ? trHtml('Cooking fat: not estimated')
+                : trHtml('{0} g cooking fat included', formatDisplayNumber(meal.scanAnalysis.reviewedCookingFatGrams))}</p>
+              ${meal.scanAnalysis.source === 'ai_estimate' ? `
+                <p class="phasic-tool-muted text-sm">${trHtml('Original AI portion: {0}', meal.scanAnalysis.originalServingDescription)}</p>
+                <div class="overflow-x-auto"><table class="w-full text-sm text-left">
+                  <caption class="sr-only">${trHtml('Original estimate and saved nutrition')}</caption>
+                  <thead><tr><th class="py-2 pr-2">${trHtml('Nutrient')}</th><th class="py-2 pr-2">${trHtml('Original estimate')}</th><th class="py-2">${trHtml('Saved')}</th></tr></thead>
+                  <tbody>${(['calories', 'protein', 'carbs', 'fat'] as const).map(key => `<tr>
+                    <th class="py-2 pr-2 font-medium">${trHtml({ calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat' }[key])}</th>
+                    <td class="py-2 pr-2">${formatDisplayNumber(meal.scanAnalysis!.originalNutrition[key], key === 'calories' ? 0 : 1)}</td>
+                    <td class="py-2">${formatDisplayNumber(getMealNutrientForDisplay(meal, key), key === 'calories' ? 0 : 1)} ${trHtml(key === 'calories' ? 'kcal' : 'g')}</td>
+                  </tr>`).join('')}</tbody>
+                </table></div>
+                <p class="phasic-tool-muted text-sm">${trHtml('Original AI total fat: {0} g', formatDisplayNumber(meal.scanAnalysis.originalNutrition.fat))}</p>
+                <p class="phasic-tool-muted text-sm">${trHtml('Original AI cooking fat: {0} g', formatDisplayNumber(meal.scanAnalysis.originalCookingFat?.estimatedGrams ?? null))}</p>
+                ${meal.scanAnalysis.confidence !== null ? `<p class="phasic-tool-muted text-sm">${trHtml('Analysis confidence: {0}%', formatDisplayNumber(meal.scanAnalysis.confidence * 100, 0))}</p>` : ''}
+              ` : ''}
+              ${meal.scanAnalysis.editedFields.length ? `<p class="phasic-tool-muted text-sm">${trHtml('Edited before saving: {0}', meal.scanAnalysis.editedFields.map(field => tr({ name: 'Food name', servingDescription: 'Serving description', calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Total fat (g)', cookingFatGrams: 'Cooking fat included in total (g)' }[field])).join(' · '))}</p>` : ''}
+              ${meal.scanAnalysis.source === 'ai_estimate' && meal.scanAnalysis.editedFields.includes('servingDescription') && profile ? `<p class="phasic-tool-muted text-sm">${trHtml('Micronutrients refer to the original analyzed portion and were not rescaled after editing.')}</p>` : ''}
+              ${meal.scanAnalysis.originalCookingFat?.assumptions.length ? `<ul class="phasic-tool-muted text-sm list-disc pl-5">${meal.scanAnalysis.originalCookingFat.assumptions.map(text => `<li>${escapeHtml(text)}</li>`).join('')}</ul>` : ''}
+              ${meal.scanAnalysis.warnings.length ? `<ul class="phasic-tool-muted text-sm list-disc pl-5">${meal.scanAnalysis.warnings.map(text => `<li>${escapeHtml(text)}</li>`).join('')}</ul>` : ''}
+            </section>
+          ` : ''}
 
           <!-- Ingredients -->
           ${meal.ingredients && meal.ingredients.length > 0 ? `

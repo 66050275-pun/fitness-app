@@ -21,7 +21,7 @@ flowchart TD
   E --> L[Lock: flush, clear key, discard store and personal DOM]
 ```
 
-There is no application user database, login service, real food-recognition endpoint, connected health provider or remote coach in this build. Scanner and coach are local demonstrations. Clipboard copy and sharing are explicit user actions; feedback copy can include the email and description the user entered.
+There is no application user database, login service, configured food-recognition endpoint, connected health provider or remote coach in this build. The scanner accepts a real photo through the platform picker and supports local preparation/manual nutrition review; recognition awaits backend configuration. The coach remains a local demonstration. Clipboard copy and sharing are explicit user actions; feedback copy can include the email and description the user entered.
 
 ## Persistent information
 
@@ -79,7 +79,7 @@ The table below lists every screen/component source and its input controls. All 
 | Component | Role / controls |
 | --- | --- |
 | `src/components/BottomSheets/QuickAddBottomSheet.ts` | `renderQuickAddBottomSheet`; renders navigation, records, summaries or actions |
-| `src/components/PhasicTools/HiddenFatScanner.ts` | Cooking-fat calculator and today-only estimate list; `phasic-fat-oil`, `phasic-fat-coconut`, `phasic-fat-dressing`, `phasic-fat-meal` |
+| `src/components/PhasicTools/HiddenFatScanner.ts` | Food scan/review entry, today's scanned nutrition, and a clearly labeled missing-fat calculator; `phasic-fat-oil`, `phasic-fat-coconut`, `phasic-fat-dressing`, `phasic-fat-meal` |
 | `src/components/PhasicTools/ProteinSplitter.ts` | Saved four/five interval choice and rounded target allocation |
 | `src/components/PhasicTools/ProteinRadar.ts` | Today’s known meal-group protein chart and incomplete-data states |
 | `src/components/PhasicTools/FatGauge.ts` | Known logged fat and weight-based ceiling, including uncertainty |
@@ -231,3 +231,11 @@ Added `WorkoutMuscleMap` to workout setup, with original inline front/back SVG a
 - Mutation controls verify the unlocked vault, saved Special Program and active tool. Accepted diary drafts reset to prevent accidental duplicate additions; later storage failures use the existing vault save indicator and retry flow. Private callbacks, chart views and dialog snapshots clear on lock/disposal.
 - Protein uses a planning benchmark rather than a measured leucine threshold. Recomposition uses daily mean weights and matched supported exercise estimates, with explicit insufficient-data states; it does not infer body fat or lean mass.
 - Validation for this update consists of strict TypeScript/Vite build, source review and passive synthetic mobile layouts. No automated tests were added or run.
+
+## Food photo review update — 2026-10-12
+
+Schema 9 stores optional original/reviewed scan analysis metadata in the same encrypted meal snapshot. The Hidden Fat scan flow treats cooking fat as part of total meal fat and adjusts only differences when a known estimate changes. It never creates a second fat entry for a reviewed scan.
+
+Selected photos are prepared locally, retained in memory, and released on scan exit or vault lock. Their bytes, filenames, object URLs, upload consent and unfinished review drafts are excluded from vault persistence and backups. Recognition remains disconnected by default. A future trusted transport must supply a localized photo-processing notice and use a server that holds provider credentials; explicit consent precedes invocation. Cancellation/timeout ignores late responses, while any future server/provider retention must be agreed separately. Details: `docs/FOOD_SCAN_BACKEND.md`.
+
+Additional modules: `src/services/foodAnalysisBackend.ts`, `foodPhotoService.ts`, `foodScanService.ts`, and `src/screens/foodScanController.ts`. The response adapter now validates unknown JSON, retains unknown nutrients/confidence, and renders only supplied micronutrients. Saved analysis preserves the original portion and nutrition, the included cooking-fat amount and edited-field provenance.

@@ -1,227 +1,128 @@
+import { trHtml } from '../i18n/index.ts';
+import { store } from '../store/appState.ts';
+import { readReviewNumber, resolveCookingFatDraft, reviewedNutrition, validateScanReview } from '../services/foodScanService.ts';
+import { getFatGauge } from '../services/phasicRecompService.ts';
+import { getTodayKey } from '../utils/dateUtils.ts';
 import { formatDisplayNumber } from '../utils/safeNumbers.ts';
-import { tr, trHtml } from '../i18n/index.ts';
-import { demoFoodImage } from '../data/demoImage.ts';
-import { htmlJsArg } from '../utils/sanitize.ts';
-import { store } from '../store/appState';
-import { MealType } from '../types/index.ts';
-import { selectNutrientHighlights } from '../utils/nutrientCalculations';
-import { DEMO_SALMON_BOWL_MICRONUTRIENTS } from '../data/demoNutritionData';
+import { escapeHtml } from '../utils/sanitize.ts';
+import type { FoodScanReview, FoodScanReviewField, MealType } from '../types/index.ts';
+
+function field(review: FoodScanReview, key: FoodScanReviewField, label: string, numeric = false): string {
+  return `<label class="flex flex-col gap-2 min-w-0 font-heading font-bold text-sm" for="scan-review-${key}">
+    ${trHtml(label)}
+    <input id="scan-review-${key}" class="phasic-tool-input w-full font-sans font-normal" type="text"
+      ${numeric ? 'inputmode="decimal" maxlength="12"' : `maxlength="${key === 'name' ? 200 : 300}"`}
+      value="${escapeHtml(key === 'cookingFatGrams' ? review.cookingFatInput : review[key])}" ${key === 'cookingFatGrams' ? 'oninput="window.scanCookingDraft(this.value)" onchange' : 'oninput'}="window.scanReviewInput('${key}', this.value)"
+      ${numeric ? `placeholder="${trHtml('Unknown')}"` : ''} />
+  </label>`;
+}
 
 export function renderFoodResultScreen(): string {
-  const { lastScannedFood } = store.getState();
-  const food = lastScannedFood || {
-    name: 'Mediterranean Poke Bowl',
-    subtitle: tr("Wild Sashimi Tuna, Brown Rice & Greens"),
-    calories: 540,
-    protein: 38,
-    carbs: 52,
-    fat: 16,
-    confidence: 0.98,
-    glycemicIndex: 'Low' as const,
-    ingredients: ['Wild Sashimi Tuna', 'Organic Brown Rice', 'Wakame Seaweed', 'Edamame', 'Sesame Seeds'],
-    suggestedMealType: 'dinner' as const,
-    micronutrients: DEMO_SALMON_BOWL_MICRONUTRIENTS
-  };
+  const state = store.getState();
+  const food = state.lastScannedFood;
+  const review = state.foodScan.review;
+  if (!food || !review) return `<div class="food-scan-screen min-h-screen flex flex-col gap-4 p-5">
+    <h1 class="font-heading font-extrabold text-xl">${trHtml('No food analysis to review')}</h1>
+    <button type="button" class="ui-primary-button" onclick="window.openScannerMode('food')">${trHtml('Scan Food')}</button></div>`;
 
-  const highlights = selectNutrientHighlights(food.micronutrients || DEMO_SALMON_BOWL_MICRONUTRIENTS, 6);
+  let nutrition;
+  let cookingGrams = null;
+  try { const resolved = resolveCookingFatDraft(review); nutrition = reviewedNutrition(resolved); cookingGrams = readReviewNumber(resolved.cookingFatGrams); }
+  catch { nutrition = { calories: null, protein: null, carbs: null, fat: null }; }
+  const cooking = food.cookingFat;
+  const special = store.isSpecialProgramUnlocked();
+  const today = getTodayKey();
+  const gauge = getFatGauge(store.getMealsForDate(today), today, store.getEffectiveNutritionGoals(today).fatTarget,
+    state.userProfile.dietProgram ?? 'standard', state.userProfile.currentWeightKg);
+  const fatBalance = nutrition.fat === null ? null : gauge.ceilingGrams - gauge.consumedKnownGrams - nutrition.fat;
+  const cookingKnown = cooking?.estimatedGrams !== null && cooking?.estimatedGrams !== undefined;
+  const rangeKnown = cooking?.rangeMinGrams !== null && cooking?.rangeMinGrams !== undefined
+    && cooking?.rangeMaxGrams !== null && cooking?.rangeMaxGrams !== undefined;
 
   return `
-    <div class="flex flex-col min-h-screen pb-10 bg-surface dark:bg-dark-surface transition-colors">
-      
-      <!-- Top Image Hero Banner -->
-      <div class="relative w-full h-64 overflow-hidden bg-black">
-        <img 
-          src="${demoFoodImage}"
-          class="w-full h-full object-cover" 
-          alt="${trHtml(food.name)}"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+    <div class="food-scan-screen min-h-screen flex flex-col gap-4 px-screen-gutter pt-5 pb-8">
+      <header class="flex items-center gap-3">
+        <button type="button" onclick="window.openScannerMode('food')" class="phasic-tool-secondary rounded-full h-12 w-12 flex items-center justify-center shrink-0" aria-label="${trHtml('Back')}">
+          <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+        </button>
+        <div class="min-w-0"><h1 class="font-heading font-extrabold text-xl">${trHtml('Food scan review')}</h1>
+          <p class="phasic-tool-muted text-sm">${trHtml('One confirmed meal updates your daily totals.')}</p></div>
+      </header>
+      ${state.foodScan.photoUrl ? `<img src="${escapeHtml(state.foodScan.photoUrl)}" alt="${trHtml('Selected food photo')}" class="food-result-photo w-full rounded-3xl object-contain" />` : ''}
+      <section class="phasic-tool-note text-sm flex flex-col gap-2">
+        <p class="font-heading font-bold">${trHtml(food.source === 'ai_estimate' ? 'AI estimate' : food.source === 'manual' ? 'Manual nutrition entry' : 'Demo estimate')}</p>
+        ${food.confidence !== null ? `<p>${trHtml('Analysis confidence: {0}%', formatDisplayNumber(food.confidence * 100, 0))}</p>` : ''}
+        <p>${trHtml(food.source === 'manual' ? 'Enter nutrition for the entire portion. Blank macro values stay unknown.'
+          : 'Check the portion, nutrition and cooking-fat assumptions before saving.')}</p>
+        ${food.warnings.length ? `<ul class="list-disc pl-5">${food.warnings.map(warning => `<li>${escapeHtml(warning)}</li>`).join('')}</ul>` : ''}
+      </section>
 
-        <!-- Top Navigation -->
-        <div class="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-          <button onclick="window.navigateApp('scanner')" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-95 transition-all">
-            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-          </button>
-          <div class="flex items-center gap-2">
-            <button onclick="window.showToast('Food result shared')" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-95 transition-all">
-              <span class="material-symbols-outlined text-[20px]">share</span>
-            </button>
-          </div>
+      <section class="phasic-tool-card flex flex-col gap-4">
+        <h2 class="font-heading font-bold text-base">${trHtml('Food and portion')}</h2>
+        ${field(review, 'name', 'Food name')}
+        ${field(review, 'servingDescription', 'Serving description')}
+        <p class="phasic-tool-muted text-sm">${trHtml('All nutrition values below describe this entire portion.')}</p>
+        ${food.servingWeightGrams !== null ? `<p class="phasic-tool-muted text-sm">${trHtml('Estimated portion weight: {0} g', formatDisplayNumber(food.servingWeightGrams))}</p>` : ''}
+      </section>
+
+      <section class="phasic-tool-card flex flex-col gap-4">
+        <h2 class="font-heading font-bold text-base">${trHtml('Review nutrition')}</h2>
+        <div class="grid grid-cols-2 gap-3">
+          ${field(review, 'calories', 'Calories (kcal)', true)}
+          ${field(review, 'protein', 'Protein (g)', true)}
+          ${field(review, 'carbs', 'Carbs (g)', true)}
+          ${field(review, 'fat', 'Total fat (g)', true)}
         </div>
+        <p class="phasic-tool-muted text-sm">${trHtml('Total fat already includes the cooking-fat estimate. Adjust the portion and totals together if needed.')}</p>
+      </section>
 
-        <!-- Banner Bottom Overlay Info -->
-        <div class="absolute bottom-4 left-4 right-4 text-white z-10">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary-container text-[10px] font-extrabold uppercase flex items-center gap-1">
-              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-              ${Math.round(food.confidence * 100)}${trHtml("% AI Confidence")}
-            </span>
-            <span class="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-semibold">
-              ${trHtml("Glycemic:")} ${trHtml(food.glycemicIndex)}
-            </span>
-          </div>
-          <h1 class="font-heading font-bold text-xl leading-tight text-white">${trHtml(food.name)}</h1>
-          <p class="text-xs text-white/80 mt-0.5">${trHtml(food.subtitle)}</p>
+      <section class="phasic-tool-card flex flex-col gap-3">
+        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-primary shrink-0" aria-hidden="true">manage_search</span>
+          <div class="min-w-0"><h2 class="font-heading font-bold text-base">${trHtml('Hidden Fat Scanner')}</h2>
+            <p class="phasic-tool-muted text-sm mt-1">${trHtml('Cooking fat is part of the meal’s total fat.')}</p></div></div>
+        <p class="font-heading font-bold">${cookingKnown ? trHtml('AI cooking-fat estimate: {0} g', formatDisplayNumber(cooking!.estimatedGrams))
+          : trHtml(special ? 'Cooking fat was not estimated. You may enter the included amount yourself.' : 'Cooking fat: not estimated')}</p>
+        ${rangeKnown ? `<p class="phasic-tool-muted text-sm">${trHtml('Estimated range: {0}–{1} g', formatDisplayNumber(cooking!.rangeMinGrams), formatDisplayNumber(cooking!.rangeMaxGrams))}</p>` : ''}
+        ${cooking?.confidence !== null && cooking?.confidence !== undefined ? `<p class="phasic-tool-muted text-sm">${trHtml('Cooking-fat confidence: {0}%', formatDisplayNumber(cooking.confidence * 100, 0))}</p>` : ''}
+        ${cooking?.sources.length ? `<div><h3 class="font-heading font-bold text-sm">${trHtml('Likely cooking-fat sources')}</h3><ul class="phasic-tool-muted text-sm list-disc pl-5 mt-1">${cooking.sources.map(source => `<li>${escapeHtml(source)}</li>`).join('')}</ul></div>` : ''}
+        ${cooking?.assumptions.length ? `<div><h3 class="font-heading font-bold text-sm">${trHtml('Analysis assumptions')}</h3><ul class="phasic-tool-muted text-sm list-disc pl-5 mt-1">${cooking.assumptions.map(assumption => `<li>${escapeHtml(assumption)}</li>`).join('')}</ul></div>` : ''}
+        ${special ? `
+          ${field(review, 'cookingFatGrams', 'Cooking fat included in total (g)', true)}
+          ${cookingKnown ? `<div class="food-scan-modes grid grid-cols-3 gap-2" role="group" aria-label="${trHtml('Adjust cooking-fat estimate')}">
+            <button type="button" onclick="window.scanCookingPreset('less')">${trHtml('Less oil')}</button>
+            <button type="button" onclick="window.scanCookingPreset('regular')">${trHtml('Original estimate')}</button>
+            <button type="button" onclick="window.scanCookingPreset('more')">${trHtml('More oil')}</button>
+          </div>` : ''}
+          <p class="phasic-tool-muted text-sm">${trHtml('Changing a known cooking-fat amount adjusts total fat by the difference and calories by 9 kcal per gram. When no amount is known, enter total fat first and identify the included part.')}</p>
+        ` : `<p class="phasic-tool-muted text-sm">${trHtml('Cooking-fat adjustments are available in Special Program.')}</p>`}
+        <p id="scan-cooking-total" class="font-heading font-bold text-sm" aria-live="polite">${cookingGrams === null ? trHtml('Not estimated') : trHtml('{0} g included in total fat', formatDisplayNumber(cookingGrams))}</p>
+      </section>
+
+      ${food.ingredients.length ? `<section class="phasic-tool-card"><h2 class="font-heading font-bold text-base mb-3">${trHtml('Detected Ingredients')}</h2>
+        <div class="flex flex-wrap gap-2">${food.ingredients.map(ingredient => `<span class="rounded-xl px-3 py-2 bg-surface-container-lowest dark:bg-dark-surface-card text-sm">${escapeHtml(ingredient)}</span>`).join('')}</div></section>` : ''}
+      ${food.micronutrients ? `<button type="button" class="phasic-tool-secondary" onclick="window.openNutrientsFromScanned()">${trHtml('View All Nutrients')}</button>` : ''}
+
+      <section class="phasic-tool-card flex flex-col gap-3">
+        <h2 class="font-heading font-bold text-base">${trHtml('Assign to Meal')}</h2>
+        <div class="food-scan-modes grid grid-cols-2 gap-2">
+          ${(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(type => `<button type="button" data-scan-meal="${type}" aria-pressed="${review.mealType === type}" onclick="window.scanReviewMeal('${type}')">${trHtml(type)}</button>`).join('')}
         </div>
-      </div>
-
-      <!-- Main Result Content Sheet -->
-      <main class="px-screen-gutter flex flex-col gap-4 -mt-3 relative z-20 bg-surface dark:bg-dark-surface rounded-t-3xl pt-5">
-        
-        <!-- Energy Summary Strip -->
-        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex items-center justify-between">
-          <div>
-            <span class="text-xs text-on-surface-variant dark:text-gray-400 font-medium">${trHtml("Estimated Caloric Intake")}</span>
-            <div class="flex flex-wrap items-baseline gap-1 mt-0.5">
-              <span class="ui-number font-display text-3xl font-extrabold text-on-surface dark:text-white leading-none">${formatDisplayNumber(food.calories, 0)}</span>
-              <span class="text-xs font-bold text-on-surface-variant dark:text-gray-400">${trHtml("kcal")}</span>
-            </div>
-          </div>
-
-          <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary dark:text-primary-container flex items-center justify-center">
-            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-          </div>
+      </section>
+      <section class="phasic-tool-card flex flex-col gap-3" aria-label="${trHtml('Meal totals to save')}">
+        <h2 class="font-heading font-bold text-base">${trHtml('Meal totals to save')}</h2>
+        <div class="grid grid-cols-2 gap-3">
+          ${(['calories', 'protein', 'carbs', 'fat'] as const).map(key => `<div class="min-w-0">
+            <p class="phasic-tool-muted text-sm">${trHtml({ calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat' }[key])}</p>
+            <p class="font-heading font-extrabold text-xl break-words"><span id="scan-total-${key}" aria-live="polite">${formatDisplayNumber(nutrition[key], key === 'calories' ? 0 : 1)}</span> ${trHtml(key === 'calories' ? 'kcal' : 'g')}</p>
+          </div>`).join('')}
         </div>
-
-        <!-- Macronutrients Distribution Dials -->
-        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient">
-          <h3 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-3">${trHtml("Macronutrient Profile")}</h3>
-          
-          <div class="ui-number-grid grid grid-cols-3 gap-3">
-            <!-- Protein -->
-            <div class="flex flex-col items-center bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
-              <span class="text-[11px] font-bold text-primary dark:text-primary-container">${trHtml("Protein")}</span>
-              <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(food.protein)} ${trHtml("g")}</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("32% of total")}</span>
-            </div>
-
-            <!-- Carbs -->
-            <div class="flex flex-col items-center bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
-              <span class="text-[11px] font-bold text-tertiary dark:text-tertiary-fixed">${trHtml("Carbs")}</span>
-              <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(food.carbs)} ${trHtml("g")}</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("44% of total")}</span>
-            </div>
-
-            <!-- Fat -->
-            <div class="flex flex-col items-center bg-surface-container-low dark:bg-dark-surface-card-high p-3 rounded-xl">
-              <span class="text-[11px] font-bold text-amber-500">${trHtml("Healthy Fats")}</span>
-              <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white mt-0.5">${formatDisplayNumber(food.fat)} ${trHtml("g")}</span>
-              <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("24% of total")}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Detected Ingredients Section -->
-        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient">
-          <h3 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-2.5">${trHtml("Detected Ingredients")}</h3>
-          <div class="flex flex-wrap gap-1.5">
-            ${food.ingredients.map(ing => `
-              <span class="px-2.5 py-1 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface dark:text-gray-200 font-medium">
-                ${trHtml(ing)}
-              </span>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- Vitamins & Minerals Section -->
-        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="flex items-center gap-1.5">
-                <h3 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">${trHtml("Vitamins & Minerals")}</h3>
-                <span class="px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] font-extrabold">${trHtml("DEMO")}</span>
-              </div>
-              <p class="text-[10px] text-on-surface-variant dark:text-gray-400 mt-0.5">${trHtml("Key nutrient highlights")}</p>
-            </div>
-            
-            <button 
-              type="button" 
-              onclick="window.openNutrientsFromScanned()" 
-              class="px-2.5 py-1 rounded-xl bg-primary/10 text-primary dark:text-primary-container text-xs font-bold hover:bg-primary/20 active:scale-95 transition-all flex items-center gap-1"
-            >
-              <span>${trHtml("View All Nutrients")}</span>
-              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-            </button>
-          </div>
-
-          <!-- Nutrient Highlights (4-6 items) -->
-          <div class="ui-number-grid grid grid-cols-2 gap-2">
-            ${highlights.map(n => {
-              const dv = n.dailyValuePercent;
-              const progressWidth = dv !== null && dv !== undefined ? Math.min(100, Math.max(0, dv)) : 0;
-              return `
-                <div class="p-2.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex flex-col gap-1.5">
-                  <div class="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <span class="font-heading font-bold text-xs text-on-surface dark:text-white block leading-tight">${trHtml(n.name)}</span>
-                      <span class="ui-number text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${formatDisplayNumber(n.amount, 4)} ${trHtml(n.unit)}</span>
-                    </div>
-                    ${dv !== null && dv !== undefined ? `
-                      <span class="ui-number text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary dark:text-primary-container">
-                        ${formatDisplayNumber(dv, 1)}${trHtml("% DV")}
-                      </span>
-                    ` : ''}
-                  </div>
-
-                  ${dv !== null && dv !== undefined ? `
-                    <div 
-                      class="w-full h-1 rounded-full bg-surface-container-lowest dark:bg-dark-surface-card overflow-hidden"
-                      role="progressbar"
-                      aria-valuenow="${progressWidth}"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                      aria-label="${trHtml(n.name)} ${formatDisplayNumber(dv, 1)} ${trHtml("percent daily value")}"
-                    >
-                      <div class="h-full rounded-full bg-primary" style="width: ${progressWidth}%;"></div>
-                    </div>
-                  ` : ''}
-
-                  <div class="flex items-center justify-between text-[9px] text-on-surface-variant dark:text-gray-400 pt-0.5">
-                    <span class="uppercase tracking-wider font-semibold">${trHtml(n.source || 'estimate')}</span>
-                    ${n.confidence ? `<span>${Math.round(n.confidence * 100)}${trHtml("% conf")}</span>` : ''}
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-
-          <!-- Demo Disclaimer Notice -->
-          <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-2 text-[10px] text-amber-800 dark:text-amber-300">
-            <span class="material-symbols-outlined text-[15px] shrink-0">info</span>
-            <span>${trHtml("Sample nutrient data for UI preview. Analysis API is not connected yet.")}</span>
-          </div>
-        </div>
-
-        <!-- Meal Type Selector -->
-        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-2">
-          <h3 class="font-heading text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-gray-400">${trHtml("Assign to Meal")}</h3>
-          
-          <div class="grid grid-cols-4 gap-2 mt-1">
-            ${(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(type => `
-              <button 
-                id="meal-btn-${type}" 
-                onclick="window.selectedMealType = ${htmlJsArg(type)}; document.querySelectorAll('[id^=meal-btn-]').forEach(b => b.classList.replace('bg-primary', 'bg-surface-container-low')); this.classList.replace('bg-surface-container-low', 'bg-primary');"
-                class="py-2 px-1 text-center rounded-xl text-xs font-bold capitalize transition-all border border-outline-variant/30 ${type === food.suggestedMealType ? 'bg-primary text-white' : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface dark:text-gray-300'}"
-              >
-                ${trHtml(type)}
-              </button>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- Primary Confirm Action Button -->
-        <div class="pt-2">
-          <button 
-            onclick="window.logCurrentFood()" 
-            class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-heading text-base font-bold shadow-glow-primary hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
-          >
-            <span class="material-symbols-outlined text-[22px]">check_circle</span>
-            <span>${trHtml("Log Meal to Daily Diary")}</span>
-          </button>
-        </div>
-
-      </main>
-
-    </div>
-  `;
+        <p class="phasic-tool-muted text-sm">${trHtml(special ? 'Today’s strict fat allowance after this meal' : 'Today’s fat allowance after this meal')}</p>
+        <p id="scan-fat-balance" class="font-heading font-bold" aria-live="polite">${fatBalance === null ? trHtml('Add total fat to preview today’s allowance.') : trHtml(fatBalance < 0 ? '{0} g over the ceiling' : '{0} g remaining', formatDisplayNumber(Math.abs(fatBalance)))}</p>
+        <p class="phasic-tool-muted text-sm">${trHtml('Unknown fat in other logged meals may reduce the remaining allowance.')}</p>
+        <p id="scan-review-consistency" class="food-scan-caution text-sm empty:hidden" role="status"></p>
+      </section>
+      <p id="scan-review-error" class="phasic-tool-error text-sm empty:hidden" role="alert" tabindex="-1"></p>
+      <button id="scan-save-meal" type="button" class="ui-primary-button" onclick="window.scanSaveReviewedMeal()" ${validateScanReview(review) ? 'disabled' : ''}>${trHtml('Confirm and log today’s meal')}</button>
+      <p class="phasic-tool-muted text-sm leading-relaxed">${trHtml('Saves one meal with the reviewed totals and analysis history in your encrypted vault. Check the save indicator for storage completion.')}</p>
+    </div>`;
 }

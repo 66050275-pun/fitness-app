@@ -17,7 +17,7 @@ export interface QuickAddAction {
   readonly icon: string;
   readonly label: string;
   readonly description: string;
-  readonly badge?: 'Simulation' | 'Prototype';
+  readonly badge?: 'Setup pending' | 'Prototype';
 }
 
 /** Six standard destinations plus a separate full-width More entry. */
@@ -27,7 +27,7 @@ export const QUICK_ADD_ACTIONS: readonly QuickAddAction[] = [
     icon: 'photo_camera',
     label: 'Scan Food',
     description: 'Identify a meal with your camera',
-    badge: 'Simulation',
+    badge: 'Setup pending',
   },
   {
     id: 'scan-barcode',

@@ -1,4 +1,5 @@
 import { trHtml } from '../../i18n/index.ts';
+import { getFoodAnalysisBackend } from '../../services/foodAnalysisBackend.ts';
 import { store } from '../../store/appState';
 import { QUICK_ADD_ACTIONS, type QuickAddAction } from './quickAddActions';
 import {
@@ -10,6 +11,7 @@ import { renderPhasicRecompTool } from '../PhasicTools/PhasicRecompTools';
 
 /** Icons and routes come exclusively from the app-owned action definitions. */
 function renderAction(action: QuickAddAction): string {
+  const badge = action.id === 'scan-food' && getFoodAnalysisBackend() ? undefined : action.badge;
   return `
     <button
       type="button"
@@ -22,7 +24,7 @@ function renderAction(action: QuickAddAction): string {
         <span class="material-symbols-outlined">${action.icon}</span>
       </span>
       <span class="quick-add-action-label">${trHtml(action.label)}</span>
-      ${action.badge ? `<span class="quick-add-action-badge">${trHtml(action.badge)}</span>` : ''}
+      ${badge ? `<span class="quick-add-action-badge">${trHtml(badge)}</span>` : ''}
       <span id="quick-add-description-${action.id}" class="sr-only">${trHtml(action.description)}</span>
     </button>
   `;

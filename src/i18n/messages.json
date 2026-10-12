@@ -8854,5 +8854,409 @@
   "No supported loaded workouts": {
     "en": "No supported loaded workouts",
     "th": "ยังไม่มีการฝึกแบบนับครั้งที่ใช้น้ำหนักและรองรับการคำนวณ"
+  },
+  "Invalid food analysis response.": {
+    "en": "Invalid food analysis response.",
+    "th": "ข้อมูลผลวิเคราะห์อาหารไม่ถูกต้อง"
+  },
+  "Enter valid, non-negative nutrition values.": {
+    "en": "Enter valid, non-negative nutrition values.",
+    "th": "กรอกสารอาหารเป็นตัวเลขที่ถูกต้องและไม่ติดลบ"
+  },
+  "Cooking fat must be part of the total fat.": {
+    "en": "Cooking fat must be part of the total fat.",
+    "th": "ไขมันจากการปรุงต้องรวมอยู่ในไขมันทั้งหมดและไม่เกินไขมันรวม"
+  },
+  "Add a food name and serving description.": {
+    "en": "Add a food name and serving description.",
+    "th": "กรอกชื่ออาหารและรายละเอียดหน่วยบริโภค"
+  },
+  "Enter the calories before saving this meal.": {
+    "en": "Enter the calories before saving this meal.",
+    "th": "กรอกแคลอรีก่อนบันทึกมื้ออาหารนี้"
+  },
+  "Choose a meal interval.": {
+    "en": "Choose a meal interval.",
+    "th": "เลือกมื้ออาหาร"
+  },
+  "This photo could not be opened. Try another image.": {
+    "en": "This photo could not be opened. Try another image.",
+    "th": "เปิดรูปนี้ไม่ได้ ลองเลือกรูปอื่น"
+  },
+  "Choose a JPEG, PNG or WebP photo.": {
+    "en": "Choose a JPEG, PNG or WebP photo.",
+    "th": "เลือกรูปชนิด JPEG, PNG หรือ WebP"
+  },
+  "Choose a photo smaller than 12 MB.": {
+    "en": "Choose a photo smaller than 12 MB.",
+    "th": "เลือกรูปที่มีขนาดไม่เกิน 12 MB"
+  },
+  "This photo is too large to process. Choose a smaller image.": {
+    "en": "This photo is too large to process. Choose a smaller image.",
+    "th": "รูปนี้ใหญ่เกินกว่าจะประมวลผลได้ กรุณาเลือกรูปขนาดเล็กลง"
+  },
+  "Add total fat to preview today’s allowance.": {
+    "en": "Add total fat to preview today’s allowance.",
+    "th": "กรอกไขมันรวมเพื่อดูโควตาไขมันที่เหลือวันนี้"
+  },
+  "Not estimated": {
+    "en": "Not estimated",
+    "th": "ยังไม่มีค่าประมาณ"
+  },
+  "{0} g included in total fat": {
+    "en": "{0} g included in total fat",
+    "th": "รวมอยู่ในไขมันทั้งหมด {0} กรัม"
+  },
+  "Calories and macros differ considerably. Review the values before saving.": {
+    "en": "Calories and macros differ considerably. Review the values before saving.",
+    "th": "แคลอรีกับสารอาหารหลักต่างกันมาก กรุณาตรวจสอบก่อนบันทึก"
+  },
+  "Enter a cooking-fat estimate within the total fat allowance.": {
+    "en": "Enter a cooking-fat estimate within the total fat allowance.",
+    "th": "กรอกไขมันจากการปรุงให้ถูกต้อง โดยต้องเป็นส่วนหนึ่งของไขมันรวม"
+  },
+  "AI analysis is awaiting backend setup.": {
+    "en": "AI analysis is awaiting backend setup.",
+    "th": "การวิเคราะห์ AI กำลังรอเชื่อมต่อบริการ"
+  },
+  "Confirm photo processing before analysis.": {
+    "en": "Confirm photo processing before analysis.",
+    "th": "ยืนยันการส่งรูปเพื่อประมวลผลก่อนวิเคราะห์"
+  },
+  "Analysis took too long. Retry or enter the meal manually.": {
+    "en": "Analysis took too long. Retry or enter the meal manually.",
+    "th": "การวิเคราะห์ใช้เวลานานเกินไป ลองใหม่หรือกรอกข้อมูลมื้ออาหารเอง"
+  },
+  "The analysis returned incomplete or invalid data. Retry or enter the meal manually.": {
+    "en": "The analysis returned incomplete or invalid data. Retry or enter the meal manually.",
+    "th": "ผลวิเคราะห์มีข้อมูลไม่ครบหรือไม่ถูกต้อง ลองใหม่หรือกรอกข้อมูลเอง"
+  },
+  "Food analysis failed. Retry or enter the meal manually.": {
+    "en": "Food analysis failed. Retry or enter the meal manually.",
+    "th": "วิเคราะห์อาหารไม่สำเร็จ ลองใหม่หรือกรอกข้อมูลเอง"
+  },
+  "Review your meal before logging it.": {
+    "en": "Review your meal before logging it.",
+    "th": "ตรวจสอบมื้ออาหารก่อนบันทึก"
+  },
+  "Scanner mode": {
+    "en": "Scanner mode",
+    "th": "โหมดการสแกน"
+  },
+  "Food photo": {
+    "en": "Food photo",
+    "th": "รูปอาหาร"
+  },
+  "Food photo preview": {
+    "en": "Food photo preview",
+    "th": "ตัวอย่างรูปอาหาร"
+  },
+  "Selected food photo": {
+    "en": "Selected food photo",
+    "th": "รูปอาหารที่เลือก"
+  },
+  "Start with a food photo": {
+    "en": "Start with a food photo",
+    "th": "เริ่มด้วยรูปอาหาร"
+  },
+  "Keep the whole portion visible and use good lighting.": {
+    "en": "Keep the whole portion visible and use good lighting.",
+    "th": "ถ่ายให้เห็นอาหารทั้งจานและใช้แสงที่เพียงพอ"
+  },
+  "Preparing photo locally…": {
+    "en": "Preparing photo locally…",
+    "th": "กำลังเตรียมรูปบนอุปกรณ์…"
+  },
+  "Analyzing food and cooking fats…": {
+    "en": "Analyzing food and cooking fats…",
+    "th": "กำลังวิเคราะห์อาหารและไขมันจากการปรุง…"
+  },
+  "Take photo": {
+    "en": "Take photo",
+    "th": "ถ่ายรูป"
+  },
+  "Choose photo": {
+    "en": "Choose photo",
+    "th": "เลือกรูป"
+  },
+  "AI food analysis": {
+    "en": "AI food analysis",
+    "th": "วิเคราะห์อาหารด้วย AI"
+  },
+  "Your photo will be processed by {0}.": {
+    "en": "Your photo will be processed by {0}.",
+    "th": "รูปของคุณจะได้รับการประมวลผลโดย {0}"
+  },
+  "You can prepare a photo and enter nutrition yourself. AI results will become available when the service is connected.": {
+    "en": "You can prepare a photo and enter nutrition yourself. AI results will become available when the service is connected.",
+    "th": "คุณเตรียมรูปและกรอกสารอาหารเองได้ ผล AI จะพร้อมใช้เมื่อเชื่อมต่อบริการแล้ว"
+  },
+  "Photos stay in memory for this scan and are discarded when you leave or lock the app. Saved meals contain nutrition results, not photos.": {
+    "en": "Photos stay in memory for this scan and are discarded when you leave or lock the app. Saved meals contain nutrition results, not photos.",
+    "th": "แอปเก็บรูปไว้ในหน่วยความจำระหว่างสแกน และล้างเมื่อออกจากหน้าสแกนหรือล็อกแอป มื้อที่บันทึกจะเก็บผลโภชนาการโดยไม่เก็บรูป"
+  },
+  "I agree to send this food photo for analysis.": {
+    "en": "I agree to send this food photo for analysis.",
+    "th": "ฉันยินยอมให้ส่งรูปอาหารนี้เพื่อวิเคราะห์"
+  },
+  "Analyze this photo": {
+    "en": "Analyze this photo",
+    "th": "วิเคราะห์รูปนี้"
+  },
+  "Review current result": {
+    "en": "Review current result",
+    "th": "ตรวจสอบผลปัจจุบัน"
+  },
+  "Enter nutrition manually": {
+    "en": "Enter nutrition manually",
+    "th": "กรอกสารอาหารเอง"
+  },
+  "Discard photo and result": {
+    "en": "Discard photo and result",
+    "th": "ล้างรูปและผลวิเคราะห์"
+  },
+  "Photo analysis estimates portions and cooking fats. Check the values before saving; hidden oil quantities may be uncertain.": {
+    "en": "Photo analysis estimates portions and cooking fats. Check the values before saving; hidden oil quantities may be uncertain.",
+    "th": "การวิเคราะห์รูปเป็นการประมาณหน่วยบริโภคและไขมันจากการปรุง กรุณาตรวจสอบก่อนบันทึก เพราะปริมาณน้ำมันแฝงอาจไม่แน่นอน"
+  },
+  "Food scan review": {
+    "en": "Food scan review",
+    "th": "ตรวจสอบผลสแกนอาหาร"
+  },
+  "No food analysis to review": {
+    "en": "No food analysis to review",
+    "th": "ยังไม่มีผลวิเคราะห์อาหารให้ตรวจสอบ"
+  },
+  "One confirmed meal updates your daily totals.": {
+    "en": "One confirmed meal updates your daily totals.",
+    "th": "ยืนยันมื้ออาหารครั้งเดียวเพื่ออัปเดตยอดรวมของวัน"
+  },
+  "Manual nutrition entry": {
+    "en": "Manual nutrition entry",
+    "th": "สารอาหารที่กรอกเอง"
+  },
+  "Demo estimate": {
+    "en": "Demo estimate",
+    "th": "ค่าตัวอย่าง"
+  },
+  "Analysis confidence: {0}%": {
+    "en": "Analysis confidence: {0}%",
+    "th": "ความมั่นใจในการวิเคราะห์: {0}%"
+  },
+  "Enter nutrition for the entire portion. Blank macro values stay unknown.": {
+    "en": "Enter nutrition for the entire portion. Blank macro values stay unknown.",
+    "th": "กรอกสารอาหารสำหรับหน่วยบริโภคทั้งหมด ช่องสารอาหารที่เว้นว่างจะคงสถานะไม่ทราบ"
+  },
+  "Check the portion, nutrition and cooking-fat assumptions before saving.": {
+    "en": "Check the portion, nutrition and cooking-fat assumptions before saving.",
+    "th": "ตรวจสอบหน่วยบริโภค สารอาหาร และข้อสันนิษฐานเรื่องไขมันจากการปรุงก่อนบันทึก"
+  },
+  "Food and portion": {
+    "en": "Food and portion",
+    "th": "อาหารและหน่วยบริโภค"
+  },
+  "Food name": {
+    "en": "Food name",
+    "th": "ชื่ออาหาร"
+  },
+  "Serving description": {
+    "en": "Serving description",
+    "th": "รายละเอียดหน่วยบริโภค"
+  },
+  "All nutrition values below describe this entire portion.": {
+    "en": "All nutrition values below describe this entire portion.",
+    "th": "สารอาหารทั้งหมดด้านล่างเป็นค่าของหน่วยบริโภคนี้ทั้งส่วน"
+  },
+  "Estimated portion weight: {0} g": {
+    "en": "Estimated portion weight: {0} g",
+    "th": "น้ำหนักหน่วยบริโภคโดยประมาณ: {0} กรัม"
+  },
+  "Review nutrition": {
+    "en": "Review nutrition",
+    "th": "ตรวจสอบสารอาหาร"
+  },
+  "Total fat (g)": {
+    "en": "Total fat (g)",
+    "th": "ไขมันรวม (กรัม)"
+  },
+  "Total fat already includes the cooking-fat estimate. Adjust the portion and totals together if needed.": {
+    "en": "Total fat already includes the cooking-fat estimate. Adjust the portion and totals together if needed.",
+    "th": "ไขมันรวมมีค่าประมาณไขมันจากการปรุงอยู่แล้ว หากเปลี่ยนหน่วยบริโภคให้ปรับยอดสารอาหารตามด้วย"
+  },
+  "Cooking fat is part of the meal’s total fat.": {
+    "en": "Cooking fat is part of the meal’s total fat.",
+    "th": "ไขมันจากการปรุงเป็นส่วนหนึ่งของไขมันรวมในมื้ออาหาร"
+  },
+  "AI cooking-fat estimate: {0} g": {
+    "en": "AI cooking-fat estimate: {0} g",
+    "th": "ไขมันจากการปรุงที่ AI ประมาณ: {0} กรัม"
+  },
+  "Cooking fat was not estimated. You may enter the included amount yourself.": {
+    "en": "Cooking fat was not estimated. You may enter the included amount yourself.",
+    "th": "ยังไม่มีค่าประมาณไขมันจากการปรุง คุณระบุส่วนที่รวมอยู่ในไขมันทั้งหมดเองได้"
+  },
+  "Estimated range: {0}–{1} g": {
+    "en": "Estimated range: {0}–{1} g",
+    "th": "ช่วงที่ประมาณ: {0}–{1} กรัม"
+  },
+  "Cooking-fat confidence: {0}%": {
+    "en": "Cooking-fat confidence: {0}%",
+    "th": "ความมั่นใจเรื่องไขมันจากการปรุง: {0}%"
+  },
+  "Likely cooking-fat sources": {
+    "en": "Likely cooking-fat sources",
+    "th": "แหล่งไขมันจากการปรุงที่คาดการณ์"
+  },
+  "Analysis assumptions": {
+    "en": "Analysis assumptions",
+    "th": "ข้อสันนิษฐานในการวิเคราะห์"
+  },
+  "Cooking fat included in total (g)": {
+    "en": "Cooking fat included in total (g)",
+    "th": "ไขมันจากการปรุงที่รวมอยู่แล้ว (กรัม)"
+  },
+  "Adjust cooking-fat estimate": {
+    "en": "Adjust cooking-fat estimate",
+    "th": "ปรับค่าประมาณไขมันจากการปรุง"
+  },
+  "Less oil": {
+    "en": "Less oil",
+    "th": "น้ำมันน้อย"
+  },
+  "Original estimate": {
+    "en": "Original estimate",
+    "th": "ค่าเดิม"
+  },
+  "More oil": {
+    "en": "More oil",
+    "th": "น้ำมันมาก"
+  },
+  "Changing a known cooking-fat amount adjusts total fat by the difference and calories by 9 kcal per gram. When no amount is known, enter total fat first and identify the included part.": {
+    "en": "Changing a known cooking-fat amount adjusts total fat by the difference and calories by 9 kcal per gram. When no amount is known, enter total fat first and identify the included part.",
+    "th": "การเปลี่ยนค่าไขมันจากการปรุงที่ทราบแล้วจะปรับไขมันรวมตามส่วนต่าง และปรับพลังงาน 9 kcal ต่อกรัม หากยังไม่ทราบค่า ให้กรอกไขมันรวมก่อนแล้วระบุส่วนที่เป็นไขมันจากการปรุง"
+  },
+  "Cooking-fat adjustments are available in Special Program.": {
+    "en": "Cooking-fat adjustments are available in Special Program.",
+    "th": "ปรับไขมันจากการปรุงได้เมื่อเปิดใช้โปรแกรมพิเศษ"
+  },
+  "Meal totals to save": {
+    "en": "Meal totals to save",
+    "th": "ยอดสารอาหารที่จะบันทึก"
+  },
+  "Today’s strict fat allowance after this meal": {
+    "en": "Today’s strict fat allowance after this meal",
+    "th": "โควตาไขมันแบบจำกัดที่เหลือวันนี้หลังมื้อนี้"
+  },
+  "Today’s fat allowance after this meal": {
+    "en": "Today’s fat allowance after this meal",
+    "th": "โควตาไขมันที่เหลือวันนี้หลังมื้อนี้"
+  },
+  "Unknown fat in other logged meals may reduce the remaining allowance.": {
+    "en": "Unknown fat in other logged meals may reduce the remaining allowance.",
+    "th": "ไขมันที่ยังไม่ทราบค่าในมื้ออื่นอาจทำให้โควตาที่เหลือจริงน้อยลง"
+  },
+  "Confirm and log today’s meal": {
+    "en": "Confirm and log today’s meal",
+    "th": "ยืนยันและบันทึกมื้ออาหารวันนี้"
+  },
+  "Saves one meal with the reviewed totals and analysis history in your encrypted vault. Check the save indicator for storage completion.": {
+    "en": "Saves one meal with the reviewed totals and analysis history in your encrypted vault. Check the save indicator for storage completion.",
+    "th": "บันทึกมื้ออาหารหนึ่งรายการพร้อมยอดที่ตรวจสอบและประวัติการวิเคราะห์ในคลังเข้ารหัส ดูสถานะการบันทึกเพื่อยืนยันว่าเก็บข้อมูลสำเร็จ"
+  },
+  "Scan a meal, review likely cooking fats, and confirm the full nutrition before logging it.": {
+    "en": "Scan a meal, review likely cooking fats, and confirm the full nutrition before logging it.",
+    "th": "สแกนอาหาร ตรวจสอบไขมันจากการปรุงที่คาดการณ์ และยืนยันสารอาหารทั้งหมดก่อนบันทึก"
+  },
+  "Scan food and review cooking fat": {
+    "en": "Scan food and review cooking fat",
+    "th": "สแกนอาหารและตรวจสอบไขมันจากการปรุง"
+  },
+  "AI analysis is awaiting backend setup. You can prepare a photo and enter nutrition manually.": {
+    "en": "AI analysis is awaiting backend setup. You can prepare a photo and enter nutrition manually.",
+    "th": "การวิเคราะห์ AI กำลังรอเชื่อมต่อบริการ คุณเตรียมรูปและกรอกสารอาหารเองได้"
+  },
+  "Today’s reviewed food scans": {
+    "en": "Today’s reviewed food scans",
+    "th": "ผลสแกนอาหารที่ตรวจสอบและบันทึกวันนี้"
+  },
+  "Total fat: {0} g": {
+    "en": "Total fat: {0} g",
+    "th": "ไขมันรวม: {0} กรัม"
+  },
+  "Cooking fat: not estimated": {
+    "en": "Cooking fat: not estimated",
+    "th": "ไขมันจากการปรุง: ยังไม่มีค่าประมาณ"
+  },
+  "{0} g cooking fat included": {
+    "en": "{0} g cooking fat included",
+    "th": "มีไขมันจากการปรุงรวมอยู่ {0} กรัม"
+  },
+  "View saved analysis": {
+    "en": "View saved analysis",
+    "th": "ดูผลวิเคราะห์ที่บันทึก"
+  },
+  "No reviewed food scans logged today.": {
+    "en": "No reviewed food scans logged today.",
+    "th": "วันนี้ยังไม่มีผลสแกนอาหารที่ตรวจสอบและบันทึก"
+  },
+  "Manual extra-fat estimate": {
+    "en": "Manual extra-fat estimate",
+    "th": "ประมาณไขมันที่ตกหล่นด้วยตัวเอง"
+  },
+  "Use these additions only for fat missing from another meal. Reviewed scan totals already include their cooking fat.": {
+    "en": "Use these additions only for fat missing from another meal. Reviewed scan totals already include their cooking fat.",
+    "th": "ใช้ส่วนเพิ่มนี้เฉพาะไขมันที่ตกหล่นจากมื้ออื่น ยอดของผลสแกนที่ตรวจสอบแล้วมีไขมันจากการปรุงรวมอยู่แล้ว"
+  },
+  "Review cooking-fat estimates from food scans before logging.": {
+    "en": "Review cooking-fat estimates from food scans before logging.",
+    "th": "ตรวจสอบไขมันจากการปรุงในผลสแกนอาหารก่อนบันทึก"
+  },
+  "Setup pending": {
+    "en": "Setup pending",
+    "th": "รอเชื่อมต่อ"
+  },
+  "Saved scan analysis": {
+    "en": "Saved scan analysis",
+    "th": "ผลวิเคราะห์จากการสแกนที่บันทึก"
+  },
+  "Cooking fat is included in the recorded total, with no separate addition.": {
+    "en": "Cooking fat is included in the recorded total, with no separate addition.",
+    "th": "ไขมันจากการปรุงรวมอยู่ในยอดที่บันทึกแล้ว โดยไม่มีรายการเพิ่มแยก"
+  },
+  "Original AI total fat: {0} g": {
+    "en": "Original AI total fat: {0} g",
+    "th": "ไขมันรวมที่ AI ประมาณเดิม: {0} กรัม"
+  },
+  "Original AI cooking fat: {0} g": {
+    "en": "Original AI cooking fat: {0} g",
+    "th": "ไขมันจากการปรุงที่ AI ประมาณเดิม: {0} กรัม"
+  },
+  "Edited before saving: {0}": {
+    "en": "Edited before saving: {0}",
+    "th": "แก้ไขก่อนบันทึก: {0}"
+  },
+  "AI ESTIMATE": {
+    "en": "AI ESTIMATE",
+    "th": "ประมาณจาก AI"
+  },
+  "MANUAL": {
+    "en": "MANUAL",
+    "th": "กรอกเอง"
+  },
+  "Original AI portion: {0}": {
+    "en": "Original AI portion: {0}",
+    "th": "หน่วยบริโภคที่ AI วิเคราะห์เดิม: {0}"
+  },
+  "Original estimate and saved nutrition": {
+    "en": "Original estimate and saved nutrition",
+    "th": "ค่าประมาณเดิมและสารอาหารที่บันทึก"
+  },
+  "Nutrient": {
+    "en": "Nutrient",
+    "th": "สารอาหาร"
+  },
+  "Micronutrients refer to the original analyzed portion and were not rescaled after editing.": {
+    "en": "Micronutrients refer to the original analyzed portion and were not rescaled after editing.",
+    "th": "สารอาหารรองอ้างอิงหน่วยบริโภคที่วิเคราะห์เดิม โดยไม่ได้ปรับสัดส่วนหลังแก้ไข"
   }
 }

@@ -29,6 +29,8 @@ import { activatePhasicTools, bindPhasicToolHandlers, deactivatePhasicTools, ref
 import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
 import { renderFoodResultScreen } from './screens/FoodResultScreen';
+import { activateFoodScanner, bindFoodScanHandlers, deactivateFoodScanner, refreshFoodScanFeedback, syncFoodScanLifecycle } from './screens/foodScanController.ts';
+import { getTodayKey } from './utils/dateUtils.ts';
 import { renderDiaryScreen } from './screens/DiaryScreen';
 import { renderAICoachScreen } from './screens/AICoachScreen';
 import { renderFitnessScreen } from './screens/FitnessScreen';
@@ -95,6 +97,8 @@ declare global {
     removeWater: (dateKey?: string) => void;
     deleteMeal: (id: string) => void;
     logCurrentFood: () => void;
+    phasicStartFoodScan: () => void;
+    phasicOpenScanMeal: (id: string) => void;
     toggleQuickActions: (open?: boolean) => void;
     toggleDashboardWidgetDrawer: (open?: boolean) => void;
     moveDashboardWidget: (widgetId: DashboardWidgetId, direction: -1 | 1) => void;
@@ -362,46 +366,8 @@ window.deleteMeal = (id: string) => {
   store.deleteMeal(id);
 };
 
-window.logCurrentFood = () => {
-  const { lastScannedFood } = store.getState();
-  if (!lastScannedFood) {
-    store.setScreen('diary');
-    return;
-  }
-
-  const foodDef: FoodDefinition = {
-    id: `scanned-${lastScannedFood.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-    name: lastScannedFood.name,
-    brand: lastScannedFood.subtitle,
-    category: 'Scanned Food',
-    source: 'demo',
-    nutritionBasis: {
-      amount: 1,
-      unit: 'serving',
-      servingDescription: '1 prepared serving'
-    },
-    nutrition: {
-      calories: lastScannedFood.calories,
-      protein: lastScannedFood.protein,
-      carbs: lastScannedFood.carbs,
-      fat: lastScannedFood.fat,
-      micronutrients: lastScannedFood.micronutrients
-    },
-    portionOptions: [
-      { id: 'scanned-1s', label: tr("1 serving"), unit: 'serving', dimension: 'serving', quantity: 1, equivalentBaseAmount: 1, equivalentBaseUnit: 'g' },
-      { id: 'scanned-half', label: tr("0.5 serving"), unit: 'serving', dimension: 'serving', quantity: 0.5, equivalentBaseAmount: 0.5, equivalentBaseUnit: 'g' },
-      { id: 'scanned-double', label: tr("2 servings"), unit: 'serving', dimension: 'serving', quantity: 2, equivalentBaseAmount: 2, equivalentBaseUnit: 'g' }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  store.openSetPortion(
-    foodDef,
-    { quantity: 1, unit: 'serving' },
-    window.selectedMealType || lastScannedFood.suggestedMealType
-  );
-};
+// Existing callers now confirm the same reviewed, portion-specific diary entry.
+window.logCurrentFood = () => window.scanSaveReviewedMeal();
 
 window.toggleQuickActions = (open?: boolean) => {
   window.toggleQuickAdd(open);
@@ -824,6 +790,18 @@ window.openScannerMode = (mode: 'food' | 'barcode') => {
   store.openScannerMode(mode);
 };
 
+window.phasicStartFoodScan = () => {
+  const state = store.getState();
+  if (!state.quickAddOpen || state.selectedSpecialProgramTool !== 'hidden-fat-scanner' || !store.isSpecialProgramUnlocked()) return;
+  screenTransitions.dismissDialog('quick-add-backdrop', () => store.openScannerMode('food'), true);
+};
+window.phasicOpenScanMeal = id => {
+  const state = store.getState();
+  if (!state.quickAddOpen || state.selectedSpecialProgramTool !== 'hidden-fat-scanner' || !store.isSpecialProgramUnlocked()
+    || !store.getMealsForDate(getTodayKey()).some(meal => meal.id === id && meal.scanAnalysis)) return;
+  screenTransitions.dismissDialog('quick-add-backdrop', () => { store.closeQuickAdd(); store.openMealDetail(id); }, true);
+};
+
 // ==========================================
 // FOOD SEARCH, PORTIONS & RECENT FOOD BINDINGS
 // ==========================================
@@ -941,18 +919,15 @@ window.addAgainMeal = (mealId: string) => {
       id: meal.foodId || `legacy-${meal.id}`,
       name: meal.name,
       category: meal.category,
-      source: (meal.foodSource === 'quick_log' ? 'custom' : meal.foodSource) || 'custom',
+      source: (meal.foodSource === 'quick_log' || meal.foodSource === 'ai_estimate' ? 'custom' : meal.foodSource) || 'custom',
       nutritionBasis: {
         amount: meal.portion?.quantity || 1,
         unit: (meal.portion?.unit === 'g' || meal.portion?.unit === 'ml' ? meal.portion.unit : 'serving') as 'g' | 'ml' | 'serving',
         servingDescription: meal.portion?.servingDescription || tr("1 serving")
       },
       nutrition: {
-        calories: meal.calories,
-        protein: meal.protein,
-        carbs: meal.carbs,
-        fat: meal.fat,
-        micronutrients: meal.micronutrients
+        ...meal.nutritionSnapshot,
+        micronutrients: meal.nutritionSnapshot.micronutrients ?? meal.micronutrients
       },
       portionOptions: [
         {
@@ -1907,6 +1882,7 @@ window.executeProfileConfirmModalAction = () => {
 // ==========================================
 bindOnboardingHandlers();
 bindPhasicToolHandlers();
+bindFoodScanHandlers();
 
 window.handleProfilePhotoSelected = async (input: HTMLInputElement) => {
   const file = input.files?.[0];
@@ -2072,6 +2048,7 @@ function renderApp() {
   const app = document.getElementById('app');
   if (!app) return;
 
+  syncFoodScanLifecycle();
   const state = store.getState();
   const { currentScreen, fitnessSubView } = state;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', state.theme === 'dark' ? '#121e19' : '#effdf4');
@@ -2202,6 +2179,7 @@ function renderApp() {
 
   if (currentScreen === 'onboarding') refreshOnboardingFeedback();
   refreshPhasicToolFeedback();
+  refreshFoodScanFeedback();
 
   if (currentScreen === 'coach') {
     const container = document.getElementById('chat-messages-container');
@@ -2215,8 +2193,9 @@ function renderApp() {
 void startPrivateApp(() => {
   initializeStore();
   activatePhasicTools();
+  activateFoodScanner();
   store.subscribe(renderApp);
   store.subscribeWorkoutTimer(updateRestTimerDisplay);
   store.subscribeFoodSearch(updateFoodSearchContent);
   renderApp();
-}, () => { deactivatePhasicTools(); screenTransitions.reset(); resetSpecialProgramToolCallbacks(); disposeStore(); });
+}, () => { deactivateFoodScanner(); deactivatePhasicTools(); screenTransitions.reset(); resetSpecialProgramToolCallbacks(); disposeStore(); });

@@ -18,7 +18,7 @@ export const SPECIAL_PROGRAM_ACTIONS: readonly SpecialProgramAction[] = [
     id: 'hidden-fat-scanner',
     icon: 'manage_search',
     label: 'Hidden Fat Scanner',
-    description: 'Estimate cooking oil, coconut milk and dressing fats.',
+    description: 'Review cooking-fat estimates from food scans before logging.',
   },
   {
     id: 'protein-splitter',

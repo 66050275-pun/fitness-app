@@ -5,6 +5,7 @@ import { getTodayKey } from '../../utils/dateUtils.ts';
 import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { escapeHtml, htmlJsArg } from '../../utils/sanitize.ts';
 import type { HiddenFatEstimateCounts, MealType } from '../../types/index.ts';
+import { getFoodAnalysisBackend } from '../../services/foodAnalysisBackend.ts';
 
 const PRESET_ICONS = { oil: 'water_drop', coconut: 'local_drink', dressing: 'restaurant' } as const;
 
@@ -37,14 +38,32 @@ export function renderHiddenFatScanner(): string {
   const meals = store.getMealsForDate(today);
   const goals = store.getEffectiveNutritionGoals(today);
   const savedEstimates = meals.filter(meal => meal.hiddenFatEstimate);
+  const scannedMeals = meals.filter(meal => meal.scanAnalysis);
   const gauge = getFatGauge(meals, today, goals.fatTarget, state.userProfile.dietProgram ?? 'standard', state.userProfile.currentWeightKg ?? null);
   const remaining = gauge.remainingGrams;
 
   return `
     <div class="flex flex-col gap-4">
-      <p class="phasic-tool-muted text-sm leading-relaxed">${trHtml('Estimate extra cooking fat that your logged meal may not include.')}</p>
+      <p class="phasic-tool-muted text-sm leading-relaxed">${trHtml('Scan a meal, review likely cooking fats, and confirm the full nutrition before logging it.')}</p>
+      <button type="button" class="ui-primary-button" onclick="window.phasicStartFoodScan()">
+        <span class="material-symbols-outlined" aria-hidden="true">photo_camera</span>${trHtml('Scan food and review cooking fat')}
+      </button>
+      ${!getFoodAnalysisBackend() ? `<p class="phasic-tool-muted text-sm">${trHtml('AI analysis is awaiting backend setup. You can prepare a photo and enter nutrition manually.')}</p>` : ''}
+      <section class="flex flex-col gap-3">
+        <h3 class="font-heading font-bold text-base">${trHtml('Today’s reviewed food scans')}</h3>
+        ${scannedMeals.length ? `<ul class="flex flex-col gap-3">${scannedMeals.map(meal => `
+          <li class="phasic-tool-card flex flex-col gap-2">
+            <p class="font-heading font-bold text-sm break-words">${escapeHtml(meal.name)}</p>
+            <p class="phasic-tool-muted text-sm">${trHtml(meal.scanAnalysis!.source === 'ai_estimate' ? 'AI estimate' : meal.scanAnalysis!.source === 'manual' ? 'Manual nutrition entry' : 'Demo estimate')} · ${trHtml(meal.mealType)}</p>
+            <p class="text-sm">${trHtml('Total fat: {0} g', formatDisplayNumber(meal.nutritionSnapshot.fat))}</p>
+            <p class="phasic-tool-muted text-sm">${meal.scanAnalysis!.reviewedCookingFatGrams === null ? trHtml('Cooking fat: not estimated')
+              : trHtml('{0} g cooking fat included', formatDisplayNumber(meal.scanAnalysis!.reviewedCookingFatGrams))}</p>
+            <button type="button" class="phasic-tool-secondary" onclick="window.phasicOpenScanMeal(${htmlJsArg(meal.id)})">${trHtml('View saved analysis')}</button>
+          </li>`).join('')}</ul>` : `<p class="phasic-tool-muted text-sm">${trHtml('No reviewed food scans logged today.')}</p>`}
+      </section>
+      <h3 class="font-heading font-bold text-base">${trHtml('Manual extra-fat estimate')}</h3>
       <div class="phasic-tool-note text-sm leading-relaxed">
-        ${trHtml('These are adjustable estimates, not a camera scan. Add only fat missing from the meal to avoid counting it twice.')}
+        ${trHtml('Use these additions only for fat missing from another meal. Reviewed scan totals already include their cooking fat.')}
       </div>
 
       <fieldset class="flex flex-col gap-3">

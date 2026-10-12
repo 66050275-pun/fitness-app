@@ -6,6 +6,8 @@ import type {
   ActiveWorkoutSessionState,
   MealItem, 
   ScannedFood, 
+  FoodScanState,
+  FoodScanReview,
   ChatMessage, 
   ActiveScreen, 
   WorkoutExercise, 
@@ -98,6 +100,7 @@ import { calculateAge, estimateBasalEnergy, estimateMaintenanceCalories, resolve
 import { NutritionPlanService } from '../services/nutritionPlanService';
 import { estimateHiddenFat, getPhaseCycleProgress } from '../services/phasicRecompService';
 import { getOnboardingTargets, getOnboardingWaterTarget, validateOnboardingDraft } from '../utils/onboardingGoals';
+import { buildScanMealAnalysis, createScanReview, resolveCookingFatDraft, reviewedNutrition, sanitizeScanMealAnalysis, validateScanReview } from '../services/foodScanService.ts';
 
 const today = getTodayKey();
 const WORKOUT_HISTORY_STORAGE_KEY = 'nutriai_workout_history';
@@ -492,6 +495,7 @@ class Store {
       meals: persisted.meals,
       chatHistory: INITIAL_CHAT,
       lastScannedFood: null,
+      foodScan: { status: 'idle', photoUrl: null, consent: false, error: null, review: null },
       quickAddOpen: false,
       quickAddView: 'primary',
       selectedSpecialProgramTool: null,
@@ -1600,7 +1604,8 @@ class Store {
       ingredients: meal.ingredients || [],
       imageUrl: meal.imageUrl,
       micronutrients: meal.micronutrients,
-      hiddenFatEstimate: sanitizeHiddenFatEstimate(meal.hiddenFatEstimate)
+      hiddenFatEstimate: sanitizeHiddenFatEstimate(meal.hiddenFatEstimate),
+      scanAnalysis: sanitizeScanMealAnalysis(meal.scanAnalysis, nutritionSnapshot.fat)
     };
 
     this.state.meals.unshift(newMeal);
@@ -1618,9 +1623,56 @@ class Store {
     this.notify();
   }
 
-  public setScannedFood(food: ScannedFood | null) {
+  public setScannedFood(food: ScannedFood | null, notify = true) {
+    if (this.disposed || !isVaultUnlocked()) return;
     this.state.lastScannedFood = food;
-    this.notify();
+    this.state.foodScan.review = food ? createScanReview(food) : null;
+    if (notify) this.notify();
+  }
+
+  public updateFoodScan(patch: Partial<FoodScanState>, notify = true): void {
+    if (this.disposed || !isVaultUnlocked()) return;
+    Object.assign(this.state.foodScan, patch);
+    if (notify) this.notify();
+  }
+
+  /** Unsaved strings stay in memory and preserve focused fields during rerenders. */
+  public updateFoodScanReview(patch: Partial<FoodScanReview>): void {
+    if (this.disposed || !isVaultUnlocked() || !this.state.foodScan.review) return;
+    Object.assign(this.state.foodScan.review, patch);
+  }
+
+  public logReviewedScannedFood(): boolean {
+    if (this.disposed || !isVaultUnlocked() || this.state.currentScreen !== 'foodResult') return false;
+    const food = this.state.lastScannedFood;
+    const draft = this.state.foodScan.review;
+    if (!food || !draft || validateScanReview(draft)) return false;
+    const review = resolveCookingFatDraft(draft);
+    if (this.state.meals.some(meal => meal.scanAnalysis?.scanId === food.scanId)) return false;
+    const nutrition = reviewedNutrition(review);
+    const analysis = buildScanMealAnalysis(food, review);
+    if (!sanitizeScanMealAnalysis(analysis, nutrition.fat)) return false;
+    const previousMeals = [...this.state.meals];
+    const accepted = this.logMeal({
+      name: review.name.trim().slice(0, 200), category: review.servingDescription.trim().slice(0, 300),
+      date: getTodayKey(), mealType: review.mealType,
+      calories: nutrition.calories ?? 0, protein: nutrition.protein ?? 0, carbs: nutrition.carbs ?? 0, fat: nutrition.fat ?? 0,
+      nutritionSnapshot: { ...nutrition, calorieSource: food.source === 'manual' || analysis.editedFields.includes('calories') ? 'manual' : food.source,
+        micronutrients: food.micronutrients },
+      portion: { foodId: `scan-${food.scanId}`, quantity: 1, unit: 'serving', baseAmount: 1, baseUnit: 'serving',
+        servingDescription: review.servingDescription.trim().slice(0, 300) },
+      foodSource: food.source === 'manual' ? 'quick_log' : food.source, confidence: food.confidence ?? undefined,
+      ingredients: food.ingredients, micronutrients: food.micronutrients, scanAnalysis: analysis, icon: 'restaurant'
+      // Photo bytes and transient object URLs are deliberately never persisted.
+    });
+    if (!accepted) {
+      this.state.meals = previousMeals;
+      this.notify();
+      return false;
+    }
+    this.state.lastScannedFood = null;
+    this.state.foodScan.review = null;
+    return true;
   }
 
   public sendChatMessage(text: string) {
@@ -3734,10 +3786,10 @@ class Store {
     sourceBadge: string;
     profile: MicronutrientProfile | undefined;
     ingredients?: string[];
-    calories?: number;
-    protein?: number;
-    carbs?: number;
-    fat?: number;
+    calories?: number | null;
+    protein?: number | null;
+    carbs?: number | null;
+    fat?: number | null;
   } | null {
     const source = this.state.activeNutrientModalSource;
     if (!source) return null;
@@ -3745,9 +3797,9 @@ class Store {
     if (source.type === 'scanned') {
       const food = this.state.lastScannedFood;
       return {
-        title: tr(food?.name || 'Scanned Food'),
-        subtitle: tr(food?.subtitle || 'Instant Lens Preview'),
-        sourceBadge: 'DEMO ESTIMATE',
+        title: food?.name || tr('Scanned Food'),
+        subtitle: food?.subtitle || tr('Food scan review'),
+        sourceBadge: food?.source === 'ai_estimate' ? 'AI ESTIMATE' : food?.source === 'manual' ? 'MANUAL' : 'DEMO ESTIMATE',
         profile: food?.micronutrients,
         ingredients: food?.ingredients,
         calories: food?.calories,
@@ -3764,7 +3816,7 @@ class Store {
       return {
         title: mealLabel(meal, meal.name),
         subtitle: tr("{0} • {1} at {2}", tr(meal.mealType), meal.date, meal.time),
-        sourceBadge: isDemo ? 'DEMO' : 'DATABASE',
+        sourceBadge: isDemo ? 'DEMO' : meal.scanAnalysis?.source === 'ai_estimate' ? 'AI ESTIMATE' : meal.scanAnalysis?.source === 'manual' ? 'MANUAL' : 'DATABASE',
         profile: meal.nutritionSnapshot?.micronutrients || meal.micronutrients,
         ingredients: meal.ingredients,
         calories: meal.calories,
