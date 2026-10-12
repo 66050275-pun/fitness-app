@@ -131,18 +131,37 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Keep selections, target weight/date and weekly pace in a memory draft until **Save Goal Settings**. Back discards the draft. Saving a standard goal locks the extension menu; saving a special goal unlocks it. Legacy profiles default to standard.
 - An activation CTA opens Goal Settings and returns to the extension menu on Save or Back. Show the saved program separately from the current draft selection.
 - Program choice uses the existing encrypted profile persistence. Tool registration, navigation and drafts remain in memory and clear when the vault locks. Keep all new labels/descriptions bilingual.
-- Protein splits, daily fat limits and phase durations in the previews are examples of planned tool functions. Selecting a program does not prescribe these values or start scans/phase tracking.
+- Protein splits, daily fat limits and phase durations in the extension previews are examples of planned tool functions. Initial onboarding can save calculated Mini Cut or Lean Bulk nutrition targets; this does not start scans, phase tracking or the six preview tools.
 
 ## Initial onboarding and target review
 
-- Use a four-step wizard in the same green, **430px maximum-width** app column: fitness objective; body metrics; daily activity; personalized target review. Present objectives and activity tiers as selectable icon cards with readable descriptions.
-- Keep a localized **Step X of 4** label and four-segment progress bar at the top. Back returns to the previous step, preserving answers. Use shared screen transitions and a sticky bottom primary action with safe-area padding; errors remain visible beside the action and affected field.
+- Start with a welcoming **Introduction (step 0)**, followed by four setup steps in the same green, **430px maximum-width** app column: fitness objective; body metrics; daily activity; personalized target review. The introduction uses original bundled SVG artwork, three short feature descriptions and a clear Let’s set your goals action.
+- Keep a localized Introduction or **Step X of 4** label and four-segment progress bar at the top. Back preserves answers, including returning from step 1 to the introduction. Use shared screen transitions and a sticky bottom primary action with safe-area padding; errors remain visible beside the action and affected field.
+- Present six objectives as selectable icon cards: **Lose Weight, Build Muscle, Maintain Weight, General Fitness, Mini Cut and Lean Bulk**. Give the last two a Special Program badge. A selection remains a draft; only final confirmation saves the matching `primaryObjective` and `dietProgram` and unlocks the extension menu for a special program.
 - Body metrics use canonical **cm / kg** inputs, an integer age (**15–100**), height (**100–250 cm**) and current/optional target weight (**30–250 kg**). Show the target-weight difference immediately. Collect age without inventing a birth date; retain an existing birth date only when it agrees with the entered age. Existing display-unit preferences remain intact.
 - Offer Male, Female and Other. Mifflin–St Jeor uses the entered metrics and one of its defined male/female equations. Other requires a manual calorie target and shows no guessed BMR or TDEE.
-- Review TDEE with a **400 kcal deficit** for Lose Weight, a **250 kcal surplus** for Build Muscle, and maintenance calories for Maintain Weight or General Fitness. Allow a whole-number calorie adjustment and reset to the estimate; explain targets that need review.
-- Display daily calories, rounded gram targets from **30% protein / 40% carbs / 30% fat**, and hydration at **32.5 ml/kg**, rounded to **50 ml**. The review is an estimate; users can change saved targets in Profile.
+- Review standard-goal TDEE with a **400 kcal deficit** for Lose Weight, a **250 kcal surplus** for Build Muscle, and maintenance calories for Maintain Weight or General Fitness. Standard macro targets remain **30% protein / 40% carbs / 30% fat**. Allow a whole-number calorie adjustment and reset to the estimate; explain targets that need review and block a special-plan budget that cannot fit its protein and fat.
+- Mini Cut uses a **25% deficit**, with configured floors of **1,200 kcal for female** and **1,500 kcal for male/Other**, **2.3 g/kg protein**, and fat at **0.65 g/kg with a 35 g minimum**. Lean Bulk onboarding uses the **intermediate +220 kcal** surplus, **1.9 g/kg protein** and approximately **25% of calories from fat**. Both use the remaining energy for carbohydrates. Floors are planning defaults, without a guarantee of individual suitability; Other still supplies calories manually rather than receiving a guessed TDEE.
+- Display hydration at **38 ml/kg for Mini Cut**, **35 ml/kg for Lean Bulk** and **32.5 ml/kg for standard goals**, all rounded to **50 ml**. Mini Cut review shows a **4-week recommendation**, **6-week maximum** and an **optional maintenance-calorie day every 7 days**. Lean Bulk shows the **0.25–0.5% bodyweight/week** gain range. These are planning summaries, not a running phase schedule.
 - Save draft answers through the encrypted vault without replacing focused inputs. Get Started validates and recalculates the final profile and targets, waits for durable storage, then opens Dashboard. Show saving and retry states accurately; a failed write keeps the review available.
-- Restart Goal Setup pre-fills a draft while retaining the confirmed profile, goals and histories until final confirmation. Returning users can choose Keep my current goals to discard that draft. First-time users complete setup before entering the main app; recording their initial weight is idempotent across save retries.
+- Restart Goal Setup opens the introduction and pre-fills a draft while retaining the confirmed profile, goals and histories until final confirmation. Returning users can choose Keep my current goals to discard that draft. First-time users complete setup before entering the main app; recording their initial weight is idempotent across save retries. Version-2 four-step and older six-step drafts retain their resume position where valid; completed users remain completed.
+- Accepting an Activity Level calorie suggestion for a saved Mini Cut or Lean Bulk recomputes calories, macros and hydration together through the shared service. Keep the saved objective and diet-program identifiers aligned across onboarding, Goal Settings and reload.
+
+### Local nutrition plan service
+
+Use `src/services/nutritionPlanService.ts` for the six public planning functions. They calculate results without network calls or storage writes; translated notes are generated for display rather than saved as user data.
+
+| Function | Planning rule |
+| --- | --- |
+| `calculateMiniCutCalories` | TDEE × 0.75, rounded to whole calories and the configured gender floor |
+| `calculateMiniCutMacros` | Rounded 2.3 g/kg protein, rounded 0.65 g/kg fat with a 35 g minimum, remaining carbohydrates |
+| `getMiniCutPlanDetails` | Mini Cut targets plus 4-week recommendation, 6-week maximum and optional 7-day maintenance interval |
+| `calculateLeanBulkCalories` | Beginner **+300**, intermediate **+220**, advanced **+150 kcal**; intermediate is the default |
+| `calculateLeanBulkMacros` | Rounded 1.9 g/kg protein, approximately 25% calorie share from rounded fat grams, remaining carbohydrates |
+| `adjustLeanBulkCalorieSurplus` | Suggest **+120 kcal** below or **−120 kcal** above the inclusive **0.25–0.5% bodyweight/week** gain range; leave the calorie target unchanged for gains within that range |
+
+- Calculate remaining carbohydrate grams by rounding down so the macro total stays within the calorie budget. An infeasible protein/fat budget returns an explicit error for review.
+- The Lean Bulk adjustment is a pure recommendation and does not watch the weight diary, change saved targets or write weight entries. Its lower bound is the app's **800 kcal input minimum**, rather than an individual nutrition recommendation. Applying a suggestion requires an explicit caller action.
 
 ## English and Thai
 
@@ -173,4 +192,5 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.
 - `src/screens/onboarding/OnboardingScreen.ts`, `onboardingController.ts` and `src/utils/onboardingGoals.ts`: four-step presentation, input lifecycle and shared target validation/calculation.
+- `src/services/nutritionPlanService.ts`: local Mini Cut and Lean Bulk calorie, macro, duration and adjustment rules.
 - `src/i18n/`: bilingual presentation helpers and messages.

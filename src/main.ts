@@ -1505,12 +1505,24 @@ window.selectActivityTier = (level: ActivityLevel, suggestedTdee: number | null)
 
   document.querySelectorAll<HTMLElement>('[id^="activity-card-"]').forEach(card => {
     card.setAttribute('aria-pressed', 'false');
+    const marker = card.querySelector<HTMLElement>('.material-symbols-outlined');
+    if (marker) {
+      marker.textContent = 'radio_button_unchecked';
+      marker.parentElement?.classList.remove('bg-primary', 'text-white');
+      marker.parentElement?.classList.add('bg-surface-container-low', 'dark:bg-dark-surface-card-high', 'text-on-surface-variant');
+    }
     card.classList.remove('bg-primary/5', 'dark:bg-primary/10', 'border-primary', 'ring-1', 'ring-primary/40', 'shadow-ambient');
     card.classList.add('bg-surface-container-lowest', 'dark:bg-dark-surface-card', 'border-outline-variant/30');
   });
   const selectedEl = document.getElementById(`activity-card-${level}`);
   if (selectedEl) {
     selectedEl.setAttribute('aria-pressed', 'true');
+    const marker = selectedEl.querySelector<HTMLElement>('.material-symbols-outlined');
+    if (marker) {
+      marker.textContent = 'check';
+      marker.parentElement?.classList.remove('bg-surface-container-low', 'dark:bg-dark-surface-card-high', 'text-on-surface-variant');
+      marker.parentElement?.classList.add('bg-primary', 'text-white');
+    }
     selectedEl.classList.remove('bg-surface-container-lowest', 'dark:bg-dark-surface-card', 'border-outline-variant/30');
     selectedEl.classList.add('bg-primary/5', 'dark:bg-primary/10', 'border-primary', 'ring-1', 'ring-primary/40', 'shadow-ambient');
   }
@@ -1536,7 +1548,12 @@ window.dismissActivitySuggestion = () => {
 
 window.applySuggestedCalorieTarget = () => {
   if (pendingSuggestedTdee !== null && Number.isFinite(pendingSuggestedTdee)) {
-    store.updateNutritionGoals({ calorieTarget: pendingSuggestedTdee });
+    if (!store.applyActivityCalorieSuggestion(pendingSuggestedTdee, pendingActivityLevel)) {
+      alert(tr('This calorie target cannot fit your program. Review your metrics or choose a different target.'));
+      return;
+    }
+    // The store notification renders the saved tier; retain the visible unsaved selection until Confirm.
+    if (pendingActivityLevel) window.selectActivityTier(pendingActivityLevel, pendingSuggestedTdee);
   }
   const suggestionCard = document.getElementById('activity-suggestion-card');
   if (suggestionCard) suggestionCard.classList.add('hidden');

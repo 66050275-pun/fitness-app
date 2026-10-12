@@ -89,8 +89,9 @@ import { loadProfileImageBlob, deleteProfileImageDB } from '../utils/profileImag
 import { clampNonNegative, safeFiniteNumber } from '../utils/safeNumbers';
 import { createWeightGoalDraft, isSpecialProgramUnlocked } from '../utils/dietPrograms';
 import { SPECIAL_PROGRAM_ACTIONS } from '../components/BottomSheets/specialProgramActions';
-import { calculateAge } from '../utils/goalCalculations';
-import { getOnboardingTargets, validateOnboardingDraft } from '../utils/onboardingGoals';
+import { calculateAge, estimateBasalEnergy, estimateMaintenanceCalories, resolveCalculationSex } from '../utils/goalCalculations';
+import { NutritionPlanService } from '../services/nutritionPlanService';
+import { getOnboardingTargets, getOnboardingWaterTarget, validateOnboardingDraft } from '../utils/onboardingGoals';
 
 const today = getTodayKey();
 const WORKOUT_HISTORY_STORAGE_KEY = 'nutriai_workout_history';
@@ -580,7 +581,7 @@ class Store {
       editingWeightEntry: null,
 
       // Onboarding State
-      onboardingState: persisted.onboardingState || { status: 'not_started' as const, isCompleted: false, flowVersion: 2 as const, currentStep: 1 },
+      onboardingState: persisted.onboardingState || { status: 'not_started' as const, isCompleted: false, flowVersion: 3 as const, currentStep: 0 },
       onboardingDraft: persisted.onboardingDraft || createDefaultOnboardingDraft(persisted.userPreferences),
       profileImageUrl: null
     };
@@ -749,7 +750,7 @@ class Store {
     this.state.userProfile = {
       ...this.state.userProfile,
       ...goal,
-      primaryObjective: goal.weightGoalType === 'lose' ? 'lose_weight' : goal.weightGoalType === 'gain' ? 'build_muscle'
+      primaryObjective: goal.dietProgram !== 'standard' ? goal.dietProgram : goal.weightGoalType === 'lose' ? 'lose_weight' : goal.weightGoalType === 'gain' ? 'build_muscle'
         : this.state.userProfile.primaryObjective === 'general_fitness' ? 'general_fitness' : 'maintain_weight'
     };
     this.persistState();
@@ -788,7 +789,7 @@ class Store {
     this.state.userProfile = {
       ...this.state.userProfile,
       ...normalized,
-      primaryObjective: normalized.weightGoalType === 'lose' ? 'lose_weight' : normalized.weightGoalType === 'gain' ? 'build_muscle'
+      primaryObjective: normalized.dietProgram !== 'standard' ? normalized.dietProgram : normalized.weightGoalType === 'lose' ? 'lose_weight' : normalized.weightGoalType === 'gain' ? 'build_muscle'
         : this.state.userProfile.primaryObjective === 'general_fitness' ? 'general_fitness' : 'maintain_weight'
     };
     this.persistState();
@@ -810,6 +811,39 @@ class Store {
     this.state.userProfile.activityLevel = level;
     this.persistState();
     this.notify();
+  }
+
+  /** Keep a saved special program's macro and hydration targets in sync with an accepted activity estimate. */
+  public applyActivityCalorieSuggestion(calories: number, activity: ActivityLevel | null): boolean {
+    if (!Number.isInteger(calories) || calories < 800 || calories > 10000) return false;
+    const profile = this.state.userProfile;
+    const program = profile.dietProgram;
+    let goals: Partial<NutritionGoals> = { calorieTarget: calories };
+    if (program === 'mini_cut' || program === 'lean_bulk') {
+      const weight = profile.currentWeightKg;
+      if (typeof weight !== 'number' || !Number.isFinite(weight) || weight < 30 || weight > 250) return false;
+      const age = calculateAge(profile.dateOfBirth) ?? profile.ageYears;
+      const bmr = typeof profile.heightCm === 'number' && typeof age === 'number'
+        ? estimateBasalEnergy(weight, profile.heightCm, age, resolveCalculationSex(profile.biologicalSex)) : null;
+      const level = activity ?? profile.activityLevel;
+      const tdee = level ? estimateMaintenanceCalories(bmr, level) : null;
+      if (program === 'mini_cut') {
+        const floor = profile.biologicalSex === 'female' ? 1200 : 1500;
+        if (calories < floor) return false;
+        if (tdee !== null && calories >= tdee) return false;
+      }
+      if (program === 'lean_bulk' && tdee !== null && calories <= tdee) return false;
+      try {
+        const macros = program === 'mini_cut' ? NutritionPlanService.calculateMiniCutMacros(calories, weight)
+          : NutritionPlanService.calculateLeanBulkMacros(calories, weight);
+        const waterTarget = getOnboardingWaterTarget(weight, program);
+        if (waterTarget === null) return false;
+        goals = { calorieTarget: calories, proteinTarget: macros.proteinGrams,
+          carbsTarget: macros.carbsGrams, fatTarget: macros.fatGrams, waterTarget };
+      } catch { return false; }
+    }
+    this.updateNutritionGoals(goals);
+    return true;
   }
 
   public addWeightEntry(weight: number, unit: WeightUnit, date: string, time: string, note?: string) {
@@ -943,12 +977,12 @@ class Store {
   /** Draft changes are durable, but never alter the confirmed profile or targets. */
   public setOnboardingStep(step: number) {
     if (this.state.currentScreen === 'onboarding' && this.state.onboardingState.status === 'completed') return;
-    const clamped = Number.isFinite(step) ? Math.max(1, Math.min(4, Math.floor(step))) : 1;
+    const clamped = Number.isFinite(step) ? Math.max(0, Math.min(4, Math.floor(step))) : 0;
     this.state.onboardingState = {
       ...this.state.onboardingState,
       status: 'in_progress',
       isCompleted: false,
-      flowVersion: 2,
+      flowVersion: 3,
       currentStep: clamped
     };
     this.persistState();
@@ -990,7 +1024,8 @@ class Store {
     const goals = preview.goals;
     const isRestart = this.state.userProfile.profileSetupCompleted === true;
     const objective = draft.primaryObjective;
-    const weightGoalType = objective === 'lose_weight' ? 'lose' : objective === 'build_muscle' ? 'gain' : 'maintain';
+    const weightGoalType = objective === 'lose_weight' || objective === 'mini_cut' ? 'lose'
+      : objective === 'build_muscle' || objective === 'lean_bulk' ? 'gain' : 'maintain';
     const adjustment = preview.calorieAdjustment;
     const directionMatches = adjustment !== null && (weightGoalType === 'lose' ? adjustment < 0
       : weightGoalType === 'gain' ? adjustment > 0 : Math.abs(adjustment) <= 1);
@@ -1011,7 +1046,7 @@ class Store {
       dateOfBirth: draft.dateOfBirth,
       activityLevel: draft.activityLevel,
       weightGoalType,
-      dietProgram: 'standard',
+      dietProgram: objective === 'mini_cut' || objective === 'lean_bulk' ? objective : 'standard',
       targetDate: null,
       weeklyGoalRateKg: weeklyRate,
       profileSetupCompleted: true
@@ -1037,7 +1072,7 @@ class Store {
     this.state.onboardingState = {
       status: 'completed',
       isCompleted: true,
-      flowVersion: 2,
+      flowVersion: 3,
       currentStep: 4,
       completedAt: new Date().toISOString(),
       completionId
@@ -1068,7 +1103,7 @@ class Store {
   public restartGoalSetup() {
     const profile = this.state.userProfile;
     const prefs = this.state.userPreferences;
-    const primaryObjective: FitnessObjective | null = profile.primaryObjective
+    const primaryObjective: FitnessObjective | null = profile.dietProgram === 'mini_cut' || profile.dietProgram === 'lean_bulk' ? profile.dietProgram : profile.primaryObjective
       ?? (profile.weightGoalType === 'lose' ? 'lose_weight' : profile.weightGoalType === 'gain' ? 'build_muscle'
         : profile.weightGoalType === 'maintain' ? 'maintain_weight' : null);
     const currentAge = calculateAge(profile.dateOfBirth) ?? profile.ageYears ?? null;
@@ -1093,8 +1128,8 @@ class Store {
       ...this.state.onboardingState,
       status: 'in_progress',
       isCompleted: false,
-      flowVersion: 2,
-      currentStep: 1
+      flowVersion: 3,
+      currentStep: 0
     };
     this.state.profileConfirmModal = null;
     this.state.quickAddOpen = false;
@@ -1114,7 +1149,7 @@ class Store {
       ...this.state.onboardingState,
       status: 'completed',
       isCompleted: true,
-      flowVersion: 2,
+      flowVersion: 3,
       currentStep: 4
     };
     this.state.onboardingDraft = createDefaultOnboardingDraft(this.state.userPreferences);
@@ -1176,7 +1211,7 @@ class Store {
       this.state.nutritionGoals = sanitizeNutritionGoals(null);
       this.state.calorieTarget = 2100;
       this.state.waterTarget = 8;
-      this.state.onboardingState = { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 };
+      this.state.onboardingState = { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 };
       this.state.onboardingDraft = createDefaultOnboardingDraft(this.state.userPreferences);
       this.state.currentScreen = 'onboarding';
       if (this.state.profileImageUrl) {

@@ -7962,5 +7962,185 @@
   "Automatic estimates need your age, height, weight and a female or male calculation profile.": {
     "en": "Automatic estimates need your age, height, weight and a female or male calculation profile.",
     "th": "การประเมินอัตโนมัติต้องใช้อายุ ส่วนสูง น้ำหนัก และข้อมูลคำนวณสำหรับหญิงหรือชาย"
+  },
+  "Introduction": {
+    "en": "Introduction",
+    "th": "แนะนำแอป"
+  },
+  "Welcome to NutriAI": {
+    "en": "Welcome to NutriAI",
+    "th": "ยินดีต้อนรับสู่ NutriAI"
+  },
+  "Your food, fitness and progress, in one place.": {
+    "en": "Your food, fitness and progress, in one place.",
+    "th": "อาหาร การออกกำลังกาย และความก้าวหน้า ครบในที่เดียว"
+  },
+  "Let’s set your goals": {
+    "en": "Let’s set your goals",
+    "th": "มาตั้งเป้าหมายของคุณกัน"
+  },
+  "Food that fits your goals": {
+    "en": "Food that fits your goals",
+    "th": "อาหารที่เหมาะกับเป้าหมายของคุณ"
+  },
+  "Track meals and understand your daily nutrition.": {
+    "en": "Track meals and understand your daily nutrition.",
+    "th": "บันทึกมื้ออาหารและเข้าใจโภชนาการในแต่ละวัน"
+  },
+  "Training with a clear direction": {
+    "en": "Training with a clear direction",
+    "th": "ออกกำลังกายอย่างมีเป้าหมาย"
+  },
+  "Build your routine and follow your workout progress.": {
+    "en": "Build your routine and follow your workout progress.",
+    "th": "สร้างกิจวัตรและติดตามความก้าวหน้าในการออกกำลังกาย"
+  },
+  "See your progress": {
+    "en": "See your progress",
+    "th": "ดูความก้าวหน้าของคุณ"
+  },
+  "Keep nutrition and body metrics together over time.": {
+    "en": "Keep nutrition and body metrics together over time.",
+    "th": "ติดตามโภชนาการและข้อมูลร่างกายควบคู่กันอย่างต่อเนื่อง"
+  },
+  "Four simple steps, one personal starting plan.": {
+    "en": "Four simple steps, one personal starting plan.",
+    "th": "4 ขั้นตอนง่าย ๆ เพื่อแผนเริ่มต้นที่เหมาะกับคุณ"
+  },
+  "Your setup stays encrypted in this browser.": {
+    "en": "Your setup stays encrypted in this browser.",
+    "th": "ข้อมูลการตั้งค่าของคุณจะถูกเก็บแบบเข้ารหัสในเบราว์เซอร์นี้"
+  },
+  "Your Mini Cut plan": {
+    "en": "Your Mini Cut plan",
+    "th": "แผนลดไขมันระยะสั้นของคุณ"
+  },
+  "Recommended phase: {0} weeks": {
+    "en": "Recommended phase: {0} weeks",
+    "th": "ระยะที่แนะนำ: {0} สัปดาห์"
+  },
+  "Maximum phase: {0} weeks": {
+    "en": "Maximum phase: {0} weeks",
+    "th": "ระยะสูงสุด: {0} สัปดาห์"
+  },
+  "Optional refeed every {0} days at maintenance calories.": {
+    "en": "Optional refeed every {0} days at maintenance calories.",
+    "th": "หากต้องการ สามารถเพิ่มพลังงานให้เท่ากับระดับรักษาน้ำหนักทุก {0} วัน"
+  },
+  "Review your phase before continuing beyond the recommended duration.": {
+    "en": "Review your phase before continuing beyond the recommended duration.",
+    "th": "ทบทวนแผนของคุณก่อนทำต่อเกินระยะที่แนะนำ"
+  },
+  "Your Lean Bulk plan": {
+    "en": "Your Lean Bulk plan",
+    "th": "แผนเพิ่มกล้ามเนื้อแบบลีนของคุณ"
+  },
+  "Target weekly gain: {0}–{1} kg": {
+    "en": "Target weekly gain: {0}–{1} kg",
+    "th": "เป้าหมายน้ำหนักเพิ่มต่อสัปดาห์: {0}–{1} กก."
+  },
+  "Aim for 0.25–0.5% of body weight per week.": {
+    "en": "Aim for 0.25–0.5% of body weight per week.",
+    "th": "ตั้งเป้าเพิ่มน้ำหนัก 0.25–0.5% ของน้ำหนักตัวต่อสัปดาห์"
+  },
+  "Reassess calories using your weekly weight trend.": {
+    "en": "Reassess calories using your weekly weight trend.",
+    "th": "ทบทวนเป้าหมายพลังงานจากแนวโน้มน้ำหนักในแต่ละสัปดาห์"
+  },
+  "{0} ml per kg of body weight": {
+    "en": "{0} ml per kg of body weight",
+    "th": "{0} มล. ต่อน้ำหนักตัว 1 กก."
+  },
+  "Enter valid positive calories and body weight to calculate this plan.": {
+    "en": "Enter valid positive calories and body weight to calculate this plan.",
+    "th": "กรอกพลังงานและน้ำหนักตัวเป็นค่าบวกที่ถูกต้องเพื่อคำนวณแผนนี้"
+  },
+  "This value is outside the supported calculation range.": {
+    "en": "This value is outside the supported calculation range.",
+    "th": "ค่านี้อยู่นอกช่วงที่ระบบรองรับการคำนวณ"
+  },
+  "This plan needs at least {0} kcal to fit its protein and fat targets. Increase daily calories or choose another goal.": {
+    "en": "This plan needs at least {0} kcal to fit its protein and fat targets. Increase daily calories or choose another goal.",
+    "th": "แผนนี้ต้องใช้พลังงานอย่างน้อย {0} กิโลแคลอรีเพื่อให้เพียงพอกับเป้าหมายโปรตีนและไขมัน เพิ่มพลังงานต่อวันหรือเลือกเป้าหมายอื่น"
+  },
+  "Choose male, female or other for this calculation.": {
+    "en": "Choose male, female or other for this calculation.",
+    "th": "เลือกชาย หญิง หรืออื่น ๆ สำหรับการคำนวณนี้"
+  },
+  "Mini Cut is a short, intensive phase. Plan for 4 weeks and do not extend beyond 6 weeks. An optional maintenance-calorie day can be scheduled every 7 days.": {
+    "en": "Mini Cut is a short, intensive phase. Plan for 4 weeks and do not extend beyond 6 weeks. An optional maintenance-calorie day can be scheduled every 7 days.",
+    "th": "การลดไขมันระยะสั้นเป็นช่วงที่เข้มข้น วางแผนไว้ 4 สัปดาห์และไม่ควรทำเกิน 6 สัปดาห์ หากต้องการ สามารถกำหนดวันที่รับพลังงานเท่ากับระดับรักษาน้ำหนักทุก 7 วัน"
+  },
+  "Choose beginner, intermediate or advanced training experience.": {
+    "en": "Choose beginner, intermediate or advanced training experience.",
+    "th": "เลือกระดับประสบการณ์ออกกำลังกาย: เริ่มต้น ปานกลาง หรือขั้นสูง"
+  },
+  "Enter a valid weekly weight change to calculate this adjustment.": {
+    "en": "Enter a valid weekly weight change to calculate this adjustment.",
+    "th": "กรอกการเปลี่ยนแปลงน้ำหนักต่อสัปดาห์ที่ถูกต้องเพื่อคำนวณการปรับเป้าหมาย"
+  },
+  "Enter a calorie target of at least 800 kcal to calculate an adjustment.": {
+    "en": "Enter a calorie target of at least 800 kcal to calculate an adjustment.",
+    "th": "กรอกเป้าหมายพลังงานอย่างน้อย 800 กิโลแคลอรีเพื่อคำนวณการปรับเป้าหมาย"
+  },
+  "Weekly gain is {0} kg, below the target range. Try adding 120 kcal per day and review the trend again.": {
+    "en": "Weekly gain is {0} kg, below the target range. Try adding 120 kcal per day and review the trend again.",
+    "th": "น้ำหนักเพิ่มต่อสัปดาห์ {0} กก. ต่ำกว่าช่วงเป้าหมาย ลองเพิ่มพลังงานวันละ 120 กิโลแคลอรีแล้วทบทวนแนวโน้มอีกครั้ง"
+  },
+  "Weekly gain is {0} kg, above the target range. Try reducing daily calories by {1} kcal and review the trend again.": {
+    "en": "Weekly gain is {0} kg, above the target range. Try reducing daily calories by {1} kcal and review the trend again.",
+    "th": "น้ำหนักเพิ่มต่อสัปดาห์ {0} กก. สูงกว่าช่วงเป้าหมาย ลองลดพลังงานต่อวันลง {1} กิโลแคลอรีแล้วทบทวนแนวโน้มอีกครั้ง"
+  },
+  "Weekly gain is {0} kg, above the target range. The current target is already at the app minimum; review your plan before changing calories.": {
+    "en": "Weekly gain is {0} kg, above the target range. The current target is already at the app minimum; review your plan before changing calories.",
+    "th": "น้ำหนักเพิ่มต่อสัปดาห์ {0} กก. สูงกว่าช่วงเป้าหมาย แต่เป้าหมายปัจจุบันอยู่ที่ค่าต่ำสุดของแอปแล้ว ทบทวนแผนก่อนปรับพลังงาน"
+  },
+  "Weekly gain is {0} kg, within the target range. Keep your current calorie target.": {
+    "en": "Weekly gain is {0} kg, within the target range. Keep your current calorie target.",
+    "th": "น้ำหนักเพิ่มต่อสัปดาห์ {0} กก. อยู่ในช่วงเป้าหมาย ใช้เป้าหมายพลังงานปัจจุบันต่อได้"
+  },
+  "A short fat-loss phase with extra protein to support muscle retention.": {
+    "en": "A short fat-loss phase with extra protein to support muscle retention.",
+    "th": "ช่วงลดไขมันระยะสั้นที่เพิ่มโปรตีนเพื่อช่วยรักษากล้ามเนื้อ"
+  },
+  "Build muscle with a controlled calorie surplus and weight-based protein.": {
+    "en": "Build muscle with a controlled calorie surplus and weight-based protein.",
+    "th": "เพิ่มกล้ามเนื้อด้วยพลังงานส่วนเกินในระดับพอเหมาะและโปรตีนตามน้ำหนักตัว"
+  },
+  "Mini Cut requires at least {0} kcal for the selected plan setting. Increase the target or choose another goal.": {
+    "en": "Mini Cut requires at least {0} kcal for the selected plan setting. Increase the target or choose another goal.",
+    "th": "การลดไขมันระยะสั้นต้องใช้พลังงานอย่างน้อย {0} กิโลแคลอรีตามการตั้งค่าแผนที่เลือก เพิ่มเป้าหมายพลังงานหรือเลือกเป้าหมายอื่น"
+  },
+  "Mini Cut cannot create a deficit with these inputs while respecting the {0} kcal minimum. Review your metrics or choose another goal.": {
+    "en": "Mini Cut cannot create a deficit with these inputs while respecting the {0} kcal minimum. Review your metrics or choose another goal.",
+    "th": "ข้อมูลนี้ไม่สามารถสร้างพลังงานขาดดุลสำหรับการลดไขมันระยะสั้นได้โดยยังคงพลังงานขั้นต่ำ {0} กิโลแคลอรี ตรวจสอบข้อมูลร่างกายหรือเลือกเป้าหมายอื่น"
+  },
+  "Mini Cut needs a calorie target below your estimated TDEE ({0} kcal). Lower the target within the minimum or choose another goal.": {
+    "en": "Mini Cut needs a calorie target below your estimated TDEE ({0} kcal). Lower the target within the minimum or choose another goal.",
+    "th": "การลดไขมันระยะสั้นต้องมีเป้าหมายพลังงานต่ำกว่าค่า TDEE ที่ประเมินไว้ ({0} กิโลแคลอรี) ลดเป้าหมายโดยไม่ต่ำกว่าค่าขั้นต่ำหรือเลือกเป้าหมายอื่น"
+  },
+  "The Mini Cut estimate uses the {0} kcal minimum. Review the smaller deficit before continuing.": {
+    "en": "The Mini Cut estimate uses the {0} kcal minimum. Review the smaller deficit before continuing.",
+    "th": "ค่าประเมินการลดไขมันระยะสั้นใช้พลังงานขั้นต่ำ {0} กิโลแคลอรี ตรวจสอบระดับพลังงานขาดดุลที่น้อยลงก่อนดำเนินการต่อ"
+  },
+  "This Lean Bulk target is not above your estimated TDEE. Increase calories if you want a surplus.": {
+    "en": "This Lean Bulk target is not above your estimated TDEE. Increase calories if you want a surplus.",
+    "th": "เป้าหมายเพิ่มกล้ามเนื้อแบบลีนนี้ไม่สูงกว่าค่า TDEE ที่ประเมินไว้ เพิ่มพลังงานหากต้องการพลังงานส่วนเกิน"
+  },
+  "This activity estimate cannot fit your selected program. Keep your current target or review your goal settings.": {
+    "en": "This activity estimate cannot fit your selected program. Keep your current target or review your goal settings.",
+    "th": "ค่าประเมินจากกิจกรรมนี้ไม่เหมาะกับโปรแกรมที่เลือก ใช้เป้าหมายปัจจุบันต่อหรือทบทวนการตั้งค่าเป้าหมาย"
+  },
+  "This calorie target cannot fit your program. Review your metrics or choose a different target.": {
+    "en": "This calorie target cannot fit your program. Review your metrics or choose a different target.",
+    "th": "เป้าหมายพลังงานนี้ไม่เหมาะกับโปรแกรมของคุณ ตรวจสอบข้อมูลร่างกายหรือเลือกเป้าหมายอื่น"
+  },
+  "Mini Cut cannot fit its protein and fat targets below your estimated TDEE. Review your metrics or choose another goal.": {
+    "en": "Mini Cut cannot fit its protein and fat targets below your estimated TDEE. Review your metrics or choose another goal.",
+    "th": "การลดไขมันระยะสั้นไม่สามารถให้โปรตีนและไขมันถึงเป้าหมายได้โดยใช้พลังงานต่ำกว่าค่า TDEE ที่ประเมินไว้ ตรวจสอบข้อมูลร่างกายหรือเลือกเป้าหมายอื่น"
+  },
+  "Your calorie target is entered manually; no BMR or TDEE has been inferred.": {
+    "en": "Your calorie target is entered manually; no BMR or TDEE has been inferred.",
+    "th": "คุณกำหนดเป้าหมายพลังงานเอง ระบบไม่ได้คาดคะเนค่า BMR หรือ TDEE"
   }
 }

@@ -9,7 +9,7 @@ import { privateStorage } from './privateStorage.ts';
  * 4. Item-by-item sanitization so partial corruption never wipes the entire database.
  * 5. Strict safety against exceptions and JSON parsing failures.
  * 6. Schema v4: OnboardingState, OnboardingDraft, signed weeklyGoalRateKg, profileSetupCompleted.
- * 7. Schema v6: four-step onboarding, explicit objective/age, and calorie adjustment.
+ * 7. Schema v7: introduction plus four steps, explicit objective/age and special-program targets.
  */
 
 import type { 
@@ -39,9 +39,9 @@ import { calculateAge } from '../utils/goalCalculations';
 
 export const APP_STORAGE_KEY = 'nutriai_app_data_v2';
 export const LEGACY_MEALS_KEY = 'nutriai_meals';
-export const CURRENT_SCHEMA_VERSION = 6;
+export const CURRENT_SCHEMA_VERSION = 7;
 
-const FITNESS_OBJECTIVES: FitnessObjective[] = ['lose_weight', 'build_muscle', 'maintain_weight', 'general_fitness'];
+const FITNESS_OBJECTIVES: FitnessObjective[] = ['lose_weight', 'build_muscle', 'maintain_weight', 'general_fitness', 'mini_cut', 'lean_bulk'];
 
 function boundedNumber(value: unknown, min: number, max: number): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max ? value : null;
@@ -275,12 +275,15 @@ export function sanitizeUserProfile(raw: any): UserProfile {
   const validGoals = ['lose', 'maintain', 'gain', null];
   const validActivities = ['sedentary', 'light', 'moderate', 'very_active', 'athlete', null];
 
-  const dietProgram = raw.dietProgram === 'mini_cut' || raw.dietProgram === 'lean_bulk' ? raw.dietProgram : 'standard';
+  const dietProgram = raw.dietProgram === 'mini_cut' || raw.dietProgram === 'lean_bulk' ? raw.dietProgram
+    : raw.dietProgram === undefined && (raw.primaryObjective === 'mini_cut' || raw.primaryObjective === 'lean_bulk')
+      ? raw.primaryObjective : 'standard';
   const weightGoalType = dietProgram === 'mini_cut' ? 'lose' : dietProgram === 'lean_bulk' ? 'gain'
     : validGoals.includes(raw.weightGoalType) ? raw.weightGoalType : null;
 
-  const primaryObjective: FitnessObjective | null = FITNESS_OBJECTIVES.includes(raw.primaryObjective)
-    ? raw.primaryObjective as FitnessObjective : objectiveFromWeightGoal(weightGoalType);
+  const primaryObjective: FitnessObjective | null = dietProgram !== 'standard' ? dietProgram
+    : FITNESS_OBJECTIVES.includes(raw.primaryObjective) && raw.primaryObjective !== 'mini_cut' && raw.primaryObjective !== 'lean_bulk'
+      ? raw.primaryObjective as FitnessObjective : objectiveFromWeightGoal(weightGoalType);
   const age = boundedNumber(raw.ageYears, 15, 100) ?? boundedNumber(calculateAge(raw.dateOfBirth), 15, 100);
 
   // --- weeklyGoalRateKg migration (v3→v4) ---
@@ -466,7 +469,7 @@ export function sanitizeOnboardingDraft(raw: any, prefs?: UserPreferences, userP
   const validActivities = ['sedentary', 'light', 'moderate', 'very_active', 'athlete'];
   const direction = typeof raw.weightDirection === 'number' && validRates.includes(raw.weightDirection)
     ? raw.weightDirection as WeeklyWeightRate : null;
-  const legacyObjective = direction === null ? objectiveFromWeightGoal(userProfile?.weightGoalType)
+  const legacyObjective = direction === null ? userProfile?.primaryObjective ?? objectiveFromWeightGoal(userProfile?.weightGoalType)
     : direction < 0 ? 'lose_weight' : direction > 0 ? 'build_muscle' : 'maintain_weight';
   const primaryObjective: FitnessObjective | null = FITNESS_OBJECTIVES.includes(raw.primaryObjective)
     ? raw.primaryObjective as FitnessObjective : legacyObjective;
@@ -515,20 +518,21 @@ export function sanitizeOnboardingState(raw: any, userProfile?: UserProfile): On
     const validStatuses = ['not_started', 'in_progress', 'completed'];
     const status: OnboardingState['status'] = raw.status === 'completed' || raw.isCompleted === true ? 'completed'
       : validStatuses.includes(raw.status) ? raw.status : 'not_started';
-    const savedStep = boundedNumber(raw.currentStep, 1, raw.flowVersion === 2 ? 4 : 6);
-    const oldStep = savedStep === null ? 1 : Math.floor(savedStep);
-    const currentStep = status === 'completed' ? 4 : raw.flowVersion === 2 ? oldStep
+    const hasFourSteps = raw.flowVersion === 2 || raw.flowVersion === 3;
+    const savedStep = boundedNumber(raw.currentStep, raw.flowVersion === 3 ? 0 : 1, hasFourSteps ? 4 : 6);
+    const oldStep = savedStep === null ? 0 : Math.floor(savedStep);
+    const currentStep = status === 'completed' ? 4 : status === 'not_started' ? 0 : hasFourSteps ? oldStep
       : oldStep <= 2 ? 1 : oldStep === 3 ? 2 : oldStep === 4 ? 3 : 4;
     const completedAt = typeof raw.completedAt === 'string' ? raw.completedAt : null;
     const completionId = typeof raw.completionId === 'string' ? raw.completionId : null;
-    return { status, isCompleted: status === 'completed', flowVersion: 2, currentStep, completedAt, completionId };
+    return { status, isCompleted: status === 'completed', flowVersion: 3, currentStep, completedAt, completionId };
   }
 
   // Only explicit profile completion lets legacy users skip first-time setup.
   if (userProfile?.profileSetupCompleted === true) {
-    return { status: 'completed', isCompleted: true, flowVersion: 2, currentStep: 4, completedAt: null, completionId: null };
+    return { status: 'completed', isCompleted: true, flowVersion: 3, currentStep: 4, completedAt: null, completionId: null };
   }
-  return { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 };
+  return { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 };
 }
 
 /**
@@ -618,7 +622,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
         weightHistory: [],
         eatingSchedule: sanitizeEatingSchedule(null),
         nutritionGoals: sanitizeNutritionGoals(null),
-        onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 },
+        onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 },
         onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null))
       };
     }
@@ -710,7 +714,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
       weightHistory: [],
       eatingSchedule: sanitizeEatingSchedule(null),
       nutritionGoals: sanitizeNutritionGoals(null),
-      onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 },
+      onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 },
       onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null)),
       weeklyFitnessTemplate: null,
       scheduledWorkouts: {}
@@ -733,7 +737,7 @@ export function loadPersistedAppData(_initialDefaultMeals: MealItem[] = []): Per
       weightHistory: [],
       eatingSchedule: sanitizeEatingSchedule(null),
       nutritionGoals: sanitizeNutritionGoals(null),
-      onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 2, currentStep: 1 },
+      onboardingState: { status: 'not_started', isCompleted: false, flowVersion: 3, currentStep: 0 },
       onboardingDraft: createDefaultOnboardingDraft(sanitizeUserPreferences(null)),
       weeklyFitnessTemplate: null,
       scheduledWorkouts: {}

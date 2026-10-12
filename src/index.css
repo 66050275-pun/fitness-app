@@ -523,7 +523,7 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
   .vault-pin-shake { animation: none; }
 }
 
-/* Four-step onboarding follows the same green cards and 430px app shell. */
+/* An introduction leads into four setup steps in the shared 430px app shell. */
 .onboarding-wizard {
   min-width: 0; min-height: calc(100svh - var(--vault-bar-height));
   background: var(--ui-surface); color: var(--ui-text);
@@ -575,6 +575,24 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
   padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
 }
 .onboarding-footer .ui-primary-button { min-height: 52px; }
+.onboarding-intro-art {
+  width: 100%; overflow: hidden; border: 1px solid var(--ui-border);
+  background: linear-gradient(145deg, var(--ui-card), var(--ui-primary-soft));
+}
+.onboarding-intro-illustration { display: block; width: 100%; height: auto; max-height: 190px; }
+.onboarding-art-halo { fill: var(--ui-primary-soft); }
+.onboarding-art-card { fill: var(--ui-card); stroke: var(--ui-border); }
+.onboarding-art-ring { stroke: var(--ui-primary); opacity: 0.35; }
+.onboarding-art-muted { stroke: var(--ui-border); }
+.onboarding-art-primary { stroke: var(--ui-primary); }
+.onboarding-art-primary-fill { fill: #006d36; }
+.onboarding-art-leaf { fill: var(--ui-primary); opacity: 0.75; }
+.onboarding-program-badge, .onboarding-program-icon { color: var(--ui-primary); }
+.onboarding-program-badge { background: var(--ui-primary-soft); }
+.onboarding-program-card {
+  min-width: 0; color: var(--ui-text); background: var(--ui-primary-soft); border: 1px solid var(--ui-border);
+}
+.onboarding-program-fact { min-width: 0; background: var(--ui-card); color: var(--ui-primary-label); }
 @media (max-width: 350px) {
   .onboarding-metrics-grid { grid-template-columns: minmax(0, 1fr); }
   .onboarding-header, .onboarding-main, .onboarding-footer { padding-left: 16px; padding-right: 16px; }

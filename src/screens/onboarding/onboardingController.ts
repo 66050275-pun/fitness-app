@@ -3,7 +3,7 @@ import { isVaultUnlocked } from '../../services/privateStorage.ts';
 import { tr } from '../../i18n/index.ts';
 import { calculateAge } from '../../utils/goalCalculations.ts';
 import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
-import { getObjective, getOnboardingTargets, getOnboardingWaterTarget, ONBOARDING_ACTIVITIES, validateOnboardingDraft } from '../../utils/onboardingGoals.ts';
+import { getObjective, getOnboardingEnergyEstimate, getOnboardingTargets, getOnboardingWaterTarget, getOnboardingReviewMessage, ONBOARDING_ACTIVITIES, validateOnboardingDraft } from '../../utils/onboardingGoals.ts';
 
 let completing = false;
 let privacyBlocked = false;
@@ -62,18 +62,21 @@ export function refreshOnboardingFeedback(): void {
     choice.dataset.selected = String(choice.dataset.onboardingSex === draft.biologicalSex);
   });
   const preview = getOnboardingTargets(draft);
+  const energy = getOnboardingEnergyEstimate(draft);
   for (const [name, value] of Object.entries({
     calories: preview?.goals.calorieTarget, protein: preview?.goals.proteinTarget, carbs: preview?.goals.carbsTarget,
-    fat: preview?.goals.fatTarget, water: preview?.goals.waterTarget ?? getOnboardingWaterTarget(draft.currentWeightKg),
+    fat: preview?.goals.fatTarget, water: preview?.goals.waterTarget ?? getOnboardingWaterTarget(draft.currentWeightKg, draft.primaryObjective),
   })) setText(`onboarding-summary-${name}`, value == null ? '—' : formatDisplayNumber(value, 0));
-  setText('onboarding-estimate-note', draft.biologicalSex === 'other'
-    ? tr('Automatic energy estimates need a female or male calculation profile. Enter your daily calorie target to continue.')
-    : preview?.reviewReason ?? tr('Estimated locally from your body metrics and activity.'));
-  setText('onboarding-summary-energy', preview?.bmr != null && preview.tdee != null
-    ? tr('BMR {0} kcal · TDEE {1} kcal', formatDisplayNumber(preview.bmr, 0), formatDisplayNumber(preview.tdee, 0))
+  setText('onboarding-estimate-note', getOnboardingReviewMessage(draft) ?? (draft.biologicalSex === 'other'
+    ? tr(preview ? 'Your calorie target is entered manually; no BMR or TDEE has been inferred.'
+      : 'Automatic energy estimates need a female or male calculation profile. Enter your daily calorie target to continue.')
+    : preview?.reviewReason ?? tr('Estimated locally from your body metrics and activity.')));
+  setText('onboarding-summary-energy', energy?.bmr != null && energy.tdee != null
+    ? tr('BMR {0} kcal · TDEE {1} kcal', formatDisplayNumber(energy.bmr, 0), formatDisplayNumber(energy.tdee, 0))
     : preview ? tr('Macros are based on your manual calorie target.') : tr('Choose daily calories to preview your macros.'));
   if (!completing) setText('onboarding-next-label', tr(pendingConfirmation() ? 'Retry setup save'
-    : store.getState().onboardingState.currentStep === 4 ? 'Get Started' : 'Continue'));
+    : store.getState().onboardingState.currentStep === 0 ? 'Let’s set your goals'
+      : store.getState().onboardingState.currentStep === 4 ? 'Get Started' : 'Continue'));
   setBusyControls();
 }
 function showErrors(step: number): boolean {
@@ -120,7 +123,7 @@ export function bindOnboardingHandlers(): void {
     if (!canEdit()) return;
     captureMetrics(); captureCalories();
     const state = store.getState();
-    if (state.onboardingState.currentStep > 1) store.setOnboardingStep(state.onboardingState.currentStep - 1);
+    if (state.onboardingState.currentStep > 0) store.setOnboardingStep(state.onboardingState.currentStep - 1);
     else if (state.userProfile.profileSetupCompleted) store.cancelGoalSetup();
   };
   window.cancelOnboarding = () => { if (canEdit()) store.cancelGoalSetup(); };

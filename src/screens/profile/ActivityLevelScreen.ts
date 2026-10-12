@@ -2,6 +2,7 @@ import { trHtml } from '../../i18n/index.ts';
 import { htmlJsArg } from '../../utils/sanitize.ts';
 import { calculateAge, estimateBasalEnergy, estimateMaintenanceCalories, resolveCalculationSex } from '../../utils/goalCalculations.ts';
 import { getObjective } from '../../utils/onboardingGoals.ts';
+import { NutritionPlanError, NutritionPlanService } from '../../services/nutritionPlanService.ts';
 /**
  * Activity Level Sub-Screen
  * 
@@ -62,6 +63,29 @@ export function renderActivityLevelScreen(): string {
     : null;
   const calorieAdjustment = getObjective(profile?.primaryObjective ?? null)?.calorieAdjustment
     ?? (profile?.weightGoalType === 'lose' ? -400 : profile?.weightGoalType === 'gain' ? 250 : 0);
+  const program = profile?.dietProgram ?? 'standard';
+  const getSuggestedCalories = (maintenanceCalories: number | null): number | null => {
+    if (maintenanceCalories === null) return null;
+    if (program === 'standard') return Math.min(10000, Math.max(800, Math.round(maintenanceCalories + calorieAdjustment)));
+    if (typeof weightKg !== 'number' || !Number.isFinite(weightKg) || weightKg <= 0 || calculationSex === null) return null;
+    try {
+      const calculated = program === 'mini_cut'
+        ? NutritionPlanService.calculateMiniCutCalories(maintenanceCalories, calculationSex)
+        : NutritionPlanService.calculateLeanBulkCalories(maintenanceCalories, 'intermediate').calorieTarget;
+      const calories = Math.min(10000, Math.max(800, calculated));
+      if (program === 'mini_cut') {
+        if (calories >= maintenanceCalories) return null;
+        NutritionPlanService.calculateMiniCutMacros(calories, weightKg);
+      } else {
+        if (calories <= maintenanceCalories) return null;
+        NutritionPlanService.calculateLeanBulkMacros(calories, weightKg);
+      }
+      return calories;
+    } catch (error: unknown) {
+      if (error instanceof NutritionPlanError) return null;
+      throw error;
+    }
+  };
 
   return `
     <div class="flex flex-col min-h-screen pb-16 bg-surface dark:bg-dark-surface transition-colors animate-fade-in">
@@ -107,8 +131,7 @@ export function renderActivityLevelScreen(): string {
           ${ACTIVITY_OPTIONS.map(opt => {
             const isSelected = currentLevel === opt.level;
             const maintenanceCalories = estimateMaintenanceCalories(estimatedBmr, opt.level);
-            const suggestedCalories = maintenanceCalories === null ? null
-              : Math.min(10000, Math.max(800, Math.round(maintenanceCalories + calorieAdjustment)));
+            const suggestedCalories = getSuggestedCalories(maintenanceCalories);
 
             return `
               <button
@@ -140,6 +163,7 @@ export function renderActivityLevelScreen(): string {
                 <p class="text-xs text-on-surface-variant dark:text-gray-300 pl-9 leading-relaxed">
                   ${trHtml(opt.description)}
                 </p>
+                ${suggestedCalories === null && estimatedBmr !== null ? `<p class="text-[11px] text-on-surface-variant dark:text-gray-300 pl-9 leading-relaxed">${trHtml('This activity estimate cannot fit your selected program. Keep your current target or review your goal settings.')}</p>` : ''}
               </button>
             `;
           }).join('')}
