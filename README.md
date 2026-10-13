@@ -63,3 +63,7 @@ The lock screen, encryption status bar, recovery shield, exercise illustrations 
 Select English or Thai at the passphrase screen or **Profile → App Settings → Language**. All app interface text, calendars, exercise and muscle labels, built-in food examples, validation messages and local demo coach replies follow that selection. User-entered names, notes, custom food descriptions and chat messages are preserved. Brand names, source credits and scientific abbreviations keep their original spelling. Translations are bundled locally and make no translation-service requests.
 
 The harmless `nutriai_ui_language` preference contains only `en` or `th` in localStorage so the lock screen can use the same language after a reload. The saved app preference also remains in the encrypted vault. No profile or health data is added to plaintext storage. Display dates use the chosen locale with the Gregorian calendar; internal date keys, exercise identifiers and measurement values are unchanged.
+
+### Detailed nutrients and Insights
+
+Food scans request all **40 supported detailed nutrients**, with nullable amounts, canonical units, confidence and estimation notes. Confirmed profiles and reviewed calories feed the existing Diary and Insights; Mini Cut / Lean Bulk summaries use the same six tools and saved cycle goals. See [the complete nutrient inventory and data flow](docs/MICRONUTRIENTS_INSIGHTS.md).

@@ -18,6 +18,11 @@ import {
 import { calculateMicronutrientTrends } from '../utils/nutrientCalculations';
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
+import { getFatGauge } from '../services/phasicRecompService.ts';
+import { generatePhasicInsightMessages } from '../utils/phasicInsightCalculations.ts';
+import { getTodayKey } from '../utils/dateUtils.ts';
+import type { NutritionGoals } from '../types/index.ts';
+import { getMealNutrientForDisplay } from '../utils/mealNutritionDisplay.ts';
 
 export function renderInsightsScreen(): string {
   const state = store.getState();
@@ -40,8 +45,17 @@ export function renderInsightsScreen(): string {
       });
 
   // 2. Aggregate Nutrition
-  const curDailyTotals = calculateDailyNutritionTotals(state.meals, curDateKeys);
-  const prevDailyTotals = calculateDailyNutritionTotals(state.meals, prevDateKeys);
+  const goalsForDate = (date: string): NutritionGoals => {
+    const goals = store.getEffectiveNutritionGoals(date);
+    if (goals.fatTarget > 0) goals.fatTarget = getFatGauge([], date, goals.fatTarget,
+      state.userProfile.dietProgram ?? 'standard', state.userProfile.currentWeightKg).ceilingGrams;
+    return goals;
+  };
+  const todayGoals = goalsForDate(getTodayKey());
+  const curDailyTotals = calculateDailyNutritionTotals(state.meals, curDateKeys, goalsForDate);
+  const prevDailyTotals = calculateDailyNutritionTotals(state.meals, prevDateKeys, goalsForDate);
+  const unknownEntries = state.meals.filter(meal => curDateKeys.includes(meal.date) && meal.foodSource !== 'demo')
+    .filter(meal => (['calories', 'protein', 'carbs', 'fat'] as const).some(key => getMealNutrientForDisplay(meal, key) === null)).length;
 
   const curNutritionAvg = calculateNutritionAverages(curDailyTotals);
   const prevNutritionAvg = calculateNutritionAverages(prevDailyTotals);
@@ -63,7 +77,7 @@ export function renderInsightsScreen(): string {
   const adherence = calculateGoalAdherence(
     curDailyTotals,
     state.calorieTarget,
-    145, // default protein target
+    todayGoals.proteinTarget,
     state.waterByDate,
     state.waterTarget,
     curWorkoutTotals
@@ -73,14 +87,14 @@ export function renderInsightsScreen(): string {
   const prs = store.calculatePersonalRecords();
 
   // 7. Rule-based Insight Messages
-  const insightMessages = generateInsightMessages(
+  const insightMessages = [...generateInsightMessages(
     range,
     curNutritionAvg,
     curWorkoutTotals,
     adherence,
     deltaCalories,
     deltaVolume
-  );
+  ), ...generatePhasicInsightMessages(state, curDateKeys, getTodayKey())];
   return `
     <div class="flex flex-col min-h-screen pb-28 bg-surface dark:bg-dark-surface transition-colors">
       
@@ -161,9 +175,11 @@ export function renderInsightsScreen(): string {
           </div>
 
           <!-- Chart Canvas -->
+          <p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">${trHtml('All saved food sources and reviewed cooking-fat changes use the same diary totals. Targets use your current saved goals and cycle dates.')}</p>
+          ${unknownEntries > 0 ? `<p class="text-xs text-amber-700 dark:text-amber-300">${trHtml('{0} meals have incomplete calories or macros. Charts show known logged amounts; missing values are not confirmed zeros.', unknownEntries)}</p>` : ''}
           ${activeTab === 'calories' 
-            ? renderCaloriesChart(curDailyTotals, state.calorieTarget) 
-            : renderMacrosChart(curDailyTotals, 145)}
+            ? renderCaloriesChart(curDailyTotals, state.nutritionGoals.calorieTarget)
+            : renderMacrosChart(curDailyTotals, todayGoals)}
 
         </section>
 
@@ -281,6 +297,7 @@ export function renderInsightsScreen(): string {
               </div>
             </div>
           </div>
+          <p class="text-xs text-on-surface-variant dark:text-gray-300">${trHtml('Calorie target met (within 15%): {0} of {1} days. Scheduled refeed targets are included.', adherence.calorieTargetAdherenceDays, range)}</p>
         </section>
 
         <!-- E. PERSONAL PROGRESS (VERIFIED RECORDS) -->
@@ -373,9 +390,9 @@ export function renderInsightsScreen(): string {
           </div>
 
           <!-- Top Tracked Nutrients Grid -->
+          <p class="text-xs text-on-surface-variant dark:text-gray-300">${trHtml('Daily nutrient averages use dates with recorded values. AI estimates are included with their recorded source; unknown nutrients do not count toward coverage.')}</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            ${filteredNutrients.slice(0, 8).map(n => {
-              const isInsufficient = n.status === 'insufficient_data';
+            ${filteredNutrients.map(n => {
               const isTargetMet = n.status === 'target_met' || n.status === 'within_limit';
               const isNear = n.status === 'near_target' || n.status === 'near_limit';
               const isAlert = n.status === 'below_target' || n.status === 'above_limit';
@@ -407,12 +424,13 @@ export function renderInsightsScreen(): string {
                     <div>
                       <span class="text-[10px] text-on-surface-variant dark:text-gray-400 uppercase font-semibold">${trHtml("Daily Avg")}</span>
                       <div class="ui-number font-heading font-extrabold text-sm text-primary dark:text-primary-container">
-                        ${isInsufficient ? tr("Insufficient data") : `${formatDisplayNumber(n.avgDailyIntake, 4)} ${trHtml(n.unit)}`}
+                        ${n.avgDailyIntake === null ? trHtml('Not available') : `${formatDisplayNumber(n.avgDailyIntake, 4)} ${trHtml(n.unit)}`}
                       </div>
                     </div>
 
                     <div class="text-right">
                       <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${n.totalMealsReporting} ${trHtml("meals logged")}</span>
+                      <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml('{0} recorded days · {1}% meal coverage', n.daysEvaluated, n.dataCoveragePercent)}</span>
                     </div>
                   </div>
 
@@ -452,6 +470,7 @@ export function renderInsightsScreen(): string {
                 <div>
                   <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white leading-snug">${escapeHtml(msg.title)}</h4>
                   <p class="text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5 leading-relaxed">${escapeHtml(msg.text)}</p>
+                  ${msg.toolId ? `<button type="button" class="mt-2 text-sm font-bold text-primary dark:text-primary-container min-h-11 text-left" onclick="window.openPhasicInsightTool(${htmlJsArg(msg.toolId)})">${trHtml('Open {0}', msg.title)} <span aria-hidden="true">→</span></button>` : ''}
                 </div>
               </div>
             `).join('')}
@@ -518,7 +537,9 @@ function renderOverviewCard(
 }
 
 function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: number): string {
-  const maxCal = Math.max(targetCal * 1.25, ...dailyTotals.map(d => d.calories), 1000);
+  const dayTargets = dailyTotals.map(day => day.targets?.calorieTarget ?? targetCal);
+  const maxCal = Math.max(...dayTargets.map(target => target * 1.25), ...dailyTotals.map(d => d.calories), 1000);
+  const varyingTargets = new Set(dayTargets).size > 1;
   const colCount = dailyTotals.length;
   const isDense = colCount > 14;
 
@@ -528,7 +549,7 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
       <div class="flex items-center justify-between text-[10px] text-on-surface-variant dark:text-gray-400 px-1">
         <div class="flex items-center gap-1.5">
           <span class="w-3 h-0.5 bg-primary/80 rounded-full inline-block"></span>
-          <span>${trHtml("Target:")} <strong>${targetCal} ${trHtml("kcal")}</strong></span>
+          <span>${trHtml("Target:")} <strong>${varyingTargets ? trHtml('Varies by day (refeed included)') : `${formatDisplayNumber(targetCal, 0)} ${trHtml('kcal')}`}</strong></span>
         </div>
         <span class="text-[9px] text-on-surface-variant/70">${trHtml("Tap bar to inspect day")}</span>
       </div>
@@ -537,22 +558,25 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
       <div class="relative w-full h-[140px] flex items-end justify-between gap-1 pt-4 pb-1 px-1 bg-surface-container-low dark:bg-dark-surface-card-high rounded-xl border border-outline-variant/20 overflow-x-auto">
         
         <!-- Target Line across container -->
-        <div 
+        ${!varyingTargets ? `<div
           class="absolute left-0 right-0 border-b border-dashed border-primary/60 z-0 pointer-events-none"
           style="bottom: ${(targetCal / maxCal) * 100}%;"
-        ></div>
+        ></div>` : ''}
 
         <!-- Bars -->
         ${dailyTotals.map((day, idx) => {
           const heightPct = Math.min(100, Math.round((day.calories / maxCal) * 100));
-          const isOver = day.calories > targetCal;
+          const dailyTarget = dayTargets[idx];
+          const isOver = day.calories > dailyTarget;
           const isZero = day.calories === 0;
 
           return `
-            <div 
+            <button type="button"
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0} kcal logged across {1} meals', formatDisplayNumber(day.calories, 0), day.mealCount))})"
+              aria-label="${trHtml('{0}: {1} kcal logged, target {2} kcal, {3} meals with unknown calories.', day.fullDateLabel, formatDisplayNumber(day.calories, 0), formatDisplayNumber(dailyTarget, 0), day.unknownCounts.calories)}"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0} kcal logged, target {1} kcal; {2} meals, {3} with unknown calories.', formatDisplayNumber(day.calories, 0), formatDisplayNumber(dailyTarget, 0), day.mealCount, day.unknownCounts.calories))})"
             >
+              ${varyingTargets ? `<span class="absolute left-0 right-0 border-b border-dashed border-primary/70 pointer-events-none" style="bottom:${dailyTarget / maxCal * 100}%"></span>` : ''}
               <!-- Tooltip on hover/touch -->
               <div class="hidden group-hover:flex absolute top-1 -translate-x-1/2 w-[140px] max-w-[calc(100vw-80px)] bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-normal [overflow-wrap:anywhere] z-20" style="left: calc(50% + ${(0.5 - (colCount > 1 ? idx / (colCount - 1) : 0.5)) * 140}px);">
                 ${formatDisplayNumber(day.calories, 0)} ${trHtml("kcal")}
@@ -572,7 +596,7 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
               <span class="text-[9px] text-on-surface-variant dark:text-gray-400 mt-1 font-semibold truncate ${isDense && idx % Math.ceil(colCount / 7) !== 0 ? 'opacity-0' : 'opacity-100'}">
                 ${day.dayLabel.charAt(0)}
               </span>
-            </div>
+            </button>
           `;
         }).join('')}
       </div>
@@ -588,7 +612,7 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
   `;
 }
 
-function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: number): string {
+function renderMacrosChart(dailyTotals: DailyNutritionSummary[], goals: NutritionGoals): string {
   const maxGrams = Math.max(250, ...dailyTotals.map(d => d.protein + d.carbs + d.fat));
   const colCount = dailyTotals.length;
   const isDense = colCount > 14;
@@ -596,19 +620,19 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
   return `
     <div class="flex flex-col gap-2 pt-2">
       <!-- Legend with symbols & patterns for accessibility -->
-      <div class="flex items-center justify-between text-[10px] text-on-surface-variant dark:text-gray-400 px-1">
-        <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center justify-between text-[10px] text-on-surface-variant dark:text-gray-400 px-1">
+        <div class="flex flex-wrap items-center gap-3">
           <div class="flex items-center gap-1">
             <span class="w-2.5 h-2.5 rounded-xs bg-primary inline-block"></span>
-            <span>${trHtml("Protein (")}${targetProtein}${trHtml("g target)")}</span>
+            <span>${trHtml('Protein target: {0} g', formatDisplayNumber(goals.proteinTarget))}</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="w-2.5 h-2.5 rounded-xs bg-amber-500 inline-block"></span>
-            <span>${trHtml("Carbs")}</span>
+            <span>${trHtml('Carb target today: {0} g', formatDisplayNumber(goals.carbsTarget))}</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="w-2.5 h-2.5 rounded-xs bg-rose-500 inline-block"></span>
-            <span>${trHtml("Fat")}</span>
+            <span>${trHtml('Fat ceiling: {0} g', formatDisplayNumber(goals.fatTarget))}</span>
           </div>
         </div>
       </div>
@@ -619,14 +643,17 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
           const totalMacros = day.protein + day.carbs + day.fat;
           const isZero = totalMacros === 0;
 
-          const pPct = totalMacros > 0 ? (day.protein / maxGrams) * 100 : 0;
-          const cPct = totalMacros > 0 ? (day.carbs / maxGrams) * 100 : 0;
-          const fPct = totalMacros > 0 ? (day.fat / maxGrams) * 100 : 0;
+          const pPct = totalMacros > 0 ? (day.protein / totalMacros) * 100 : 0;
+          const cPct = totalMacros > 0 ? (day.carbs / totalMacros) * 100 : 0;
+          const fPct = totalMacros > 0 ? (day.fat / totalMacros) * 100 : 0;
+          const target = day.targets ?? goals;
+          const detail = tr('{0} g protein / {1} g target · {2} g carbs / {3} g target · {4} g fat / {5} g ceiling', formatDisplayNumber(day.protein), formatDisplayNumber(target.proteinTarget), formatDisplayNumber(day.carbs), formatDisplayNumber(target.carbsTarget), formatDisplayNumber(day.fat), formatDisplayNumber(target.fatTarget));
 
           return `
-            <div 
+            <button type="button"
               class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
-              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0}g protein · {1}g carbs · {2}g fat', formatDisplayNumber(day.protein), formatDisplayNumber(day.carbs), formatDisplayNumber(day.fat)))})"
+              aria-label="${escapeHtml(`${day.fullDateLabel}: ${detail}`)}"
+              onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(detail)})"
             >
               <!-- Tooltip on hover/touch -->
               <div class="hidden group-hover:flex absolute top-1 -translate-x-1/2 w-[140px] max-w-[calc(100vw-80px)] bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-normal [overflow-wrap:anywhere] z-20" style="left: calc(50% + ${(0.5 - (colCount > 1 ? idx / (colCount - 1) : 0.5)) * 140}px);">
@@ -634,7 +661,7 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
               </div>
 
               <!-- Stacked Segment -->
-              <div class="w-full max-w-[28px] flex flex-col justify-end overflow-hidden rounded-t-md ${isZero ? 'h-1 bg-outline-variant/20' : ''}">
+              <div class="w-full max-w-[28px] shrink-0 flex flex-col justify-end overflow-hidden rounded-t-md ${isZero ? 'h-1 bg-outline-variant/20' : ''}" ${!isZero ? `style="height:${totalMacros / maxGrams * 100}%;"` : ''}>
                 ${fPct > 0 ? `<div class="bg-rose-500 w-full" style="height: ${fPct}%;"></div>` : ''}
                 ${cPct > 0 ? `<div class="bg-amber-500 w-full" style="height: ${cPct}%;"></div>` : ''}
                 ${pPct > 0 ? `<div class="bg-primary w-full" style="height: ${pPct}%;"></div>` : ''}
@@ -643,7 +670,7 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], targetProtein: 
               <span class="text-[9px] text-on-surface-variant dark:text-gray-400 mt-1 font-semibold truncate ${isDense && idx % Math.ceil(colCount / 7) !== 0 ? 'opacity-0' : 'opacity-100'}">
                 ${day.dayLabel.charAt(0)}
               </span>
-            </div>
+            </button>
           `;
         }).join('')}
       </div>

@@ -21,5 +21,8 @@ export function renderPhasicRecompTool(toolId: SpecialProgramToolId, customHandl
   return `<div class="phasic-tool-content" data-phasic-tool="${toolId}">
     ${customHandlerFailed ? `<p class="phasic-tool-note" role="status">${trHtml('The custom tool could not open. The built-in tool is available below.')}</p>` : ''}
     ${renderers[toolId]()}
+    <button type="button" class="phasic-tool-secondary w-full mt-4 flex items-center justify-center gap-2" onclick="window.phasicViewInsights()">
+      <span class="material-symbols-outlined" aria-hidden="true">insights</span>${trHtml('View in Insights')}
+    </button>
   </div>`;
 }

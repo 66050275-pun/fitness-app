@@ -1,4 +1,5 @@
 import { foodLabel, mealLabel } from '../i18n/foodLabels.ts';
+import { getMealMicronutrientsForDisplay, getMealNutrientForDisplay } from '../utils/mealNutritionDisplay.ts';
 import { tr, getLanguage, hasLanguageChoice, setLanguage, getLocale } from '../i18n/index.ts';
 import { privateStorage, flushPrivateStorage, retryPrivateStorage, isVaultUnlocked } from '../services/privateStorage.ts';
 import type { 
@@ -1464,7 +1465,7 @@ class Store {
     }
     for (const m of this.state.meals) {
       if (m.date && keySet.has(m.date)) {
-        totals[m.date] = (totals[m.date] || 0) + clampNonNegative(safeFiniteNumber(m.calories));
+        totals[m.date] = (totals[m.date] || 0) + (getMealNutrientForDisplay(m, 'calories') ?? 0);
       }
     }
     return totals;
@@ -1506,7 +1507,7 @@ class Store {
 
   public getConsumedCalories(dateKey: string = this.state.selectedDate): number {
     const meals = this.getMealsForDate(dateKey);
-    return meals.reduce((sum, m) => sum + clampNonNegative(safeFiniteNumber(m.calories)), 0);
+    return meals.reduce((sum, m) => sum + (getMealNutrientForDisplay(m, 'calories') ?? 0), 0);
   }
 
   public getNetRemainingCalories(dateKey: string = this.state.selectedDate): number {
@@ -1520,9 +1521,9 @@ class Store {
     const meals = this.getMealsForDate(dateKey);
     return meals.reduce(
       (acc, m) => {
-        acc.protein += clampNonNegative(safeFiniteNumber(m.protein));
-        acc.carbs += clampNonNegative(safeFiniteNumber(m.carbs));
-        acc.fat += clampNonNegative(safeFiniteNumber(m.fat));
+        acc.protein += getMealNutrientForDisplay(m, 'protein') ?? 0;
+        acc.carbs += getMealNutrientForDisplay(m, 'carbs') ?? 0;
+        acc.fat += getMealNutrientForDisplay(m, 'fat') ?? 0;
         return acc;
       },
       { protein: 0, carbs: 0, fat: 0 }
@@ -3817,12 +3818,12 @@ class Store {
         title: mealLabel(meal, meal.name),
         subtitle: tr("{0} • {1} at {2}", tr(meal.mealType), meal.date, meal.time),
         sourceBadge: isDemo ? 'DEMO' : meal.scanAnalysis?.source === 'ai_estimate' ? 'AI ESTIMATE' : meal.scanAnalysis?.source === 'manual' ? 'MANUAL' : 'DATABASE',
-        profile: meal.nutritionSnapshot?.micronutrients || meal.micronutrients,
+        profile: getMealMicronutrientsForDisplay(meal),
         ingredients: meal.ingredients,
-        calories: meal.calories,
-        protein: meal.protein,
-        carbs: meal.carbs,
-        fat: meal.fat
+        calories: getMealNutrientForDisplay(meal, 'calories'),
+        protein: getMealNutrientForDisplay(meal, 'protein'),
+        carbs: getMealNutrientForDisplay(meal, 'carbs'),
+        fat: getMealNutrientForDisplay(meal, 'fat')
       };
     }
 

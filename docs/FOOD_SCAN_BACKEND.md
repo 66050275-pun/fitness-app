@@ -31,7 +31,7 @@ Optional protections and notices:
 - `GET {base}/models` reads `data[].id` via the server-side `list_models` helper; it is not called automatically on page load and generates no model answer.
 - `POST {base}/chat/completions` uses `model`, `messages` and `max_tokens`. The food request includes a text instruction and a locally/server re-encoded JPEG as an OpenAI-style `image_url` data URL.
 - Structured output is requested in the prompt, with no required `response_format` parameter. Parse `choices[0].message.content` (text or text blocks), then validate the food schema with strict Pydantic models before returning it. Unknown nutrition remains null, cooking fat must be included in total fat, and truncation/invalid JSON is an error.
-- Bound upstream responses and use a 35-second server timeout within the client's 45-second deadline. Map authentication, billing, quota, model/image support, timeout and response errors to safe EN/TH messages; never echo provider bodies, keys or photos.
+- Bound upstream responses and use a 60-second server read timeout within the client's 75-second deadline. Map authentication, billing, quota, model/image support, timeout and response errors to safe EN/TH messages; never echo provider bodies, keys or photos.
 
 ## Streamlit transport
 
@@ -46,7 +46,7 @@ The backend is registered in the client only when the public configuration is re
 1. Take or choose a JPEG/PNG/WebP photo using the platform picker. The camera option is a browser/native picker hint, rather than a fabricated camera feed.
 2. Locally decode, resize to at most 1,600px per side and re-encode as JPEG. Reject input files over 12 MiB, unreasonable decoded dimensions and prepared payloads over 4 MiB. Re-encoding removes original EXIF metadata and the original filename; visible content in the photo remains visible.
 3. After a backend is configured, show its label and EN/TH photo-processing notice. Require explicit confirmation before sending that photo. Replacing a photo resets consent. Changing the backend registration requires fresh consent.
-4. Invoke the registered transport with the prepared Blob, selected language and AbortSignal. The frontend aborts on cancel, leaving the flow or vault lock, ignores late responses and times out after 45 seconds. A backend must honor cancellation where practical and enforce its own limits.
+4. Invoke the registered transport with the prepared Blob, selected language and AbortSignal. The frontend aborts on cancel, leaving the flow or vault lock, ignores late responses and times out after 75 seconds. A backend must honor cancellation where practical and enforce its own limits.
 5. Validate the returned JSON and open a review of the entire portion. Missing nutrition/confidence stays `null`; no confidence, ingredients, glycemic index or micronutrients are invented.
 6. Confirm one reviewed meal in the actual local day's diary. Scan IDs prevent duplicate confirmation, and a rejected persistence queue restores the pending draft. Accepted queue writes use the existing vault status/retry controls rather than re-logging.
 
@@ -103,7 +103,7 @@ Example response, for explaining the contract:
 }
 ```
 
-`cookingFat` and `micronutrients` are optional. A known cooking-fat estimate requires a known total fat and cannot exceed it. Ranges must be ordered and contain the estimate. Micronutrients use the existing `MicronutrientProfile` units; only supplied values appear, with AI attribution.
+`cookingFat` remains optional. The prompt requests `micronutrients` with all 40 app-supported nutrient rows; omitted rows are completed as unknown (`null`), never zero. A known cooking-fat estimate requires a known total fat and cannot exceed it. Ranges must be ordered and contain the estimate. Micronutrients use the existing `MicronutrientProfile` units; known values appear with AI attribution, confidence and a brief estimation note; unknown rows remain available without numeric estimates. See [the complete inventory and Insights integration](MICRONUTRIENTS_INSIGHTS.md).
 
 Ask the provider to estimate likely cooking method/oil/coconut/dressing contributions, describe assumptions and uncertainty, and **include them in total fat and total energy**. A photo supplies estimates rather than a measurement of oil used; an unknown contribution must remain unknown.
 

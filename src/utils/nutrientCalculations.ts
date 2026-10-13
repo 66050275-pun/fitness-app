@@ -25,6 +25,7 @@ import {
   getAllNutrientReferences,
   type NutrientReferenceConfig 
 } from '../data/nutrientReferenceValues.ts';
+import { getMealMicronutrientsForDisplay } from './mealNutritionDisplay.ts';
 
 export type EvaluatedNutrientStatus = 
   | 'within_limit'
@@ -87,6 +88,30 @@ export interface MicronutrientTrendsSummary {
   nutrients: NutrientTrendItem[];
   frequentlyBelowTarget: NutrientTrendItem[];
   consistentlyMeetingTarget: NutrientTrendItem[];
+}
+
+/** Read the same portion snapshot as the diary; all-null profiles provide no coverage. */
+function recordedNutrients(meal: MealItem, includeDemo = false): NutrientValue[] {
+  if (!includeDemo && meal.foodSource === 'demo') return [];
+  const profile = getMealMicronutrientsForDisplay(meal);
+  if (!profile) return [];
+  const seen = new Set<string>();
+  const rows: NutrientValue[] = [];
+  for (const nutrient of [...profile.vitamins, ...profile.minerals, ...profile.otherNutrients]) {
+    if (!includeDemo && nutrient.source === 'demo') continue;
+    const config = getNutrientReference(nutrient.key);
+    if (!config || seen.has(config.key) || nutrient.amount === null || !Number.isFinite(nutrient.amount) || nutrient.amount < 0) continue;
+    const amount = normalizeNutrientUnit(nutrient.amount, nutrient.unit, config.defaultUnit);
+    if (amount === null || !Number.isFinite(amount)) continue;
+    seen.add(config.key);
+    rows.push({ ...nutrient, key: config.key, name: config.name, amount, unit: config.defaultUnit });
+  }
+  return rows;
+}
+
+function isDemoMeal(meal: MealItem): boolean {
+  const profile = getMealMicronutrientsForDisplay(meal);
+  return meal.foodSource === 'demo' || !!profile && [...profile.vitamins, ...profile.minerals, ...profile.otherNutrients].some(n => n.source === 'demo');
 }
 
 /**
@@ -306,10 +331,10 @@ export function aggregateDailyMicronutrients(
 ): DailyMicronutrientSummaryResult {
   const filteredMeals = options.includeDemo 
     ? meals 
-    : meals.filter(m => !m.micronutrients?.vitamins.some(v => v.source === 'demo'));
+    : meals.filter(m => !isDemoMeal(m));
 
   const totalMealsInDay = filteredMeals.length;
-  const mealsWithData = filteredMeals.filter(m => m.micronutrients !== undefined);
+  const mealsWithData = filteredMeals.filter(m => recordedNutrients(m, options.includeDemo).length > 0);
   const coveragePercentage = totalMealsInDay > 0 
     ? Math.round((mealsWithData.length / totalMealsInDay) * 100) 
     : 0;
@@ -322,8 +347,7 @@ export function aggregateDailyMicronutrients(
   }>();
 
   mealsWithData.forEach(meal => {
-    const prof = meal.micronutrients!;
-    const list = [...prof.vitamins, ...prof.minerals, ...prof.otherNutrients];
+    const list = recordedNutrients(meal, options.includeDemo);
 
     list.forEach(n => {
       if (n.amount === null || isNaN(n.amount) || n.amount < 0) return;
@@ -356,7 +380,7 @@ export function aggregateDailyMicronutrients(
     const config = getNutrientReference(key);
     if (!config) return;
 
-    const roundedAmount = Math.round(val.totalAmount * 100) / 100;
+    const roundedAmount = Math.round(val.totalAmount * 10_000) / 10_000;
     const dv = calculateDailyValuePercent(roundedAmount, val.unit, key);
     const evalResult = evaluateNutrientStatus(roundedAmount, val.unit, config, true);
 
@@ -411,13 +435,11 @@ export function calculateMicronutrientTrends(
   // Exclude demo records from real user insights
   const periodMeals = meals.filter(m => {
     if (!dateSet.has(m.date)) return false;
-    // Check if meal is tagged with demo data
-    const isDemo = m.micronutrients?.vitamins.some(v => v.source === 'demo');
-    return !isDemo;
+    return !isDemoMeal(m);
   });
 
   const totalLoggedMeals = periodMeals.length;
-  const mealsWithNutrients = periodMeals.filter(m => m.micronutrients !== undefined);
+  const mealsWithNutrients = periodMeals.filter(m => recordedNutrients(m).length > 0);
   const overallCoverage = totalLoggedMeals > 0 
     ? Math.round((mealsWithNutrients.length / totalLoggedMeals) * 100) 
     : 0;
@@ -446,12 +468,7 @@ export function calculateMicronutrientTrends(
     const dailyNutrientSum = new Map<string, { amount: number; unit: NutrientUnit }>();
 
     dayMeals.forEach(meal => {
-      if (!meal.micronutrients) return;
-      const list = [
-        ...meal.micronutrients.vitamins,
-        ...meal.micronutrients.minerals,
-        ...meal.micronutrients.otherNutrients
-      ];
+      const list = recordedNutrients(meal);
 
       list.forEach(n => {
         if (n.amount === null || isNaN(n.amount) || n.amount < 0) return;
@@ -503,9 +520,10 @@ export function calculateMicronutrientTrends(
     const mealsReporting = data?.mealsReporting || 0;
     const hasEnoughCoverage = mealsReporting >= options.minMealsThreshold;
 
-    const daysCount = dateKeys.length;
+    // Average only recorded dates: an unreported day must not become zero intake.
+    const daysCount = data?.daysWithIntake.size ?? 0;
     const avgDaily = (data && daysCount > 0) 
-      ? Math.round((data.totalAmount / daysCount) * 100) / 100 
+      ? Math.round((data.totalAmount / daysCount) * 10_000) / 10_000
       : null;
 
     const evalResult = evaluateNutrientStatus(avgDaily, config.defaultUnit, config, hasEnoughCoverage);
@@ -519,7 +537,7 @@ export function calculateMicronutrientTrends(
       name: config.name,
       shortName: config.shortName,
       category: config.category,
-      avgDailyIntake: hasEnoughCoverage ? avgDaily : null,
+      avgDailyIntake: avgDaily,
       unit: config.defaultUnit,
       referenceValue: config.referenceValue,
       direction: config.direction,

@@ -7,7 +7,7 @@ import type {
   WeightEntry,
   WorkoutHistoryEntry,
 } from '../types';
-import { ProgressiveOverloadService } from './progressiveOverloadService';
+import { ProgressiveOverloadService } from './progressiveOverloadService.ts';
 
 /** Benchmarks for planning, rather than measurements of amino acids or body composition. */
 export const PROTEIN_MEAL_BENCHMARK_GRAMS = 30;

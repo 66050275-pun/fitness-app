@@ -132,7 +132,7 @@ async function analyzePhoto(): Promise<void> {
   }
   const token = ++generation; const selectedPhoto = photo; const controller = new AbortController(); request = controller;
   let timedOut = false;
-  const timer = window.setTimeout(() => { timedOut = true; controller.abort(); }, 45_000);
+  const timer = window.setTimeout(() => { timedOut = true; controller.abort(); }, 75_000);
   store.updateFoodScan({ status: 'analyzing', error: null });
   try {
     const aborted = new Promise<never>((_, reject) => controller.signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true }));

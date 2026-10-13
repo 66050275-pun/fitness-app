@@ -101,7 +101,11 @@ export function renderFoodResultScreen(): string {
 
       ${food.ingredients.length ? `<section class="phasic-tool-card"><h2 class="font-heading font-bold text-base mb-3">${trHtml('Detected Ingredients')}</h2>
         <div class="flex flex-wrap gap-2">${food.ingredients.map(ingredient => `<span class="rounded-xl px-3 py-2 bg-surface-container-lowest dark:bg-dark-surface-card text-sm">${escapeHtml(ingredient)}</span>`).join('')}</div></section>` : ''}
-      ${food.micronutrients ? `<button type="button" class="phasic-tool-secondary" onclick="window.openNutrientsFromScanned()">${trHtml('View All Nutrients')}</button>` : ''}
+      ${food.micronutrients ? `<section class="phasic-tool-card space-y-3">
+        <button type="button" class="phasic-tool-secondary w-full" onclick="window.openNutrientsFromScanned()">${trHtml('View All Nutrients')}</button>
+        <p class="phasic-tool-muted text-sm">${trHtml('{0} of {1} nutrients estimated; the rest are unknown.', [...food.micronutrients.vitamins, ...food.micronutrients.minerals, ...food.micronutrients.otherNutrients].filter(n => n.amount !== null).length, [...food.micronutrients.vitamins, ...food.micronutrients.minerals, ...food.micronutrients.otherNutrients].length)}</p>
+        <p class="phasic-tool-muted text-sm">${trHtml('AI nutrient values are estimates for the original analyzed portion. Unknown values stay unavailable and are excluded from totals.')}</p>
+      </section>` : ''}
 
       <section class="phasic-tool-card flex flex-col gap-3">
         <h2 class="font-heading font-bold text-base">${trHtml('Assign to Meal')}</h2>
