@@ -172,6 +172,8 @@ declare global {
     selectQuickAddAction: (actionId: QuickAddActionId) => void;
     backQuickAddMenu: () => void;
     selectSpecialProgramTool: (toolId: SpecialProgramToolId) => void;
+    openPhasicInsightTool: (toolId: SpecialProgramToolId) => void;
+    phasicViewInsights: () => void;
     openSpecialProgramGoalSettings: () => void;
 
     // Insights Screen handlers
@@ -770,6 +772,20 @@ window.selectSpecialProgramTool = (toolId: SpecialProgramToolId) => {
 // ==========================================
 // INSIGHTS SCREEN BINDINGS
 // ==========================================
+window.openPhasicInsightTool = toolId => {
+  if (!isVaultUnlocked()) return;
+  const state = store.getState();
+  if (state.currentScreen !== 'insights' || state.quickAddOpen || !store.isSpecialProgramUnlocked() || !getSpecialProgramAction(toolId)) return;
+  store.openQuickAddView('tool', toolId);
+};
+
+window.phasicViewInsights = () => {
+  if (!isVaultUnlocked()) return;
+  const state = store.getState();
+  if (!state.quickAddOpen || state.quickAddView !== 'tool' || !store.isSpecialProgramUnlocked()) return;
+  screenTransitions.dismissDialog('quick-add-backdrop', () => store.setScreen('insights'));
+};
+
 window.setInsightRange = (range: 7 | 30 | 90) => {
   store.setInsightRange(range);
 };

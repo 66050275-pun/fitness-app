@@ -2,19 +2,11 @@ import { tr, trHtml } from '../../i18n/index.ts';
 import { exerciseLabel } from '../../i18n/fitnessLabels.ts';
 import { store } from '../../store/appState.ts';
 import { calculateRecompMatrix, type RecompMatrix, type RecompStatus } from '../../services/phasicRecompService.ts';
+import { RECOMP_STATUS_LABELS as STATUS_LABELS } from '../../utils/phasicInsightCalculations.ts';
 import { getTodayKey, parseLocalDateKey } from '../../utils/dateUtils.ts';
 import { getLocale } from '../../i18n/index.ts';
 import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 import { escapeHtml } from '../../utils/sanitize.ts';
-
-const STATUS_LABELS: Record<RecompStatus, string> = {
-  insufficient_data: 'Not enough comparable data',
-  optimal_recomp: 'Optimal Recomp',
-  strength_declining: 'Strength trending down',
-  building_strength: 'Strength trending up',
-  weight_rising: 'Weight trending up',
-  stable: 'Broadly stable',
-};
 
 const STATUS_NOTES: Record<RecompStatus, string> = {
   insufficient_data: 'Log weight on at least 3 days in each seven-day window and complete comparable loaded exercises in both windows.',

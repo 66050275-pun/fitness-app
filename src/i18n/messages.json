@@ -1652,8 +1652,8 @@
     "th": "ความครบถ้วนของสารอาหารรองคืออะไร?"
   },
   "Micronutrients represent trace vitamins and minerals (such as Vitamin C, Vitamin D, Calcium, and Iron). NutriAI aggregates daily micronutrients only from meals with verified nutritional profiles. Meals without micronutrient data are never assumed to be zero, and coverage percentage indicates data completeness across your day.": {
-    "en": "Micronutrients represent trace vitamins and minerals (such as Vitamin C, Vitamin D, Calcium, and Iron). NutriAI aggregates daily micronutrients only from meals with verified nutritional profiles. Meals without micronutrient data are never assumed to be zero, and coverage percentage indicates data completeness across your day.",
-    "th": "สารอาหารรองได้แก่วิตามินและแร่ธาตุ เช่น วิตามินซี วิตามินดี แคลเซียม และธาตุเหล็ก NutriAI รวมข้อมูลเฉพาะมื้อที่มีรายละเอียดโภชนาการ มื้อที่ไม่มีข้อมูลจะไม่ถือว่ามีสารอาหารเป็นศูนย์ และร้อยละความครบถ้วนแสดงว่าข้อมูลของวันนั้นครบเพียงใด"
+    "en": "Micronutrients include vitamins and minerals such as Vitamin C, Vitamin D, calcium and iron. NutriAI sums available recorded values, including clearly labeled AI estimates. Unknown values are not assumed to be zero; coverage indicates meals with known data, not laboratory accuracy.",
+    "th": "สารอาหารรองรวมวิตามินและแร่ธาตุ เช่น วิตามินซี วิตามินดี แคลเซียม และเหล็ก NutriAI รวมค่าที่มีบันทึก รวมค่าประมาณจาก AI ที่ระบุชัดเจน ค่าที่ไม่ทราบไม่ถือเป็นศูนย์ ความครอบคลุมหมายถึงมื้อที่มีข้อมูล ไม่ใช่ความแม่นยำทางห้องปฏิบัติการ"
   },
   "Fitness": {
     "en": "Fitness",
@@ -3708,16 +3708,16 @@
     "th": "มีข้อมูลสารอาหารรองสำหรับ"
   },
   "* Micronutrients reflect logged meals with verified data. Meals without micronutrient profiles are excluded from totals and not assumed to be zero.": {
-    "en": "* Micronutrients reflect logged meals with verified data. Meals without micronutrient profiles are excluded from totals and not assumed to be zero.",
-    "th": "* สารอาหารรองคำนวณจากมื้อที่มีข้อมูลโภชนาการ มื้อที่ไม่มีรายละเอียดจะไม่รวมยอด และไม่ถือว่ามีสารอาหารเป็นศูนย์"
+    "en": "Micronutrients sum available recorded values, including AI estimates. Unknown values are excluded from totals and never assumed to be zero.",
+    "th": "สารอาหารรองรวมค่าที่มีบันทึก รวมค่าประมาณ AI ค่าที่ไม่ทราบไม่นำมารวมและไม่ถือเป็นศูนย์"
   },
   "No meals logged for this date. Log meals to view trace minerals and vitamins.": {
     "en": "No meals logged for this date. Log meals to view trace minerals and vitamins.",
     "th": "ยังไม่มีมื้ออาหารในวันนี้ บันทึกมื้อเพื่อดูแร่ธาตุและวิตามิน"
   },
   "No verified micronutrient profiles recorded for meals on this date.": {
-    "en": "No verified micronutrient profiles recorded for meals on this date.",
-    "th": "มื้อของวันนี้ยังไม่มีรายละเอียดสารอาหารรองที่ตรวจสอบได้"
+    "en": "No known micronutrient values recorded for meals on this date.",
+    "th": "ยังไม่มีค่าสารอาหารรองที่ทราบบันทึกไว้สำหรับมื้ออาหารในวันที่นี้"
   },
   "No meals recorded for this date": {
     "en": "No meals recorded for this date",
@@ -9358,5 +9358,129 @@
   "Analyzed with {0}": {
     "en": "Analyzed with {0}",
     "th": "วิเคราะห์ด้วย {0}"
+  },
+  "AI nutrient values are estimates for the original analyzed portion. Unknown values stay unavailable and are excluded from totals.": {
+    "en": "AI nutrient values are estimates for the original analyzed portion. Unknown values stay unavailable and are excluded from totals.",
+    "th": "ค่าสารอาหารจาก AI เป็นค่าประมาณของปริมาณอาหารที่วิเคราะห์ครั้งแรก ค่าที่ไม่ทราบจะแสดงว่าไม่มีข้อมูลและไม่นำมารวมยอด"
+  },
+  "All saved food sources and reviewed cooking-fat changes use the same diary totals. Targets use your current saved goals and cycle dates.": {
+    "en": "All saved food sources and reviewed cooking-fat changes use the same diary totals. Targets use your current saved goals and cycle dates.",
+    "th": "อาหารทุกแหล่งที่บันทึกและการแก้ไขไขมันปรุงอาหารใช้ยอดเดียวกับไดอารี เป้าอ้างอิงเป้าที่บันทึกอยู่และวันที่ของรอบโปรแกรม"
+  },
+  "Calorie target met (within 15%): {0} of {1} days. Scheduled refeed targets are included.": {
+    "en": "Calorie target met (within 15%): {0} of {1} days. Scheduled refeed targets are included.",
+    "th": "วันที่พลังงานอยู่ในช่วงเป้า ±15%: {0} จาก {1} วัน รวมเป้าวันรีฟีดตามตารางแล้ว"
+  },
+  "Carb target today: {0} g": {
+    "en": "Carb target today: {0} g",
+    "th": "เป้าคาร์บวันนี้: {0} กรัม"
+  },
+  "Confidence unavailable": {
+    "en": "Confidence unavailable",
+    "th": "ไม่มีค่าความเชื่อมั่น"
+  },
+  "Confidence: {0}%": {
+    "en": "Confidence: {0}%",
+    "th": "ความเชื่อมั่น: {0}%"
+  },
+  "Current cycle: {0}, week {1}/{2}, day {3}/{4}. {5} scheduled refeed dates in this window. Daily calorie and carb comparisons include those allowances, not extra food logs.": {
+    "en": "Current cycle: {0}, week {1}/{2}, day {3}/{4}. {5} scheduled refeed dates in this window. Daily calorie and carb comparisons include those allowances, not extra food logs.",
+    "th": "รอบปัจจุบัน: {0} สัปดาห์ {1}/{2} วัน {3}/{4} มีวันรีฟีดตามตาราง {5} วันในช่วงนี้ การเทียบพลังงานและคาร์บรายวันรวมงบรีฟีดแล้ว โดยไม่ได้บันทึกเป็นอาหารเพิ่ม"
+  },
+  "Daily caloric intake decreased by {0}% (-{1} kcal) compared to the preceding {2}-day window.": {
+    "en": "Daily caloric intake decreased by {0}% (-{1} kcal) compared to the preceding {2}-day window.",
+    "th": "พลังงานที่บันทึกเฉลี่ยต่อวันลดลง {0}% (-{1} กิโลแคลอรี) เทียบกับช่วง {2} วันก่อนหน้า"
+  },
+  "Daily caloric intake increased by {0}% (+{1} kcal) compared to the preceding {2}-day window.": {
+    "en": "Daily caloric intake increased by {0}% (+{1} kcal) compared to the preceding {2}-day window.",
+    "th": "พลังงานที่บันทึกเฉลี่ยต่อวันเพิ่มขึ้น {0}% (+{1} กิโลแคลอรี) เทียบกับช่วง {2} วันก่อนหน้า"
+  },
+  "Daily caloric intake remained virtually unchanged from the previous period.": {
+    "en": "Daily caloric intake remained virtually unchanged from the previous period.",
+    "th": "พลังงานที่บันทึกเฉลี่ยต่อวันใกล้เคียงกับช่วงก่อนหน้า"
+  },
+  "Daily fat ceiling: {0} g. {1} logged days have complete fat data; {2} days exceeded the ceiling; {3} days have incomplete data. The ceiling uses your current saved program and weight.": {
+    "en": "Daily fat ceiling: {0} g. {1} logged days have complete fat data; {2} days exceeded the ceiling; {3} days have incomplete data. The ceiling uses your current saved program and weight.",
+    "th": "เพดานไขมันต่อวัน: {0} กรัม มีข้อมูลไขมันครบ {1} วัน เกินเพดาน {2} วัน และข้อมูลไม่ครบ {3} วัน เพดานอ้างอิงโปรแกรมและน้ำหนักที่บันทึกอยู่"
+  },
+  "Daily nutrient averages use dates with recorded values. AI estimates are included with their recorded source; unknown nutrients do not count toward coverage.": {
+    "en": "Daily nutrient averages use dates with recorded values. AI estimates are included with their recorded source; unknown nutrients do not count toward coverage.",
+    "th": "ค่าเฉลี่ยสารอาหารรายวันใช้เฉพาะวันที่มีค่าบันทึก รวมค่าประมาณ AI พร้อมระบุแหล่งข้อมูล ค่าที่ไม่ทราบจะไม่นับเป็นข้อมูลที่ครอบคลุม"
+  },
+  "Fat ceiling: {0} g": {
+    "en": "Fat ceiling: {0} g",
+    "th": "เพดานไขมัน: {0} กรัม"
+  },
+  "Latest 7 days vs previous 7: weight {0} kg; comparable strength {1}%. {2}. This is a performance trend, not measured body composition.": {
+    "en": "Latest 7 days vs previous 7: weight {0} kg; comparable strength {1}%. {2}. This is a performance trend, not measured body composition.",
+    "th": "7 วันล่าสุดเทียบ 7 วันก่อนหน้า: น้ำหนัก {0} กก. ความแข็งแรงจากท่าที่เทียบกันได้ {1}% สถานะ: {2} เป็นแนวโน้มสมรรถนะ ไม่ใช่ผลวัดองค์ประกอบร่างกาย"
+  },
+  "Open {0}": {
+    "en": "Open {0}",
+    "th": "เปิด{0}"
+  },
+  "Protein target: {0} g": {
+    "en": "Protein target: {0} g",
+    "th": "เป้าโปรตีน: {0} กรัม"
+  },
+  "Recomp compares the latest 7 days with the previous 7, regardless of this page’s range. Log weight on 3 days in each window and comparable loaded workouts to evaluate it.": {
+    "en": "Recomp compares the latest 7 days with the previous 7, regardless of this page’s range. Log weight on 3 days in each window and comparable loaded workouts to evaluate it.",
+    "th": "รีคอมพ์เทียบ 7 วันล่าสุดกับ 7 วันก่อนหน้าเสมอ แม้เลือกช่วงอื่นบนหน้านี้ ต้องบันทึกน้ำหนักอย่างน้อย 3 วันต่อช่วงและการฝึกด้วยน้ำหนักที่เทียบกันได้จึงจะประเมินได้"
+  },
+  "Saved protein plan: {0} g across {1} intervals ({2} g each). This is an allocation, not logged intake.": {
+    "en": "Saved protein plan: {0} g across {1} intervals ({2} g each). This is an allocation, not logged intake.",
+    "th": "แผนโปรตีนที่บันทึก: {0} กรัม แบ่ง {1} ช่วง (ช่วงละ {2} กรัม) เป็นแผนจัดสรร ไม่ใช่ปริมาณที่กินและบันทึกแล้ว"
+  },
+  "Set a cycle in Phase & Cycle to include scheduled refeed allowances in your daily targets.": {
+    "en": "Set a cycle in Phase & Cycle to include scheduled refeed allowances in your daily targets.",
+    "th": "ตั้งรอบในเฟสและรอบโปรแกรม เพื่อรวมงบรีฟีดตามตารางในเป้ารายวัน"
+  },
+  "Varies by day (refeed included)": {
+    "en": "Varies by day (refeed included)",
+    "th": "เปลี่ยนตามวัน (รวมรีฟีด)"
+  },
+  "View in Insights": {
+    "en": "View in Insights",
+    "th": "ดูในอินไซต์"
+  },
+  "{0} g protein / {1} g target · {2} g carbs / {3} g target · {4} g fat / {5} g ceiling": {
+    "en": "{0} g protein / {1} g target · {2} g carbs / {3} g target · {4} g fat / {5} g ceiling",
+    "th": "โปรตีน {0} / เป้า {1} กรัม · คาร์บ {2} / เป้า {3} กรัม · ไขมัน {4} / เพดาน {5} กรัม"
+  },
+  "{0} kcal logged, target {1} kcal; {2} meals, {3} with unknown calories.": {
+    "en": "{0} kcal logged, target {1} kcal; {2} meals, {3} with unknown calories.",
+    "th": "บันทึก {0} กิโลแคลอรี เป้า {1} กิโลแคลอรี มี {2} มื้อ ไม่ทราบพลังงาน {3} มื้อ"
+  },
+  "{0} meals have incomplete calories or macros. Charts show known logged amounts; missing values are not confirmed zeros.": {
+    "en": "{0} meals have incomplete calories or macros. Charts show known logged amounts; missing values are not confirmed zeros.",
+    "th": "มี {0} มื้อที่ข้อมูลพลังงานหรือสารอาหารหลักไม่ครบ กราฟแสดงยอดที่ทราบและบันทึกแล้ว ค่าที่ขาดไม่ถือเป็นศูนย์"
+  },
+  "{0} of {1} logged meal groups were below the 30 g protein benchmark; {2} groups have incomplete protein data. This does not measure leucine.": {
+    "en": "{0} of {1} logged meal groups were below the 30 g protein benchmark; {2} groups have incomplete protein data. This does not measure leucine.",
+    "th": "กลุ่มมื้อที่บันทึก {0} จาก {1} กลุ่มมีโปรตีนน้อยกว่าเกณฑ์วางแผน 30 กรัม และ {2} กลุ่มมีข้อมูลโปรตีนไม่ครบ ค่านี้ไม่ได้วัดลิวซีน"
+  },
+  "{0} of {1} nutrients estimated; the rest are unknown.": {
+    "en": "{0} of {1} nutrients estimated; the rest are unknown.",
+    "th": "ประเมินสารอาหารได้ {0} จาก {1} รายการ ที่เหลือยังไม่ทราบค่า"
+  },
+  "{0} recorded days · {1}% meal coverage": {
+    "en": "{0} recorded days · {1}% meal coverage",
+    "th": "มีค่าบันทึก {0} วัน · ครอบคลุม {1}% ของมื้อ"
+  },
+  "{0} reviewed scans: {1} g included cooking fat, {2} unknown estimates. Manual extra fat: {3} g. These calories and fats are already counted once in nutrition totals.": {
+    "en": "{0} reviewed scans: {1} g included cooking fat, {2} unknown estimates. Manual extra fat: {3} g. These calories and fats are already counted once in nutrition totals.",
+    "th": "ผลสแกนที่ยืนยัน {0} มื้อ มีไขมันปรุงอาหารรวมอยู่ {1} กรัม ไม่ทราบค่าประมาณ {2} มื้อ และไขมันเพิ่มที่กรอกเอง {3} กรัม พลังงานและไขมันเหล่านี้นับในยอดรวมครั้งเดียวแล้ว"
+  },
+  "{0}: {1} kcal logged, target {2} kcal, {3} meals with unknown calories.": {
+    "en": "{0}: {1} kcal logged, target {2} kcal, {3} meals with unknown calories.",
+    "th": "{0}: บันทึก {1} กิโลแคลอรี เป้า {2} กิโลแคลอรี ไม่ทราบพลังงาน {3} มื้อ"
+  },
+  "Each interval meets the 30 g planning benchmark.": {
+    "en": "Each interval meets the 30 g planning benchmark.",
+    "th": "ทุกช่วงถึงเกณฑ์วางแผนโปรตีน 30 กรัม"
+  },
+  "The saved target is too low to provide 30 g in every interval.": {
+    "en": "The saved target is too low to provide 30 g in every interval.",
+    "th": "เป้าที่บันทึกยังไม่เพียงพอให้ทุกช่วงได้โปรตีน 30 กรัม"
   }
 }

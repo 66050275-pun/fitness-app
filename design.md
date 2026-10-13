@@ -214,3 +214,9 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/services/foodAnalysisBackend.ts`, `aiFoodAnalysisAdapter.ts`, `streamlitFoodAnalysis.ts` and `docs/FOOD_SCAN_BACKEND.md`: trusted backend registration, Maxplus session transport and validated analysis contract.
 - `backend/` and `streamlit_component/index.html`: server credentials, provider/schema validation, request budget and a small invisible RPC component.
 - `src/i18n/`: bilingual presentation helpers and messages.
+
+## Detailed nutrients and Insights data (2026-10-13)
+
+- Keep the existing Insights layout and category filters. Display the complete supported nutrient list with recorded-day/meal coverage and clear AI estimate attribution; all-null profiles contribute no coverage. The nutrient dialog shows per-row confidence and estimate notes. Unknown values remain unavailable.
+- Keep calorie/macro charts connected to the same portion snapshots as Diary. Use saved protein goals, exact hydration targets, day-specific refeed calories/carbs and the current Mini Cut fat ceiling.
+- Add six tool summaries within the existing Activity & Nutrition Analysis section for saved special programs. Open the existing tool dialog from a summary, and use the shared exit transition to return from a tool to Insights. Plans and scheduled allowances are not logged food. Recomp retains its labeled seven-day comparison.

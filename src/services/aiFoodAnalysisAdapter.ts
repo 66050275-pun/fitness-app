@@ -1,4 +1,7 @@
 import type { CookingFatAnalysis, FoodAnalysisResult, MicronutrientProfile, NutrientUnit, NutrientValue, ScannedFood } from '../types/index.ts';
+import nutrientCatalog from '../data/foodAnalysisNutrients.json' with { type: 'json' };
+import { getNutrientReference } from '../data/nutrientReferenceValues.ts';
+import { calculateDailyValuePercent } from '../utils/nutrientCalculations.ts';
 
 function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid food analysis response.');
@@ -39,21 +42,42 @@ export function normalizeCookingFat(value: unknown, totalFat: number | null): Co
 }
 
 function normalizeMicronutrients(value: unknown): MicronutrientProfile | undefined {
-  if (value === null || value === undefined) return undefined;
-  const raw = record(value);
+  const raw = value === null || value === undefined ? {} : record(value);
   const units: readonly NutrientUnit[] = ['mg', 'mcg', 'g', 'IU', 'mg_NE', 'mcg_DFE', 'mcg_RAE', 'mg_alpha_TE'];
-  const nutrients = (list: unknown): NutrientValue[] => {
-    if (list === undefined) return [];
-    if (!Array.isArray(list)) throw new Error('Invalid food analysis response.');
-    return list.slice(0, 100).map(item => {
+  const nutrients = (category: keyof typeof nutrientCatalog): NutrientValue[] => {
+    const list = raw[category] ?? [];
+    if (!Array.isArray(list) || list.length > 100) throw new Error('Invalid food analysis response.');
+    const supplied = new Map<string, NutrientValue>();
+    const definitions = nutrientCatalog[category];
+    for (const item of list) {
       const nutrient = record(item);
       if (typeof nutrient.key !== 'string' || typeof nutrient.name !== 'string' || !units.includes(nutrient.unit as NutrientUnit))
         throw new Error('Invalid food analysis response.');
-      return { key: nutrient.key.slice(0, 100), name: nutrient.name.slice(0, 200), unit: nutrient.unit as NutrientUnit,
-        amount: analysisNumber(nutrient.amount, 1_000_000), source: 'ai_estimate', confidence: analysisNumber(nutrient.confidence, 1) };
+      const config = getNutrientReference(nutrient.key);
+      const definition = definitions.find(entry => entry.key === config?.key);
+      if (!definition || supplied.has(definition.key)) throw new Error('Invalid food analysis response.');
+      const unit = definition.unit as NutrientUnit;
+      const massFactors: Partial<Record<NutrientUnit, number>> = { g: 1_000_000, mg: 1000, mcg: 1 };
+      let amount = analysisNumber(nutrient.amount, 1_000_000);
+      if (nutrient.unit !== unit) {
+        const from = massFactors[nutrient.unit as NutrientUnit], to = massFactors[unit];
+        if (!from || !to) throw new Error('Invalid food analysis response.');
+        if (amount !== null) amount = analysisNumber(amount * from / to, 1_000_000);
+      }
+      const confidence = analysisNumber(nutrient.confidence, 1);
+      if (nutrient.note !== undefined && nutrient.note !== null && (typeof nutrient.note !== 'string' || nutrient.note.length > 300))
+        throw new Error('Invalid food analysis response.');
+      supplied.set(definition.key, { key: definition.key, name: definition.name, unit, amount,
+        dailyValuePercent: calculateDailyValuePercent(amount, unit, definition.key),
+        source: 'ai_estimate', confidence: amount === null ? null : confidence,
+        note: typeof nutrient.note === 'string' ? nutrient.note.trim() : undefined });
+    }
+    return definitions.map(definition => supplied.get(definition.key) ?? {
+      key: definition.key, name: definition.name, unit: definition.unit as NutrientUnit,
+      amount: null, dailyValuePercent: null, confidence: null, source: 'ai_estimate'
     });
   };
-  return { vitamins: nutrients(raw.vitamins), minerals: nutrients(raw.minerals), otherNutrients: nutrients(raw.otherNutrients) };
+  return { vitamins: nutrients('vitamins'), minerals: nutrients('minerals'), otherNutrients: nutrients('otherNutrients') };
 }
 
 /** Validates untrusted backend JSON. Missing nutrients remain unknown, including confidence. */

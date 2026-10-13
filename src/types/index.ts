@@ -39,6 +39,8 @@ export interface NutrientValue {
   dailyValuePercent?: number | null;
   source?: 'ai_estimate' | 'database' | 'nutrition_label' | 'manual' | 'demo';
   confidence?: number | null;
+  /** Brief estimation basis or explanation for an unavailable AI nutrient. */
+  note?: string;
 }
 
 export interface ServingBasis {

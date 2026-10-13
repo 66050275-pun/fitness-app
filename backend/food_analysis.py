@@ -7,6 +7,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from .maxplus import AnalysisError
+from .nutrients import complete_micronutrients
 
 Macro = Annotated[float, Field(strict=True, ge=0, le=2000, allow_inf_nan=False)]
 Confidence = Annotated[float, Field(strict=True, ge=0, le=1, allow_inf_nan=False)]
@@ -43,6 +44,7 @@ class Nutrient(StrictResult):
     unit: Literal["mg", "mcg", "g", "IU", "mg_NE", "mcg_DFE", "mcg_RAE", "mg_alpha_TE"]
     confidence: Confidence | None = None
     source: Literal["ai_estimate"] = "ai_estimate"
+    note: Annotated[str, Field(max_length=300)] | None = None
 
 
 class Micronutrients(StrictResult):
@@ -77,10 +79,9 @@ class FoodResult(StrictResult):
 
 def validate_food_result(value: object) -> dict:
     try:
-        # Exclude absent optional micronutrients: the frontend must not replace an unknown profile with a demo.
         result = FoodResult.model_validate(value).model_dump()
-        if result["micronutrients"] is None:
-            del result["micronutrients"]
+        # Every supported nutrient has a row. Completion creates unknowns, never numeric estimates.
+        result["micronutrients"] = complete_micronutrients(result["micronutrients"])
         return result
     except (ValidationError, ValueError, TypeError):
         raise AnalysisError("response_invalid") from None

@@ -9,9 +9,10 @@ import { tr, getLocale } from '../i18n/index.ts';
  * - Honest delta comparisons without fake numbers
  */
 
-import type { MealItem, WorkoutHistoryEntry } from '../types/index.ts';
-import { formatDateKey, parseDateKey } from './dateUtils';
-import { clampNonNegative, safeFiniteNumber, safeRatio } from './safeNumbers';
+import type { MealItem, NutritionGoals, SpecialProgramToolId, WorkoutHistoryEntry } from '../types/index.ts';
+import { formatDateKey, parseDateKey } from './dateUtils.ts';
+import { safeRatio } from './safeNumbers.ts';
+import { getMealNutrientForDisplay } from './mealNutritionDisplay.ts';
 
 export interface DailyNutritionSummary {
   dateKey: string;
@@ -22,6 +23,9 @@ export interface DailyNutritionSummary {
   carbs: number;
   fat: number;
   mealCount: number;
+  unknownCounts: Record<'calories' | 'protein' | 'carbs' | 'fat', number>;
+  /** Current saved goals evaluated for this date, including a scheduled refeed. */
+  targets: NutritionGoals | null;
 }
 
 export interface NutritionAverages {
@@ -65,6 +69,7 @@ export interface InsightMessage {
   text: string;
   icon: string;
   status: 'positive' | 'neutral' | 'attention';
+  toolId?: SpecialProgramToolId;
 }
 
 /**
@@ -90,10 +95,13 @@ export function getDateRangeKeys(rangeDays: number, periodOffset: number = 0): s
 /**
  * Aggregate meals by calendar date for the specified date range.
  */
-export function calculateDailyNutritionTotals(meals: MealItem[], dateKeys: string[]): DailyNutritionSummary[] {
+export function calculateDailyNutritionTotals(
+  meals: MealItem[], dateKeys: string[], getGoalsForDate?: (dateKey: string) => NutritionGoals
+): DailyNutritionSummary[] {
   const mealMap = new Map<string, MealItem[]>();
   
   meals.forEach(m => {
+    if (m.foodSource === 'demo') return;
     const list = mealMap.get(m.date) || [];
     list.push(m);
     mealMap.set(m.date, list);
@@ -105,12 +113,16 @@ export function calculateDailyNutritionTotals(meals: MealItem[], dateKeys: strin
     let pro = 0;
     let carb = 0;
     let fat = 0;
+    const unknownCounts = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
     dayMeals.forEach(m => {
-      cal += clampNonNegative(safeFiniteNumber(m.calories));
-      pro += clampNonNegative(safeFiniteNumber(m.protein));
-      carb += clampNonNegative(safeFiniteNumber(m.carbs));
-      fat += clampNonNegative(safeFiniteNumber(m.fat));
+      const values = { calories: getMealNutrientForDisplay(m, 'calories'), protein: getMealNutrientForDisplay(m, 'protein'),
+        carbs: getMealNutrientForDisplay(m, 'carbs'), fat: getMealNutrientForDisplay(m, 'fat') };
+      for (const key of ['calories', 'protein', 'carbs', 'fat'] as const) if (values[key] === null) unknownCounts[key]++;
+      cal += values.calories ?? 0;
+      pro += values.protein ?? 0;
+      carb += values.carbs ?? 0;
+      fat += values.fat ?? 0;
     });
 
     const dateObj = parseDateKey(key);
@@ -121,11 +133,8 @@ export function calculateDailyNutritionTotals(meals: MealItem[], dateKeys: strin
       dateKey: key,
       dayLabel,
       fullDateLabel,
-      calories: Math.round(cal),
-      protein: Math.round(pro),
-      carbs: Math.round(carb),
-      fat: Math.round(fat),
-      mealCount: dayMeals.length
+      calories: cal, protein: pro, carbs: carb, fat,
+      mealCount: dayMeals.length, unknownCounts, targets: getGoalsForDate?.(key) ?? null
     };
   });
 }
@@ -338,15 +347,18 @@ export function calculateGoalAdherence(
   let calorieMet = 0;
 
   dailyTotals.forEach(d => {
-    if (d.protein >= proteinTarget && d.protein > 0) {
+    const calorieGoal = d.targets?.calorieTarget ?? calorieTarget;
+    const proteinGoal = d.targets?.proteinTarget ?? proteinTarget;
+    const waterGoalMl = d.targets?.waterTarget ?? waterTarget * 250;
+    if (proteinGoal > 0 && d.protein >= proteinGoal && d.protein > 0) {
       proteinMet += 1;
     }
     // Calorie adherence defined as within 15% range of target
-    if (d.calories > 0 && Math.abs(d.calories - calorieTarget) <= calorieTarget * 0.15) {
+    if (calorieGoal > 0 && d.mealCount > 0 && d.unknownCounts.calories === 0 && d.calories > 0 && Math.abs(d.calories - calorieGoal) <= calorieGoal * 0.15) {
       calorieMet += 1;
     }
     const water = waterByDate[d.dateKey] || 0;
-    if (water >= waterTarget && waterTarget > 0) {
+    if (water * 250 >= waterGoalMl && waterGoalMl > 0) {
       waterMet += 1;
     }
   });
@@ -397,7 +409,7 @@ export function generateInsightMessages(
     messages.push({
       id: 'msg-protein-target',
       category: 'nutrition',
-      title: isHigh ? 'Consistent Protein Adherence' : 'Protein Goal Progress',
+      title: tr(isHigh ? 'Consistent Protein Adherence' : 'Protein Goal Progress'),
       text: tr("You met your protein target on {0} of the last {1} days ({2}% adherence).", adherence.proteinGoalMetDays, rangeDays, Math.round((adherence.proteinGoalMetDays / rangeDays) * 100)),
       icon: 'egg_alt',
       status: isHigh ? 'positive' : 'neutral'
@@ -460,10 +472,10 @@ export function generateInsightMessages(
   // 4. Calorie intake trend
   if (deltaCal && deltaCal.hasEnoughData) {
     const text = deltaCal.direction === 'up'
-      ? `Daily caloric intake increased by ${deltaCal.percent}% (+${deltaCal.deltaAbsolute} kcal) compared to the preceding ${rangeDays}-day window.`
+      ? tr('Daily caloric intake increased by {0}% (+{1} kcal) compared to the preceding {2}-day window.', deltaCal.percent, deltaCal.deltaAbsolute, rangeDays)
       : deltaCal.direction === 'down'
-        ? `Daily caloric intake decreased by ${deltaCal.percent}% (-${deltaCal.deltaAbsolute} kcal) compared to the preceding ${rangeDays}-day window.`
-        : `Daily caloric intake remained virtually unchanged from the previous period.`;
+        ? tr('Daily caloric intake decreased by {0}% (-{1} kcal) compared to the preceding {2}-day window.', deltaCal.percent, Math.abs(deltaCal.deltaAbsolute), rangeDays)
+        : tr('Daily caloric intake remained virtually unchanged from the previous period.');
     
     messages.push({
       id: 'msg-calorie-delta',

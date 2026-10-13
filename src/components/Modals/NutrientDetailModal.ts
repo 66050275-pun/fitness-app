@@ -16,6 +16,7 @@ import { htmlJsArg } from '../../utils/sanitize.ts';
 
 import { store } from '../../store/appState';
 import { getNutrientReference } from '../../data/nutrientReferenceValues';
+import { calculateDailyValuePercent } from '../../utils/nutrientCalculations.ts';
 import type { NutrientValue } from '../../types/index.ts';
 
 function escapeHtml(str: string): string {
@@ -165,6 +166,7 @@ export function renderNutrientDetailModal(): string {
           ` : ''}
 
           <!-- Vitamins Category -->
+          ${modalData.sourceBadge === 'AI ESTIMATE' ? `<p class="text-sm text-on-surface-variant dark:text-gray-300 leading-relaxed">${trHtml('AI nutrient values are estimates for the original analyzed portion. Unknown values stay unavailable and are excluded from totals.')}</p>` : ''}
           ${(activeCategory === 'all' || activeCategory === 'vitamins') ? renderNutrientCategoryBlock(tr("Vitamins"), vitamins) : ''}
 
           <!-- Minerals Category -->
@@ -216,9 +218,9 @@ function renderNutrientCategoryBlock(title: string, list: NutrientValue[]): stri
 
 function renderNutrientRow(item: NutrientValue): string {
   const config = getNutrientReference(item.key);
-  const safeName = trHtml(item.name);
+  const safeName = trHtml(config?.name ?? item.name);
   const amountStr = item.amount !== null ? `${formatDisplayNumber(item.amount, 4)} ${trHtml(item.unit)}` : tr("Not available");
-  const dv = item.dailyValuePercent;
+  const dv = calculateDailyValuePercent(item.amount, item.unit, item.key);
   const isMaxLimit = config?.direction === 'maximum_limit';
   const hasDV = config?.hasDailyValuePercent ?? (dv !== null && dv !== undefined);
 
@@ -244,6 +246,7 @@ function renderNutrientRow(item: NutrientValue): string {
             ${statusBadgeHtml}
           </div>
           <span class="text-[11px] font-extrabold text-primary dark:text-primary-container mt-0.5 block">${amountStr}</span>
+          ${item.source === 'ai_estimate' ? `<span class="text-[11px] text-on-surface-variant dark:text-gray-400 block mt-1">${trHtml('AI ESTIMATE')} · ${item.confidence === null || item.confidence === undefined ? trHtml('Confidence unavailable') : trHtml('Confidence: {0}%', formatDisplayNumber(item.confidence * 100, 0))}</span>` : ''}
         </div>
 
         <div class="text-right">
@@ -257,6 +260,7 @@ function renderNutrientRow(item: NutrientValue): string {
       </div>
 
       <!-- Accessible Progress Bar -->
+      ${item.note ? `<p class="text-xs text-on-surface-variant dark:text-gray-300 leading-relaxed">${escapeHtml(item.note)}</p>` : ''}
       ${hasDV && dv !== null && dv !== undefined ? `
         <div 
           class="w-full h-1.5 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high overflow-hidden" 
@@ -307,6 +311,7 @@ function renderUnavailableNutrientsBlock(profile: any): string {
         ${unavail.map(n => `
           <span class="px-2 py-0.5 rounded-lg bg-surface-container dark:bg-dark-surface-card-high text-[10px] text-on-surface-variant font-medium">
             ${trHtml(n.name)}${trHtml(": Not available")}
+            ${n.note ? `<span class="block mt-1 text-xs leading-relaxed">${escapeHtml(n.note)}</span>` : ''}
           </span>
         `).join('')}
       </div>
