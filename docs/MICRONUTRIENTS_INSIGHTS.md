@@ -4,11 +4,11 @@ Reference date: 2026-10-13 (Asia/Bangkok).
 
 ## Full food-scan contract
 
-The Maxplus vision prompt requests **all 40 existing app nutrients**: 13 vitamins plus choline in the vitamin section, 15 minerals, and 11 other nutrients/lipids. Calories, protein, carbohydrates and total fat are separate primary fields, so a scan reviews **44 nutrition fields** in total.
+One Maxplus vision request identifies the meal; six small text-only requests together request **all 40 existing app nutrients**: 13 vitamins plus choline in the vitamin section, 15 minerals, and 11 other nutrients/lipids. Calories, protein, carbohydrates and total fat are separate primary fields, so a scan reviews **44 nutrition fields** in total.
 
-`src/data/foodAnalysisNutrients.json` is the shared AI contract for Python and TypeScript. It mirrors every key, category and canonical unit in `nutrientReferenceValues.ts`; the regression check detects drift. The backend prompts for every row, then validates and fills any omitted row with `amount: null` and `confidence: null`. No numeric nutrient values are manufactured by completion.
+`src/data/foodAnalysisNutrients.json` is the shared AI contract for Python and TypeScript. It mirrors every key, category and canonical unit in `nutrientReferenceValues.ts`; the regression check detects drift. The backend requests every row across six batches, then validates, merges and fills any omitted row with `amount: null` and `confidence: null`. No numeric nutrient values are manufactured by completion.
 
-Each supplied nutrient has `key`, `name`, `amount`, `unit`, `confidence`, `source: ai_estimate` and a short `note` describing the estimate's basis or reason for an unknown value. All amounts refer to the whole original pictured portion. The prompt asks for ingredient quantities, preparation/cooking-loss assumptions and uncertainty about fortification, sauces and oil. Estimates use the model's food-composition knowledge, without claiming a live database lookup or a laboratory measurement. Every row is requested, but numeric completeness or accuracy cannot be guaranteed from a photo.
+Each supplied nutrient has `key`, `name`, `amount`, `unit`, `confidence`, `source: ai_estimate` and a short `note` (up to 160 characters for batch output) describing the estimate's basis or reason for an unknown value. All amounts refer to the whole original pictured portion. The prompt asks for ingredient quantities, preparation/cooking-loss assumptions and uncertainty about fortification, sauces and oil. Estimates use the model's food-composition knowledge, without claiming a live database lookup or a laboratory measurement. Every row is requested, but numeric completeness or accuracy cannot be guaranteed from a photo.
 
 Plain mass units can be normalized (g/mg/mcg). Nutrient-specific RAE/DFE/NE/alpha-TE equivalents require the correct unit; arbitrary IU conversion is rejected. Duplicate keys, incorrect categories, non-finite/negative values and unrecognized nutrient keys are rejected. Daily-value percentages are calculated by the app's existing reference rules, not supplied by the model.
 
@@ -87,9 +87,9 @@ The existing analysis section gains six program summaries for saved Mini Cut / L
 
 Each summary opens its existing tool dialog; each tool can dismiss to Insights through the existing modal transition lifecycle. Saving/deleting diary entries, changing targets or cycle preferences uses normal store notifications and updates these calculations. Standard goals keep the tools locked. All new app-owned labels support EN and TH; provider text uses the language requested at analysis time.
 
-## Verification and limits
+## Prior verification and current limits
 
-Offline checks cover the full 40-key/unit/category inventory; partial response completion; null vs real zero; duplicate/unit rejection; confidence/notes serialization; snapshot/coverage averaging; saved protein/refeed/water adherence; cooking-fat delta accounting; and six tool summaries in EN/TH. The Python check mocks the provider transport and confirms every nutrient key/unit is requested. Run the scoped checks with:
+Before this batching change, offline checks covered the full 40-key/unit/category inventory; partial response completion; null vs real zero; duplicate/unit rejection; confidence/notes serialization; snapshot/coverage averaging; saved protein/refeed/water adherence; cooking-fat delta accounting; and six tool summaries in EN/TH. The Python check mocks the provider transport and confirms every nutrient key/unit is requested. Run the scoped checks with:
 
 ```bash
 node tests/food-analysis-insights.test.ts
@@ -97,6 +97,6 @@ python -m unittest discover -s tests -p test_food_analysis.py -v
 npm run build
 ```
 
-A scoped Chromium check also passed using a fresh synthetic vault: 40 nutrient rows, confidence/notes, confirmation into the diary and existing Insights, all six tool dialogs and return links, refeed-day inspection, visible macro bars, and no horizontal overflow at 320/390px in EN/TH and light/dark themes. This exercised the local client; it did not exercise the live Streamlit transport.
+Before this batching change, a scoped Chromium check also passed using a fresh synthetic vault: 40 nutrient rows, confidence/notes, confirmation into the diary and existing Insights, all six tool dialogs and return links, refeed-day inspection, visible macro bars, and no horizontal overflow at 320/390px in EN/TH and light/dark themes. This exercised the local client; it did not exercise the live Streamlit transport.
 
-No paid Maxplus request, real food photo or production vault data is used by these checks. Live vision output and the deployed Streamlit bridge still require owner Secrets, an image-capable model and a real scan. The request budget remains unchanged; the fuller reply can use up to 6,500 output tokens, with a 60-second server read timeout inside the client's 75-second cancellation deadline.
+No paid Maxplus request, real food photo or production vault data is used by these checks. Live vision output and the deployed Streamlit bridge still require owner Secrets, an image-capable model and a real scan. The batched workflow uses a 2,500-token primary image reply plus up to six 1,400-token text replies. The daily limit still counts logical scans, so a full scan may make seven provider calls. The whole workflow is bounded to 210 seconds inside a 240-second client deadline. See [batch behavior, partial results and percentage progress](FOOD_SCAN_BACKEND.md#batched-analysis-and-percentage-progress).

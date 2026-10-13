@@ -471,13 +471,22 @@ export interface FoodScanReview {
   mealType: MealType;
 }
 
-/** Ephemeral: image URLs, consent and unfinished edits never enter the vault snapshot. */
+/** Completed workflow milestones supplied by the current analysis request. */
+export interface FoodAnalysisProgress {
+  percent: number;
+  stage: 'preparing' | 'meal' | 'nutrients' | 'combining' | 'complete';
+  completedBatches: number;
+  totalBatches: number;
+}
+
+/** Ephemeral: image URLs, progress, consent and unfinished edits never enter the vault snapshot. */
 export interface FoodScanState {
   status: 'idle' | 'preparing' | 'ready' | 'analyzing' | 'error';
   photoUrl: string | null;
   consent: boolean;
   error: string | null;
   review: FoodScanReview | null;
+  progress: FoodAnalysisProgress | null;
 }
 
 export interface ScanMealAnalysis {

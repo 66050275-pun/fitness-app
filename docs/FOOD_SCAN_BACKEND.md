@@ -31,7 +31,7 @@ Optional protections and notices:
 - `GET {base}/models` reads `data[].id` via the server-side `list_models` helper; it is not called automatically on page load and generates no model answer.
 - `POST {base}/chat/completions` uses `model`, `messages` and `max_tokens`. The food request includes a text instruction and a locally/server re-encoded JPEG as an OpenAI-style `image_url` data URL.
 - Structured output is requested in the prompt, with no required `response_format` parameter. Parse `choices[0].message.content` (text or text blocks), then validate the food schema with strict Pydantic models before returning it. Unknown nutrition remains null, cooking fat must be included in total fat, and truncation/invalid JSON is an error.
-- Bound upstream responses and use a 60-second server read timeout within the client's 75-second deadline. Map authentication, billing, quota, model/image support, timeout and response errors to safe EN/TH messages; never echo provider bodies, keys or photos.
+- Bound upstream responses and use a 35-second server read timeout, 45-second primary-request cap and 25-second nutrient-request cap. The whole pipeline is bounded to 210 seconds inside the client's 240-second deadline. Map authentication, billing, quota, model/image support, timeout and response errors to safe EN/TH messages; never echo provider bodies, keys or photos.
 
 ## Streamlit transport
 
@@ -46,7 +46,7 @@ The backend is registered in the client only when the public configuration is re
 1. Take or choose a JPEG/PNG/WebP photo using the platform picker. The camera option is a browser/native picker hint, rather than a fabricated camera feed.
 2. Locally decode, resize to at most 1,600px per side and re-encode as JPEG. Reject input files over 12 MiB, unreasonable decoded dimensions and prepared payloads over 4 MiB. Re-encoding removes original EXIF metadata and the original filename; visible content in the photo remains visible.
 3. After a backend is configured, show its label and EN/TH photo-processing notice. Require explicit confirmation before sending that photo. Replacing a photo resets consent. Changing the backend registration requires fresh consent.
-4. Invoke the registered transport with the prepared Blob, selected language and AbortSignal. The frontend aborts on cancel, leaving the flow or vault lock, ignores late responses and times out after 75 seconds. A backend must honor cancellation where practical and enforce its own limits.
+4. Invoke the registered transport with the prepared Blob, selected language and AbortSignal. The frontend aborts on cancel, leaving the flow or vault lock, ignores late responses and times out after 240 seconds (including all sequential batches). A backend must honor cancellation where practical and enforce its own limits.
 5. Validate the returned JSON and open a review of the entire portion. Missing nutrition/confidence stays `null`; no confidence, ingredients, glycemic index or micronutrients are invented.
 6. Confirm one reviewed meal in the actual local day's diary. Scan IDs prevent duplicate confirmation, and a rejected persistence queue restores the pending draft. Accepted queue writes use the existing vault status/retry controls rather than re-logging.
 
@@ -61,6 +61,7 @@ interface FoodAnalysisRequest {
   photo: Blob;
   language: 'en' | 'th';
   signal: AbortSignal;
+  onProgress?: (progress: FoodAnalysisProgress) => void;
 }
 
 interface FoodAnalysisBackend {
@@ -69,6 +70,8 @@ interface FoodAnalysisBackend {
   analyze(request: FoodAnalysisRequest): Promise<unknown>;
 }
 ```
+
+The request also accepts an optional `onProgress(progress)` callback for validated workflow milestones. Progress is a nonterminal event; only the final result/error releases the request.
 
 Register the transport from trusted application initialization before the scan UI renders. Its implementation will call the agreed NutriAI backend with the agreed authentication and payload format. Provider credentials belong on the server. The client has no provider API-key field, arbitrary endpoint input or automatic upload.
 
@@ -103,7 +106,7 @@ Example response, for explaining the contract:
 }
 ```
 
-`cookingFat` remains optional. The prompt requests `micronutrients` with all 40 app-supported nutrient rows; omitted rows are completed as unknown (`null`), never zero. A known cooking-fat estimate requires a known total fat and cannot exceed it. Ranges must be ordered and contain the estimate. Micronutrients use the existing `MicronutrientProfile` units; known values appear with AI attribution, confidence and a brief estimation note; unknown rows remain available without numeric estimates. See [the complete inventory and Insights integration](MICRONUTRIENTS_INSIGHTS.md).
+`cookingFat` remains optional. One image request identifies the primary meal; six sequential text-only requests estimate no more than eight nutrients each. Together they request all 40 app-supported nutrient rows; omitted rows are completed as unknown (`null`), never zero. A known cooking-fat estimate requires a known total fat and cannot exceed it. Ranges must be ordered and contain the estimate. Micronutrients use the existing `MicronutrientProfile` units; known values appear with AI attribution, confidence and a brief estimation note; unknown rows remain available without numeric estimates. See [the complete inventory and Insights integration](MICRONUTRIENTS_INSIGHTS.md).
 
 Ask the provider to estimate likely cooking method/oil/coconut/dressing contributions, describe assumptions and uncertainty, and **include them in total fat and total energy**. A photo supplies estimates rather than a measurement of oil used; an unknown contribution must remain unknown.
 
@@ -129,6 +132,24 @@ Ask the provider to estimate likely cooking method/oil/coconut/dressing contribu
 - `appState.ts` / `storagePersistence.ts`: one-entry diary persistence and schema migration.
 - `streamlitFoodAnalysis.ts` / `streamlit_component/index.html`: client registration and typed session RPC.
 - `backend/settings.py`: server-only key/model/settings plus public capability metadata.
-- `backend/maxplus.py`: official-host model listing and vision chat-completion requests.
+- `backend/maxplus.py`: official-host model listing, one vision request and compact text-only nutrient requests.
+- `backend/food_scan_pipeline.py`: six sequential nutrient batches, bounded cancellation, partial-result handling and real stage progress.
 - `backend/food_analysis.py`: strict server response schema and included-fat validation.
 - `backend/streamlit_transport.py`: session jobs, cancellation, deduplication and bounded owner request budget.
+
+## Batched analysis and percentage progress
+
+The reported production error was `response_invalid` (the UI showed “The AI result could not be validated”). This code can originate from provider JSON parsing or nutrition validation; the screenshot alone does not prove a timeout or size limit. The previous all-in-one request allowed 6,500 output tokens and rejected the entire scan when a detailed nutrient failed validation.
+
+The current workflow:
+
+1. Send the prepared JPEG once to identify the whole portion, calories/macros and included cooking-fat estimate. Keep the output cap at 2,500 tokens. Validate these primary values separately, ignoring unrequested extra detail fields. Bare numeric strings are accepted as numbers; unit-bearing text, negative/non-finite/out-of-bound amounts and inconsistent cooking-fat totals remain invalid.
+2. Freeze the validated primary portion. Send six compact **text-only** requests, each with at most eight requested nutrient keys, canonical units and a bounded meal context. Each reply has only `key`, `amount`, `confidence`, `note`, capped at 1,400 output tokens. No profile, PIN or extra photo upload is sent.
+3. Merge each validated group into the same 40-row profile. Batch replies cannot replace the food, serving, calories or macros. If a batch is invalid/incomplete, continue with other batches; if a provider timeout/quota/auth/availability error occurs, stop further detail requests. Preserve the primary meal and successful groups, fill unavailable rows with null and show a localized warning before confirmation. There are no automatic paid retries.
+4. Retain one scan ID and one final review/diary confirmation. Partial results are not logged while the workflow is running.
+
+Progress is completed-workflow progress, not elapsed time or upload-byte progress: 0% local preparation, 10% ready to send, 15% server photo accepted, 30% primary meal validated, 40–90% after handled nutrient batches, 95% combining, and 100% once the final combined result is validated. A partial-result fallback can advance to combination early; its batch counter remains the actual number handled. The result's warning explains unavailable groups.
+
+Both the sidecar and client keep the pending request alive for progress events. Frame/request binding, event sequence acknowledgements and monotonic validation prevent stale progress from updating a replacement scan. Cancel, Back and vault lock abort the active task and stop later requests; an already accepted provider request may still be billed. The percentage updates in place, honors Reduce Motion, includes accessible value/stage text and brings the progress/Cancel controls into view after Analyze.
+
+The existing daily limit counts **logical scan attempts**. One successful full scan now makes at most **seven provider calls** (one image + six text); the default 20-scan allowance therefore permits up to 140 calls per process/day. Four logical scans remain the maximum concurrency, with each scan issuing detail requests sequentially. This bounds work but is not a provider billing guarantee.

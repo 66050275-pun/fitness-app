@@ -1,11 +1,13 @@
 """Offline regression checks for the complete Maxplus nutrition contract."""
 
 import unittest
+import json
 from unittest.mock import AsyncMock, patch
 
 from backend.food_analysis import validate_food_result
-from backend.maxplus import AnalysisError, analyze_food_photo
-from backend.nutrients import NUTRIENT_CATALOG
+from backend.maxplus import AnalysisError
+from backend.food_scan_pipeline import analyze_food_in_batches
+from backend.nutrients import NUTRIENT_BATCHES
 
 
 class NutrientContractTests(unittest.TestCase):
@@ -35,18 +37,28 @@ class NutrientContractTests(unittest.TestCase):
 
 class PromptTests(unittest.IsolatedAsyncioTestCase):
     async def test_provider_prompt_requests_every_supported_nutrient_in_selected_language(self):
-        fake = AsyncMock(return_value={"choices": [{"message": {"content": '{"foodName":"Meal","servingDescription":"One plate"}'}}]})
+        responses = [{"foodName": "Meal", "servingDescription": "One plate"}]
+        responses += [{"nutrients": [{"key": row["key"], "amount": None} for row in definitions]}
+                      for _, definitions in NUTRIENT_BATCHES]
+        fake = AsyncMock(side_effect=[{"choices": [{"message": {"content": json.dumps(result)}}]} for result in responses])
         with patch("backend.maxplus._request_json", fake):
-            await analyze_food_photo("offline-test-key", "vision-model", b"offline-photo", "th")
-        payload = fake.call_args.args[3]
-        prompt = payload["messages"][1]["content"][0]["text"]
-        for definitions in NUTRIENT_CATALOG.values():
+            result = await analyze_food_in_batches("offline-test-key", "vision-model", b"offline-photo", "th")
+        self.assertEqual(len(fake.call_args_list), 7)
+        primary = fake.call_args_list[0].args[3]
+        self.assertEqual(primary["max_tokens"], 2500)
+        self.assertEqual(primary["messages"][1]["content"][1]["type"], "image_url")
+        for index, (_, definitions) in enumerate(NUTRIENT_BATCHES):
+            payload = fake.call_args_list[index + 1].args[3]
+            prompt = payload["messages"][1]["content"]
+            self.assertIsInstance(prompt, str)
+            self.assertLessEqual(len(definitions), 8)
+            self.assertEqual(payload["max_tokens"], 1400)
             for row in definitions:
                 self.assertIn(row["key"], prompt)
                 self.assertIn(row["unit"], prompt)
-        self.assertIn("Thai", prompt)
-        self.assertIn("amount and confidence MUST be null", prompt)
-        self.assertGreaterEqual(payload["max_tokens"], 6500)
+            self.assertIn("Thai", prompt)
+            self.assertIn("amount and confidence MUST be null", prompt)
+        self.assertEqual(sum(len(rows) for rows in result["micronutrients"].values()), 40)
 
 
 if __name__ == "__main__":

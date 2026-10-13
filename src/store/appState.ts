@@ -496,7 +496,7 @@ class Store {
       meals: persisted.meals,
       chatHistory: INITIAL_CHAT,
       lastScannedFood: null,
-      foodScan: { status: 'idle', photoUrl: null, consent: false, error: null, review: null },
+      foodScan: { status: 'idle', photoUrl: null, consent: false, error: null, review: null, progress: null },
       quickAddOpen: false,
       quickAddView: 'primary',
       selectedSpecialProgramTool: null,

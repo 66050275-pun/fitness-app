@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from typing import Annotated, Literal
+import math
+import re
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -13,6 +15,18 @@ Macro = Annotated[float, Field(strict=True, ge=0, le=2000, allow_inf_nan=False)]
 Confidence = Annotated[float, Field(strict=True, ge=0, le=1, allow_inf_nan=False)]
 Note = Annotated[str, Field(strict=True, max_length=400)]
 Notes = Annotated[list[Note], Field(max_length=30)]
+
+
+def _numeric(item):
+    # Only bare JSON numeric strings: never infer units or convert an unknown value to zero.
+    if isinstance(item, str) and len(item) <= 50 and re.fullmatch(r"\d+(?:\.\d+)?(?:[eE][+-]?\d+)?", item.strip()):
+        return float(item.strip())
+    return item
+
+
+def _confidence(item):
+    value = _numeric(item)
+    return value if type(value) in (int, float) and 0 <= value <= 1 and math.isfinite(value) else None
 
 
 class StrictResult(BaseModel):
@@ -53,6 +67,60 @@ class Micronutrients(StrictResult):
     otherNutrients: Annotated[list[Nutrient], Field(max_length=100)] = Field(default_factory=list)
 
 
+class BatchNutrient(StrictResult):
+    key: Annotated[str, Field(min_length=1, max_length=100)]
+    amount: Annotated[float, Field(strict=True, ge=0, le=1_000_000, allow_inf_nan=False)] | None = None
+    confidence: Confidence | None = None
+    note: Annotated[str, Field(max_length=160)] | None = None
+
+
+class NutrientBatch(StrictResult):
+    nutrients: Annotated[list[BatchNutrient], Field(max_length=8)]
+
+
+def validate_nutrient_batch(value: object, definitions: list[dict]) -> list[dict]:
+    """A batch can only contribute its requested keys, never redefine the primary meal."""
+    try:
+        lookup = {item["key"]: item for item in definitions}
+        if not isinstance(value, dict) or not isinstance(value.get("nutrients"), list) or len(value["nutrients"]) > 8:
+            raise ValueError("Missing nutrient batch")
+        prepared = []
+        for row in value["nutrients"]:
+            if not isinstance(row, dict) or not isinstance(row.get("key"), str):
+                raise ValueError("Invalid nutrient row")
+            identity = re.sub(r"[^a-z0-9]", "", row["key"].lower())
+            definition = next((item for key, item in lookup.items() if re.sub(r"[^a-z0-9]", "", key) == identity), None)
+            if definition is None:
+                raise ValueError("Unrequested nutrient")
+            amount = _numeric(row.get("amount"))
+            unit = row.get("unit", definition["unit"])
+            if unit != definition["unit"]:
+                from .nutrients import MASS_FACTORS
+                if unit not in MASS_FACTORS or definition["unit"] not in MASS_FACTORS:
+                    raise ValueError("Incompatible nutrient unit")
+                if amount is not None:
+                    if type(amount) not in (float, int):
+                        raise ValueError("Invalid nutrient amount")
+                    amount *= MASS_FACTORS[unit] / MASS_FACTORS[definition["unit"]]
+            note = row.get("note")
+            # Extra names/source/DV fields do not override app-owned units, attribution or references.
+            prepared.append({"key": definition["key"], "amount": amount, "confidence": _confidence(row.get("confidence")),
+                             "note": note[:160] if isinstance(note, str) else note})
+        rows = NutrientBatch.model_validate({"nutrients": prepared}).model_dump()["nutrients"]
+        seen: set[str] = set()
+        result = []
+        for row in rows:
+            key = row["key"]
+            if key not in lookup or key in seen:
+                raise ValueError("Unexpected or duplicate batch nutrient")
+            seen.add(key)
+            result.append({**lookup[key], **row, "source": "ai_estimate",
+                           "confidence": row["confidence"] if row["amount"] is not None else None})
+        return result
+    except (ValidationError, ValueError, TypeError):
+        raise AnalysisError("response_invalid") from None
+
+
 class FoodResult(StrictResult):
     foodName: Annotated[str, Field(min_length=1, max_length=200)]
     servingDescription: Annotated[str, Field(min_length=1, max_length=300)]
@@ -85,3 +153,20 @@ def validate_food_result(value: object) -> dict:
         return result
     except (ValidationError, ValueError, TypeError):
         raise AnalysisError("response_invalid") from None
+
+
+def validate_primary_food_result(value: object) -> dict:
+    """Ignore unrequested detail/extra fields while retaining strict checks on meal nutrition."""
+    if not isinstance(value, dict):
+        raise AnalysisError("response_invalid")
+    primary = {key: item for key, item in value.items() if key in FoodResult.model_fields and key != "micronutrients"}
+
+    for key in ("servingWeightGrams", "calories", "protein", "carbs", "fat", "overallConfidence"):
+        if key in primary:
+            primary[key] = _confidence(primary[key]) if key == "overallConfidence" else _numeric(primary[key])
+    cooking = primary.get("cookingFat")
+    if isinstance(cooking, dict):
+        primary["cookingFat"] = {key: _confidence(item) if key == "confidence" else _numeric(item) if key in (
+            "estimatedGrams", "rangeMinGrams", "rangeMaxGrams"
+        ) else item for key, item in cooking.items() if key in CookingFat.model_fields}
+    return validate_food_result(primary)

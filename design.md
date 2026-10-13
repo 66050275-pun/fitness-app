@@ -220,3 +220,9 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - Keep the existing Insights layout and category filters. Display the complete supported nutrient list with recorded-day/meal coverage and clear AI estimate attribution; all-null profiles contribute no coverage. The nutrient dialog shows per-row confidence and estimate notes. Unknown values remain unavailable.
 - Keep calorie/macro charts connected to the same portion snapshots as Diary. Use saved protein goals, exact hydration targets, day-specific refeed calories/carbs and the current Mini Cut fat ceiling.
 - Add six tool summaries within the existing Activity & Nutrition Analysis section for saved special programs. Open the existing tool dialog from a summary, and use the shared exit transition to return from a tool to Insights. Plans and scheduled allowances are not logged food. Recomp retains its labeled seven-day comparison.
+
+### Food-scan batch progress
+
+- While analyzing, show a readable percentage, green progress bar and localized stage/batch counter over the food preview. Use actual completed workflow milestones; do not simulate progress with a timer. Keep Cancel reachable on narrow screens, and bring progress into view after Analyze.
+- Update the existing mounted meter in place so status events do not move focus or reset animation. Respect Reduce Motion. Progress state is transient and clears on error, cancel, replacement, departure or vault lock.
+- A missing detailed nutrient batch must not discard a valid primary meal. Show its warning and unavailable nutrients in the existing result review, then save one combined meal only after confirmation.

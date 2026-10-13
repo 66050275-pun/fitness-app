@@ -9482,5 +9482,29 @@
   "The saved target is too low to provide 30 g in every interval.": {
     "en": "The saved target is too low to provide 30 g in every interval.",
     "th": "เป้าที่บันทึกยังไม่เพียงพอให้ทุกช่วงได้โปรตีน 30 กรัม"
+  },
+  "Identifying the meal and primary nutrition…": {
+    "en": "Identifying the meal and primary nutrition…",
+    "th": "กำลังวิเคราะห์อาหารและสารอาหารหลัก…"
+  },
+  "Nutrient batches processed: {0} of {1}.": {
+    "en": "Nutrient batches processed: {0} of {1}.",
+    "th": "วิเคราะห์ชุดสารอาหารแล้ว {0} จาก {1} ชุด"
+  },
+  "Combining and checking results…": {
+    "en": "Combining and checking results…",
+    "th": "กำลังรวมผลและตรวจสอบข้อมูล…"
+  },
+  "Analysis ready for review.": {
+    "en": "Analysis ready for review.",
+    "th": "ผลวิเคราะห์พร้อมให้ตรวจสอบแล้ว"
+  },
+  "Food analysis progress": {
+    "en": "Food analysis progress",
+    "th": "ความคืบหน้าการวิเคราะห์อาหาร"
+  },
+  "Progress updates when each step finishes.": {
+    "en": "Progress updates when each step finishes.",
+    "th": "ความคืบหน้าจะอัปเดตเมื่อแต่ละขั้นตอนเสร็จ"
   }
 }
