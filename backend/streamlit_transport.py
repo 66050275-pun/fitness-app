@@ -17,7 +17,8 @@ from zoneinfo import ZoneInfo
 from typing import Any
 
 from .food_analysis import validate_food_result
-from .maxplus import AnalysisError, analyze_food_photo, prepare_server_photo
+from .maxplus import AnalysisError, prepare_server_photo
+from .food_scan_pipeline import TOTAL_BATCHES, analyze_food_in_batches
 from .settings import AnalysisSettings
 
 ID = re.compile(r"[a-zA-Z0-9-]{1,80}")
@@ -90,7 +91,7 @@ class BrowserSession:
                 return
             self.sequence += 1
             self.events.append({"id": request_id, "seq": self.sequence, **payload})
-            # One final event per request. Bound storage if a browser stops acknowledging.
+            # Progress and one terminal event per request; bound unacknowledged storage.
             while len(self.events) > 64:
                 self.events.popleft()
 
@@ -148,11 +149,20 @@ class BrowserSession:
                 photo = prepare_server_photo(body.get("photo"))
                 if job.cancelled:
                     return
-                result = await analyze_food_photo(settings.api_key, settings.model, photo, body["language"], settings.base_url)
+                last_progress = {"completedBatches": 0, "totalBatches": TOTAL_BATCHES}
+
+                def on_progress(progress: dict):
+                    last_progress.update(progress)
+                    if not job.cancelled:
+                        self._emit(request_id, job.frame, kind="progress", progress=progress)
+
+                result = await analyze_food_in_batches(settings.api_key, settings.model, photo, body["language"],
+                                                      settings.base_url, on_progress)
                 validated = validate_food_result(result)
                 validated["analysisProvider"] = "Maxplus"
                 validated["analysisModel"] = settings.model
                 if not job.cancelled:
+                    on_progress({**last_progress, "percent": 100, "stage": "complete"})
                     self._emit(request_id, job.frame, kind="result", result=validated)
             except asyncio.CancelledError:
                 pass

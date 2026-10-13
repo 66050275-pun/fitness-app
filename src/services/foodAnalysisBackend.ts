@@ -1,10 +1,13 @@
 import type { Language } from '../i18n/index.ts';
+import type { FoodAnalysisProgress } from '../types/index.ts';
 
 export interface FoodAnalysisRequest {
   /** JPEG resized locally and re-encoded without the original filename/EXIF metadata. */
   photo: Blob;
   language: Language;
   signal: AbortSignal;
+  /** Completed workflow milestones from the backend, never a simulated provider percentage. */
+  onProgress?: (progress: FoodAnalysisProgress) => void;
 }
 
 export interface FoodAnalysisBackend {

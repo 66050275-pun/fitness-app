@@ -614,6 +614,9 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 .food-scan-screen :where(input, section) { scroll-margin-top: calc(var(--vault-bar-height, 44px) + 12px); }
 .food-scan-screen header .phasic-tool-secondary { border-radius: 9999px; }
 .food-scan-photo { height: 280px; border: 1px solid var(--ui-border); background: var(--ui-panel); }
+.food-scan-photo.food-scan-photo-busy { min-height: 320px; }
+.food-scan-progress-track { height: 10px; border-radius: 9999px; overflow: hidden; background: rgb(255 255 255 / 25%); }
+.food-scan-progress-fill { height: 100%; border-radius: inherit; background: #72fd9e; transition: width var(--ui-motion-duration) var(--ui-motion-easing); }
 .food-result-photo { max-height: 240px; background: var(--ui-panel); border: 1px solid var(--ui-border); }
 .food-scan-modes > button { min-height: 48px; min-width: 0; flex: 1; padding: 10px 12px; border: 1px solid var(--ui-border); border-radius: 14px; background: var(--ui-card); color: var(--ui-text); font-weight: 700; font-size: 14px; }
 .food-scan-modes > button[aria-pressed="true"] { background: var(--ui-primary-soft); border-color: var(--ui-primary); color: var(--ui-primary-label); }

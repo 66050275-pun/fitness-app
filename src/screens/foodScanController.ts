@@ -9,6 +9,7 @@ import { changeCookingFat, createManualScannedFood, inputNumber, readReviewNumbe
 import { getFatGauge } from '../services/phasicRecompService.ts';
 import { getTodayKey } from '../utils/dateUtils.ts';
 import { formatDisplayNumber } from '../utils/safeNumbers.ts';
+import { foodScanProgressLabel, normalizeFoodScanProgress } from '../utils/foodScanProgress.ts';
 import type { FoodScanReviewField, MealType } from '../types/index.ts';
 
 declare global {
@@ -60,7 +61,7 @@ function clearSession(notify = true): void {
   releasePhoto();
   if (!isVaultUnlocked()) return;
   store.setScannedFood(null, false);
-  store.updateFoodScan({ photoUrl: null, status: 'idle', consent: false, error: null, review: null }, notify);
+  store.updateFoodScan({ photoUrl: null, status: 'idle', consent: false, error: null, review: null, progress: null }, notify);
 }
 
 function captureReview(): boolean {
@@ -132,15 +133,32 @@ async function analyzePhoto(): Promise<void> {
   }
   const token = ++generation; const selectedPhoto = photo; const controller = new AbortController(); request = controller;
   let timedOut = false;
-  const timer = window.setTimeout(() => { timedOut = true; controller.abort(); }, 75_000);
-  store.updateFoodScan({ status: 'analyzing', error: null });
+  const timer = window.setTimeout(() => { timedOut = true; controller.abort(); }, 240_000);
+  store.updateFoodScan({ status: 'analyzing', error: null,
+    progress: { percent: 10, stage: 'meal', completedBatches: 0, totalBatches: 6 } });
+  // Analyze is below the photo/consent section; bring progress and Cancel into view.
+  document.getElementById('scan-analysis-progress')?.scrollIntoView({ block: 'center', behavior: 'auto' });
   try {
     const aborted = new Promise<never>((_, reject) => controller.signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true }));
-    const result = await Promise.race([backend.analyze({ photo: selectedPhoto, language: getLanguage(), signal: controller.signal }), aborted]);
+    const result = await Promise.race([backend.analyze({ photo: selectedPhoto, language: getLanguage(), signal: controller.signal,
+      onProgress: value => {
+        const progress = normalizeFoodScanProgress(value);
+        if (!progress || token !== generation || !isScanner() || controller.signal.aborted
+          || progress.percent < (store.getState().foodScan.progress?.percent ?? 0)) return;
+        store.updateFoodScan({ progress }, false);
+        const meter = document.getElementById('scan-analysis-progress');
+        meter?.setAttribute('aria-valuenow', String(progress.percent));
+        meter?.setAttribute('aria-valuetext', `${progress.percent}% · ${foodScanProgressLabel(progress)}`);
+        const fill = document.getElementById('scan-analysis-progress-fill');
+        if (fill) fill.style.width = `${progress.percent}%`;
+        setText('scan-analysis-percent', `${progress.percent}%`);
+        setText('scan-analysis-stage', foodScanProgressLabel(progress));
+      }
+    }), aborted]);
     if (token !== generation || !isScanner() || controller.signal.aborted) return;
     const food = adaptFoodAnalysisResultToScannedFood(result);
     request = null;
-    store.updateFoodScan({ status: 'ready', error: null }, false);
+    store.updateFoodScan({ status: 'ready', error: null, progress: null }, false);
     store.setScannedFood(food, false); store.setScreen('foodResult');
   } catch (error) {
     if (token !== generation || !isScanner()) return;
@@ -148,7 +166,7 @@ async function analyzePhoto(): Promise<void> {
       : error instanceof FoodAnalysisServiceError ? error.message
       : error instanceof Error && error.message === 'Invalid food analysis response.' ? 'The analysis returned incomplete or invalid data. Retry or enter the meal manually.'
         : 'Food analysis failed. Retry or enter the meal manually.';
-    store.updateFoodScan({ status: 'error', error: message });
+    store.updateFoodScan({ status: 'error', error: message, progress: null });
   } finally {
     window.clearTimeout(timer);
     if (request === controller) request = null;
@@ -167,14 +185,15 @@ export function bindFoodScanHandlers(): void {
     if (!isScanner() || request) { input.value = ''; return; }
     const file = input.files?.[0]; input.value = ''; if (!file) return;
     clearSession(false); const token = generation;
-    store.updateFoodScan({ status: 'preparing', error: null });
+    store.updateFoodScan({ status: 'preparing', error: null,
+      progress: { percent: 0, stage: 'preparing', completedBatches: 0, totalBatches: 6 } });
     void prepareFoodPhoto(file).then(prepared => {
       if (token !== generation || !isScanner()) return;
       photo = prepared; photoUrl = URL.createObjectURL(prepared);
-      store.updateFoodScan({ photoUrl, status: 'ready', consent: false, error: null });
+      store.updateFoodScan({ photoUrl, status: 'ready', consent: false, error: null, progress: null });
     }).catch(error => {
       if (token !== generation || !isScanner()) return;
-      store.updateFoodScan({ status: 'error', error: error instanceof Error && PHOTO_ERROR_MESSAGES.has(error.message)
+      store.updateFoodScan({ status: 'error', progress: null, error: error instanceof Error && PHOTO_ERROR_MESSAGES.has(error.message)
         ? error.message : 'This photo could not be opened. Try another image.' });
     });
   };
@@ -191,7 +210,7 @@ export function bindFoodScanHandlers(): void {
   window.scanCancelAnalysis = () => {
     if (!isScanner()) return;
     generation++; request?.abort(); request = null;
-    store.updateFoodScan({ status: photo ? 'ready' : 'idle', error: null });
+    store.updateFoodScan({ status: photo ? 'ready' : 'idle', error: null, progress: null });
   };
   window.scanDiscard = () => { if (available()) clearSession(); };
   window.scanManualReview = () => {

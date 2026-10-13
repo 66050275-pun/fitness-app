@@ -10,24 +10,27 @@ NUTRIENT_CATALOG = json.loads(
     (Path(__file__).resolve().parents[1] / "src/data/foodAnalysisNutrients.json").read_text(encoding="utf-8")
 )
 MASS_FACTORS = {"g": 1_000_000, "mg": 1000, "mcg": 1}
+NUTRIENT_BATCHES = tuple(
+    (category, definitions[offset:offset + 8])
+    for category, definitions in NUTRIENT_CATALOG.items()
+    for offset in range(0, len(definitions), 8)
+)
 
 
-def nutrient_prompt() -> str:
+def nutrient_prompt(definitions: list[dict]) -> str:
     return (
-        "micronutrients MUST be an object with vitamins, minerals and otherNutrients arrays. "
-        "Include EVERY entry in this catalog exactly once in its listed array; keys and units are exact: "
-        + json.dumps(NUTRIENT_CATALOG, separators=(",", ":"))
-        + ". Each entry has key, name, amount (number|null), unit, confidence (0..1|null), "
-        "source (always ai_estimate), note (brief localized estimation basis or reason for unknown, max 300 characters). "
-        "Names and notes may be localized. Amounts are for the entire pictured portion, "
-        "not per 100 g. Estimate from recognized ingredients, likely quantities, preparation and established "
-        "food-composition knowledge. Account for cooking losses and uncertainty about fortification, salt, "
-        "oil and sauces. Supply an estimate only when you have a reasonable basis; otherwise amount and "
-        "confidence MUST be null. Never replace missing evidence with zero, never invent laboratory precision, "
-        "references, brands or a food-database lookup. Zero requires evidence. Do not compute daily-value "
-        "percentages (the app does that). Preserve nutrient-specific equivalents (RAE, DFE, NE, alpha-TE); "
-        "never convert arbitrary IU or chemically different forms without evidence. Explain major portion "
-        "and nutrient assumptions in warnings. Micronutrients are estimates, not measured or verified values."
+        "Return only {\"nutrients\":[...]} with one row for EVERY key in this small catalog: "
+        + json.dumps(definitions, separators=(",", ":"))
+        + ". A row contains ONLY key, amount (number|null), confidence (0..1|null), and note "
+        "(brief localized estimation basis or unknown reason, at most 160 characters). Do not return "
+        "name, unit, source, macros, percentages or any other fields. Use exactly the catalog's keys "
+        "and units for amounts, for the whole portion described in the meal context. "
+        "Estimate from the recognized dish, ingredients, portion, preparation and food-composition "
+        "knowledge. The context is an uncertain photo estimate, not measured ingredient quantities. "
+        "Account for cooking losses and uncertainty about fortification, salt and sauces. "
+        "If there is no reasonable basis, amount and confidence MUST be null, never zero. "
+        "Never invent measurements, precise confidence, brands, references or a database lookup. "
+        "Preserve RAE/DFE/NE/alpha-TE equivalents; do not invent conversions or medical advice."
     )
 
 

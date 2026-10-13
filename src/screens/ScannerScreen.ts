@@ -3,6 +3,7 @@ import { store } from '../store/appState.ts';
 import { getFoodAnalysisBackend } from '../services/foodAnalysisBackend.ts';
 import { getFoodAnalysisAccessCode, isFoodAnalysisAccessCodeRequired } from '../services/streamlitFoodAnalysis.ts';
 import { escapeHtml } from '../utils/sanitize.ts';
+import { foodScanProgressLabel } from '../utils/foodScanProgress.ts';
 
 export function renderScannerScreen(): string {
   const state = store.getState();
@@ -11,6 +12,7 @@ export function renderScannerScreen(): string {
   const backend = getFoodAnalysisBackend();
   const busy = scan.status === 'preparing' || scan.status === 'analyzing';
   const disabled = busy ? 'disabled' : '';
+  const progress = scan.progress ?? { percent: 0, stage: 'preparing' as const, completedBatches: 0, totalBatches: 6 };
 
   return `
     <div class="food-scan-screen min-h-screen flex flex-col gap-5 px-screen-gutter pt-5 pb-8">
@@ -34,7 +36,7 @@ export function renderScannerScreen(): string {
           <button type="button" class="phasic-tool-secondary" onclick="window.navigateApp('quickLog')">${trHtml('Quick Log')}</button>
         </section>
       ` : `
-        <section class="food-scan-photo relative rounded-3xl overflow-hidden" aria-label="${trHtml('Food photo preview')}">
+        <section class="food-scan-photo ${busy ? 'food-scan-photo-busy' : ''} relative rounded-3xl overflow-hidden" aria-label="${trHtml('Food photo preview')}">
           ${scan.photoUrl ? `<img src="${escapeHtml(scan.photoUrl)}" alt="${trHtml('Selected food photo')}" class="w-full h-full object-contain" />`
             : `<div class="flex flex-col items-center justify-center gap-3 h-full px-6 text-center">
               <span class="material-symbols-outlined text-6xl text-primary" aria-hidden="true">add_a_photo</span>
@@ -43,7 +45,15 @@ export function renderScannerScreen(): string {
             </div>`}
           ${busy ? `<div class="absolute inset-0 bg-black/60 text-white flex flex-col gap-3 items-center justify-center p-5" role="status">
             <span class="material-symbols-outlined animate-spin text-3xl" aria-hidden="true">progress_activity</span>
-            <p class="font-heading font-bold text-center">${trHtml(scan.status === 'preparing' ? 'Preparing photo locally…' : 'Analyzing food and cooking fats…')}</p>
+            <p id="scan-analysis-stage" class="font-heading font-bold text-center">${escapeHtml(foodScanProgressLabel(progress))}</p>
+            <div class="w-full max-w-[240px] space-y-2">
+              <p id="scan-analysis-percent" class="text-center font-heading font-extrabold text-2xl tabular-nums" aria-hidden="true">${progress.percent}%</p>
+              <div id="scan-analysis-progress" class="food-scan-progress-track" role="progressbar" aria-label="${trHtml('Food analysis progress')}"
+                aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}" aria-valuetext="${escapeHtml(`${progress.percent}% · ${foodScanProgressLabel(progress)}`)}">
+                <div id="scan-analysis-progress-fill" class="food-scan-progress-fill" style="width:${progress.percent}%"></div>
+              </div>
+              <p class="text-xs text-center text-white/90">${trHtml('Progress updates when each step finishes.')}</p>
+            </div>
             ${scan.status === 'analyzing' ? `<button type="button" class="rounded-xl border border-white/40 py-3 px-5" onclick="window.scanCancelAnalysis()">${trHtml('Cancel')}</button>` : ''}
           </div>` : ''}
         </section>

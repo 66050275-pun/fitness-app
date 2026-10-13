@@ -24,6 +24,7 @@ class AnalysisSettings:
 
     def public_config(self) -> dict:
         public = {"ready": self.error is None, "provider": "Maxplus", "model": self.model if self.error is None else None,
+                  "analysisProtocol": "batched-v2",
                   "accessCodeRequired": bool(self.access_code), "error": self.error,
                   "notice": {"en": self.notice_en, "th": self.notice_th}}
         # Version only public metadata. Never hash/return the provider key or access code.

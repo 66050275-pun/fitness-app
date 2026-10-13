@@ -1,6 +1,8 @@
 import { getLanguage } from '../i18n/index.ts';
 import { registerFoodAnalysisBackend } from './foodAnalysisBackend.ts';
 import type { FoodAnalysisRequest } from './foodAnalysisBackend.ts';
+import type { FoodAnalysisProgress } from '../types/index.ts';
+import { normalizeFoodScanProgress } from '../utils/foodScanProgress.ts';
 
 const CHANNEL = 'nutriai-food-analysis-v1';
 interface PublicConfig {
@@ -16,6 +18,8 @@ interface PendingRequest {
   reject: (reason: Error) => void;
   signal: AbortSignal;
   abort: () => void;
+  onProgress?: (progress: FoodAnalysisProgress) => void;
+  lastProgress: number;
 }
 
 const ERROR_KEYS: Readonly<Record<string, string>> = {
@@ -92,7 +96,7 @@ function normalizeConfig(value: unknown): PublicConfig | null {
     accessCodeRequired: raw.accessCodeRequired, notice: { en: notice.en, th: notice.th }, version: raw.version };
 }
 
-async function analyze({ photo, language, signal }: FoodAnalysisRequest): Promise<unknown> {
+async function analyze({ photo, language, signal, onProgress }: FoodAnalysisRequest): Promise<unknown> {
   const selectedConfig = config;
   const selectedFrame = frame;
   if (!selectedConfig?.ready || !selectedFrame) throw new FoodAnalysisServiceError('service_not_configured');
@@ -108,7 +112,7 @@ async function analyze({ photo, language, signal }: FoodAnalysisRequest): Promis
     throw new DOMException('Aborted', 'AbortError');
   const id = crypto.randomUUID();
   return new Promise((resolve, reject) => {
-    const item: PendingRequest = { resolve, reject, signal, abort: () => {
+    const item: PendingRequest = { resolve, reject, signal, onProgress, lastProgress: 0, abort: () => {
       release(id, item); post({ type: 'cancel', id }); reject(new DOMException('Aborted', 'AbortError'));
     } };
     signal.addEventListener('abort', item.abort, { once: true }); pending.set(id, item);
@@ -141,6 +145,14 @@ export function initializeStreamlitFoodAnalysis(): void {
     }
     if (message.frame !== frame || message.type !== 'response' || typeof message.id !== 'string') return;
     const item = pending.get(message.id); if (!item) return;
+    if (message.kind === 'progress') {
+      const progress = normalizeFoodScanProgress(message.progress);
+      if (progress && !item.signal.aborted && progress.percent >= item.lastProgress) {
+        item.lastProgress = progress.percent;
+        try { item.onProgress?.(progress); } catch { /* A view callback cannot fail the analysis request. */ }
+      }
+      return;
+    }
     release(message.id, item);
     if (message.kind === 'result') item.resolve(message.result);
     else item.reject(new FoodAnalysisServiceError(typeof message.code === 'string' ? message.code : 'service_error'));
