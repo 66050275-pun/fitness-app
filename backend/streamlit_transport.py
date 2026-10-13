@@ -18,7 +18,7 @@ from typing import Any
 
 from .food_analysis import validate_food_result
 from .maxplus import AnalysisError, prepare_server_photo
-from .food_scan_pipeline import TOTAL_BATCHES, analyze_food_in_batches
+from .food_scan_pipeline import TOTAL_BATCHES, analyze_food_in_batches, complete_food_in_batches
 from .settings import AnalysisSettings
 
 ID = re.compile(r"[a-zA-Z0-9-]{1,80}")
@@ -33,16 +33,17 @@ class ScanBudget:
         self.count = 0
         self.active = 0
 
-    def reserve(self, limit: int) -> None:
+    def reserve(self, limit: int, count_scan: bool = True) -> None:
         with self.lock:
             day = datetime.now(ZoneInfo("Asia/Bangkok")).date().isoformat()
             if day != self.day:
                 self.day, self.count = day, 0
-            if self.count >= limit:
+            if count_scan and self.count >= limit:
                 raise AnalysisError("daily_limit_reached")
             if self.active >= 4:
                 raise AnalysisError("service_busy")
-            self.count += 1
+            if count_scan:
+                self.count += 1
             self.active += 1
 
     def release(self):
@@ -66,6 +67,14 @@ class Job:
                 pass
 
 
+@dataclass
+class PendingChoice:
+    frame: str
+    config_version: str
+    created_at: float
+    candidates: list[dict]
+
+
 class BrowserSession:
     def __init__(self):
         self.lock = threading.RLock()
@@ -78,6 +87,13 @@ class BrowserSession:
         self.last_nonce: str | None = None
         self.attempts: deque[float] = deque()
         self.last_attempt = 0.0
+        self.choices: dict[str, PendingChoice] = {}
+
+    def _prune_choices(self):
+        now = time.monotonic()
+        for token in list(self.choices):
+            if now - self.choices[token].created_at > 1200:
+                del self.choices[token]
 
     def _remember(self, request_id: str):
         self.seen.add(request_id)
@@ -109,14 +125,17 @@ class BrowserSession:
             if len(self.jobs) >= 1:
                 self._emit(request_id, frame, kind="error", code="service_busy")
                 return
+            self._prune_choices()
             now = time.monotonic()
             while self.attempts and now - self.attempts[0] > 3600:
                 self.attempts.popleft()
-            if (self.last_attempt and now - self.last_attempt < 5) or len(self.attempts) >= 10:
+            is_confirmation = message.get("action") == "confirm_food"
+            if not is_confirmation and ((self.last_attempt and now - self.last_attempt < 5) or len(self.attempts) >= 10):
                 self._emit(request_id, frame, kind="error", code="session_rate_limit")
                 return
-            self.last_attempt = now
-            self.attempts.append(now)
+            if not is_confirmation:
+                self.last_attempt = now
+                self.attempts.append(now)
             job = Job(frame)
             self.jobs[request_id] = job
 
@@ -128,10 +147,13 @@ class BrowserSession:
                     return
                 if settings.error:
                     raise AnalysisError(settings.error)
-                if message.get("action") != "analyze":
+                action = message.get("action")
+                if action not in ("analyze", "confirm_food"):
                     raise AnalysisError("request_invalid")
                 body = message.get("payload")
-                if not isinstance(body, dict) or set(body) - {"photo", "language", "consent", "configVersion", "accessCode"}:
+                allowed = {"language", "consent", "configVersion", "accessCode"} | (
+                    {"photo", "dishHint"} if action == "analyze" else {"selectionToken", "candidateId"})
+                if not isinstance(body, dict) or set(body) - allowed:
                     raise AnalysisError("request_invalid")
                 if body.get("consent") is not True or body.get("configVersion") != settings.public_config()["version"]:
                     raise AnalysisError("consent_required")
@@ -144,9 +166,26 @@ class BrowserSession:
                     raise AnalysisError("access_denied")
                 if job.cancelled:
                     return
-                budget.reserve(settings.daily_limit)
+                hint = body.get("dishHint", "")
+                if not isinstance(hint, str) or len(hint) > 160:
+                    raise AnalysisError("request_invalid")
+                selected = None
+                if action == "confirm_food":
+                    token, candidate_id = body.get("selectionToken"), body.get("candidateId")
+                    if not isinstance(token, str) or not ID.fullmatch(token) or not isinstance(candidate_id, str):
+                        raise AnalysisError("selection_expired")
+                    with self.lock:
+                        self._prune_choices()
+                        choice = self.choices.get(token)
+                        if choice is None or choice.frame != job.frame or choice.config_version != body["configVersion"]:
+                            raise AnalysisError("selection_expired")
+                        match = re.fullmatch(r"option-([1-3])", candidate_id)
+                        if not match or int(match[1]) > len(choice.candidates):
+                            raise AnalysisError("request_invalid")
+                        selected = choice.candidates[int(match[1]) - 1]["meal"]
+                budget.reserve(settings.daily_limit, count_scan=action == "analyze")
                 reserved = True
-                photo = prepare_server_photo(body.get("photo"))
+                photo = prepare_server_photo(body.get("photo")) if action == "analyze" else None
                 if job.cancelled:
                     return
                 last_progress = {"completedBatches": 0, "totalBatches": TOTAL_BATCHES}
@@ -156,8 +195,31 @@ class BrowserSession:
                     if not job.cancelled:
                         self._emit(request_id, job.frame, kind="progress", progress=progress)
 
-                result = await analyze_food_in_batches(settings.api_key, settings.model, photo, body["language"],
-                                                      settings.base_url, on_progress)
+                if action == "confirm_food":
+                    with self.lock:
+                        if self.choices.pop(body["selectionToken"], None) is not choice or job.cancelled:
+                            raise AnalysisError("selection_expired")
+                    result = await complete_food_in_batches(settings.api_key, settings.model, selected, body["language"],
+                                                           settings.base_url, on_progress)
+                else:
+                    result = await analyze_food_in_batches(settings.api_key, settings.model, photo, body["language"],
+                                                          settings.base_url, on_progress, hint.strip())
+                if result.get("kind") == "food_choices":
+                    with self.lock:
+                        if job.cancelled or job.frame != self.frame:
+                            return
+                        self._prune_choices()
+                        if len(self.choices) >= 5:
+                            oldest = min(self.choices, key=lambda token: self.choices[token].created_at)
+                            del self.choices[oldest]
+                        self.choices[request_id] = PendingChoice(job.frame, body["configVersion"],
+                                                                 time.monotonic(), result["candidates"])
+                    public = [{"id": f"option-{index + 1}", "name": item["meal"]["foodName"],
+                               "description": item["meal"]["servingDescription"], "confidence": item["meal"]["overallConfidence"],
+                               "reason": item["reason"]} for index, item in enumerate(result["candidates"])]
+                    self._emit(request_id, job.frame, kind="result", result={"kind": "food_choices",
+                               "selectionToken": request_id, "question": result["question"], "candidates": public})
+                    return
                 validated = validate_food_result(result)
                 validated["analysisProvider"] = "Maxplus"
                 validated["analysisModel"] = settings.model
@@ -201,6 +263,7 @@ class BrowserSession:
                 self.seen.clear()
                 self.seen_order.clear()
                 self.events.clear()
+                self.choices.clear()
                 self.frame = frame
             if message.get("type") == "boot":
                 return
@@ -215,6 +278,7 @@ class BrowserSession:
             if isinstance(cancels, list):
                 for request_id in cancels[:16]:
                     if isinstance(request_id, str) and ID.fullmatch(request_id):
+                        self.choices.pop(request_id, None)
                         if request_id in self.jobs:
                             self.jobs[request_id].cancel()
                         if request_id not in self.seen:
@@ -228,4 +292,5 @@ class BrowserSession:
 
     def snapshot(self):
         with self.lock:
+            self._prune_choices()
             return {"frame": self.frame, "events": list(self.events), "accepted": list(self.seen)}

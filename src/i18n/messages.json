@@ -9506,5 +9506,201 @@
   "Progress updates when each step finishes.": {
     "en": "Progress updates when each step finishes.",
     "th": "ความคืบหน้าจะอัปเดตเมื่อแต่ละขั้นตอนเสร็จ"
+  },
+  "A photo needs attention": {
+    "en": "A photo needs attention",
+    "th": "มีรูปที่ต้องตรวจสอบ"
+  },
+  "Add photos of your meal": {
+    "en": "Add photos of your meal",
+    "th": "เพิ่มรูปอาหารของคุณ"
+  },
+  "Analysis continues while you use this app. Keep it open and unlocked; closing or locking clears unfinished scans.": {
+    "en": "Analysis continues while you use this app. Keep it open and unlocked; closing or locking clears unfinished scans.",
+    "th": "ใช้หน้าอื่นในแอปได้ระหว่างวิเคราะห์ กรุณาเปิดแอปและปลดล็อกไว้ การปิดหรือล็อกแอปจะล้างการสแกนที่ยังไม่บันทึก"
+  },
+  "Analyze {0} photo(s)": {
+    "en": "Analyze photos ({0})",
+    "th": "วิเคราะห์ {0} รูป"
+  },
+  "Analyzing your food": {
+    "en": "Analyzing your food",
+    "th": "กำลังวิเคราะห์อาหาร"
+  },
+  "Back to photo queue": {
+    "en": "Back to photo queue",
+    "th": "กลับไปยังรายการรูป"
+  },
+  "Choose food for {0} photo(s)": {
+    "en": "Photos to identify: {0}",
+    "th": "เลือกระบุอาหารสำหรับ {0} รูป"
+  },
+  "Choose one portion. Nutrition is calculated only for your selection.": {
+    "en": "Choose one portion. Nutrition is calculated only for your selection.",
+    "th": "เลือกอาหารหนึ่งจาน ระบบจะคำนวณสารอาหารเฉพาะตัวเลือกที่คุณเลือก"
+  },
+  "Choose photos": {
+    "en": "Choose photos",
+    "th": "เลือกรูป"
+  },
+  "Clear photos and unfinished results": {
+    "en": "Clear photos and unfinished results",
+    "th": "ล้างรูปและผลที่ยังไม่บันทึก"
+  },
+  "Continue on Home": {
+    "en": "Continue on Home",
+    "th": "กลับไปใช้หน้าหลัก"
+  },
+  "Dish name or clue (optional)": {
+    "en": "Dish name or clue (optional)",
+    "th": "ชื่ออาหารหรือคำอธิบาย (ไม่บังคับ)"
+  },
+  "Each confirmed photo logs one meal. Skip repeated photos of the same dish to avoid counting it twice.": {
+    "en": "Each confirmed photo logs one meal. Skip repeated photos of the same dish to avoid counting it twice.",
+    "th": "แต่ละรูปที่ยืนยันจะบันทึกอาหารหนึ่งรายการ กรุณาข้ามรูปอาหารจานเดิมเพื่อป้องกันการนับซ้ำ"
+  },
+  "Enter manually": {
+    "en": "Enter manually",
+    "th": "กรอกเอง"
+  },
+  "Food analysis activity": {
+    "en": "Food analysis activity",
+    "th": "สถานะการวิเคราะห์อาหาร"
+  },
+  "Food analysis paused": {
+    "en": "Food analysis paused",
+    "th": "การวิเคราะห์อาหารหยุดพัก"
+  },
+  "Food photo queue": {
+    "en": "Food photo queue",
+    "th": "รายการรูปอาหาร"
+  },
+  "Food photo {0}": {
+    "en": "Food photo {0}",
+    "th": "รูปอาหารที่ {0}"
+  },
+  "For example: papaya salad, no peanuts": {
+    "en": "For example: papaya salad, no peanuts",
+    "th": "เช่น ส้มตำ ไม่ใส่ถั่วลิสง"
+  },
+  "I agree to send these food photos for analysis.": {
+    "en": "I agree to send these food photos for analysis.",
+    "th": "ฉันยินยอมส่งรูปอาหารเหล่านี้เพื่อวิเคราะห์"
+  },
+  "None of these? Add a dish name and retry, or enter nutrition manually.": {
+    "en": "None of these? Add a dish name and retry, or enter nutrition manually.",
+    "th": "ไม่มีตัวเลือกที่ตรง? เพิ่มชื่ออาหารแล้ววิเคราะห์อีกครั้ง หรือกรอกสารอาหารเอง"
+  },
+  "Open food analysis queue": {
+    "en": "Open food analysis queue",
+    "th": "เปิดรายการวิเคราะห์อาหาร"
+  },
+  "Other results ready to review": {
+    "en": "Other results ready to review",
+    "th": "ผลอื่นที่พร้อมตรวจสอบ"
+  },
+  "Photo privacy": {
+    "en": "Photo privacy",
+    "th": "ความเป็นส่วนตัวของรูป"
+  },
+  "Photo {0}": {
+    "en": "Photo {0}",
+    "th": "รูปที่ {0}"
+  },
+  "Photo {0} of {1}": {
+    "en": "Photo {0} of {1}",
+    "th": "รูปที่ {0} จาก {1}"
+  },
+  "Photos and unfinished results stay in memory until you clear this queue, close or lock the app. Saved meals contain nutrition, not photos.": {
+    "en": "Photos and unfinished results stay in memory until you clear this queue, close or lock the app. Saved meals contain nutrition, not photos.",
+    "th": "รูปและผลที่ยังไม่บันทึกอยู่ในหน่วยความจำจนกว่าจะล้างรายการ ปิดหรือล็อกแอป รายการอาหารที่บันทึกจะเก็บสารอาหารโดยไม่เก็บรูป"
+  },
+  "Preparing your photos…": {
+    "en": "Preparing your photos…",
+    "th": "กำลังเตรียมรูป…"
+  },
+  "Retry this photo": {
+    "en": "Retry this photo",
+    "th": "วิเคราะห์รูปนี้อีกครั้ง"
+  },
+  "Review and log this meal": {
+    "en": "Review and log this meal",
+    "th": "ตรวจสอบและบันทึกอาหารนี้"
+  },
+  "Skip photo {0}": {
+    "en": "Skip photo {0}",
+    "th": "ข้ามรูปที่ {0}"
+  },
+  "Skip this photo / duplicate dish": {
+    "en": "Skip this photo / duplicate dish",
+    "th": "ข้ามรูปนี้ / อาหารจานเดิม"
+  },
+  "Stop food analysis": {
+    "en": "Stop food analysis",
+    "th": "หยุดการวิเคราะห์อาหาร"
+  },
+  "Tap to review · {0} photo(s)": {
+    "en": "Tap to review · {0} photo(s)",
+    "th": "แตะเพื่อตรวจสอบ · {0} รูป"
+  },
+  "Up to 5 photos. Keep one dish and its whole portion visible in each photo.": {
+    "en": "Up to 5 photos. Keep one dish and its whole portion visible in each photo.",
+    "th": "เพิ่มได้สูงสุด 5 รูป ถ่ายหนึ่งจานต่อรูปให้เห็นอาหารทั้งจาน"
+  },
+  "Which food is in this photo?": {
+    "en": "Which food is in this photo?",
+    "th": "อาหารในรูปนี้คือเมนูไหน?"
+  },
+  "Your photos will be processed by {0}.": {
+    "en": "Your photos will be processed by {0}.",
+    "th": "รูปของคุณจะถูกประมวลผลโดย {0}"
+  },
+  "{0} / 5 photos": {
+    "en": "{0} / 5 photos",
+    "th": "{0} / 5 รูป"
+  },
+  "{0} result(s) ready to review": {
+    "en": "Results ready: {0}",
+    "th": "มี {0} ผลที่พร้อมตรวจสอบ"
+  },
+  "Choose up to 5 photos per scan. Clear this queue to start another.": {
+    "en": "Choose up to 5 photos per scan. Clear this queue to start another.",
+    "th": "เลือกได้สูงสุด 5 รูปต่อรอบ กรุณาล้างรายการนี้เพื่อเริ่มรอบใหม่"
+  },
+  "These food choices expired. Add a dish name and analyze the photo again.": {
+    "en": "These food choices expired. Add a dish name and analyze the photo again.",
+    "th": "ตัวเลือกอาหารเหล่านี้หมดอายุแล้ว เพิ่มชื่ออาหารและวิเคราะห์รูปอีกครั้ง"
+  },
+  "Food is unclear. Add a dish name and retry, or enter nutrition manually.": {
+    "en": "Food is unclear. Add a dish name and retry, or enter nutrition manually.",
+    "th": "ยังระบุอาหารไม่ชัดเจน เพิ่มชื่ออาหารแล้วลองอีกครั้ง หรือกรอกสารอาหารเอง"
+  },
+  "Ready to analyze": {
+    "en": "Ready to analyze",
+    "th": "พร้อมวิเคราะห์"
+  },
+  "Waiting in queue": {
+    "en": "Waiting in queue",
+    "th": "รอคิววิเคราะห์"
+  },
+  "Analyzing food": {
+    "en": "Analyzing food",
+    "th": "กำลังวิเคราะห์อาหาร"
+  },
+  "Choose the food": {
+    "en": "Choose the food",
+    "th": "เลือกเมนูอาหาร"
+  },
+  "Ready to review": {
+    "en": "Ready to review",
+    "th": "พร้อมตรวจสอบ"
+  },
+  "Needs attention": {
+    "en": "Needs attention",
+    "th": "ต้องตรวจสอบ"
+  },
+  "{0} ready · {1} choose · {2} errors": {
+    "en": "{0} ready · {1} choose · {2} errors",
+    "th": "พร้อม {0} · เลือก {1} · ตรวจ {2}"
   }
 }

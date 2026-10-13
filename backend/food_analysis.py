@@ -170,3 +170,28 @@ def validate_primary_food_result(value: object) -> dict:
             "estimatedGrams", "rangeMinGrams", "rangeMaxGrams"
         ) else item for key, item in cooking.items() if key in CookingFat.model_fields}
     return validate_food_result(primary)
+
+
+def validate_recognition_result(value: object) -> dict:
+    """Support the choice envelope and older single-meal replies without fabricating an identity."""
+    if not isinstance(value, dict):
+        raise AnalysisError("response_invalid")
+    candidates = value.get("candidates", [value])
+    if not isinstance(candidates, list) or not 1 <= len(candidates) <= 3:
+        raise AnalysisError("food_not_recognized")
+    validated = []
+    for candidate in candidates:
+        try:
+            meal = validate_primary_food_result(candidate)
+        except AnalysisError:
+            continue
+        note = candidate.get("identificationNote", "")
+        validated.append({"meal": meal, "reason": note[:200] if isinstance(note, str) else ""})
+    if not validated:
+        raise AnalysisError("response_invalid")
+    question = value.get("question", "")
+    requested = value.get("requiresConfirmation", "candidates" in value)
+    low_confidence = any(item["meal"]["overallConfidence"] is None or item["meal"]["overallConfidence"] < 0.65
+                         for item in validated)
+    return {"requiresConfirmation": requested is not False or len(candidates) > 1 or low_confidence,
+            "question": question[:300] if isinstance(question, str) else "", "candidates": validated}

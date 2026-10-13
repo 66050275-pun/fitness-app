@@ -1,16 +1,18 @@
 import { getLanguage, tr } from '../i18n/index.ts';
 import { store } from '../store/appState.ts';
 import { isVaultUnlocked } from '../services/privateStorage.ts';
-import { adaptFoodAnalysisResultToScannedFood } from '../services/aiFoodAnalysisAdapter.ts';
+import { adaptFoodAnalysisResultToScannedFood, normalizeFoodRecognitionChoices } from '../services/aiFoodAnalysisAdapter.ts';
 import { getFoodAnalysisBackend, type FoodAnalysisBackend } from '../services/foodAnalysisBackend.ts';
 import { clearFoodAnalysisAccessCode, FoodAnalysisServiceError, setFoodAnalysisAccessCode } from '../services/streamlitFoodAnalysis.ts';
 import { prepareFoodPhoto } from '../services/foodPhotoService.ts';
-import { changeCookingFat, createManualScannedFood, inputNumber, readReviewNumber, resolveCookingFatDraft, reviewedNutrition, SCAN_REVIEW_FIELDS, validateScanReview } from '../services/foodScanService.ts';
+import { changeCookingFat, createManualScannedFood, createScanReview, inputNumber, readReviewNumber, resolveCookingFatDraft, reviewedNutrition, SCAN_REVIEW_FIELDS, validateScanReview } from '../services/foodScanService.ts';
 import { getFatGauge } from '../services/phasicRecompService.ts';
 import { getTodayKey } from '../utils/dateUtils.ts';
 import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { foodScanProgressLabel, normalizeFoodScanProgress } from '../utils/foodScanProgress.ts';
-import type { FoodScanReviewField, MealType } from '../types/index.ts';
+import type { FoodScanItem, FoodScanReviewField, MealType } from '../types/index.ts';
+import { createFoodScanItem, MAX_SCAN_PHOTOS, scanQueuePercent } from '../utils/foodScanQueue.ts';
+import { refreshFoodScanActivity } from '../components/FoodScan/FoodScanActivity.ts';
 
 declare global {
   interface Window {
@@ -21,7 +23,13 @@ declare global {
     scanAnalyzePhoto: () => void;
     scanCancelAnalysis: () => void;
     scanDiscard: () => void;
-    scanManualReview: () => void;
+    scanManualReview: (id?: string) => void;
+    scanDishHint: (id: string, value: string) => void;
+    scanChooseFood: (id: string, candidateId: string) => void;
+    scanRetryPhoto: (id: string) => void;
+    scanSkipPhoto: (id: string) => void;
+    scanReviewPhoto: (id: string) => void;
+    scanOpenQueue: () => void;
     scanReviewInput: (field: FoodScanReviewField, value: string) => void;
     scanCookingDraft: (value: string) => void;
     scanCookingPreset: (level: 'less' | 'regular' | 'more') => void;
@@ -33,9 +41,11 @@ declare global {
 
 let blocked = true;
 let generation = 0;
-let photo: Blob | null = null;
-let photoUrl: string | null = null;
+const photos = new Map<string, Blob>();
+let sessionItems: FoodScanItem[] = [];
 let request: AbortController | null = null;
+let worker: Promise<void> | null = null;
+let lastImageAttempt = 0;
 let consentedBackend: FoodAnalysisBackend | null = null;
 let saving = false;
 const PHOTO_ERROR_MESSAGES = new Set([
@@ -52,16 +62,26 @@ function isReview(): boolean {
 }
 function setText(id: string, value: string): void { const element = document.getElementById(id); if (element) element.textContent = value; }
 function reviewError(message: string): void { setText('scan-review-error', message ? tr(message) : ''); }
-function releasePhoto(): void {
+function discardChoices(item: FoodScanItem): void {
+  if (item.choices) (consentedBackend ?? getFoodAnalysisBackend())?.discardSelection?.(item.choices.selectionToken);
+  item.choices = null; item.selectedCandidateId = null;
+}
+function releaseItemPhoto(item: FoodScanItem): void {
+  photos.delete(item.id);
+  if (item.photoUrl) URL.revokeObjectURL(item.photoUrl);
+  item.photoUrl = null;
+}
+function releaseSession(): void {
   generation++; request?.abort(); request = null;
-  if (photoUrl) URL.revokeObjectURL(photoUrl);
-  photo = null; photoUrl = null; consentedBackend = null;
+  for (const item of sessionItems) { discardChoices(item); releaseItemPhoto(item); }
+  sessionItems = []; photos.clear(); consentedBackend = null;
 }
 function clearSession(notify = true): void {
-  releasePhoto();
+  releaseSession();
   if (!isVaultUnlocked()) return;
   store.setScannedFood(null, false);
-  store.updateFoodScan({ photoUrl: null, status: 'idle', consent: false, error: null, review: null, progress: null }, notify);
+  store.updateFoodScan({ photoUrl: null, status: 'idle', consent: false, error: null, review: null, progress: null,
+    items: [], activeItemId: null, reviewItemId: null, started: false, running: false }, notify);
 }
 
 function captureReview(): boolean {
@@ -124,98 +144,294 @@ function applyCookingFat(value: string): void {
   } catch { reviewError('Enter a cooking-fat estimate within the total fat allowance.'); }
 }
 
-async function analyzePhoto(): Promise<void> {
-  if (!isScanner() || !photo || request || store.getState().foodScan.status === 'preparing') return;
-  const backend = getFoodAnalysisBackend();
-  if (!backend) { store.updateFoodScan({ error: 'AI analysis is awaiting backend setup.', status: 'ready' }); return; }
-  if (!store.getState().foodScan.consent || consentedBackend !== backend) {
-    store.updateFoodScan({ consent: false, error: 'Confirm photo processing before analysis.' }); return;
+function itemById(id: string): FoodScanItem | undefined {
+  return available() ? store.getState().foodScan.items.find(item => item.id === id) : undefined;
+}
+
+function updateQueue(notify = true): void {
+  if (!available()) return;
+  const scan = store.getState().foodScan;
+  const active = scan.items.find(item => item.id === scan.activeItemId);
+  store.updateFoodScan({ items: [...scan.items], progress: active?.progress ?? null,
+    status: scan.status === 'preparing' ? 'preparing' : scan.running ? 'analyzing' : scan.items.length ? 'ready' : 'idle' }, notify);
+}
+
+function refreshQueueProgress(item: FoodScanItem): void {
+  if (!available()) return;
+  const progress = item.progress;
+  if (progress) {
+    const meter = document.getElementById(`scan-item-${item.id}-progress`);
+    meter?.setAttribute('aria-valuenow', String(progress.percent));
+    meter?.setAttribute('aria-valuetext', `${progress.percent}% · ${foodScanProgressLabel(progress)}`);
+    const fill = document.getElementById(`scan-item-${item.id}-fill`);
+    if (fill) fill.style.width = `${progress.percent}%`;
+    setText(`scan-item-${item.id}-percent`, `${progress.percent}%`);
+    setText(`scan-item-${item.id}-stage`, foodScanProgressLabel(progress));
   }
-  const token = ++generation; const selectedPhoto = photo; const controller = new AbortController(); request = controller;
-  let timedOut = false;
-  const timer = window.setTimeout(() => { timedOut = true; controller.abort(); }, 240_000);
-  store.updateFoodScan({ status: 'analyzing', error: null,
-    progress: { percent: 10, stage: 'meal', completedBatches: 0, totalBatches: 6 } });
-  // Analyze is below the photo/consent section; bring progress and Cancel into view.
-  document.getElementById('scan-analysis-progress')?.scrollIntoView({ block: 'center', behavior: 'auto' });
-  try {
-    const aborted = new Promise<never>((_, reject) => controller.signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true }));
-    const result = await Promise.race([backend.analyze({ photo: selectedPhoto, language: getLanguage(), signal: controller.signal,
-      onProgress: value => {
-        const progress = normalizeFoodScanProgress(value);
-        if (!progress || token !== generation || !isScanner() || controller.signal.aborted
-          || progress.percent < (store.getState().foodScan.progress?.percent ?? 0)) return;
-        store.updateFoodScan({ progress }, false);
-        const meter = document.getElementById('scan-analysis-progress');
-        meter?.setAttribute('aria-valuenow', String(progress.percent));
-        meter?.setAttribute('aria-valuetext', `${progress.percent}% · ${foodScanProgressLabel(progress)}`);
-        const fill = document.getElementById('scan-analysis-progress-fill');
-        if (fill) fill.style.width = `${progress.percent}%`;
-        setText('scan-analysis-percent', `${progress.percent}%`);
-        setText('scan-analysis-stage', foodScanProgressLabel(progress));
+  setText('scan-queue-percent', `${scanQueuePercent(store.getState().foodScan)}%`);
+  refreshFoodScanActivity();
+}
+
+function canUpload(): FoodAnalysisBackend | null {
+  const backend = getFoodAnalysisBackend();
+  if (!backend) { store.updateFoodScan({ error: 'AI analysis is awaiting backend setup.' }); return null; }
+  if (!store.getState().foodScan.consent || consentedBackend !== backend) {
+    store.updateFoodScan({ consent: false, error: 'Confirm photo processing before analysis.' }); return null;
+  }
+  return backend;
+}
+
+/** Cancellable pacing respects the backend's five-second spacing without inventing percentage progress. */
+function waitForQueue(delay: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) return Promise.reject(new DOMException('Aborted', 'AbortError'));
+  return new Promise((resolve, reject) => {
+    const abort = () => { window.clearTimeout(timer); reject(new DOMException('Aborted', 'AbortError')); };
+    const timer = window.setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, delay);
+    signal.addEventListener('abort', abort, { once: true });
+  });
+}
+
+async function runQueue(token: number): Promise<void> {
+  while (available() && token === generation) {
+    const item = store.getState().foodScan.items.find(entry => entry.status === 'queued');
+    if (!item) break;
+    const backend = canUpload();
+    if (!backend) {
+      for (const pending of store.getState().foodScan.items) if (pending.status === 'queued') {
+        pending.status = pending.choices ? 'needs_choice' : 'ready'; pending.selectedCandidateId = null;
       }
-    }), aborted]);
-    if (token !== generation || !isScanner() || controller.signal.aborted) return;
-    const food = adaptFoodAnalysisResultToScannedFood(result);
-    request = null;
-    store.updateFoodScan({ status: 'ready', error: null, progress: null }, false);
-    store.setScannedFood(food, false); store.setScreen('foodResult');
-  } catch (error) {
-    if (token !== generation || !isScanner()) return;
-    const message = timedOut ? 'Analysis took too long. Retry or enter the meal manually.'
-      : error instanceof FoodAnalysisServiceError ? error.message
-      : error instanceof Error && error.message === 'Invalid food analysis response.' ? 'The analysis returned incomplete or invalid data. Retry or enter the meal manually.'
-        : 'Food analysis failed. Retry or enter the meal manually.';
-    store.updateFoodScan({ status: 'error', error: message, progress: null });
-  } finally {
-    window.clearTimeout(timer);
-    if (request === controller) request = null;
+      break;
+    }
+    const controller = new AbortController(); request = controller;
+    let timedOut = false;
+    let timer = 0;
+    let abortListener: (() => void) | null = null;
+    const confirming = !!item.choices && !!item.selectedCandidateId;
+    item.status = 'analyzing'; item.error = null;
+    item.progress = { percent: confirming ? 30 : 10, stage: confirming ? 'nutrients' : 'meal', completedBatches: 0, totalBatches: 6 };
+    store.updateFoodScan({ activeItemId: item.id, running: true }, false); updateQueue();
+    try {
+      // Cancellation delivery through Streamlit also needs time to clear the previous server job.
+      await waitForQueue(Math.max(750, confirming ? 0 : 5500 - (performance.now() - lastImageAttempt)), controller.signal);
+      if (token !== generation || !available() || item.status !== 'analyzing') return;
+      timer = window.setTimeout(() => { timedOut = true; controller.abort(); }, 240_000);
+      const onProgress = (value: unknown) => {
+        const progress = normalizeFoodScanProgress(value);
+        if (!progress || token !== generation || !available() || controller.signal.aborted
+          || item.status !== 'analyzing' || progress.percent < (item.progress?.percent ?? 0)) return;
+        item.progress = progress; updateQueue(false); refreshQueueProgress(item);
+      };
+      let operation: Promise<unknown>;
+      if (confirming) {
+        if (!backend.confirmSelection) throw new FoodAnalysisServiceError('selection_expired');
+        operation = backend.confirmSelection({ selectionToken: item.choices!.selectionToken, candidateId: item.selectedCandidateId!,
+          language: getLanguage(), signal: controller.signal, onProgress });
+      } else {
+        const photo = photos.get(item.id);
+        if (!photo) throw new FoodAnalysisServiceError('photo_invalid');
+        lastImageAttempt = performance.now();
+        operation = backend.analyze({ photo, dishHint: item.dishHint, language: getLanguage(), signal: controller.signal, onProgress });
+      }
+      const aborted = new Promise<never>((_, reject) => {
+        abortListener = () => reject(new DOMException('Aborted', 'AbortError'));
+        controller.signal.addEventListener('abort', abortListener, { once: true });
+      });
+      const result = await Promise.race([operation, aborted]);
+      if (token !== generation || !available() || controller.signal.aborted || item.status !== 'analyzing') continue;
+      const choices = normalizeFoodRecognitionChoices(result);
+      if (choices) {
+        if (confirming || !backend.confirmSelection) throw new Error('Invalid food analysis response.');
+        item.choices = choices; item.selectedCandidateId = null; item.status = 'needs_choice';
+        item.progress = { percent: 30, stage: 'meal', completedBatches: 0, totalBatches: 6 };
+      } else {
+        const food = adaptFoodAnalysisResultToScannedFood(result, item.id);
+        discardChoices(item); item.result = food; item.review = createScanReview(food);
+        item.status = 'review'; item.progress = { percent: 100, stage: 'complete',
+          completedBatches: item.progress?.completedBatches ?? 0, totalBatches: 6 };
+      }
+    } catch (error) {
+      if (token !== generation || !available()) return;
+      // Skipping one photo cancels only its job; the remaining queue continues.
+      if (itemById(item.id)?.status !== 'skipped') {
+        if (confirming) discardChoices(item);
+        item.status = 'error'; item.progress = null;
+        item.error = timedOut ? 'Analysis took too long. Retry or enter the meal manually.'
+          : error instanceof FoodAnalysisServiceError ? error.message
+            : error instanceof Error && error.message === 'Invalid food analysis response.'
+              ? 'The analysis returned incomplete or invalid data. Retry or enter the meal manually.'
+              : 'Food analysis failed. Retry or enter the meal manually.';
+      }
+      // An owner-key/service problem affects the whole queue. Wait for an explicit user retry.
+      if (error instanceof FoodAnalysisServiceError && [
+        'service_not_configured', 'configuration_invalid', 'key_invalid', 'key_rejected', 'billing_required', 'model_required',
+        'access_denied', 'consent_required', 'session_rate_limit', 'daily_limit_reached', 'provider_rate_limit', 'service_busy', 'provider_unavailable'
+      ].includes(error.code)) {
+        for (const pending of store.getState().foodScan.items) if (pending.status === 'queued')
+          pending.status = pending.selectedCandidateId ? 'needs_choice' : 'ready';
+        break;
+      }
+    } finally {
+      window.clearTimeout(timer);
+      if (abortListener) controller.signal.removeEventListener('abort', abortListener);
+      if (request === controller) request = null;
+      if (available() && token === generation) { store.updateFoodScan({ activeItemId: null }, false); updateQueue(); }
+    }
   }
 }
 
+function startQueue(): void {
+  if (!available() || worker || !store.getState().foodScan.items.some(item => item.status === 'queued')) return;
+  const token = generation;
+  store.updateFoodScan({ running: true, started: true, error: null }, false);
+  worker = runQueue(token).catch(() => {
+    if (!available() || token !== generation) return;
+    for (const item of store.getState().foodScan.items) if (item.status === 'queued' || item.status === 'analyzing') {
+      discardChoices(item); item.status = 'error'; item.progress = null;
+      item.error = 'Food analysis failed. Retry or enter the meal manually.';
+    }
+  }).finally(() => {
+    worker = null;
+    if (!available()) return;
+    if (token === generation) { store.updateFoodScan({ running: false, activeItemId: null }, false); updateQueue(); }
+    // A new user action may have queued work while the previous cancellation settled.
+    startQueue();
+  });
+}
+
+function stopQueue(notify = true): void {
+  if (!available()) return;
+  generation++; request?.abort(); request = null;
+  const scan = store.getState().foodScan;
+  for (const item of scan.items) {
+    if (item.status === 'analyzing') {
+      discardChoices(item); item.status = 'ready'; item.progress = null;
+    } else if (item.status === 'queued') {
+      item.status = item.choices ? 'needs_choice' : 'ready'; item.selectedCandidateId = null;
+    }
+  }
+  store.updateFoodScan({ running: false, activeItemId: null, progress: null, error: null, status: scan.items.length ? 'ready' : 'idle' }, false);
+  updateQueue(notify);
+}
+
+function analyzePhotos(): void {
+  if (!isScanner() || store.getState().foodScan.status === 'preparing' || !canUpload()) return;
+  const scan = store.getState().foodScan;
+  const ready = scan.items.filter(item => item.status === 'ready' && photos.has(item.id));
+  if (!ready.length) return;
+  for (const item of ready) { item.status = 'queued'; item.error = null; }
+  store.updateFoodScan({ started: true, error: null }, false);
+  store.setScreen('dashboard'); startQueue();
+}
+
+async function selectPhotos(files: File[]): Promise<void> {
+  if (!isScanner() || store.getState().foodScan.running || store.getState().foodScan.status === 'preparing') return;
+  const scan = store.getState().foodScan;
+  const slots = MAX_SCAN_PHOTOS - scan.items.length;
+  if (files.length > slots) { store.updateFoodScan({ error: 'Choose up to 5 photos per scan. Clear this queue to start another.' }); return; }
+  const token = generation;
+  store.updateFoodScan({ status: 'preparing', error: null, consent: false }); consentedBackend = null;
+  try {
+    for (const file of files) {
+      if (token !== generation || !available()) return;
+      let prepared: Blob;
+      try { prepared = await prepareFoodPhoto(file); }
+      catch (error) {
+        if (token !== generation || !available()) return;
+        store.updateFoodScan({ error: error instanceof Error && PHOTO_ERROR_MESSAGES.has(error.message)
+          ? error.message : 'This photo could not be opened. Try another image.' });
+        continue;
+      }
+      if (token !== generation || !available()) return;
+      const item = createFoodScanItem(URL.createObjectURL(prepared));
+      photos.set(item.id, prepared); scan.items.push(item); sessionItems = scan.items;
+      updateQueue();
+    }
+  } finally {
+    if (token === generation && available()) { store.updateFoodScan({ status: scan.items.length ? 'ready' : 'idle' }, false); updateQueue(); }
+  }
+}
+
+function openReview(id: string): void {
+  if (!available()) return;
+  if (isReview() && !captureReview()) return;
+  if (store.activateScanReview(id)) store.setScreen('foodResult');
+}
+
 export function bindFoodScanHandlers(): void {
-  document.addEventListener('nutriai:lock-start', () => { blocked = true; clearSession(false); });
+  document.addEventListener('nutriai:lock-start', () => { clearSession(false); blocked = true; });
   document.addEventListener('nutriai:lock-end', () => { blocked = false; if (isVaultUnlocked()) store.updateFoodScan({}); });
+  window.addEventListener('pagehide', () => { if (available()) clearSession(false); else releaseSession(); });
+  document.addEventListener('nutriai:food-backend-change', () => {
+    if (!available()) return;
+    stopQueue(false);
+    for (const item of store.getState().foodScan.items) {
+      if (item.status === 'needs_choice') { discardChoices(item); item.status = 'ready'; item.progress = null; }
+    }
+    consentedBackend = null; store.updateFoodScan({ consent: false }, false); updateQueue();
+  });
   window.scanChoosePhoto = camera => {
-    if (!isScanner() || request) return;
+    if (!isScanner() || store.getState().foodScan.running || store.getState().foodScan.status === 'preparing') return;
     const input = document.getElementById(camera ? 'scan-camera-input' : 'scan-gallery-input');
     if (input instanceof HTMLInputElement) input.click();
   };
   window.scanSelectPhoto = input => {
-    if (!isScanner() || request) { input.value = ''; return; }
-    const file = input.files?.[0]; input.value = ''; if (!file) return;
-    clearSession(false); const token = generation;
-    store.updateFoodScan({ status: 'preparing', error: null,
-      progress: { percent: 0, stage: 'preparing', completedBatches: 0, totalBatches: 6 } });
-    void prepareFoodPhoto(file).then(prepared => {
-      if (token !== generation || !isScanner()) return;
-      photo = prepared; photoUrl = URL.createObjectURL(prepared);
-      store.updateFoodScan({ photoUrl, status: 'ready', consent: false, error: null, progress: null });
-    }).catch(error => {
-      if (token !== generation || !isScanner()) return;
-      store.updateFoodScan({ status: 'error', progress: null, error: error instanceof Error && PHOTO_ERROR_MESSAGES.has(error.message)
-        ? error.message : 'This photo could not be opened. Try another image.' });
-    });
+    const files = Array.from(input.files ?? []); input.value = '';
+    if (files.length) void selectPhotos(files);
+  };
+  window.scanDishHint = (id, value) => {
+    if (!isScanner()) return;
+    const item = itemById(id);
+    if (item && ['ready', 'error', 'needs_choice'].includes(item.status)) item.dishHint = value.slice(0, 160);
   };
   window.scanConsent = accepted => {
-    if (!isScanner() || request) return;
+    if (!isScanner() || store.getState().foodScan.running) return;
     consentedBackend = accepted ? getFoodAnalysisBackend() : null;
     store.updateFoodScan({ consent: accepted && !!consentedBackend, error: null });
   };
-  window.scanAIServiceCode = value => {
-    if (!isScanner() || request) return;
-    setFoodAnalysisAccessCode(value);
-  };
-  window.scanAnalyzePhoto = () => { void analyzePhoto(); };
-  window.scanCancelAnalysis = () => {
+  window.scanAIServiceCode = value => { if (isScanner() && !store.getState().foodScan.running) setFoodAnalysisAccessCode(value); };
+  window.scanAnalyzePhoto = analyzePhotos;
+  window.scanCancelAnalysis = () => stopQueue();
+  window.scanDiscard = () => { if (available()) { clearSession(); if (store.getState().currentScreen === 'foodResult') store.openScannerMode('food'); } };
+  window.scanOpenQueue = () => { if (available()) store.openScannerMode('food'); };
+  window.scanChooseFood = (id, candidateId) => {
     if (!isScanner()) return;
-    generation++; request?.abort(); request = null;
-    store.updateFoodScan({ status: photo ? 'ready' : 'idle', error: null, progress: null });
+    const item = itemById(id);
+    if (!item || item.status !== 'needs_choice' || !item.choices?.candidates.some(candidate => candidate.id === candidateId) || !canUpload()) return;
+    if (!item.dishHint) item.dishHint = item.choices.candidates.find(candidate => candidate.id === candidateId)!.name.slice(0, 160);
+    item.selectedCandidateId = candidateId; item.status = 'queued'; item.error = null;
+    store.updateFoodScan({ started: true }, false); updateQueue(); startQueue();
   };
-  window.scanDiscard = () => { if (available()) clearSession(); };
-  window.scanManualReview = () => {
-    if (!isScanner() || request || store.getState().foodScan.status === 'preparing') return;
-    store.setScannedFood(createManualScannedFood(), false); store.setScreen('foodResult');
+  window.scanRetryPhoto = id => {
+    if (!isScanner()) return;
+    const item = itemById(id);
+    if (!item || !['error', 'needs_choice'].includes(item.status) || !photos.has(id) || !canUpload()) return;
+    discardChoices(item); item.status = 'queued'; item.error = null; item.progress = null;
+    store.updateFoodScan({ started: true }, false); updateQueue(); startQueue();
+  };
+  window.scanSkipPhoto = id => {
+    if (!available()) return;
+    const item = itemById(id); if (!item || item.status === 'saved' || item.status === 'skipped') return;
+    if (store.getState().foodScan.activeItemId === id) request?.abort();
+    discardChoices(item); releaseItemPhoto(item); item.status = 'skipped'; item.progress = null; item.result = null; item.review = null;
+    if (store.getState().foodScan.reviewItemId === id) {
+      store.setScannedFood(null, false); store.updateFoodScan({ photoUrl: null, reviewItemId: null }, false);
+      if (store.getState().currentScreen === 'foodResult') store.openScannerMode('food');
+    }
+    updateQueue();
+  };
+  window.scanReviewPhoto = openReview;
+  window.scanManualReview = id => {
+    if (!isScanner() || store.getState().foodScan.status === 'preparing') return;
+    const scan = store.getState().foodScan;
+    let item = id ? itemById(id) : scan.items.find(entry => ['ready', 'error', 'needs_choice'].includes(entry.status));
+    if (item && !['ready', 'error', 'needs_choice'].includes(item.status)) return;
+    if (!item) {
+      if (scan.items.length >= MAX_SCAN_PHOTOS) { store.updateFoodScan({ error: 'Choose up to 5 photos per scan. Clear this queue to start another.' }); return; }
+      item = createFoodScanItem(null); scan.items.push(item); sessionItems = scan.items;
+    }
+    discardChoices(item); item.result = createManualScannedFood(); item.result.scanId = item.id; item.result.name = item.dishHint;
+    item.review = createScanReview(item.result); item.status = 'review'; item.error = null;
+    updateQueue(false); openReview(item.id);
   };
   window.scanReviewInput = (field, value) => {
     if (!isReview() || !SCAN_REVIEW_FIELDS.includes(field)) return;
@@ -241,27 +457,36 @@ export function bindFoodScanHandlers(): void {
   };
   window.scanSaveReviewedMeal = () => {
     if (!captureReview()) return;
-    const error = validateScanReview(store.getState().foodScan.review!);
+    const scan = store.getState().foodScan;
+    const item = scan.items.find(entry => entry.id === scan.reviewItemId && entry.status === 'review');
+    if (!item) return;
+    const error = validateScanReview(scan.review!);
     if (error) { reviewError(error); document.getElementById('scan-review-error')?.focus(); return; }
     saving = true;
     let accepted = false;
     try { accepted = store.logReviewedScannedFood(); }
     finally { saving = false; }
     if (!accepted) { reviewError('The change could not be queued. Keep this tab open and retry.'); return; }
-    clearSession(false); store.selectDate(getTodayKey()); store.setScreen('diary');
+    item.status = 'saved'; item.result = null; item.review = null; releaseItemPhoto(item);
+    store.updateFoodScan({ photoUrl: null, reviewItemId: null }, false);
+    // Consume only this draft; other photos and their results remain available in the activity widget.
+    updateQueue(false); store.selectDate(getTodayKey()); store.setScreen('diary');
   };
   window.scanOpenPendingReview = () => {
-    if (available() && store.getState().lastScannedFood && store.getState().foodScan.review) store.setScreen('foodResult');
+    if (!available()) return;
+    const scan = store.getState().foodScan;
+    const item = scan.items.find(entry => entry.id === scan.reviewItemId && entry.status === 'review')
+      ?? scan.items.find(entry => entry.status === 'review');
+    if (item) openReview(item.id);
   };
 }
 
 export function activateFoodScanner(): void { blocked = false; saving = false; }
-export function deactivateFoodScanner(): void { blocked = true; saving = false; releasePhoto(); clearFoodAnalysisAccessCode(); }
+export function deactivateFoodScanner(): void { blocked = true; saving = false; releaseSession(); clearFoodAnalysisAccessCode(); }
 
-/** Called before rendering: leaving either scan screen discards photo/unfinished analysis and aborts work. */
+/** Navigation preserves the in-memory queue. Lock/discard/pagehide is the privacy boundary. */
 export function syncFoodScanLifecycle(): void {
   if (!available()) return;
-  const state = store.getState();
-  if ((state.currentScreen === 'scanner' && state.scannerMode === 'food') || state.currentScreen === 'foodResult') return;
-  if (photo || request || state.lastScannedFood || state.foodScan.status !== 'idle') clearSession(false);
+  const scan = store.getState().foodScan;
+  if (scan.items.length && scan.items.every(item => item.status === 'saved' || item.status === 'skipped')) clearSession(false);
 }

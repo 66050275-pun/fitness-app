@@ -30,6 +30,7 @@ import { renderDashboardScreen } from './screens/DashboardScreen';
 import { renderScannerScreen } from './screens/ScannerScreen';
 import { renderFoodResultScreen } from './screens/FoodResultScreen';
 import { activateFoodScanner, bindFoodScanHandlers, deactivateFoodScanner, refreshFoodScanFeedback, syncFoodScanLifecycle } from './screens/foodScanController.ts';
+import { renderFoodScanActivity, refreshFoodScanActivity } from './components/FoodScan/FoodScanActivity.ts';
 import { getTodayKey } from './utils/dateUtils.ts';
 import { initializeStreamlitFoodAnalysis } from './services/streamlitFoodAnalysis.ts';
 import { renderDiaryScreen } from './screens/DiaryScreen';
@@ -2179,6 +2180,7 @@ function renderApp() {
   const showBottomNav = !isWorkoutActive && !isProfileSubpage && ['dashboard', 'diary', 'insights', 'coach', 'profile'].includes(currentScreen);
 
   screenTransitions.render(app, state, screenHtml, showBottomNav ? renderBottomNav() : '', `
+    ${renderFoodScanActivity()}
     ${renderQuickAddBottomSheet()}
     ${renderDashboardWidgetDrawer()}
     ${renderWeeklyProgramEditorModal()}
@@ -2197,6 +2199,7 @@ function renderApp() {
   if (currentScreen === 'onboarding') refreshOnboardingFeedback();
   refreshPhasicToolFeedback();
   refreshFoodScanFeedback();
+  refreshFoodScanActivity();
 
   if (currentScreen === 'coach') {
     const container = document.getElementById('chat-messages-container');

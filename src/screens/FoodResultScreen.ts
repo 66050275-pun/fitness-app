@@ -21,6 +21,9 @@ export function renderFoodResultScreen(): string {
   const state = store.getState();
   const food = state.lastScannedFood;
   const review = state.foodScan.review;
+  const queue = state.foodScan.items;
+  const currentIndex = queue.findIndex(item => item.id === state.foodScan.reviewItemId);
+  const otherReviews = queue.filter(item => item.status === 'review' && item.id !== state.foodScan.reviewItemId);
   if (!food || !review) return `<div class="food-scan-screen min-h-screen flex flex-col gap-4 p-5">
     <h1 class="font-heading font-extrabold text-xl">${trHtml('No food analysis to review')}</h1>
     <button type="button" class="ui-primary-button" onclick="window.openScannerMode('food')">${trHtml('Scan Food')}</button></div>`;
@@ -46,8 +49,13 @@ export function renderFoodResultScreen(): string {
           <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
         </button>
         <div class="min-w-0"><h1 class="font-heading font-extrabold text-xl">${trHtml('Food scan review')}</h1>
-          <p class="phasic-tool-muted text-sm">${trHtml('One confirmed meal updates your daily totals.')}</p></div>
+          <p class="phasic-tool-muted text-sm">${currentIndex >= 0 && queue.length > 1 ? trHtml('Photo {0} of {1}', currentIndex + 1, queue.length)
+            : trHtml('One confirmed meal updates your daily totals.')}</p></div>
       </header>
+      ${otherReviews.length ? `<section class="phasic-tool-note text-sm flex flex-col gap-2">
+        <p class="font-heading font-bold">${trHtml('Other results ready to review')}</p>
+        <div class="flex flex-wrap gap-2">${otherReviews.map(item => `<button type="button" class="phasic-tool-secondary" onclick="window.scanReviewPhoto('${item.id}')">${trHtml('Photo {0}', queue.indexOf(item) + 1)}</button>`).join('')}</div>
+      </section>` : ''}
       ${state.foodScan.photoUrl ? `<img src="${escapeHtml(state.foodScan.photoUrl)}" alt="${trHtml('Selected food photo')}" class="food-result-photo w-full rounded-3xl object-contain" />` : ''}
       <section class="phasic-tool-note text-sm flex flex-col gap-2">
         <p class="font-heading font-bold">${trHtml(food.source === 'ai_estimate' ? 'AI estimate' : food.source === 'manual' ? 'Manual nutrition entry' : 'Demo estimate')}</p>
@@ -128,6 +136,8 @@ export function renderFoodResultScreen(): string {
       </section>
       <p id="scan-review-error" class="phasic-tool-error text-sm empty:hidden" role="alert" tabindex="-1"></p>
       <button id="scan-save-meal" type="button" class="ui-primary-button" onclick="window.scanSaveReviewedMeal()" ${validateScanReview(review) ? 'disabled' : ''}>${trHtml('Confirm and log today’s meal')}</button>
+      <button type="button" class="phasic-tool-secondary" onclick="window.scanOpenQueue()">${trHtml('Back to photo queue')}</button>
+      ${currentIndex >= 0 ? `<button type="button" class="phasic-tool-muted text-sm underline min-h-12" onclick="window.scanSkipPhoto('${queue[currentIndex].id}')">${trHtml('Skip this photo / duplicate dish')}</button>` : ''}
       <p class="phasic-tool-muted text-sm leading-relaxed">${trHtml('Saves one meal with the reviewed totals and analysis history in your encrypted vault. Check the save indicator for storage completion.')}</p>
     </div>`;
 }

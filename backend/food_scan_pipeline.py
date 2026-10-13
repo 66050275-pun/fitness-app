@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Callable
 
-from .food_analysis import validate_primary_food_result, validate_nutrient_batch
+from .food_analysis import validate_recognition_result, validate_nutrient_batch
 from .maxplus import AnalysisError, analyze_food_photo, analyze_nutrient_batch
 from .nutrients import NUTRIENT_BATCHES, complete_micronutrients
 
@@ -19,22 +19,33 @@ STOP_BATCH_ERRORS = {
 
 
 async def analyze_food_in_batches(key: str, model: str, photo: bytes, language: str, base_url: str | None = None,
-                                  on_progress: Callable[[dict], None] | None = None) -> dict:
+                                  on_progress: Callable[[dict], None] | None = None, dish_hint: str = "") -> dict:
+    if on_progress:
+        on_progress({"percent": 15, "stage": "meal", "completedBatches": 0, "totalBatches": TOTAL_BATCHES})
+    try:
+        raw = await asyncio.wait_for(analyze_food_photo(key, model, photo, language, base_url, dish_hint), 45)
+    except asyncio.TimeoutError:
+        raise AnalysisError("provider_timeout") from None
+    recognition = validate_recognition_result(raw)
+    if recognition["requiresConfirmation"]:
+        return {"kind": "food_choices", "question": recognition["question"], "candidates": recognition["candidates"]}
+    return await complete_food_in_batches(key, model, recognition["candidates"][0]["meal"], language, base_url, on_progress)
+
+
+async def complete_food_in_batches(key: str, model: str, primary: dict, language: str, base_url: str | None = None,
+                                   on_progress: Callable[[dict], None] | None = None) -> dict:
     """A failed detailed batch leaves its values unknown; a failed primary meal aborts the scan."""
     def progress(percent: int, stage: str, handled: int = 0):
         if on_progress is not None:
             on_progress({"percent": percent, "stage": stage, "completedBatches": handled, "totalBatches": TOTAL_BATCHES})
 
-    meal: dict | None = None
+    meal: dict = primary
     handled = 0
     incomplete = False
     profile = {"vitamins": [], "minerals": [], "otherNutrients": []}
 
     async def run_batches():
         nonlocal meal, handled, incomplete
-        progress(15, "meal")
-        raw = await asyncio.wait_for(analyze_food_photo(key, model, photo, language, base_url), 45)
-        meal = validate_primary_food_result(raw)
         # Detailed estimates use this fixed validated portion and never alter its primary totals.
         progress(30, "nutrients")
         for category, definitions in NUTRIENT_BATCHES:
@@ -57,14 +68,10 @@ async def analyze_food_in_batches(key: str, model: str, photo: bytes, language: 
             progress(30 + handled * 10, "nutrients", handled)
 
     try:
-        await asyncio.wait_for(run_batches(), MAX_ANALYSIS_SECONDS)
+        await asyncio.wait_for(run_batches(), MAX_ANALYSIS_SECONDS - 45)
     except asyncio.TimeoutError:
-        if meal is None:
-            raise AnalysisError("provider_timeout") from None
         incomplete = True
 
-    if meal is None:
-        raise AnalysisError("response_invalid")
     progress(95, "combining", handled)
     meal["micronutrients"] = complete_micronutrients(profile)
     if incomplete or handled < TOTAL_BATCHES:

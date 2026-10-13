@@ -21,7 +21,7 @@ Optional protections and notices:
 
 - `MAXPLUS_ACCESS_CODE`: a separate service code of 16–256 characters. If set, callers enter it in the scan screen before analysis. It is not the vault PIN, is not written to local storage and clears on vault lock/page close. The server checks it with a constant-time comparison.
 - `MAXPLUS_DAILY_SCAN_LIMIT`: 1–1,000 scan attempts per **Asia/Bangkok** calendar day, default 20, shared by this server process. It includes rejected photos after admission, can reset on a process restart, and is not a provider billing guarantee. Configure spending limits in Maxplus too.
-- Each browser session permits one in-flight request, at least five seconds between attempts, and at most ten attempts/hour. The owner budget also bounds four active requests across sessions.
+- Each browser session permits one in-flight request, at least five seconds between image attempts, and at most ten image attempts/hour. Candidate confirmation continues an already-admitted image attempt and does not count as another scan. The owner budget also bounds four active requests across sessions, including confirmations.
 - `MAXPLUS_PHOTO_NOTICE_EN` and `MAXPLUS_PHOTO_NOTICE_TH`: optional accurate processing/retention notices; supply both together. Default copy explains NutriAI → Maxplus → model-service processing without promising a provider retention policy.
 
 ## Maxplus API method taken from Subject AI
@@ -37,18 +37,18 @@ Optional protections and notices:
 
 `streamlit_component/index.html` is a small, invisible handshaking component based on Subject AI's session bridge pattern. It runs alongside the existing `st.iframe`, forwarding only the typed food-analysis RPC. The application stays in its original srcdoc iframe and original storage origin, with its existing scrolling/viewport behavior; catalog fetches keep their existing CSP destination.
 
-The Python `BrowserSession` is held in `st.session_state`, with request-ID deduplication, frame binding, acknowledgement, per-session events and cancellation. No separate Uvicorn port, public proxy endpoint, global photo/result cache or frontend provider key is introduced. The RPC fragment reruns/polls independently of the app iframe and discards acknowledged upload payloads in the bridge. Server jobs release their payloads/results after completion/acknowledgement; remaining session/widget memory is subject to Streamlit's session lifetime.
+The Python `BrowserSession` is held in `st.session_state`, with request-ID deduplication, frame binding, acknowledgement, per-session events and cancellation. No separate Uvicorn port, public proxy endpoint, global photo/result cache or frontend provider key is introduced. The RPC fragment reruns/polls independently of the app iframe and discards acknowledged upload payloads in the bridge. Jobs release owned photo payloads after completion. For ambiguous recognition, this session temporarily holds at most five sets of validated candidate nutrition (no photos), expiring after 20 minutes, cleared on cancellation/frame replacement and consumed once on confirmation. Acknowledged response events are removed; remaining session/widget memory is subject to Streamlit's session lifetime.
 
 The backend is registered in the client only when the public configuration is ready. Public config includes provider/model, processing notice and service-code requirement; never the API key or service code. Changing its version resets client consent. Plain `npm run dev` has no Streamlit parent and retains manual entry; use `python -m streamlit run streamlit_app.py` for the connected server flow.
 
 ## Client flow
 
-1. Take or choose a JPEG/PNG/WebP photo using the platform picker. The camera option is a browser/native picker hint, rather than a fabricated camera feed.
+1. Take photos or choose up to five JPEG/PNG/WebP photos using the platform picker. The gallery accepts multiple selections; the camera can append another photo. Each photo represents one dish/portion, with a Skip duplicate action. The camera option is a browser/native picker hint.
 2. Locally decode, resize to at most 1,600px per side and re-encode as JPEG. Reject input files over 12 MiB, unreasonable decoded dimensions and prepared payloads over 4 MiB. Re-encoding removes original EXIF metadata and the original filename; visible content in the photo remains visible.
-3. After a backend is configured, show its label and EN/TH photo-processing notice. Require explicit confirmation before sending that photo. Replacing a photo resets consent. Changing the backend registration requires fresh consent.
-4. Invoke the registered transport with the prepared Blob, selected language and AbortSignal. The frontend aborts on cancel, leaving the flow or vault lock, ignores late responses and times out after 240 seconds (including all sequential batches). A backend must honor cancellation where practical and enforce its own limits.
-5. Validate the returned JSON and open a review of the entire portion. Missing nutrition/confidence stays `null`; no confidence, ingredients, glycemic index or micronutrients are invented.
-6. Confirm one reviewed meal in the actual local day's diary. Scan IDs prevent duplicate confirmation, and a rejected persistence queue restores the pending draft. Accepted queue writes use the existing vault status/retry controls rather than re-logging.
+3. Show the configured backend label and EN/TH processing notice. Require explicit consent for the selected queue. Adding photos or changing backend registration resets consent. An optional dish hint (160 characters) is treated as untrusted data, not instructions.
+4. Analyze starts a sequential queue and returns to Home. A floating activity pill displays completed milestones and opens the queue. Navigation inside the unlocked app preserves work; Cancel, Clear, page close and vault lock stop work and ignore late responses. Each image/confirmation RPC has a 240-second client deadline. No OS background worker or cross-device job exists; ordinary privacy/idle locking remains active.
+5. Validate the JSON. A clear high-confidence single dish proceeds to detailed nutrients. An uncertain/low-or-unknown-confidence dish or multiple identities pauses that photo with 1–3 choices, while other photos continue. Selecting ONE candidate resumes its detailed nutrients via a text-only confirmation RPC without another photo upload. None fitting allows a user-initiated hint/retry or manual entry. Genuine non-food/unrecognizable images remain errors, not forced invented choices.
+6. Review and confirm each portion separately in the actual local day's diary. Alternatives and unfinished results never add calories. Scan IDs prevent duplicate confirmation of that draft; different photos of the same dish need the explicit Skip action. Saving one leaves the other results available; a rejected persistence queue restores the draft. Missing nutrition/confidence stays `null`; accepted writes use existing vault status/retry controls.
 
 Manual nutrition entry is available before backend setup and after analysis errors. It uses the same review/accounting flow and is labeled manual. Blank macro values remain unknown; calories, a name and a portion description are required to save.
 
@@ -59,6 +59,7 @@ Manual nutrition entry is available before backend setup and after analysis erro
 ```ts
 interface FoodAnalysisRequest {
   photo: Blob;
+  dishHint?: string;
   language: 'en' | 'th';
   signal: AbortSignal;
   onProgress?: (progress: FoodAnalysisProgress) => void;
@@ -68,6 +69,10 @@ interface FoodAnalysisBackend {
   label: string;
   photoProcessingNotice: { en: string; th: string };
   analyze(request: FoodAnalysisRequest): Promise<unknown>;
+  confirmSelection?(request: Omit<FoodAnalysisRequest, 'photo' | 'dishHint'> & {
+    selectionToken: string; candidateId: string;
+  }): Promise<unknown>;
+  discardSelection?(selectionToken: string): void;
 }
 ```
 
@@ -79,7 +84,9 @@ The built-in registration is now `initializeStreamlitFoodAnalysis` in `src/servi
 
 ## Backend response
 
-Use the `FoodAnalysisResult` interface in `src/types/index.ts`. Nutrition is for the entire returned portion. Numbers must be finite/non-negative; use `null` for unknown values. Nutrition bounds are 20,000 kcal, 2,000g per macro and 10,000g serving weight. Confidence is 0–1. The transport receives the desired language so names, notes and assumptions can match the UI.
+Final nutrition uses `FoodAnalysisResult` in `src/types/index.ts`. Numbers are finite/non-negative; unknowns are `null`. Bounds are 20,000 kcal, 2,000g per macro and 10,000g serving weight. Confidence is 0–1. The provider prompt includes a JSON shape with `requiresConfirmation`, `question` and 1–3 `candidates`, each with its own whole-portion primary nutrition. Server validation also accepts older flat single-meal replies. A known confidence below 0.65 or missing confidence requires user confirmation; the number is only an AI estimate, not a calibrated accuracy guarantee.
+
+Before detailed nutrients, an ambiguous result uses the public `FoodRecognitionChoices` envelope: `kind: "food_choices"`, opaque `selectionToken`, `question` and 1–3 `{id, name, description, confidence, reason}` items. Macros for all alternatives remain server-side and are not logged. `confirm_food` sends only the token and an `option-1`/`option-2`/`option-3` ID with the same consent/config/access checks. Server-held candidates cannot be replaced by client-supplied nutrition. Expired/used tokens require explicit photo retry. Names/notes are requested in the selected language and escaped when rendered.
 
 Example response, for explaining the contract:
 
@@ -117,7 +124,7 @@ Ask the provider to estimate likely cooking method/oil/coconut/dressing contribu
 - When no included amount is known, the user's first included amount identifies part of the existing total. It cannot silently increase the total. Further changes to a known amount use the difference rule. Clearing an included amount removes its classification while retaining current nutrition totals.
 - The portion description is editable, with explicit instructions to update totals if the portion changes. Micronutrients retain their original analysis basis and are not automatically rescaled.
 - Schema 9 adds optional `MealItem.scanAnalysis`: scan ID, source, original nutrition/portion/cooking-fat estimates, confidence/warnings, reviewed included cooking grams and edited fields. The meal snapshot stores reviewed nutrition; server-controlled provider/model provenance is preserved in optional metadata, and legacy aggregate zeros are only a display/aggregation fallback for unknown values.
-- Photo bytes/object URLs, consent, transport state and unfinished review strings are ephemeral. They are not included in encrypted snapshots/backups. Navigation away and vault lock release them and cancel the bridge request. A server/provider request already accepted may still complete or be billed; Maxplus/model-service retention follows their policies.
+- Photo bytes/object URLs, hints, choices, consent, queue state and unfinished review strings are ephemeral and excluded from encrypted snapshots/backups. App navigation preserves them until Clear, page close or vault lock. Saved/skipped items release their photos immediately; finishing all items clears the queue. A server/provider request already accepted may still complete or be billed; Maxplus/model-service retention follows their policies.
 - Fat Gauge, Protein Radar and diary totals read the ordinary meal snapshot. The optional standalone extra-fat calculator remains for fat genuinely missing from another logged meal, with a visible instruction to avoid applying it to already-reviewed scan totals.
 
 ## Code map
@@ -150,6 +157,6 @@ The current workflow:
 
 Progress is completed-workflow progress, not elapsed time or upload-byte progress: 0% local preparation, 10% ready to send, 15% server photo accepted, 30% primary meal validated, 40–90% after handled nutrient batches, 95% combining, and 100% once the final combined result is validated. A partial-result fallback can advance to combination early; its batch counter remains the actual number handled. The result's warning explains unavailable groups.
 
-Both the sidecar and client keep the pending request alive for progress events. Frame/request binding, event sequence acknowledgements and monotonic validation prevent stale progress from updating a replacement scan. Cancel, Back and vault lock abort the active task and stop later requests; an already accepted provider request may still be billed. The percentage updates in place, honors Reduce Motion, includes accessible value/stage text and brings the progress/Cancel controls into view after Analyze.
+Both sidecar and client keep pending requests alive for progress events. Frame/request/generation binding and monotonic per-photo validation ignore stale progress. Cancel and vault lock stop later requests; an already accepted call may still be billed. Back/navigation now preserves the queue. The activity pill and per-photo meters update in place, respect Reduce Motion, and do not replace the current screen/form on every milestone. The queue percentage averages completed milestones; errors/skips count as handled, with separate ready/choice/error labels. 100% does not imply every photo produced a valid result.
 
-The existing daily limit counts **logical scan attempts**. One successful full scan now makes at most **seven provider calls** (one image + six text); the default 20-scan allowance therefore permits up to 140 calls per process/day. Four logical scans remain the maximum concurrency, with each scan issuing detail requests sequentially. This bounds work but is not a provider billing guarantee.
+The daily limit counts **image scan attempts**, per photo. One full portion makes at most **seven provider calls** (one image + six text), including an ambiguous image resumed after selection. Selecting a candidate does not restart recognition or consume another logical scan; an explicit retry does. Five photos may therefore make up to 35 provider calls. The default 20-scan allowance permits up to 140 calls per process/day, with four active jobs globally and one per browser session. This bounds work but is not a provider billing guarantee. No automatic paid retry is added.

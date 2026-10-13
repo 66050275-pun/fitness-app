@@ -1,4 +1,4 @@
-import type { CookingFatAnalysis, FoodAnalysisResult, MicronutrientProfile, NutrientUnit, NutrientValue, ScannedFood } from '../types/index.ts';
+import type { CookingFatAnalysis, FoodAnalysisResult, FoodRecognitionChoices, MicronutrientProfile, NutrientUnit, NutrientValue, ScannedFood } from '../types/index.ts';
 import nutrientCatalog from '../data/foodAnalysisNutrients.json' with { type: 'json' };
 import { getNutrientReference } from '../data/nutrientReferenceValues.ts';
 import { calculateDailyValuePercent } from '../utils/nutrientCalculations.ts';
@@ -12,6 +12,29 @@ function optionalProvenance(value: unknown): string | undefined {
   if (value === undefined || value === null) return undefined;
   if (typeof value !== 'string' || !value.trim() || value.length > 100) throw new Error('Invalid food analysis response.');
   return value.trim();
+}
+
+/** Validate the alternative-identity envelope before displaying any provider-controlled text. */
+export function normalizeFoodRecognitionChoices(value: unknown): FoodRecognitionChoices | null {
+  const raw = record(value);
+  if (raw.kind !== 'food_choices') return null;
+  if (typeof raw.selectionToken !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(raw.selectionToken)
+    || typeof raw.question !== 'string' || raw.question.length > 300
+    || !Array.isArray(raw.candidates) || !raw.candidates.length || raw.candidates.length > 3)
+    throw new Error('Invalid food analysis response.');
+  const ids = new Set<string>();
+  const candidates = raw.candidates.map(value => {
+    const candidate = record(value);
+    if (typeof candidate.id !== 'string' || !/^option-[1-3]$/.test(candidate.id) || ids.has(candidate.id)
+      || typeof candidate.name !== 'string' || !candidate.name.trim() || candidate.name.length > 200
+      || typeof candidate.description !== 'string' || !candidate.description.trim() || candidate.description.length > 300
+      || typeof candidate.reason !== 'string' || candidate.reason.length > 200)
+      throw new Error('Invalid food analysis response.');
+    ids.add(candidate.id);
+    return { id: candidate.id, name: candidate.name.trim(), description: candidate.description.trim(),
+      reason: candidate.reason.trim(), confidence: analysisNumber(candidate.confidence, 1) };
+  });
+  return { kind: 'food_choices', selectionToken: raw.selectionToken, question: raw.question.trim(), candidates };
 }
 
 export function analysisNumber(value: unknown, maximum = 2000): number | null {
@@ -96,7 +119,7 @@ export function normalizeFoodAnalysisResult(value: unknown): FoodAnalysisResult 
 }
 
 /** Pure conversion only. The transport is supplied later by the trusted backend integration. */
-export function adaptFoodAnalysisResultToScannedFood(response: unknown, scanId = crypto.randomUUID()): ScannedFood {
+export function adaptFoodAnalysisResultToScannedFood(response: unknown, scanId: string = crypto.randomUUID()): ScannedFood {
   const result = normalizeFoodAnalysisResult(response);
   return { scanId, source: 'ai_estimate', analyzedAt: new Date().toISOString(), name: result.foodName,
     subtitle: result.servingDescription, servingWeightGrams: result.servingWeightGrams ?? null,

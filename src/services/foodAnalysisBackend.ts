@@ -4,10 +4,17 @@ import type { FoodAnalysisProgress } from '../types/index.ts';
 export interface FoodAnalysisRequest {
   /** JPEG resized locally and re-encoded without the original filename/EXIF metadata. */
   photo: Blob;
+  /** Optional user-supplied dish name; untrusted text, bounded to 160 characters. */
+  dishHint?: string;
   language: Language;
   signal: AbortSignal;
   /** Completed workflow milestones from the backend, never a simulated provider percentage. */
   onProgress?: (progress: FoodAnalysisProgress) => void;
+}
+
+export interface FoodSelectionRequest extends Omit<FoodAnalysisRequest, 'photo' | 'dishHint'> {
+  selectionToken: string;
+  candidateId: string;
 }
 
 export interface FoodAnalysisBackend {
@@ -15,6 +22,9 @@ export interface FoodAnalysisBackend {
   /** Public-facing photo processing/retention notice. Supply both supported languages. */
   photoProcessingNotice: Record<Language, string>;
   analyze(request: FoodAnalysisRequest): Promise<unknown>;
+  /** Resume detailed nutrition for one server-validated candidate without uploading the photo again. */
+  confirmSelection?(request: FoodSelectionRequest): Promise<unknown>;
+  discardSelection?(selectionToken: string): void;
 }
 
 let backend: FoodAnalysisBackend | null = null;

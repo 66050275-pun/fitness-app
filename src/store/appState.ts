@@ -496,7 +496,8 @@ class Store {
       meals: persisted.meals,
       chatHistory: INITIAL_CHAT,
       lastScannedFood: null,
-      foodScan: { status: 'idle', photoUrl: null, consent: false, error: null, review: null, progress: null },
+      foodScan: { status: 'idle', photoUrl: null, consent: false, error: null, review: null, progress: null,
+        items: [], activeItemId: null, reviewItemId: null, started: false, running: false },
       quickAddOpen: false,
       quickAddView: 'primary',
       selectedSpecialProgramTool: null,
@@ -1641,6 +1642,16 @@ class Store {
   public updateFoodScanReview(patch: Partial<FoodScanReview>): void {
     if (this.disposed || !isVaultUnlocked() || !this.state.foodScan.review) return;
     Object.assign(this.state.foodScan.review, patch);
+  }
+
+  /** Point the existing review screen at one queued result, keeping each item's unfinished edits. */
+  public activateScanReview(itemId: string): boolean {
+    if (this.disposed || !isVaultUnlocked()) return false;
+    const item = this.state.foodScan.items.find(entry => entry.id === itemId && entry.status === 'review');
+    if (!item?.result || !item.review) return false;
+    this.state.lastScannedFood = item.result;
+    Object.assign(this.state.foodScan, { review: item.review, reviewItemId: item.id, photoUrl: item.photoUrl });
+    return true;
   }
 
   public logReviewedScannedFood(): boolean {

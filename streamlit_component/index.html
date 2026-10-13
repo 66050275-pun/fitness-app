@@ -63,13 +63,16 @@
     if (data.type === 'cancel') {
       outgoing.delete(data.id); pending.delete(data.id); cancelled.add(data.id); send('control'); return;
     }
-    if (data.type !== 'request' || data.action !== 'analyze' || pending.has(data.id)) return;
+    if (data.type !== 'request' || !['analyze','confirm_food'].includes(data.action) || pending.has(data.id)) return;
     if (pending.size >= 1) { tellApp({type:'response',id:data.id,kind:'error',code:'service_busy'}); return; }
     const payload = data.payload;
-    if (!payload || typeof payload !== 'object' || typeof payload.photo !== 'string' || payload.photo.length > 5592408) {
-      tellApp({type:'response',id:data.id,kind:'error',code:'photo_invalid'}); return;
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)
+      || (data.action === 'analyze' && (typeof payload.photo !== 'string' || payload.photo.length > 5592408))
+      || (data.action === 'confirm_food' && (typeof payload.selectionToken !== 'string'
+        || !/^[a-zA-Z0-9-]{1,80}$/.test(payload.selectionToken) || !/^option-[1-3]$/.test(payload.candidateId)))) {
+      tellApp({type:'response',id:data.id,kind:'error',code:'request_invalid'}); return;
     }
-    pending.add(data.id); outgoing.set(data.id,{id:data.id,action:'analyze',payload}); send('requests');
+    pending.add(data.id); outgoing.set(data.id,{id:data.id,action:data.action,payload}); send('requests');
   });
   window.addEventListener('pagehide', () => {
     for (const id of pending) cancelled.add(id);
