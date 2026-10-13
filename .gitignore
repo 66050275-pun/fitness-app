@@ -14,5 +14,9 @@ android/local.properties
 # Python preview and test artifacts
 __pycache__/
 *.pyc
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
 test-results/
 playwright-report/

@@ -1,6 +1,45 @@
 # Food photo analysis and Hidden Fat integration
 
-Scope: `66050275-pun/fitness-app`. The client flow is implemented. Backend deployment, authentication, provider selection and API credentials remain pending the owner's instructions. No endpoint is configured and the default build sends no food photos over the network.
+Scope: `66050275-pun/fitness-app`. Maxplus server integration is implemented following `66050275-pun/subject-ai` at commit `96f83e50c93887cb9075bf28ae1077ef49893b58` (read-only reference). The owner selected **Streamlit Secrets** credentials, rather than browser API-key entry. Actual provider credentials/model access and live vision compatibility must be configured/confirmed by the owner. Without complete server configuration the scanner remains available for manual entry and sends no food photos to Maxplus.
+
+## Enable Maxplus on Streamlit
+
+In **fitness-app's** Streamlit Cloud app, open **Settings → Secrets** and set:
+
+```toml
+MAXPLUS_API_KEY = "your-actual-maxplus-key"
+MAXPLUS_MODEL = "an-actual-image-capable-model-id"
+MAXPLUS_BASE_URL = "https://api.maxplus-ai.cc/v1"
+MAXPLUS_DAILY_SCAN_LIMIT = 20
+```
+
+Use the exact model ID from your Maxplus account. It must accept OpenAI-style image input (`image_url`); listing a model alone does not prove vision support or quota. No default model, automatic model selection or automatic paid retry is assumed. Subject AI's source likewise states that live Maxplus compatibility was unverified. Keys entered in its browser are not stored in that repository and cannot be imported from it.
+
+The complete template is `.streamlit/secrets.toml.example`. For local Streamlit, use the ignored `.streamlit/secrets.toml` or matching server environment variables. Never use a `VITE_*` key or commit real credentials. Refresh the app after saving Secrets; reboot it if Streamlit has not loaded the new settings.
+
+Optional protections and notices:
+
+- `MAXPLUS_ACCESS_CODE`: a separate service code of 16–256 characters. If set, callers enter it in the scan screen before analysis. It is not the vault PIN, is not written to local storage and clears on vault lock/page close. The server checks it with a constant-time comparison.
+- `MAXPLUS_DAILY_SCAN_LIMIT`: 1–1,000 scan attempts per **Asia/Bangkok** calendar day, default 20, shared by this server process. It includes rejected photos after admission, can reset on a process restart, and is not a provider billing guarantee. Configure spending limits in Maxplus too.
+- Each browser session permits one in-flight request, at least five seconds between attempts, and at most ten attempts/hour. The owner budget also bounds four active requests across sessions.
+- `MAXPLUS_PHOTO_NOTICE_EN` and `MAXPLUS_PHOTO_NOTICE_TH`: optional accurate processing/retention notices; supply both together. Default copy explains NutriAI → Maxplus → model-service processing without promising a provider retention policy.
+
+## Maxplus API method taken from Subject AI
+
+- Official default base: `https://api.maxplus-ai.cc/v1`, with owner-configured paths limited to that HTTPS host. Credentials, ports, queries, fragments, arbitrary hosts and redirects are rejected.
+- Bearer authentication is added only by Python on the server.
+- `GET {base}/models` reads `data[].id` via the server-side `list_models` helper; it is not called automatically on page load and generates no model answer.
+- `POST {base}/chat/completions` uses `model`, `messages` and `max_tokens`. The food request includes a text instruction and a locally/server re-encoded JPEG as an OpenAI-style `image_url` data URL.
+- Structured output is requested in the prompt, with no required `response_format` parameter. Parse `choices[0].message.content` (text or text blocks), then validate the food schema with strict Pydantic models before returning it. Unknown nutrition remains null, cooking fat must be included in total fat, and truncation/invalid JSON is an error.
+- Bound upstream responses and use a 35-second server timeout within the client's 45-second deadline. Map authentication, billing, quota, model/image support, timeout and response errors to safe EN/TH messages; never echo provider bodies, keys or photos.
+
+## Streamlit transport
+
+`streamlit_component/index.html` is a small, invisible handshaking component based on Subject AI's session bridge pattern. It runs alongside the existing `st.iframe`, forwarding only the typed food-analysis RPC. The application stays in its original srcdoc iframe and original storage origin, with its existing scrolling/viewport behavior; catalog fetches keep their existing CSP destination.
+
+The Python `BrowserSession` is held in `st.session_state`, with request-ID deduplication, frame binding, acknowledgement, per-session events and cancellation. No separate Uvicorn port, public proxy endpoint, global photo/result cache or frontend provider key is introduced. The RPC fragment reruns/polls independently of the app iframe and discards acknowledged upload payloads in the bridge. Server jobs release their payloads/results after completion/acknowledgement; remaining session/widget memory is subject to Streamlit's session lifetime.
+
+The backend is registered in the client only when the public configuration is ready. Public config includes provider/model, processing notice and service-code requirement; never the API key or service code. Changing its version resets client consent. Plain `npm run dev` has no Streamlit parent and retains manual entry; use `python -m streamlit run streamlit_app.py` for the connected server flow.
 
 ## Client flow
 
@@ -33,7 +72,7 @@ interface FoodAnalysisBackend {
 
 Register the transport from trusted application initialization before the scan UI renders. Its implementation will call the agreed NutriAI backend with the agreed authentication and payload format. Provider credentials belong on the server. The client has no provider API-key field, arbitrary endpoint input or automatic upload.
 
-Before connecting it, agree the backend URL, authentication, upload format, provider/model, photo retention and processing notice, quota/rate limits and server-side request/response validation. The current Streamlit Python host builds/embeds static assets; this change does not introduce a recognition server there.
+The built-in registration is now `initializeStreamlitFoodAnalysis` in `src/services/streamlitFoodAnalysis.ts`. It uses a session-scoped Streamlit RPC to Python; the provider URL and credentials never become browser request destinations or headers. Other future trusted transports can still use the same registration contract.
 
 ## Backend response
 
@@ -74,8 +113,8 @@ Ask the provider to estimate likely cooking method/oil/coconut/dressing contribu
 - Special Program users can change a known included estimate. Changing **10 → 13 g** changes total fat **28 → 31 g** and calories **612 → 639 kcal**. Repeating the same choice adds nothing. Other food macros remain unchanged.
 - When no included amount is known, the user's first included amount identifies part of the existing total. It cannot silently increase the total. Further changes to a known amount use the difference rule. Clearing an included amount removes its classification while retaining current nutrition totals.
 - The portion description is editable, with explicit instructions to update totals if the portion changes. Micronutrients retain their original analysis basis and are not automatically rescaled.
-- Schema 9 adds optional `MealItem.scanAnalysis`: scan ID, source, original nutrition/portion/cooking-fat estimates, confidence/warnings, reviewed included cooking grams and edited fields. The meal snapshot stores reviewed nutrition; legacy aggregate zeros are only a display/aggregation fallback for unknown values.
-- Photo bytes/object URLs, consent, transport state and unfinished review strings are ephemeral. They are not included in encrypted snapshots/backups. Navigation away and vault lock release them; processing already accepted by a future server is subject to its agreed retention/cancellation policy.
+- Schema 9 adds optional `MealItem.scanAnalysis`: scan ID, source, original nutrition/portion/cooking-fat estimates, confidence/warnings, reviewed included cooking grams and edited fields. The meal snapshot stores reviewed nutrition; server-controlled provider/model provenance is preserved in optional metadata, and legacy aggregate zeros are only a display/aggregation fallback for unknown values.
+- Photo bytes/object URLs, consent, transport state and unfinished review strings are ephemeral. They are not included in encrypted snapshots/backups. Navigation away and vault lock release them and cancel the bridge request. A server/provider request already accepted may still complete or be billed; Maxplus/model-service retention follows their policies.
 - Fat Gauge, Protein Radar and diary totals read the ordinary meal snapshot. The optional standalone extra-fat calculator remains for fat genuinely missing from another logged meal, with a visible instruction to avoid applying it to already-reviewed scan totals.
 
 ## Code map
@@ -88,3 +127,8 @@ Ask the provider to estimate likely cooking method/oil/coconut/dressing contribu
 - `ScannerScreen.ts` / `FoodResultScreen.ts`: themed EN/TH UI.
 - `HiddenFatScanner.ts` / `MealDetailModal.ts`: scan entry, today's results and saved analysis history.
 - `appState.ts` / `storagePersistence.ts`: one-entry diary persistence and schema migration.
+- `streamlitFoodAnalysis.ts` / `streamlit_component/index.html`: client registration and typed session RPC.
+- `backend/settings.py`: server-only key/model/settings plus public capability metadata.
+- `backend/maxplus.py`: official-host model listing and vision chat-completion requests.
+- `backend/food_analysis.py`: strict server response schema and included-fat validation.
+- `backend/streamlit_transport.py`: session jobs, cancellation, deduplication and bounded owner request budget.

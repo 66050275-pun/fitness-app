@@ -116,6 +116,7 @@ export function renderMealDetailModal(): string {
           ${meal.scanAnalysis ? `
             <section class="phasic-tool-card flex flex-col gap-3">
               <h3 class="font-heading font-bold text-base">${trHtml('Saved scan analysis')}</h3>
+              ${meal.scanAnalysis.analysisProvider ? `<p class="phasic-tool-muted text-sm">${trHtml('Analyzed with {0}', [meal.scanAnalysis.analysisProvider, meal.scanAnalysis.analysisModel].filter(Boolean).join(' · '))}</p>` : ''}
               <p class="phasic-tool-muted text-sm">${trHtml('Cooking fat is included in the recorded total, with no separate addition.')}</p>
               <p class="text-sm">${meal.scanAnalysis.reviewedCookingFatGrams === null ? trHtml('Cooking fat: not estimated')
                 : trHtml('{0} g cooking fat included', formatDisplayNumber(meal.scanAnalysis.reviewedCookingFatGrams))}</p>

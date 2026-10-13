@@ -5,6 +5,12 @@ function record(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function optionalProvenance(value: unknown): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== 'string' || !value.trim() || value.length > 100) throw new Error('Invalid food analysis response.');
+  return value.trim();
+}
+
 export function analysisNumber(value: unknown, maximum = 2000): number | null {
   if (value === null || value === undefined) return null;
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > maximum)
@@ -61,7 +67,8 @@ export function normalizeFoodAnalysisResult(value: unknown): FoodAnalysisResult 
     protein: analysisNumber(raw.protein), carbs: analysisNumber(raw.carbs), fat,
     ingredients: analysisTextList(raw.ingredients), overallConfidence: analysisNumber(raw.overallConfidence, 1),
     cookingFat: normalizeCookingFat(raw.cookingFat, fat), warnings: analysisTextList(raw.warnings),
-    micronutrients: normalizeMicronutrients(raw.micronutrients) };
+    micronutrients: normalizeMicronutrients(raw.micronutrients), analysisProvider: optionalProvenance(raw.analysisProvider),
+    analysisModel: optionalProvenance(raw.analysisModel) };
 }
 
 /** Pure conversion only. The transport is supplied later by the trusted backend integration. */
@@ -72,5 +79,5 @@ export function adaptFoodAnalysisResultToScannedFood(response: unknown, scanId =
     calories: result.calories, protein: result.protein, carbs: result.carbs, fat: result.fat,
     confidence: result.overallConfidence ?? null, glycemicIndex: null, ingredients: result.ingredients,
     suggestedMealType: 'lunch', cookingFat: result.cookingFat ?? null, warnings: result.warnings ?? [],
-    micronutrients: result.micronutrients };
+    micronutrients: result.micronutrients, analysisProvider: result.analysisProvider, analysisModel: result.analysisModel };
 }

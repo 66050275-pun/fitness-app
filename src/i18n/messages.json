@@ -9258,5 +9258,105 @@
   "Micronutrients refer to the original analyzed portion and were not rescaled after editing.": {
     "en": "Micronutrients refer to the original analyzed portion and were not rescaled after editing.",
     "th": "สารอาหารรองอ้างอิงหน่วยบริโภคที่วิเคราะห์เดิม โดยไม่ได้ปรับสัดส่วนหลังแก้ไข"
+  },
+  "AI scanning is not available yet. You can enter nutrition manually.": {
+    "en": "AI scanning is not available yet. You can enter nutrition manually.",
+    "th": "การสแกนด้วย AI ยังไม่พร้อมใช้งาน คุณกรอกสารอาหารเองได้"
+  },
+  "The AI service needs setup. Please contact the app owner.": {
+    "en": "The AI service needs setup. Please contact the app owner.",
+    "th": "บริการ AI ยังตั้งค่าไม่ครบ กรุณาติดต่อเจ้าของแอป"
+  },
+  "The AI service credentials need attention. Please contact the app owner.": {
+    "en": "The AI service credentials need attention. Please contact the app owner.",
+    "th": "ข้อมูลเชื่อมต่อบริการ AI ต้องได้รับการแก้ไข กรุณาติดต่อเจ้าของแอป"
+  },
+  "Maxplus rejected the service credentials. Please contact the app owner.": {
+    "en": "Maxplus rejected the service credentials. Please contact the app owner.",
+    "th": "Maxplus ไม่ยอมรับข้อมูลเชื่อมต่อบริการ กรุณาติดต่อเจ้าของแอป"
+  },
+  "Maxplus credits or billing need attention. You can enter nutrition manually.": {
+    "en": "Maxplus credits or billing need attention. You can enter nutrition manually.",
+    "th": "เครดิตหรือการชำระเงินของ Maxplus ต้องได้รับการตรวจสอบ คุณกรอกสารอาหารเองได้"
+  },
+  "The app owner needs to select an image-capable Maxplus model.": {
+    "en": "The app owner needs to select an image-capable Maxplus model.",
+    "th": "เจ้าของแอปต้องเลือกโมเดล Maxplus ที่รองรับภาพ"
+  },
+  "Maxplus rejected the model or photo. An image-capable model is required.": {
+    "en": "Maxplus rejected the model or photo. An image-capable model is required.",
+    "th": "Maxplus ไม่ยอมรับโมเดลหรือภาพนี้ ต้องใช้โมเดลที่รองรับภาพ"
+  },
+  "The AI service endpoint needs attention. Please contact the app owner.": {
+    "en": "The AI service endpoint needs attention. Please contact the app owner.",
+    "th": "จุดเชื่อมต่อบริการ AI ต้องได้รับการแก้ไข กรุณาติดต่อเจ้าของแอป"
+  },
+  "Maxplus is limiting requests. Wait before trying again.": {
+    "en": "Maxplus is limiting requests. Wait before trying again.",
+    "th": "Maxplus จำกัดจำนวนคำขอ กรุณารอสักครู่ก่อนลองใหม่"
+  },
+  "Maxplus is unavailable. Retry later or enter nutrition manually.": {
+    "en": "Maxplus is unavailable. Retry later or enter nutrition manually.",
+    "th": "Maxplus ยังไม่พร้อมให้บริการ ลองใหม่ภายหลังหรือกรอกสารอาหารเอง"
+  },
+  "Maxplus took too long. Retry or enter nutrition manually.": {
+    "en": "Maxplus took too long. Retry or enter nutrition manually.",
+    "th": "Maxplus ใช้เวลานานเกินไป ลองใหม่หรือกรอกสารอาหารเอง"
+  },
+  "The AI result could not be validated. Retry or enter nutrition manually.": {
+    "en": "The AI result could not be validated. Retry or enter nutrition manually.",
+    "th": "ตรวจสอบความถูกต้องของผล AI ไม่สำเร็จ ลองใหม่หรือกรอกสารอาหารเอง"
+  },
+  "The AI result was incomplete. Retry or enter nutrition manually.": {
+    "en": "The AI result was incomplete. Retry or enter nutrition manually.",
+    "th": "ผลจาก AI ไม่ครบถ้วน ลองใหม่หรือกรอกสารอาหารเอง"
+  },
+  "No food could be identified. Choose a clearer food photo.": {
+    "en": "No food could be identified. Choose a clearer food photo.",
+    "th": "ยังระบุอาหารในภาพไม่ได้ กรุณาเลือกรูปอาหารที่ชัดเจนขึ้น"
+  },
+  "The photo could not be processed. Choose another food photo.": {
+    "en": "The photo could not be processed. Choose another food photo.",
+    "th": "ประมวลผลรูปนี้ไม่ได้ กรุณาเลือกรูปอาหารอื่น"
+  },
+  "The AI access code is incorrect. Check it and try again.": {
+    "en": "The AI access code is incorrect. Check it and try again.",
+    "th": "รหัสใช้บริการ AI ไม่ถูกต้อง กรุณาตรวจสอบแล้วลองใหม่"
+  },
+  "Confirm photo processing again before analysis.": {
+    "en": "Confirm photo processing again before analysis.",
+    "th": "ยืนยันการส่งภาพเพื่อประมวลผลอีกครั้งก่อนวิเคราะห์"
+  },
+  "Too many scan attempts. Wait before trying again.": {
+    "en": "Too many scan attempts. Wait before trying again.",
+    "th": "ลองสแกนถี่เกินไป กรุณารอก่อนลองใหม่"
+  },
+  "Today’s AI scan allowance has been reached. You can enter nutrition manually.": {
+    "en": "Today’s AI scan allowance has been reached. You can enter nutrition manually.",
+    "th": "ใช้โควตาสแกน AI ของบริการวันนี้ครบแล้ว คุณกรอกสารอาหารเองได้"
+  },
+  "The AI service is busy. Wait before trying again.": {
+    "en": "The AI service is busy. Wait before trying again.",
+    "th": "บริการ AI กำลังประมวลผลคำขออื่น กรุณารอก่อนลองใหม่"
+  },
+  "AI access code": {
+    "en": "AI access code",
+    "th": "รหัสใช้บริการ AI"
+  },
+  "Use the service code from the app owner. Your vault PIN stays on this device.": {
+    "en": "Use the service code from the app owner. Your vault PIN stays on this device.",
+    "th": "ใช้รหัสบริการจากเจ้าของแอป ส่วน PIN ของคลังส่วนตัวยังคงอยู่เฉพาะบนอุปกรณ์นี้"
+  },
+  "Food photo AI processing": {
+    "en": "Food photo AI processing",
+    "th": "การประมวลผลรูปอาหารด้วย AI"
+  },
+  "When you approve AI analysis, the selected food photo passes through NutriAI’s server to Maxplus and its model service. NutriAI does not save food photos. Provider processing and retention follow their own policies. Reviewed nutrition stays in your encrypted browser vault; your profile and vault PIN are not sent for analysis.": {
+    "en": "When you approve AI analysis, the selected food photo passes through NutriAI’s server to Maxplus and its model service. NutriAI does not save food photos. Provider processing and retention follow their own policies. Reviewed nutrition stays in your encrypted browser vault; your profile and vault PIN are not sent for analysis.",
+    "th": "เมื่อคุณยินยอมให้ AI วิเคราะห์ รูปอาหารที่เลือกจะผ่านเซิร์ฟเวอร์ NutriAI ไปยัง Maxplus และบริการโมเดล แอปไม่บันทึกรูปอาหาร ส่วนการประมวลผลและการเก็บข้อมูลของผู้ให้บริการเป็นไปตามนโยบายของผู้ให้บริการนั้น สารอาหารที่ตรวจสอบแล้วเก็บในคลังเข้ารหัสของเบราว์เซอร์ โดยไม่ส่งข้อมูลโปรไฟล์หรือ PIN ของคลังไปวิเคราะห์"
+  },
+  "Analyzed with {0}": {
+    "en": "Analyzed with {0}",
+    "th": "วิเคราะห์ด้วย {0}"
   }
 }

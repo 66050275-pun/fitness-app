@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; object-src 'none'; base-uri 'none'">
+  <style>html,body{margin:0;overflow:hidden}</style>
+</head>
+<body>
+<script>
+(() => {
+  'use strict';
+  const channel = 'nutriai-food-analysis-v1';
+  const frame = crypto.randomUUID();
+  const outgoing = new Map();
+  const cancelled = new Set();
+  const pending = new Set();
+  let appWindow = null, appOrigin = null, parentOrigin = null, config = null, ack = 0;
+
+  function send(type) {
+    window.parent.postMessage({isStreamlitMessage:true,type:'streamlit:setComponentValue',dataType:'json',value:{
+      type,frame,nonce:crypto.randomUUID(),ack,requests:[...outgoing.values()],cancel:[...cancelled]
+    }}, '*');
+  }
+  function tellApp(message) {
+    if (appWindow && appOrigin) appWindow.postMessage({channel,frame,...message}, appOrigin);
+  }
+  window.addEventListener('message', event => {
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
+    if (event.source === window.parent && data.type === 'streamlit:render') {
+      parentOrigin = event.origin;
+      const args = data.args || {};
+      config = args.config || null;
+      if (args.frame !== frame) return;
+      tellApp({type:'config',config});
+      let changed = false;
+      for (const id of args.accepted || []) {
+        if (outgoing.delete(id)) changed = true;
+        if (cancelled.delete(id)) changed = true;
+      }
+      for (const result of args.events || []) {
+        if (!Number.isSafeInteger(result.seq) || result.seq <= ack) continue;
+        ack = result.seq; changed = true;
+        if (pending.delete(result.id)) tellApp({type:'response',...result});
+      }
+      if (changed) send('control');
+      return;
+    }
+    if (data.channel !== channel || !parentOrigin || event.origin !== parentOrigin || event.source === window.parent) return;
+    if (data.type === 'hello') {
+      // The original st.iframe srcdoc inherits the Streamlit parent's origin.
+      // Bind this session to that sibling window, without moving the app or its vault origin.
+      if (appWindow && appWindow !== event.source) return;
+      try { if (event.source?.parent !== window.parent) return; } catch (_) { return; }
+      appWindow = event.source; appOrigin = event.origin; tellApp({type:'config',config}); return;
+    }
+    if (event.source !== appWindow || event.origin !== appOrigin) return;
+    if (data.frame !== frame || typeof data.id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(data.id)) return;
+    if (data.type === 'cancel') {
+      outgoing.delete(data.id); pending.delete(data.id); cancelled.add(data.id); send('control'); return;
+    }
+    if (data.type !== 'request' || data.action !== 'analyze' || pending.has(data.id)) return;
+    if (pending.size >= 1) { tellApp({type:'response',id:data.id,kind:'error',code:'service_busy'}); return; }
+    const payload = data.payload;
+    if (!payload || typeof payload !== 'object' || typeof payload.photo !== 'string' || payload.photo.length > 5592408) {
+      tellApp({type:'response',id:data.id,kind:'error',code:'photo_invalid'}); return;
+    }
+    pending.add(data.id); outgoing.set(data.id,{id:data.id,action:'analyze',payload}); send('requests');
+  });
+  window.addEventListener('pagehide', () => {
+    for (const id of pending) cancelled.add(id);
+    outgoing.clear(); pending.clear(); send('control');
+  });
+  window.parent.postMessage({isStreamlitMessage:true,type:'streamlit:setFrameHeight',height:0}, '*');
+  window.parent.postMessage({isStreamlitMessage:true,type:'streamlit:componentReady',apiVersion:1}, '*');
+  send('boot');
+  send('ready');
+})();
+</script>
+</body>
+</html>

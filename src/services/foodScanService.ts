@@ -75,7 +75,8 @@ export function buildScanMealAnalysis(food: ScannedFood, review: FoodScanReview)
     originalFoodName: food.name, originalServingDescription: food.subtitle, originalServingWeightGrams: food.servingWeightGrams,
     originalNutrition: { calories: food.calories, protein: food.protein, carbs: food.carbs, fat: food.fat },
     originalCookingFat: food.cookingFat, reviewedCookingFatGrams: readReviewNumber(review.cookingFatGrams),
-    confidence: food.confidence, warnings: [...food.warnings], editedFields };
+    confidence: food.confidence, warnings: [...food.warnings], editedFields,
+    analysisProvider: food.analysisProvider, analysisModel: food.analysisModel };
 }
 
 /** Metadata is optional for old diaries; malformed metadata does not discard the meal. */
@@ -98,6 +99,8 @@ export function sanitizeScanMealAnalysis(value: unknown, recordedFat: number | n
       originalServingWeightGrams: analysisNumber(raw.originalServingWeightGrams, 10_000),
       originalNutrition, originalCookingFat: normalizeCookingFat(raw.originalCookingFat, originalNutrition.fat),
       reviewedCookingFatGrams, confidence: analysisNumber(raw.confidence, 1), warnings: analysisTextList(raw.warnings),
-      editedFields: Array.isArray(raw.editedFields) ? SCAN_REVIEW_FIELDS.filter(field => (raw.editedFields as unknown[]).includes(field)) : [] };
+      editedFields: Array.isArray(raw.editedFields) ? SCAN_REVIEW_FIELDS.filter(field => (raw.editedFields as unknown[]).includes(field)) : [],
+      analysisProvider: typeof raw.analysisProvider === 'string' && raw.analysisProvider.trim() && raw.analysisProvider.length <= 100 ? raw.analysisProvider.trim() : undefined,
+      analysisModel: typeof raw.analysisModel === 'string' && raw.analysisModel.trim() && raw.analysisModel.length <= 100 ? raw.analysisModel.trim() : undefined };
   } catch { return undefined; }
 }

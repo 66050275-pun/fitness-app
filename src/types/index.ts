@@ -400,6 +400,8 @@ export interface ScannedFood {
   servingWeightGrams: number | null;
   cookingFat: CookingFatAnalysis | null;
   warnings: string[];
+  analysisProvider?: string;
+  analysisModel?: string;
   imageUrl?: string;
   micronutrients?: MicronutrientProfile;
 }
@@ -439,6 +441,9 @@ export interface FoodAnalysisResult {
   warnings?: string[];
   /** Estimated cooking fat ALREADY INCLUDED in the total fat and calories above. */
   cookingFat?: CookingFatAnalysis | null;
+  /** Server-controlled provenance, rather than a provider-generated claim. */
+  analysisProvider?: string;
+  analysisModel?: string;
 }
 
 export interface CookingFatAnalysis {
@@ -487,6 +492,8 @@ export interface ScanMealAnalysis {
   confidence: number | null;
   warnings: string[];
   editedFields: FoodScanReviewField[];
+  analysisProvider?: string;
+  analysisModel?: string;
 }
 
 export type FitnessSubView = 'home' | 'setup' | 'active' | 'summary';

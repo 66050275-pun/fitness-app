@@ -52,6 +52,11 @@ export function renderDataPrivacyScreen(): string {
           </button>
         </div>
 
+        <section class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-5 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
+          <h2 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml('Food photo AI processing')}</h2>
+          <p class="text-sm text-on-surface-variant dark:text-gray-300 leading-relaxed">${trHtml('When you approve AI analysis, the selected food photo passes through NutriAI’s server to Maxplus and its model service. NutriAI does not save food photos. Provider processing and retention follow their own policies. Reviewed nutrition stays in your encrypted browser vault; your profile and vault PIN are not sent for analysis.')}</p>
+        </section>
+
         <!-- Local Storage Architecture Card -->
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-5 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
           <div class="flex items-center gap-3">

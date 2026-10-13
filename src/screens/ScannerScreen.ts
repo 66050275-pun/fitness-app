@@ -1,6 +1,7 @@
 import { getLanguage, trHtml } from '../i18n/index.ts';
 import { store } from '../store/appState.ts';
 import { getFoodAnalysisBackend } from '../services/foodAnalysisBackend.ts';
+import { getFoodAnalysisAccessCode, isFoodAnalysisAccessCodeRequired } from '../services/streamlitFoodAnalysis.ts';
 import { escapeHtml } from '../utils/sanitize.ts';
 
 export function renderScannerScreen(): string {
@@ -62,6 +63,11 @@ export function renderScannerScreen(): string {
             : trHtml('You can prepare a photo and enter nutrition yourself. AI results will become available when the service is connected.')}</p>
           <p>${trHtml('Photos stay in memory for this scan and are discarded when you leave or lock the app. Saved meals contain nutrition results, not photos.')}</p>
           ${backend ? `<p>${escapeHtml(backend.photoProcessingNotice[getLanguage()])}</p>
+            ${isFoodAnalysisAccessCodeRequired() ? `<label class="flex flex-col gap-2 font-heading font-bold" for="scan-ai-service-code">
+              ${trHtml('AI access code')}<input id="scan-ai-service-code" type="password" autocomplete="off" maxlength="256" class="phasic-tool-input w-full font-sans font-normal"
+                value="${escapeHtml(getFoodAnalysisAccessCode())}" oninput="window.scanAIServiceCode(this.value)" ${disabled} />
+              <span class="font-sans font-normal">${trHtml('Use the service code from the app owner. Your vault PIN stays on this device.')}</span>
+            </label>` : ''}
             <label class="flex items-start gap-3 mt-2"><input id="scan-upload-consent" type="checkbox" class="h-5 w-5 mt-0.5 shrink-0" onchange="window.scanConsent(this.checked)" ${scan.consent ? 'checked' : ''} ${disabled} />
               <span>${trHtml('I agree to send this food photo for analysis.')}</span></label>` : ''}
         </section>
