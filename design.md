@@ -2,7 +2,7 @@
 
 This file records the current theme of `fitness-app`. Read it before changing the UI. Keep new screens and components consistent with these patterns, and update this reference when an intentional design change is made.
 
-Reference date: 2026-10-12. The actual tokens live in `tailwind.config.js` and `src/index.css`.
+Reference date: 2026-10-13. The actual tokens live in `tailwind.config.js` and `src/index.css`.
 
 ## Visual direction
 
@@ -176,7 +176,9 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - Present Hidden Fat as cooking fat **already included** in total fat. For Special Program users, provide an editable included amount and **Less oil / Original estimate / More oil** choices derived from the returned range or the original estimate. Changes to a known included amount adjust total fat by its difference and energy by **9 kcal/g**. An unknown included amount is identified within the entered total instead of added automatically.
 - Show cooking-fat sources, assumptions, uncertainty range and confidence only when supplied. Preserve warnings and original nutrition/portion metadata alongside edited fields. Detailed nutrient data continues to describe the original analyzed portion unless a separate recalculation is supplied.
 - Confirmation logs one meal for the actual local day, updates diary-derived tools, consumes the draft and uses the existing save status for durable-storage completion. API retries do not log meals. Persist results in the encrypted vault; discard image bytes, object URLs, consent and unfinished edits when leaving the scan flow or locking the vault.
-- All app-owned copy is EN/TH. Backend names, foods, ingredients and analysis notes are escaped text; request the selected language from the future backend.
+- All app-owned copy is EN/TH. Backend names, foods, ingredients and analysis notes are escaped text; request the selected language from Maxplus.
+- Maxplus uses the owner’s server-side Streamlit Secrets and a configured image-capable model. Show consent with the accurate provider notice before each selected photo is analyzed. Keep provider/credential/quota/vision/timeout errors actionable, and retain manual entry. If the owner sets a separate service access code, show a 16px password field in the same green card; the code is ephemeral and distinct from the vault PIN.
+- The small Streamlit API component runs invisibly alongside the original app iframe; its RPC fragment polls independently. Keep the app in its original `st.iframe` to preserve its storage origin, scrolling, privacy bar, focus and viewport behavior. Public configuration contains provider/model/notices and readiness; service credentials remain on the server.
 
 ## English and Thai
 
@@ -209,5 +211,6 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/screens/onboarding/OnboardingScreen.ts`, `onboardingController.ts` and `src/utils/onboardingGoals.ts`: four-step presentation, input lifecycle and shared target validation/calculation.
 - `src/services/nutritionPlanService.ts`: local Mini Cut and Lean Bulk calorie, macro, duration and adjustment rules.
 - `src/screens/ScannerScreen.ts`, `FoodResultScreen.ts`, `foodScanController.ts` and `src/services/foodScanService.ts`: photo preparation, nutrition review, included-fat accounting and ephemeral scan lifecycle.
-- `src/services/foodAnalysisBackend.ts`, `aiFoodAnalysisAdapter.ts` and `docs/FOOD_SCAN_BACKEND.md`: pending backend registration and validated analysis contract.
+- `src/services/foodAnalysisBackend.ts`, `aiFoodAnalysisAdapter.ts`, `streamlitFoodAnalysis.ts` and `docs/FOOD_SCAN_BACKEND.md`: trusted backend registration, Maxplus session transport and validated analysis contract.
+- `backend/` and `streamlit_component/index.html`: server credentials, provider/schema validation, request budget and a small invisible RPC component.
 - `src/i18n/`: bilingual presentation helpers and messages.

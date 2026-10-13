@@ -31,6 +31,7 @@ import { renderScannerScreen } from './screens/ScannerScreen';
 import { renderFoodResultScreen } from './screens/FoodResultScreen';
 import { activateFoodScanner, bindFoodScanHandlers, deactivateFoodScanner, refreshFoodScanFeedback, syncFoodScanLifecycle } from './screens/foodScanController.ts';
 import { getTodayKey } from './utils/dateUtils.ts';
+import { initializeStreamlitFoodAnalysis } from './services/streamlitFoodAnalysis.ts';
 import { renderDiaryScreen } from './screens/DiaryScreen';
 import { renderAICoachScreen } from './screens/AICoachScreen';
 import { renderFitnessScreen } from './screens/FitnessScreen';
@@ -2188,6 +2189,11 @@ function renderApp() {
     }
   }
 }
+
+initializeStreamlitFoodAnalysis();
+document.addEventListener('nutriai:food-backend-change', () => {
+  if (isVaultUnlocked() && store) store.updateFoodScan({ consent: false, error: null });
+});
 
 // Initialize health/profile state only after the local vault is unlocked.
 void startPrivateApp(() => {

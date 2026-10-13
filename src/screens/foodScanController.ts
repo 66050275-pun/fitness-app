@@ -3,6 +3,7 @@ import { store } from '../store/appState.ts';
 import { isVaultUnlocked } from '../services/privateStorage.ts';
 import { adaptFoodAnalysisResultToScannedFood } from '../services/aiFoodAnalysisAdapter.ts';
 import { getFoodAnalysisBackend, type FoodAnalysisBackend } from '../services/foodAnalysisBackend.ts';
+import { clearFoodAnalysisAccessCode, FoodAnalysisServiceError, setFoodAnalysisAccessCode } from '../services/streamlitFoodAnalysis.ts';
 import { prepareFoodPhoto } from '../services/foodPhotoService.ts';
 import { changeCookingFat, createManualScannedFood, inputNumber, readReviewNumber, resolveCookingFatDraft, reviewedNutrition, SCAN_REVIEW_FIELDS, validateScanReview } from '../services/foodScanService.ts';
 import { getFatGauge } from '../services/phasicRecompService.ts';
@@ -15,6 +16,7 @@ declare global {
     scanChoosePhoto: (camera: boolean) => void;
     scanSelectPhoto: (input: HTMLInputElement) => void;
     scanConsent: (accepted: boolean) => void;
+    scanAIServiceCode: (value: string) => void;
     scanAnalyzePhoto: () => void;
     scanCancelAnalysis: () => void;
     scanDiscard: () => void;
@@ -143,6 +145,7 @@ async function analyzePhoto(): Promise<void> {
   } catch (error) {
     if (token !== generation || !isScanner()) return;
     const message = timedOut ? 'Analysis took too long. Retry or enter the meal manually.'
+      : error instanceof FoodAnalysisServiceError ? error.message
       : error instanceof Error && error.message === 'Invalid food analysis response.' ? 'The analysis returned incomplete or invalid data. Retry or enter the meal manually.'
         : 'Food analysis failed. Retry or enter the meal manually.';
     store.updateFoodScan({ status: 'error', error: message });
@@ -179,6 +182,10 @@ export function bindFoodScanHandlers(): void {
     if (!isScanner() || request) return;
     consentedBackend = accepted ? getFoodAnalysisBackend() : null;
     store.updateFoodScan({ consent: accepted && !!consentedBackend, error: null });
+  };
+  window.scanAIServiceCode = value => {
+    if (!isScanner() || request) return;
+    setFoodAnalysisAccessCode(value);
   };
   window.scanAnalyzePhoto = () => { void analyzePhoto(); };
   window.scanCancelAnalysis = () => {
@@ -230,7 +237,7 @@ export function bindFoodScanHandlers(): void {
 }
 
 export function activateFoodScanner(): void { blocked = false; saving = false; }
-export function deactivateFoodScanner(): void { blocked = true; saving = false; releasePhoto(); }
+export function deactivateFoodScanner(): void { blocked = true; saving = false; releasePhoto(); clearFoodAnalysisAccessCode(); }
 
 /** Called before rendering: leaving either scan screen discards photo/unfinished analysis and aborts work. */
 export function syncFoodScanLifecycle(): void {

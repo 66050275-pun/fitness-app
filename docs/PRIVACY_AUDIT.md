@@ -4,7 +4,7 @@ Scope: `66050275-pun/fitness-app` only. Public Streamlit mobile preview, its fro
 
 ## Application and data flow
 
-NutriAI is a TypeScript/Vite nutrition and fitness tracker with a Capacitor Android wrapper. Streamlit builds the frontend and embeds static HTML/JavaScript/CSS in an iframe. Its Python code handles no personal form values. A central store owns navigation, profile, goals, diary, exercises and local demo conversations.
+NutriAI is a TypeScript/Vite nutrition and fitness tracker with a Capacitor Android wrapper. Streamlit builds the frontend and keeps the existing HTML/JavaScript/CSS in its original srcdoc iframe, alongside an invisible session-scoped API component. Profile, goals, diary, workouts and the vault PIN stay in the client. With configured Maxplus owner credentials, Python processes explicitly consented food photos and an optional service access code in session memory, then returns validated nutrition for local review. It does not store these photos or receive the vault decryption key.
 
 ```mermaid
 flowchart TD
@@ -19,9 +19,15 @@ flowchart TD
   J[Legacy plaintext storage and photo] --> G
   H --> K[Remove legacy copies after committed migration]
   E --> L[Lock: flush, clear key, discard store and personal DOM]
+  M[Selected food photo] --> N[Explicit AI processing consent]
+  N --> O[Session Streamlit bridge]
+  O --> P[Maxplus and model service]
+  P --> Q[Validated nutrition review]
+  Q --> R[Confirm one meal]
+  R --> F
 ```
 
-There is no application user database, login service, configured food-recognition endpoint, connected health provider or remote coach in this build. The scanner accepts a real photo through the platform picker and supports local preparation/manual nutrition review; recognition awaits backend configuration. The coach remains a local demonstration. Clipboard copy and sharing are explicit user actions; feedback copy can include the email and description the user entered.
+There is no application user database, account login, connected health provider or remote coach. The scanner calls Maxplus through Python only when the owner's key and image-capable model are configured and the user confirms photo processing. Manual entry remains available. The coach remains a local demonstration. Clipboard copy and sharing are explicit user actions; feedback copy can include the email and description the user entered.
 
 ## Persistent information
 
@@ -35,6 +41,8 @@ There is no application user database, login service, configured food-recognitio
 | Weight history, search history, dashboard layout and insight range | Plaintext localStorage | Encrypted vault |
 | Feedback subject, description, contact email and diagnostics preference | Plaintext localStorage | Encrypted vault |
 | Profile photo | Plaintext Blob in separate IndexedDB | Encrypted bytes in same vault |
+| Food scan photo | Local preview only | Ephemeral browser/Streamlit session memory; sent to Maxplus/model service only for confirmed AI analysis; not included in app snapshots/backups |
+| Maxplus owner API key | Not configured | Streamlit Secrets or server environment only; omitted from public component config, browser storage and provider errors |
 | Coach conversation, active workout and unsaved modal/form input | In memory | In memory; discarded on lock |
 | Downloaded backup | Plaintext JSON, omitted photo | Encrypted JSON, includes photo and saved drafts |
 
@@ -239,3 +247,17 @@ Schema 9 stores optional original/reviewed scan analysis metadata in the same en
 Selected photos are prepared locally, retained in memory, and released on scan exit or vault lock. Their bytes, filenames, object URLs, upload consent and unfinished review drafts are excluded from vault persistence and backups. Recognition remains disconnected by default. A future trusted transport must supply a localized photo-processing notice and use a server that holds provider credentials; explicit consent precedes invocation. Cancellation/timeout ignores late responses, while any future server/provider retention must be agreed separately. Details: `docs/FOOD_SCAN_BACKEND.md`.
 
 Additional modules: `src/services/foodAnalysisBackend.ts`, `foodPhotoService.ts`, `foodScanService.ts`, and `src/screens/foodScanController.ts`. The response adapter now validates unknown JSON, retains unknown nutrients/confidence, and renders only supplied micronutrients. Saved analysis preserves the original portion and nutrition, the included cooking-fat amount and edited-field provenance.
+
+## Maxplus server integration — 2026-10-13
+
+Adapted the official-host Bearer/chat-completion method and session bridge pattern from `66050275-pun/subject-ai` commit `96f83e50c93887cb9075bf28ae1077ef49893b58`, with read-only access to that repo. The owner selected Streamlit Secrets for the provider key. Live provider/vision compatibility has not been confirmed; no credentials or paid calls were used during implementation.
+
+- A small handshaking component runs alongside the original app iframe. Sibling messages are bound to their source, origin and frame, with the Streamlit parent's origin captured from its own render event. Server requests/results are scoped to `st.session_state`; IDs deduplicate reruns, cancellation precedes new submissions, acknowledged uploads/responses leave wrapper queues, and late results from another frame are ignored. Browser vault storage remains keyed by the same origin.
+- Photos are locally and server-side re-encoded as bounded JPEGs, processed in memory, and excluded from app persistence/backup. Streamlit widget/session memory lasts according to the platform lifecycle; an already accepted provider call may complete or be billed after cancellation. Provider retention follows its own policy.
+- Owner credentials and optional service codes are never returned in public config. API keys are server-only, not a browser form field. An optional separate AI access code clears on vault lock/page close and is not the vault PIN.
+- The official HTTPS Maxplus host is allowlisted, redirects refused, upstream bodies bounded, and key/model/input/generated nutrition validated. Errors are safe codes and EN/TH messages rather than raw provider/exception bodies. No automatic provider calls, model switching or retries occur on startup.
+- Process-wide quota counters contain no user data: default 20 admitted attempts per Bangkok day and four active jobs; per session one in-flight job, five-second spacing and ten attempts/hour. Process restarts can reset the owner counter, so this does not replace provider spending controls.
+- The inner app CSP continues to permit only its explicit catalog fetch destination; photo RPC uses the trusted parent bridge. The invisible bridge creates no application frames and keeps the app's previous iframe origin intact. Global caching is limited to static frontend assets and data-free quota counters.
+- Current evidence: production TypeScript/Vite build, Python syntax compilation/backend imports, component JavaScript syntax compilation, source review and EN/TH label audit. No automated tests or live Maxplus calls were added/run for this change. Historical browser checks earlier in this document predate the new bridge and do not certify this version end to end.
+
+See `docs/FOOD_SCAN_BACKEND.md` for setup, limitations and module inventory.

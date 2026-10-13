@@ -10,6 +10,10 @@ import tempfile
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
+
+from backend.settings import load_settings
+from backend.streamlit_transport import BrowserSession, ScanBudget
 
 
 ROOT = Path(__file__).resolve().parent
@@ -115,6 +119,10 @@ st.markdown(
         display: block; width: 100% !important; border: 0 !important;
         height: 100vh !important; height: 100dvh !important;
       }
+      .stElementContainer:has(iframe[title*="nutriai_food_bridge"]) {
+        height: 0 !important; min-height: 0 !important; margin: 0 !important; overflow: hidden !important;
+      }
+      iframe[title*="nutriai_food_bridge"] { height: 0 !important; min-height: 0 !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -134,4 +142,31 @@ except (FileNotFoundError, RuntimeError, subprocess.CalledProcessError) as exc:
     st.exception(exc)
     st.stop()
 
+workspace = components.declare_component("nutriai_food_bridge", path=str(ROOT / "streamlit_component"))
+
+
+@st.cache_resource(show_spinner=False)
+def scan_budget() -> ScanBudget:
+    # Shared owner quota counters only. Photos/results/credentials are never cached here.
+    return ScanBudget()
+
+
+if "nutriai_food_transport" not in st.session_state:
+    st.session_state.nutriai_food_transport = BrowserSession()
+
+
+@st.fragment(run_every=0.5)
+def render_workspace() -> None:
+    session = st.session_state.nutriai_food_transport
+    settings = load_settings(st.secrets)
+    value = workspace(
+        config=settings.public_config(),
+        **session.snapshot(),
+        key="nutriai-workspace",
+        default=None,
+    )
+    session.accept(value, settings, scan_budget())
+
+
+render_workspace()
 st.iframe(frontend_html, height="stretch", alt="NutriAI")

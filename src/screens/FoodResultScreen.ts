@@ -51,6 +51,7 @@ export function renderFoodResultScreen(): string {
       ${state.foodScan.photoUrl ? `<img src="${escapeHtml(state.foodScan.photoUrl)}" alt="${trHtml('Selected food photo')}" class="food-result-photo w-full rounded-3xl object-contain" />` : ''}
       <section class="phasic-tool-note text-sm flex flex-col gap-2">
         <p class="font-heading font-bold">${trHtml(food.source === 'ai_estimate' ? 'AI estimate' : food.source === 'manual' ? 'Manual nutrition entry' : 'Demo estimate')}</p>
+        ${food.analysisProvider ? `<p>${trHtml('Analyzed with {0}', [food.analysisProvider, food.analysisModel].filter(Boolean).join(' · '))}</p>` : ''}
         ${food.confidence !== null ? `<p>${trHtml('Analysis confidence: {0}%', formatDisplayNumber(food.confidence * 100, 0))}</p>` : ''}
         <p>${trHtml(food.source === 'manual' ? 'Enter nutrition for the entire portion. Blank macro values stay unknown.'
           : 'Check the portion, nutrition and cooking-fat assumptions before saving.')}</p>

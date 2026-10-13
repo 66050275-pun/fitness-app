@@ -10,7 +10,7 @@ This repository is a Vite and TypeScript web app with a Capacitor Android projec
 
 Streamlit installs Node.js and npm from `packages.txt`. The entry point fingerprints the frontend sources, including the translation files. It runs `npm ci` when the dependency files change and `npm run build` when the frontend changes; reruns with the same source reuse the built files. The initial start can take longer while dependencies install.
 
-The preview uses the same browser-based app and its six-digit PIN protected encrypted browser vault. Capacitor native features are not available in the Streamlit page. Food scanning supports the phone's photo/camera picker, local image preparation and a nutrition review flow connected to Hidden Fat Scanner. AI recognition awaits backend setup; users can enter nutrition manually meanwhile. See [the food analysis integration contract](docs/FOOD_SCAN_BACKEND.md).
+The preview uses the same browser-based app and its six-digit PIN protected encrypted browser vault. Capacitor native features are not available in the Streamlit page. Food scanning supports the phone's photo/camera picker, local image preparation and a nutrition review flow connected to Hidden Fat Scanner. Streamlit's session-scoped backend calls Maxplus after explicit photo consent, using an owner key from Secrets. Set `MAXPLUS_API_KEY` and an image-capable `MAXPLUS_MODEL` in **fitness-app's** Streamlit Secrets to enable it; manual entry remains available before configuration or on errors. See [the Maxplus setup and food analysis contract](docs/FOOD_SCAN_BACKEND.md).
 
 ## Run locally
 
@@ -25,7 +25,7 @@ To run the regular Vite development server instead, use `npm run dev`.
 
 ## Personal data in the public test build
 
-Before entering profile or health details, create a unique local passphrase of at least 12 characters. The frontend encrypts the profile, health logs, settings, feedback draft and photo with AES-256-GCM before saving them in IndexedDB. Neither the passphrase nor the encryption key is saved or sent to an app server. Existing NutriAI plaintext browser data is migrated before its old copies are removed.
+Before entering profile or health details, create a local six-digit PIN. The frontend encrypts the profile, health logs, settings, feedback draft and profile photo with AES-256-GCM before saving them in IndexedDB. Neither the PIN nor the encryption key is saved or sent to an app server. Existing NutriAI plaintext browser data is migrated before its old copies are removed. Confirmed AI food scans send the food photo through NutriAI's server to Maxplus; saved nutrition results use the same encrypted browser vault.
 
 Use the persistent **Lock** button on shared devices. The app also locks after five minutes without interaction and hides the screen while the page is backgrounded. Unsaved forms and active workout sessions are discarded when locked. Watch the save indicator: storage errors are shown, and the app will not claim it saved or completed a lock while changes are unsaved. Export an encrypted backup if saving fails.
 
