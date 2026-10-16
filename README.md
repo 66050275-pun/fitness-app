@@ -12,6 +12,8 @@ Streamlit installs Node.js and npm from `packages.txt`. The entry point fingerpr
 
 The preview uses the same browser-based app and its six-digit PIN protected encrypted browser vault. Capacitor native features are not available in the Streamlit page. Food scanning supports the phone's photo/camera picker, local image preparation and a nutrition review flow connected to Hidden Fat Scanner. Streamlit's session-scoped backend calls Maxplus after explicit photo consent, using an owner key from Secrets. Set `MAXPLUS_API_KEY` and an image-capable `MAXPLUS_MODEL` in **fitness-app's** Streamlit Secrets to enable it; manual entry remains available before configuration or on errors. See [the Maxplus setup and food analysis contract](docs/FOOD_SCAN_BACKEND.md).
 
+Food scanning accepts up to **five photos** in a queue. Uncertain identification offers up to **three food choices** before estimating detailed nutrients for the selected portion. Analyze returns to Home with a floating progress/activity pill; app navigation preserves work while the app stays open and unlocked. Review/save each photo separately and skip duplicate dishes. Clear, page close and vault lock discard unfinished scans/photos; confirmed nutrition stays in the encrypted diary and existing Insights.
+
 ## Run locally
 
 ```bash

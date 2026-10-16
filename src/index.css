@@ -618,6 +618,26 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 .food-scan-progress-track { height: 10px; border-radius: 9999px; overflow: hidden; background: rgb(255 255 255 / 25%); }
 .food-scan-progress-fill { height: 100%; border-radius: inherit; background: #72fd9e; transition: width var(--ui-motion-duration) var(--ui-motion-easing); }
 .food-result-photo { max-height: 240px; background: var(--ui-panel); border: 1px solid var(--ui-border); }
+.food-scan-queue-photo { width: 100%; height: 190px; object-fit: contain; border-radius: 18px; background: var(--ui-panel); }
+.food-scan-queue-progress .food-scan-progress-track { background: var(--ui-panel-high); }
+.food-scan-queue-progress .food-scan-progress-fill { background: var(--ui-primary); }
+.food-scan-skip { min-width: 48px; min-height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--ui-panel); color: var(--ui-muted); }
+.food-scan-choice { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 64px; width: 100%; padding: 14px; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-panel); color: var(--ui-text); transition: background var(--ui-motion-duration), transform var(--ui-motion-duration); }
+.food-scan-choice:active { background: var(--ui-primary-soft); transform: scale(.99); }
+.food-scan-choice:disabled { opacity: .55; }
+.food-scan-choice:focus-visible, .food-scan-activity button:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 3px; }
+/* App-local activity pill: the privacy bar and modal layers remain above it. */
+.food-scan-activity { position: fixed; top: calc(var(--vault-bar-height) + 10px); left: 50%; transform: translateX(-50%); width: min(calc(100% - 24px), 394px); display: flex; align-items: center; min-height: 64px; padding: 6px; border: 1px solid var(--ui-primary); border-radius: 32px; background: var(--ui-card); color: var(--ui-text); box-shadow: 0 6px 24px rgb(0 60 30 / .18); z-index: 60; }
+.food-scan-activity-enter { animation: scan-activity-enter var(--ui-motion-duration) var(--ui-motion-easing); }
+.food-scan-activity-open { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; min-height: 52px; padding: 0 6px; border-radius: 28px; }
+.food-scan-activity-ring { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; padding: 3px; background: conic-gradient(var(--ui-primary) var(--scan-progress), var(--ui-panel-high) 0); }
+.food-scan-activity-ring > span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--ui-card); font-size: 10px; font-weight: 800; color: var(--ui-primary); }
+.food-scan-activity-cancel { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%; color: var(--ui-muted); background: var(--ui-panel); }
+.food-scan-activity-open:active, .food-scan-activity-cancel:active { background: var(--ui-primary-soft); }
+@keyframes scan-activity-enter { from { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(.94); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+/* Reserve room while the pill is present, including sticky dashboard/profile headers. */
+#app.vault-open:has(#food-scan-activity) { padding-top: calc(var(--vault-bar-height) + 84px); }
+#app.vault-open:has(#food-scan-activity) .app-screen :where(header.sticky) { top: calc(var(--vault-bar-height) + 84px); }
 .food-scan-modes > button { min-height: 48px; min-width: 0; flex: 1; padding: 10px 12px; border: 1px solid var(--ui-border); border-radius: 14px; background: var(--ui-card); color: var(--ui-text); font-weight: 700; font-size: 14px; }
 .food-scan-modes > button[aria-pressed="true"] { background: var(--ui-primary-soft); border-color: var(--ui-primary); color: var(--ui-primary-label); }
 .food-scan-modes > button:active { transform: scale(0.99); }

@@ -1,6 +1,6 @@
 import { getLanguage } from '../i18n/index.ts';
 import { registerFoodAnalysisBackend } from './foodAnalysisBackend.ts';
-import type { FoodAnalysisRequest } from './foodAnalysisBackend.ts';
+import type { FoodAnalysisRequest, FoodSelectionRequest } from './foodAnalysisBackend.ts';
 import type { FoodAnalysisProgress } from '../types/index.ts';
 import { normalizeFoodScanProgress } from '../utils/foodScanProgress.ts';
 
@@ -36,13 +36,14 @@ const ERROR_KEYS: Readonly<Record<string, string>> = {
   provider_timeout: 'Maxplus took too long. Retry or enter nutrition manually.',
   response_invalid: 'The AI result could not be validated. Retry or enter nutrition manually.',
   output_incomplete: 'The AI result was incomplete. Retry or enter nutrition manually.',
-  food_not_recognized: 'No food could be identified. Choose a clearer food photo.',
+  food_not_recognized: 'Food is unclear. Add a dish name and retry, or enter nutrition manually.',
   photo_invalid: 'The photo could not be processed. Choose another food photo.',
   access_denied: 'The AI access code is incorrect. Check it and try again.',
   consent_required: 'Confirm photo processing again before analysis.',
   session_rate_limit: 'Too many scan attempts. Wait before trying again.',
   daily_limit_reached: 'Today’s AI scan allowance has been reached. You can enter nutrition manually.',
   service_busy: 'The AI service is busy. Wait before trying again.',
+  selection_expired: 'These food choices expired. Add a dish name and analyze the photo again.',
 };
 
 export class FoodAnalysisServiceError extends Error {
@@ -96,7 +97,25 @@ function normalizeConfig(value: unknown): PublicConfig | null {
     accessCodeRequired: raw.accessCodeRequired, notice: { en: notice.en, th: notice.th }, version: raw.version };
 }
 
-async function analyze({ photo, language, signal, onProgress }: FoodAnalysisRequest): Promise<unknown> {
+function requestAnalysis(action: 'analyze' | 'confirm_food', payload: Record<string, unknown>,
+  { language, signal, onProgress }: Omit<FoodAnalysisRequest, 'photo'>, selectedConfig = config, selectedFrame = frame): Promise<unknown> {
+  if (!selectedConfig?.ready || !selectedFrame) return Promise.reject(new FoodAnalysisServiceError('service_not_configured'));
+  if (signal.aborted || frame !== selectedFrame || config?.version !== selectedConfig.version)
+    return Promise.reject(new DOMException('Aborted', 'AbortError'));
+  const id = crypto.randomUUID();
+  return new Promise((resolve, reject) => {
+    const item: PendingRequest = { resolve, reject, signal, onProgress, lastProgress: 0, abort: () => {
+      release(id, item); post({ type: 'cancel', id }); reject(new DOMException('Aborted', 'AbortError'));
+    } };
+    signal.addEventListener('abort', item.abort, { once: true }); pending.set(id, item);
+    post({ type: 'request', id, action, payload: {
+      ...payload, language, consent: true, configVersion: selectedConfig.version,
+      accessCode: selectedConfig.accessCodeRequired ? accessCode : ''
+    } });
+  });
+}
+
+async function analyze({ photo, language, signal, onProgress, dishHint }: FoodAnalysisRequest): Promise<unknown> {
   const selectedConfig = config;
   const selectedFrame = frame;
   if (!selectedConfig?.ready || !selectedFrame) throw new FoodAnalysisServiceError('service_not_configured');
@@ -110,17 +129,16 @@ async function analyze({ photo, language, signal, onProgress }: FoodAnalysisRequ
   const encoded = btoa(binary);
   if (signal.aborted || frame !== selectedFrame || config?.version !== selectedConfig.version)
     throw new DOMException('Aborted', 'AbortError');
-  const id = crypto.randomUUID();
-  return new Promise((resolve, reject) => {
-    const item: PendingRequest = { resolve, reject, signal, onProgress, lastProgress: 0, abort: () => {
-      release(id, item); post({ type: 'cancel', id }); reject(new DOMException('Aborted', 'AbortError'));
-    } };
-    signal.addEventListener('abort', item.abort, { once: true }); pending.set(id, item);
-    post({ type: 'request', id, action: 'analyze', payload: {
-      photo: encoded, language, consent: true, configVersion: selectedConfig.version,
-      accessCode: selectedConfig.accessCodeRequired ? accessCode : ''
-    } });
-  });
+  return requestAnalysis('analyze', { photo: encoded, dishHint: (dishHint ?? '').slice(0, 160) },
+    { language, signal, onProgress }, selectedConfig, selectedFrame);
+}
+
+function confirmSelection(request: FoodSelectionRequest): Promise<unknown> {
+  return requestAnalysis('confirm_food', { selectionToken: request.selectionToken, candidateId: request.candidateId }, request);
+}
+
+function discardSelection(selectionToken: string): void {
+  if (/^[a-zA-Z0-9-]{1,80}$/.test(selectionToken)) post({ type: 'cancel', id: selectionToken });
 }
 
 /** The small Streamlit wrapper handshakes and forwards only this RPC; ordinary catalog requests remain untouched. */
@@ -139,7 +157,7 @@ export function initializeStreamlitFoodAnalysis(): void {
       for (const item of pending.values()) item.abort();
       config = next; frame = message.frame; configurationSignature = signature; accessCode = '';
       registerFoodAnalysisBackend(next.ready ? { label: next.model ? `Maxplus · ${next.model}` : 'Maxplus',
-        photoProcessingNotice: next.notice, analyze } : null);
+        photoProcessingNotice: next.notice, analyze, confirmSelection, discardSelection } : null);
       document.dispatchEvent(new Event('nutriai:food-backend-change'));
       return;
     }

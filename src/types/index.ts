@@ -479,6 +479,35 @@ export interface FoodAnalysisProgress {
   totalBatches: number;
 }
 
+/** A choice is an alternative identity for ONE portion, never another meal to add automatically. */
+export interface FoodRecognitionCandidate {
+  id: string;
+  name: string;
+  description: string;
+  confidence: number | null;
+  reason: string;
+}
+
+export interface FoodRecognitionChoices {
+  kind: 'food_choices';
+  selectionToken: string;
+  question: string;
+  candidates: FoodRecognitionCandidate[];
+}
+
+export interface FoodScanItem {
+  id: string;
+  photoUrl: string | null;
+  dishHint: string;
+  status: 'ready' | 'queued' | 'analyzing' | 'needs_choice' | 'review' | 'error' | 'saved' | 'skipped';
+  progress: FoodAnalysisProgress | null;
+  error: string | null;
+  choices: FoodRecognitionChoices | null;
+  selectedCandidateId: string | null;
+  result: ScannedFood | null;
+  review: FoodScanReview | null;
+}
+
 /** Ephemeral: image URLs, progress, consent and unfinished edits never enter the vault snapshot. */
 export interface FoodScanState {
   status: 'idle' | 'preparing' | 'ready' | 'analyzing' | 'error';
@@ -487,6 +516,11 @@ export interface FoodScanState {
   error: string | null;
   review: FoodScanReview | null;
   progress: FoodAnalysisProgress | null;
+  items: FoodScanItem[];
+  activeItemId: string | null;
+  reviewItemId: string | null;
+  started: boolean;
+  running: boolean;
 }
 
 export interface ScanMealAnalysis {
