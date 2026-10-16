@@ -48,7 +48,11 @@ The browser checks require Python with `requirements.txt` installed and Playwrig
 
 ## Exercise illustrations
 
-Fitness routine setup, the exercise catalog and the active workout screen include locally bundled illustrations from `@bryllim/workout-guide@1.0.0`. Artwork is CC BY-SA 4.0 by Bryl Lim, with Everkinetic credit where applicable. The code license is separate from the artwork license. Per-image upstream credits and exact source URLs are retained in [the attribution manifest](docs/exercise-art/ATTRIBUTION.json), with the original artwork license and attribution notice alongside it. Images are unchanged and do not make external image requests. The catalog's Dumbbell Incline Fly uses the dumbbell-fly reference, explicitly labelled as an incline-bench variation.
+The exercise catalog includes **254 illustrated entries**: all 253 repetition-based movements in `@bryllim/workout-guide@1.0.0` plus the existing Dumbbell Incline Fly variation. The library's timed, distance-based and stretching entries are excluded from this reps-based picker. Search in English/Thai, filter by muscle or equipment, browse 12 results per page and expand an exercise to see two poses. Existing routine names, aliases and default programs are preserved; adding exercises keeps your catalog/filter position and marks movements already in the routine.
+
+Artwork is unchanged **CC BY-SA 4.0** by Bryl Lim, with Everkinetic credit where applicable. Per-frame credits and exact source URLs are retained in [the attribution manifest](docs/exercise-art/ATTRIBUTION.json), with the original artwork license/notice alongside it. The code license is separate. Dumbbell Incline Fly retains its explicit incline-bench variation note for the dumbbell-fly illustration. Source asset generation is reproducible with `python scripts/generate_exercise_art.py` after `npm ci`.
+
+PNG files load as needed from the app's local assets, using the existing component route on Streamlit. They are not embedded as one large JavaScript image payload and do not contact an external image CDN. The app/vault stays in its original iframe/origin. All catalog movements feed the same anatomical map, workout log and history; bodyweight, assisted and band movements are excluded from automatic weight increases/strength estimates that require known external load.
 
 ### Workout muscle overview
 

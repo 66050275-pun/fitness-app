@@ -4,7 +4,8 @@ import { tr, trHtml, getLocale, translatedLabel } from '../i18n/index.ts';
 import { renderWorkoutMuscleMap } from '../components/Fitness/WorkoutMuscleMap';
 import { renderExerciseIllustration } from '../components/Fitness/ExerciseIllustration';
 import { store } from '../store/appState';
-import { WORKOUT_PRESETS, AVAILABLE_EXERCISE_POOL } from '../data/workoutPresets';
+import { WORKOUT_PRESETS } from '../data/workoutPresets';
+import { renderExerciseCatalog } from '../components/Fitness/ExerciseCatalog.ts';
 import type { WorkoutPreset, WorkoutExercise, ActiveWorkoutSessionState, WorkoutHistoryEntry, AppState } from '../types/index.ts';
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
@@ -392,43 +393,7 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
           `).join('')}
         </div>
 
-        <!-- Add Exercise Expander -->
-        <div class="pt-1">
-          <div id="add-exercise-accordion" class="hidden bg-surface-container-lowest dark:bg-dark-surface-card p-4 rounded-2xl border border-outline-variant/30 mb-3 flex flex-col gap-2">
-            <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400 mb-1">${trHtml("Select from Exercise Catalog")}</h4>
-            <div class="max-h-48 overflow-y-auto flex flex-col gap-1.5 pr-1">
-              ${AVAILABLE_EXERCISE_POOL.map(poolEx => `
-                <div class="p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high">
-                  <div class="flex items-center gap-2.5">
-                    ${renderExerciseIllustration(poolEx.name, true)}
-                    <div class="flex-1 min-w-0">
-                    <span class="font-heading font-bold text-xs text-on-surface dark:text-white block">${escapeHtml(exerciseLabel(poolEx.name))}</span>
-                    <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${escapeHtml(translatedMuscles(poolEx.muscleGroup))}</span>
-                  </div>
-                  <button 
-                    onclick="window.addExerciseToDraft(${htmlJsArg(poolEx.name)}, ${htmlJsArg(poolEx.muscleGroup)}, ${poolEx.defaultSets}, ${poolEx.defaultReps}, ${poolEx.restSeconds})"
-                    class="px-2.5 py-1 rounded-lg bg-primary text-white text-[11px] font-bold active:scale-95 transition-all"
-                  >
-                    ${trHtml("+ Add")}
-                  </button>
-                  </div>
-                  <details class="mt-2">
-                    <summary class="text-[11px] font-semibold text-primary dark:text-primary-container cursor-pointer">${trHtml("View exercise / ดูภาพท่า")}</summary>
-                    <div class="mt-2">${renderExerciseIllustration(poolEx.name)}</div>
-                  </details>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <button 
-            onclick="document.getElementById('add-exercise-accordion').classList.toggle('hidden')" 
-            class="w-full py-3 rounded-2xl border-2 border-dashed border-outline-variant/50 hover:border-primary text-primary dark:text-primary-container font-heading text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
-          >
-            <span class="material-symbols-outlined text-[18px]">add_circle</span>
-            <span>${trHtml("Add Exercise from Catalog")}</span>
-          </button>
-        </div>
+        ${renderExerciseCatalog(exercises)}
 
         <!-- Bottom Start Button (Sticky) -->
         <div class="pt-3">

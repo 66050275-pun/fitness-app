@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import hashlib
 import re
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -60,6 +61,14 @@ def prepare_frontend(source_signature: str, dependency_signature: str) -> str:
     if not index_file.is_file():
         raise FileNotFoundError("Vite did not create dist/index.html")
 
+    # Serve public exercise PNGs through the existing local component route. Keep the app/vault
+    # in its original iframe; do not embed the whole artwork library in its JavaScript payload.
+    image_directory = ROOT / "streamlit_component" / "exercise-assets"
+    image_directory.mkdir(parents=True, exist_ok=True)
+    for image in (DIST / "assets").glob("*.png"):
+        target = image_directory / image.name
+        if not target.is_file() or target.stat().st_size != image.stat().st_size:
+            shutil.copyfile(image, target)
     return str(DIST)
 
 

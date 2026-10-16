@@ -9702,5 +9702,1125 @@
   "{0} ready · {1} choose · {2} errors": {
     "en": "{0} ready · {1} choose · {2} errors",
     "th": "พร้อม {0} · เลือก {1} · ตรวจ {2}"
+  },
+  "Incline Bench Press": {
+    "en": "Incline Bench Press",
+    "th": "บาร์เบลเพรสบนม้านั่งเอียงขึ้น"
+  },
+  "Dumbbell Bench Press": {
+    "en": "Dumbbell Bench Press",
+    "th": "ดัมเบลเบนช์เพรส"
+  },
+  "Decline Bench Press": {
+    "en": "Decline Bench Press",
+    "th": "บาร์เบลเพรสบนม้านั่งเอียงลง"
+  },
+  "Machine Chest Press": {
+    "en": "Machine Chest Press",
+    "th": "ดันอกด้วยเครื่อง"
+  },
+  "Pec Deck": {
+    "en": "Pec Deck",
+    "th": "บีบอกด้วยเครื่องเพกเดก"
+  },
+  "Cable Fly": {
+    "en": "Cable Fly",
+    "th": "เคเบิลฟลาย"
+  },
+  "Push-up": {
+    "en": "Push-up",
+    "th": "วิดพื้น"
+  },
+  "Weighted Push-up": {
+    "en": "Weighted Push-up",
+    "th": "วิดพื้นเพิ่มน้ำหนัก"
+  },
+  "Dumbbell Seated Shoulder Press": {
+    "en": "Dumbbell Seated Shoulder Press",
+    "th": "นั่งดัมเบลโชลเดอร์เพรส"
+  },
+  "Arnold Press": {
+    "en": "Arnold Press",
+    "th": "อาร์โนลด์เพรส"
+  },
+  "Front Raise": {
+    "en": "Front Raise",
+    "th": "ดัมเบลยกแขนด้านหน้า"
+  },
+  "Rear Delt Fly": {
+    "en": "Rear Delt Fly",
+    "th": "ดัมเบลฟลายไหล่หลัง"
+  },
+  "Reverse Pec Deck": {
+    "en": "Reverse Pec Deck",
+    "th": "รีเวิร์สเพกเดก"
+  },
+  "Upright Row": {
+    "en": "Upright Row",
+    "th": "อัปไรต์โรว์"
+  },
+  "Deadlift": {
+    "en": "Deadlift",
+    "th": "เดดลิฟต์"
+  },
+  "T-Bar Row": {
+    "en": "T-Bar Row",
+    "th": "ทีบาร์โรว์"
+  },
+  "Dumbbell Bent Over Row": {
+    "en": "Dumbbell Bent Over Row",
+    "th": "ก้มตัวดัมเบลโรว์"
+  },
+  "One-Arm Dumbbell Row": {
+    "en": "One-Arm Dumbbell Row",
+    "th": "ดัมเบลโรว์แขนเดียว"
+  },
+  "Chest Supported Row": {
+    "en": "Chest Supported Row",
+    "th": "โรว์แบบมีที่รองอก"
+  },
+  "Machine Row": {
+    "en": "Machine Row",
+    "th": "ดึงหลังด้วยเครื่อง"
+  },
+  "Close-Grip Lat Pulldown": {
+    "en": "Close-Grip Lat Pulldown",
+    "th": "แลตพูลดาวน์จับแคบ"
+  },
+  "Straight-Arm Pulldown": {
+    "en": "Straight-Arm Pulldown",
+    "th": "พูลดาวน์แขนตรง"
+  },
+  "Pull-up": {
+    "en": "Pull-up",
+    "th": "พูลอัป"
+  },
+  "Assisted Pull-up": {
+    "en": "Assisted Pull-up",
+    "th": "พูลอัปด้วยเครื่องช่วย"
+  },
+  "Weighted Pull-up": {
+    "en": "Weighted Pull-up",
+    "th": "พูลอัปเพิ่มน้ำหนัก"
+  },
+  "Chin-up": {
+    "en": "Chin-up",
+    "th": "ชินอัป"
+  },
+  "Barbell Shrug": {
+    "en": "Barbell Shrug",
+    "th": "บาร์เบลยักไหล่"
+  },
+  "Squat": {
+    "en": "Squat",
+    "th": "บาร์เบลสควอต"
+  },
+  "Front Squat": {
+    "en": "Front Squat",
+    "th": "ฟรอนต์สควอต"
+  },
+  "Hack Squat": {
+    "en": "Hack Squat",
+    "th": "แฮกสควอต"
+  },
+  "Walking Lunge": {
+    "en": "Walking Lunge",
+    "th": "วอล์กกิงลันจ์"
+  },
+  "Step-Up": {
+    "en": "Step-Up",
+    "th": "ถือดัมเบลก้าวขึ้นแท่น"
+  },
+  "Leg Extension": {
+    "en": "Leg Extension",
+    "th": "เหยียดขาด้วยเครื่อง"
+  },
+  "Seated Leg Curl": {
+    "en": "Seated Leg Curl",
+    "th": "นั่งเลกเคิร์ล"
+  },
+  "Hip Thrust": {
+    "en": "Hip Thrust",
+    "th": "บาร์เบลฮิปทรัสต์"
+  },
+  "Glute Bridge": {
+    "en": "Glute Bridge",
+    "th": "กลูตบริดจ์"
+  },
+  "Good Morning": {
+    "en": "Good Morning",
+    "th": "กู๊ดมอร์นิง"
+  },
+  "Bicep Curl": {
+    "en": "Bicep Curl",
+    "th": "ดัมเบลเคิร์ล"
+  },
+  "Cable Curl": {
+    "en": "Cable Curl",
+    "th": "เคเบิลเคิร์ล"
+  },
+  "Reverse Curl": {
+    "en": "Reverse Curl",
+    "th": "รีเวิร์สเคิร์ล"
+  },
+  "Wrist Curl": {
+    "en": "Wrist Curl",
+    "th": "งอข้อมือด้วยบาร์เบล"
+  },
+  "Tricep Pushdown": {
+    "en": "Tricep Pushdown",
+    "th": "ไตรเซปส์พุชดาวน์"
+  },
+  "Overhead Tricep Extension": {
+    "en": "Overhead Tricep Extension",
+    "th": "เคเบิลเหยียดแขนเหนือศีรษะ"
+  },
+  "Skull Crusher": {
+    "en": "Skull Crusher",
+    "th": "สกัลครัชเชอร์"
+  },
+  "Close-Grip Bench Press": {
+    "en": "Close-Grip Bench Press",
+    "th": "เบนช์เพรสจับแคบ"
+  },
+  "Dip": {
+    "en": "Dip",
+    "th": "ดิปส์อกและหลังแขน"
+  },
+  "Assisted Dip": {
+    "en": "Assisted Dip",
+    "th": "ดิปส์ด้วยเครื่องช่วย"
+  },
+  "Cable Crunch": {
+    "en": "Cable Crunch",
+    "th": "เคเบิลครันช์"
+  },
+  "Ab Wheel Rollout": {
+    "en": "Ab Wheel Rollout",
+    "th": "กลิ้งล้อบริหารหน้าท้อง"
+  },
+  "Dumbbell Fly": {
+    "en": "Dumbbell Fly",
+    "th": "ดัมเบลฟลาย"
+  },
+  "Incline Cable Fly": {
+    "en": "Incline Cable Fly",
+    "th": "เคเบิลฟลายบนม้านั่งเอียงขึ้น"
+  },
+  "Decline Dumbbell Press": {
+    "en": "Decline Dumbbell Press",
+    "th": "ดัมเบลเพรสบนม้านั่งเอียงลง"
+  },
+  "Smith Machine Bench Press": {
+    "en": "Smith Machine Bench Press",
+    "th": "เบนช์เพรสด้วยสมิทแมชชีน"
+  },
+  "Landmine Press": {
+    "en": "Landmine Press",
+    "th": "แลนด์ไมน์เพรส"
+  },
+  "Chest Dip": {
+    "en": "Chest Dip",
+    "th": "ดิปส์เน้นอก"
+  },
+  "Weighted Dip": {
+    "en": "Weighted Dip",
+    "th": "ดิปส์เพิ่มน้ำหนัก"
+  },
+  "Machine Shoulder Press": {
+    "en": "Machine Shoulder Press",
+    "th": "โชลเดอร์เพรสด้วยเครื่อง"
+  },
+  "Standing Dumbbell Press": {
+    "en": "Standing Dumbbell Press",
+    "th": "ยืนดัมเบลเพรส"
+  },
+  "Push Press": {
+    "en": "Push Press",
+    "th": "พุชเพรส"
+  },
+  "Machine Lateral Raise": {
+    "en": "Machine Lateral Raise",
+    "th": "ยกแขนด้านข้างด้วยเครื่อง"
+  },
+  "Cable Front Raise": {
+    "en": "Cable Front Raise",
+    "th": "เคเบิลยกแขนด้านหน้า"
+  },
+  "Plate Front Raise": {
+    "en": "Plate Front Raise",
+    "th": "ยกแผ่นน้ำหนักด้านหน้า"
+  },
+  "Bent-Over Rear Delt Raise": {
+    "en": "Bent-Over Rear Delt Raise",
+    "th": "ก้มตัวยกดัมเบลเน้นไหล่หลัง"
+  },
+  "Cable Rear Delt Fly": {
+    "en": "Cable Rear Delt Fly",
+    "th": "เคเบิลฟลายไหล่หลัง"
+  },
+  "Pendlay Row": {
+    "en": "Pendlay Row",
+    "th": "เพนเดลย์โรว์"
+  },
+  "Inverted Row": {
+    "en": "Inverted Row",
+    "th": "อินเวิร์ตโรว์"
+  },
+  "Meadows Row": {
+    "en": "Meadows Row",
+    "th": "เมโดวส์โรว์"
+  },
+  "Single-Arm Cable Row": {
+    "en": "Single-Arm Cable Row",
+    "th": "เคเบิลโรว์แขนเดียว"
+  },
+  "Wide-Grip Lat Pulldown": {
+    "en": "Wide-Grip Lat Pulldown",
+    "th": "แลตพูลดาวน์จับกว้าง"
+  },
+  "Neutral-Grip Pull-up": {
+    "en": "Neutral-Grip Pull-up",
+    "th": "พูลอัปจับหันฝ่ามือเข้าหากัน"
+  },
+  "Assisted Chin-up": {
+    "en": "Assisted Chin-up",
+    "th": "ชินอัปด้วยเครื่องช่วย"
+  },
+  "Weighted Chin-up": {
+    "en": "Weighted Chin-up",
+    "th": "ชินอัปเพิ่มน้ำหนัก"
+  },
+  "Rack Pull": {
+    "en": "Rack Pull",
+    "th": "แร็กพูล"
+  },
+  "Back Extension": {
+    "en": "Back Extension",
+    "th": "เหยียดหลัง"
+  },
+  "Dumbbell Shrug": {
+    "en": "Dumbbell Shrug",
+    "th": "ดัมเบลยักไหล่"
+  },
+  "Goblet Squat": {
+    "en": "Goblet Squat",
+    "th": "ก็อบเลตสควอต"
+  },
+  "Smith Machine Squat": {
+    "en": "Smith Machine Squat",
+    "th": "สควอตด้วยสมิทแมชชีน"
+  },
+  "Belt Squat": {
+    "en": "Belt Squat",
+    "th": "เบลต์สควอต"
+  },
+  "Sumo Deadlift": {
+    "en": "Sumo Deadlift",
+    "th": "ซูโม่เดดลิฟต์"
+  },
+  "Trap Bar Deadlift": {
+    "en": "Trap Bar Deadlift",
+    "th": "แทรปบาร์เดดลิฟต์"
+  },
+  "Lying Leg Curl": {
+    "en": "Lying Leg Curl",
+    "th": "นอนคว่ำเลกเคิร์ล"
+  },
+  "Nordic Hamstring Curl": {
+    "en": "Nordic Hamstring Curl",
+    "th": "นอร์ดิกแฮมสตริงเคิร์ล"
+  },
+  "Single-Leg Romanian Deadlift": {
+    "en": "Single-Leg Romanian Deadlift",
+    "th": "โรมาเนียนเดดลิฟต์ขาเดียว"
+  },
+  "Reverse Lunge": {
+    "en": "Reverse Lunge",
+    "th": "ถือดัมเบลลันจ์ถอยหลัง"
+  },
+  "Split Squat": {
+    "en": "Split Squat",
+    "th": "ถือดัมเบลสปลิตสควอต"
+  },
+  "Cable Kickback": {
+    "en": "Cable Kickback",
+    "th": "เคเบิลเตะขาไปด้านหลัง"
+  },
+  "Hip Abduction Machine": {
+    "en": "Hip Abduction Machine",
+    "th": "กางสะโพกด้วยเครื่อง"
+  },
+  "Single-Leg Glute Bridge": {
+    "en": "Single-Leg Glute Bridge",
+    "th": "กลูตบริดจ์ขาเดียว"
+  },
+  "Barbell Glute Bridge": {
+    "en": "Barbell Glute Bridge",
+    "th": "บาร์เบลกลูตบริดจ์"
+  },
+  "Dumbbell Glute Bridge": {
+    "en": "Dumbbell Glute Bridge",
+    "th": "ดัมเบลกลูตบริดจ์"
+  },
+  "Dumbbell Hip Thrust": {
+    "en": "Dumbbell Hip Thrust",
+    "th": "ดัมเบลฮิปทรัสต์"
+  },
+  "Smith Machine Hip Thrust": {
+    "en": "Smith Machine Hip Thrust",
+    "th": "ฮิปทรัสต์ด้วยสมิทแมชชีน"
+  },
+  "Smith Machine Romanian Deadlift": {
+    "en": "Smith Machine Romanian Deadlift",
+    "th": "โรมาเนียนเดดลิฟต์ด้วยสมิทแมชชีน"
+  },
+  "Dumbbell Romanian Deadlift": {
+    "en": "Dumbbell Romanian Deadlift",
+    "th": "ดัมเบลโรมาเนียนเดดลิฟต์"
+  },
+  "Kettlebell Romanian Deadlift": {
+    "en": "Kettlebell Romanian Deadlift",
+    "th": "เคตเทิลเบลโรมาเนียนเดดลิฟต์"
+  },
+  "Cable Pull-Through": {
+    "en": "Cable Pull-Through",
+    "th": "เคเบิลพูลทรู"
+  },
+  "Machine Glute Kickback": {
+    "en": "Machine Glute Kickback",
+    "th": "เตะขาเน้นก้นด้วยเครื่อง"
+  },
+  "Cable Standing Hip Abduction": {
+    "en": "Cable Standing Hip Abduction",
+    "th": "ยืนกางสะโพกด้วยเคเบิล"
+  },
+  "Cable Standing Hip Adduction": {
+    "en": "Cable Standing Hip Adduction",
+    "th": "ยืนหุบสะโพกด้วยเคเบิล"
+  },
+  "Hip Adduction Machine": {
+    "en": "Hip Adduction Machine",
+    "th": "หุบสะโพกด้วยเครื่อง"
+  },
+  "Smith Machine Bulgarian Split Squat": {
+    "en": "Smith Machine Bulgarian Split Squat",
+    "th": "บัลแกเรียนสปลิตสควอตด้วยสมิทแมชชีน"
+  },
+  "Smith Machine Reverse Lunge": {
+    "en": "Smith Machine Reverse Lunge",
+    "th": "ลันจ์ถอยหลังด้วยสมิทแมชชีน"
+  },
+  "Smith Machine Split Squat": {
+    "en": "Smith Machine Split Squat",
+    "th": "สปลิตสควอตด้วยสมิทแมชชีน"
+  },
+  "Heel-Elevated Goblet Squat": {
+    "en": "Heel-Elevated Goblet Squat",
+    "th": "ก็อบเลตสควอตยกส้นเท้า"
+  },
+  "Dumbbell Sumo Squat": {
+    "en": "Dumbbell Sumo Squat",
+    "th": "ดัมเบลซูโม่สควอต"
+  },
+  "Dumbbell Sumo Deadlift": {
+    "en": "Dumbbell Sumo Deadlift",
+    "th": "ดัมเบลซูโม่เดดลิฟต์"
+  },
+  "Front-Foot Elevated Split Squat": {
+    "en": "Front-Foot Elevated Split Squat",
+    "th": "สปลิตสควอตยกเท้าหน้าบนแท่น"
+  },
+  "Deficit Reverse Lunge": {
+    "en": "Deficit Reverse Lunge",
+    "th": "ลันจ์ถอยหลังจากแท่นสูง"
+  },
+  "Dumbbell Lateral Lunge": {
+    "en": "Dumbbell Lateral Lunge",
+    "th": "ดัมเบลลันจ์ด้านข้าง"
+  },
+  "Dumbbell Curtsy Lunge": {
+    "en": "Dumbbell Curtsy Lunge",
+    "th": "ดัมเบลเคิร์ตซีลันจ์"
+  },
+  "Landmine Squat": {
+    "en": "Landmine Squat",
+    "th": "แลนด์ไมน์สควอต"
+  },
+  "Landmine Romanian Deadlift": {
+    "en": "Landmine Romanian Deadlift",
+    "th": "แลนด์ไมน์โรมาเนียนเดดลิฟต์"
+  },
+  "Kettlebell Swing": {
+    "en": "Kettlebell Swing",
+    "th": "เคตเทิลเบลสวิง"
+  },
+  "Glute-Focused Back Extension": {
+    "en": "Glute-Focused Back Extension",
+    "th": "เหยียดหลังเน้นก้น"
+  },
+  "Reverse Hyperextension": {
+    "en": "Reverse Hyperextension",
+    "th": "รีเวิร์สไฮเปอร์เอ็กซ์เทนชัน"
+  },
+  "Donkey Calf Raise": {
+    "en": "Donkey Calf Raise",
+    "th": "ดองกีคาล์ฟเรส"
+  },
+  "Leg Press Calf Raise": {
+    "en": "Leg Press Calf Raise",
+    "th": "เขย่งน่องบนเครื่องเลกเพรส"
+  },
+  "Jump Squat": {
+    "en": "Jump Squat",
+    "th": "จัมป์สควอต"
+  },
+  "Incline Dumbbell Curl": {
+    "en": "Incline Dumbbell Curl",
+    "th": "ดัมเบลเคิร์ลบนม้านั่งเอียง"
+  },
+  "Concentration Curl": {
+    "en": "Concentration Curl",
+    "th": "คอนเซนเทรชันเคิร์ล"
+  },
+  "EZ-Bar Curl": {
+    "en": "EZ-Bar Curl",
+    "th": "อีซีบาร์เคิร์ล"
+  },
+  "Spider Curl": {
+    "en": "Spider Curl",
+    "th": "สไปเดอร์เคิร์ล"
+  },
+  "Rope Hammer Curl": {
+    "en": "Rope Hammer Curl",
+    "th": "โรปแฮมเมอร์เคิร์ล"
+  },
+  "Drag Curl": {
+    "en": "Drag Curl",
+    "th": "แดร็กเคิร์ล"
+  },
+  "Rope Tricep Pushdown": {
+    "en": "Rope Tricep Pushdown",
+    "th": "ไตรเซปส์พุชดาวน์ด้วยเชือก"
+  },
+  "Two Dumbbell Skullcrusher": {
+    "en": "Two Dumbbell Skullcrusher",
+    "th": "สกัลครัชเชอร์ด้วยดัมเบลสองข้าง"
+  },
+  "Single Dumbbell Skullcrusher": {
+    "en": "Single Dumbbell Skullcrusher",
+    "th": "สกัลครัชเชอร์ด้วยดัมเบลหนึ่งลูก"
+  },
+  "Dumbbell Overhead Tricep Extension": {
+    "en": "Dumbbell Overhead Tricep Extension",
+    "th": "ดัมเบลเหยียดแขนเหนือศีรษะ"
+  },
+  "Single Arm Dumbbell Tricep Extension": {
+    "en": "Single Arm Dumbbell Tricep Extension",
+    "th": "ดัมเบลเหยียดแขนเหนือศีรษะข้างเดียว"
+  },
+  "Bench Dip": {
+    "en": "Bench Dip",
+    "th": "ดิปส์บนม้านั่ง"
+  },
+  "Tricep Kickback": {
+    "en": "Tricep Kickback",
+    "th": "ไตรเซปส์คิกแบ็ก"
+  },
+  "Wrist Extension": {
+    "en": "Wrist Extension",
+    "th": "เหยียดข้อมือ"
+  },
+  "Crunch": {
+    "en": "Crunch",
+    "th": "ครันช์"
+  },
+  "Reverse Crunch": {
+    "en": "Reverse Crunch",
+    "th": "รีเวิร์สครันช์"
+  },
+  "Russian Twist": {
+    "en": "Russian Twist",
+    "th": "รัสเซียนทวิสต์"
+  },
+  "Bicycle Crunch": {
+    "en": "Bicycle Crunch",
+    "th": "ไบซิเคิลครันช์"
+  },
+  "Dead Bug": {
+    "en": "Dead Bug",
+    "th": "เดดบั๊ก"
+  },
+  "Bird Dog": {
+    "en": "Bird Dog",
+    "th": "เบิร์ดด็อก"
+  },
+  "Pallof Press": {
+    "en": "Pallof Press",
+    "th": "พัลลอฟเพรส"
+  },
+  "Cable Woodchop": {
+    "en": "Cable Woodchop",
+    "th": "เคเบิลวูดช็อป"
+  },
+  "Half-Kneeling Pallof Press": {
+    "en": "Half-Kneeling Pallof Press",
+    "th": "พัลลอฟเพรสแบบคุกเข่าข้างเดียว"
+  },
+  "Hanging Knee Raise": {
+    "en": "Hanging Knee Raise",
+    "th": "โหนบาร์ยกเข่า"
+  },
+  "Captain's Chair Knee Raise": {
+    "en": "Captain's Chair Knee Raise",
+    "th": "ยกเข่าบนเครื่องแคปเทนส์แชร์"
+  },
+  "Decline Sit-Up": {
+    "en": "Decline Sit-Up",
+    "th": "ซิตอัปบนม้านั่งเอียงลง"
+  },
+  "Weighted Crunch": {
+    "en": "Weighted Crunch",
+    "th": "ครันช์เพิ่มน้ำหนัก"
+  },
+  "Weighted Russian Twist": {
+    "en": "Weighted Russian Twist",
+    "th": "รัสเซียนทวิสต์เพิ่มน้ำหนัก"
+  },
+  "Dumbbell Side Bend": {
+    "en": "Dumbbell Side Bend",
+    "th": "ดัมเบลเอียงลำตัวด้านข้าง"
+  },
+  "Incline Push-up": {
+    "en": "Incline Push-up",
+    "th": "วิดพื้นวางมือบนแท่น"
+  },
+  "Knee Push-up": {
+    "en": "Knee Push-up",
+    "th": "วิดพื้นวางเข่า"
+  },
+  "Wide Push-up": {
+    "en": "Wide Push-up",
+    "th": "วิดพื้นมือกว้าง"
+  },
+  "Diamond Push-up": {
+    "en": "Diamond Push-up",
+    "th": "วิดพื้นมือชิดรูปเพชร"
+  },
+  "Decline Push-up": {
+    "en": "Decline Push-up",
+    "th": "วิดพื้นยกเท้าสูง"
+  },
+  "Pike Push-up": {
+    "en": "Pike Push-up",
+    "th": "ไพก์พุชอัป"
+  },
+  "Feet-Elevated Pike Push-up": {
+    "en": "Feet-Elevated Pike Push-up",
+    "th": "ไพก์พุชอัปยกเท้าสูง"
+  },
+  "Archer Push-up": {
+    "en": "Archer Push-up",
+    "th": "อาร์เชอร์พุชอัป"
+  },
+  "Typewriter Push-up": {
+    "en": "Typewriter Push-up",
+    "th": "ไทป์ไรเตอร์พุชอัป"
+  },
+  "Explosive Push-up": {
+    "en": "Explosive Push-up",
+    "th": "วิดพื้นแบบระเบิดพลัง"
+  },
+  "Hindu Push-up": {
+    "en": "Hindu Push-up",
+    "th": "ฮินดูพุชอัป"
+  },
+  "Scapular Push-up": {
+    "en": "Scapular Push-up",
+    "th": "วิดพื้นขยับสะบัก"
+  },
+  "Push-up Shoulder Tap": {
+    "en": "Push-up Shoulder Tap",
+    "th": "วิดพื้นแตะไหล่"
+  },
+  "Wall Push-up": {
+    "en": "Wall Push-up",
+    "th": "วิดพื้นกับกำแพง"
+  },
+  "Wall Walk": {
+    "en": "Wall Walk",
+    "th": "เดินไต่กำแพงด้วยเท้า"
+  },
+  "Wall Handstand Push-up": {
+    "en": "Wall Handstand Push-up",
+    "th": "วิดพื้นหกสูงพิงกำแพง"
+  },
+  "Handstand Push-up": {
+    "en": "Handstand Push-up",
+    "th": "วิดพื้นหกสูง"
+  },
+  "Chair Dip": {
+    "en": "Chair Dip",
+    "th": "ดิปส์บนเก้าอี้"
+  },
+  "Doorway Row": {
+    "en": "Doorway Row",
+    "th": "โรว์กับวงกบประตู"
+  },
+  "Towel Row": {
+    "en": "Towel Row",
+    "th": "โรว์ด้วยผ้าขนหนู"
+  },
+  "Prone Y Raise": {
+    "en": "Prone Y Raise",
+    "th": "นอนคว่ำยกแขนรูปตัววาย"
+  },
+  "Prone T Raise": {
+    "en": "Prone T Raise",
+    "th": "นอนคว่ำยกแขนรูปตัวที"
+  },
+  "Superman": {
+    "en": "Superman",
+    "th": "ซูเปอร์แมน"
+  },
+  "Reverse Snow Angel": {
+    "en": "Reverse Snow Angel",
+    "th": "รีเวิร์สสโนว์แองเจิล"
+  },
+  "Scapular Pull-up": {
+    "en": "Scapular Pull-up",
+    "th": "โหนบาร์ขยับสะบัก"
+  },
+  "Negative Pull-up": {
+    "en": "Negative Pull-up",
+    "th": "เนกาทีฟพูลอัป"
+  },
+  "Commando Pull-up": {
+    "en": "Commando Pull-up",
+    "th": "คอมมานโดพูลอัป"
+  },
+  "L-Sit Pull-up": {
+    "en": "L-Sit Pull-up",
+    "th": "พูลอัปยกขารูปตัวแอล"
+  },
+  "Towel Pull-up": {
+    "en": "Towel Pull-up",
+    "th": "พูลอัปจับผ้าขนหนู"
+  },
+  "Bodyweight Squat": {
+    "en": "Bodyweight Squat",
+    "th": "สควอตด้วยน้ำหนักตัว"
+  },
+  "Pistol Squat": {
+    "en": "Pistol Squat",
+    "th": "พิสทอลสควอต"
+  },
+  "Assisted Pistol Squat": {
+    "en": "Assisted Pistol Squat",
+    "th": "พิสทอลสควอตแบบมีตัวช่วย"
+  },
+  "Shrimp Squat": {
+    "en": "Shrimp Squat",
+    "th": "ชริมป์สควอต"
+  },
+  "Cossack Squat": {
+    "en": "Cossack Squat",
+    "th": "คอสแซกสควอต"
+  },
+  "Sissy Squat": {
+    "en": "Sissy Squat",
+    "th": "ซิสซีสควอต"
+  },
+  "Forward Lunge": {
+    "en": "Forward Lunge",
+    "th": "ลันจ์ไปด้านหน้า"
+  },
+  "Lateral Lunge": {
+    "en": "Lateral Lunge",
+    "th": "ลันจ์ด้านข้าง"
+  },
+  "Curtsy Lunge": {
+    "en": "Curtsy Lunge",
+    "th": "เคิร์ตซีลันจ์"
+  },
+  "Skater Squat": {
+    "en": "Skater Squat",
+    "th": "สเกตเตอร์สควอต"
+  },
+  "Single-Leg Box Squat": {
+    "en": "Single-Leg Box Squat",
+    "th": "บ็อกซ์สควอตขาเดียว"
+  },
+  "Step-Down": {
+    "en": "Step-Down",
+    "th": "ก้าวลงจากแท่น"
+  },
+  "Calf Raise": {
+    "en": "Calf Raise",
+    "th": "เขย่งน่องด้วยน้ำหนักตัว"
+  },
+  "Single-Leg Calf Raise": {
+    "en": "Single-Leg Calf Raise",
+    "th": "เขย่งน่องขาเดียว"
+  },
+  "Glute Bridge March": {
+    "en": "Glute Bridge March",
+    "th": "กลูตบริดจ์สลับยกขา"
+  },
+  "Frog Pump": {
+    "en": "Frog Pump",
+    "th": "ฟร็อกปัมป์"
+  },
+  "Donkey Kick": {
+    "en": "Donkey Kick",
+    "th": "ดองกีคิก"
+  },
+  "Fire Hydrant": {
+    "en": "Fire Hydrant",
+    "th": "ไฟร์ไฮแรนต์"
+  },
+  "Clamshell": {
+    "en": "Clamshell",
+    "th": "แคลมเชลล์"
+  },
+  "Hip Airplane": {
+    "en": "Hip Airplane",
+    "th": "ฮิปแอร์เพลน"
+  },
+  "Side-Lying Hip Abduction": {
+    "en": "Side-Lying Hip Abduction",
+    "th": "นอนตะแคงกางสะโพก"
+  },
+  "Side-Lying Leg Raise": {
+    "en": "Side-Lying Leg Raise",
+    "th": "นอนตะแคงยกขา"
+  },
+  "Lying Hamstring Walkout": {
+    "en": "Lying Hamstring Walkout",
+    "th": "นอนยกสะโพกเดินเท้าออก"
+  },
+  "Towel Hamstring Curl": {
+    "en": "Towel Hamstring Curl",
+    "th": "แฮมสตริงเคิร์ลด้วยผ้าขนหนู"
+  },
+  "Stability Ball Hamstring Curl": {
+    "en": "Stability Ball Hamstring Curl",
+    "th": "แฮมสตริงเคิร์ลด้วยบอล"
+  },
+  "Banded Glute Bridge": {
+    "en": "Banded Glute Bridge",
+    "th": "กลูตบริดจ์ด้วยยางยืด"
+  },
+  "Banded Hip Thrust": {
+    "en": "Banded Hip Thrust",
+    "th": "ฮิปทรัสต์ด้วยยางยืด"
+  },
+  "Banded Frog Pump": {
+    "en": "Banded Frog Pump",
+    "th": "ฟร็อกปัมป์ด้วยยางยืด"
+  },
+  "Banded Clamshell": {
+    "en": "Banded Clamshell",
+    "th": "แคลมเชลล์ด้วยยางยืด"
+  },
+  "Banded Lateral Walk": {
+    "en": "Banded Lateral Walk",
+    "th": "เดินด้านข้างด้วยยางยืด"
+  },
+  "Banded Monster Walk": {
+    "en": "Banded Monster Walk",
+    "th": "มอนสเตอร์วอล์กด้วยยางยืด"
+  },
+  "Banded Squat": {
+    "en": "Banded Squat",
+    "th": "สควอตด้วยยางยืด"
+  },
+  "Banded Donkey Kick": {
+    "en": "Banded Donkey Kick",
+    "th": "ดองกีคิกด้วยยางยืด"
+  },
+  "Banded Fire Hydrant": {
+    "en": "Banded Fire Hydrant",
+    "th": "ไฟร์ไฮแรนต์ด้วยยางยืด"
+  },
+  "Banded Kickback": {
+    "en": "Banded Kickback",
+    "th": "เตะขาไปด้านหลังด้วยยางยืด"
+  },
+  "Banded Standing Hip Abduction": {
+    "en": "Banded Standing Hip Abduction",
+    "th": "ยืนกางสะโพกด้วยยางยืด"
+  },
+  "Banded Seated Hip Abduction": {
+    "en": "Banded Seated Hip Abduction",
+    "th": "นั่งกางสะโพกด้วยยางยืด"
+  },
+  "Band Pull-Apart": {
+    "en": "Band Pull-Apart",
+    "th": "ดึงยางยืดแยกแขน"
+  },
+  "Banded Face Pull": {
+    "en": "Banded Face Pull",
+    "th": "เฟซพูลด้วยยางยืด"
+  },
+  "Banded Row": {
+    "en": "Banded Row",
+    "th": "โรว์ด้วยยางยืด"
+  },
+  "Banded Lat Pulldown": {
+    "en": "Banded Lat Pulldown",
+    "th": "แลตพูลดาวน์ด้วยยางยืด"
+  },
+  "Banded Pallof Press": {
+    "en": "Banded Pallof Press",
+    "th": "พัลลอฟเพรสด้วยยางยืด"
+  },
+  "Banded Woodchop": {
+    "en": "Banded Woodchop",
+    "th": "วูดช็อปด้วยยางยืด"
+  },
+  "Banded Dead Bug": {
+    "en": "Banded Dead Bug",
+    "th": "เดดบั๊กด้วยยางยืด"
+  },
+  "Hollow Rock": {
+    "en": "Hollow Rock",
+    "th": "ฮอลโลว์ร็อก"
+  },
+  "V-Up": {
+    "en": "V-Up",
+    "th": "วีอัป"
+  },
+  "Lying Leg Raise": {
+    "en": "Lying Leg Raise",
+    "th": "นอนยกขา"
+  },
+  "Toe Touch": {
+    "en": "Toe Touch",
+    "th": "ยกตัวแตะปลายเท้า"
+  },
+  "Heel Tap": {
+    "en": "Heel Tap",
+    "th": "แตะส้นเท้าสลับข้าง"
+  },
+  "Plank Shoulder Tap": {
+    "en": "Plank Shoulder Tap",
+    "th": "แพลงก์แตะไหล่"
+  },
+  "Inchworm": {
+    "en": "Inchworm",
+    "th": "อินช์เวิร์ม"
+  },
+  "Seated Knee Tuck": {
+    "en": "Seated Knee Tuck",
+    "th": "นั่งดึงเข่าเข้าหาลำตัว"
+  },
+  "Side Plank Hip Dip": {
+    "en": "Side Plank Hip Dip",
+    "th": "ไซด์แพลงก์ลดและยกสะโพก"
+  },
+  "Dragon Flag": {
+    "en": "Dragon Flag",
+    "th": "ดรากอนแฟล็ก"
+  },
+  "Burpee": {
+    "en": "Burpee",
+    "th": "เบอร์พี"
+  },
+  "Half Burpee": {
+    "en": "Half Burpee",
+    "th": "ฮาล์ฟเบอร์พี"
+  },
+  "Squat Thrust": {
+    "en": "Squat Thrust",
+    "th": "สควอตทรัสต์"
+  },
+  "Skater Hop": {
+    "en": "Skater Hop",
+    "th": "กระโดดสเกตเตอร์"
+  },
+  "Sprawl": {
+    "en": "Sprawl",
+    "th": "สปรอลล์"
+  },
+  "Adductors": {
+    "en": "Adductors",
+    "th": "กล้ามเนื้อต้นขาด้านใน"
+  },
+  "All equipment": {
+    "en": "All equipment",
+    "th": "อุปกรณ์ทั้งหมด"
+  },
+  "All muscles": {
+    "en": "All muscles",
+    "th": "กล้ามเนื้อทั้งหมด"
+  },
+  "Artwork: Bryl Lim / Everkinetic where credited.": {
+    "en": "Artwork: Bryl Lim / Everkinetic where credited.",
+    "th": "ภาพโดย Bryl Lim / Everkinetic ตามเครดิตของแต่ละภาพ"
+  },
+  "Barbell": {
+    "en": "Barbell",
+    "th": "บาร์เบล"
+  },
+  "Bench": {
+    "en": "Bench",
+    "th": "ม้านั่ง"
+  },
+  "Bodyweight": {
+    "en": "Bodyweight",
+    "th": "น้ำหนักตัว"
+  },
+  "Box": {
+    "en": "Box",
+    "th": "แท่น"
+  },
+  "Cable": {
+    "en": "Cable",
+    "th": "เคเบิล"
+  },
+  "Chair": {
+    "en": "Chair",
+    "th": "เก้าอี้"
+  },
+  "Clear filters": {
+    "en": "Clear filters",
+    "th": "ล้างตัวกรอง"
+  },
+  "Core": {
+    "en": "Core",
+    "th": "แกนกลางลำตัว"
+  },
+  "Default: {0} sets × {1} reps · Rest {2} s": {
+    "en": "Default: {0} sets × {1} reps · Rest {2} s",
+    "th": "ค่าเริ่มต้น: {0} เซ็ต × {1} ครั้ง · พัก {2} วินาที"
+  },
+  "Doorway": {
+    "en": "Doorway",
+    "th": "วงกบประตู"
+  },
+  "Dumbbell": {
+    "en": "Dumbbell",
+    "th": "ดัมเบล"
+  },
+  "Equipment": {
+    "en": "Equipment",
+    "th": "อุปกรณ์"
+  },
+  "Exercise catalog pages": {
+    "en": "Exercise catalog pages",
+    "th": "หน้ารายการท่าออกกำลังกาย"
+  },
+  "Exercise results": {
+    "en": "Exercise results",
+    "th": "ผลการค้นหาท่าออกกำลังกาย"
+  },
+  "Illustration unavailable": {
+    "en": "Illustration unavailable",
+    "th": "ไม่สามารถแสดงภาพท่านี้ได้"
+  },
+  "Kettlebell": {
+    "en": "Kettlebell",
+    "th": "เคตเทิลเบล"
+  },
+  "Lower Back": {
+    "en": "Lower Back",
+    "th": "หลังส่วนล่าง"
+  },
+  "Machine": {
+    "en": "Machine",
+    "th": "เครื่องออกกำลังกาย"
+  },
+  "Muscle group": {
+    "en": "Muscle group",
+    "th": "กลุ่มกล้ามเนื้อ"
+  },
+  "Next": {
+    "en": "Next",
+    "th": "ถัดไป"
+  },
+  "No exercises match these filters.": {
+    "en": "No exercises match these filters.",
+    "th": "ไม่พบท่าที่ตรงกับตัวกรองนี้"
+  },
+  "Page {0} of {1}": {
+    "en": "Page {0} of {1}",
+    "th": "หน้าที่ {0} จาก {1}"
+  },
+  "Plate": {
+    "en": "Plate",
+    "th": "แผ่นน้ำหนัก"
+  },
+  "Posterior Chain": {
+    "en": "Posterior Chain",
+    "th": "กล้ามเนื้อด้านหลังลำตัวและขา"
+  },
+  "Pull-up Bar": {
+    "en": "Pull-up Bar",
+    "th": "บาร์โหน"
+  },
+  "Rear Delts": {
+    "en": "Rear Delts",
+    "th": "หัวไหล่ด้านหลัง"
+  },
+  "Repetition tracking; automatic load increases are disabled for this movement.": {
+    "en": "Repetition tracking; automatic load increases are disabled for this movement.",
+    "th": "บันทึกเป็นจำนวนครั้ง ท่านี้ไม่เพิ่มน้ำหนักให้อัตโนมัติ"
+  },
+  "Resistance Band": {
+    "en": "Resistance Band",
+    "th": "ยางยืด"
+  },
+  "Search by exercise, muscle or equipment": {
+    "en": "Search by exercise, muscle or equipment",
+    "th": "ค้นหาด้วยชื่อท่า กล้ามเนื้อ หรืออุปกรณ์"
+  },
+  "Search exercises": {
+    "en": "Search exercises",
+    "th": "ค้นหาท่าออกกำลังกาย"
+  },
+  "Shoulders": {
+    "en": "Shoulders",
+    "th": "หัวไหล่"
+  },
+  "Showing {0}–{1} of {2} exercises": {
+    "en": "Showing {0}–{1} of {2} exercises",
+    "th": "แสดงท่าที่ {0}–{1} จาก {2} ท่า"
+  },
+  "Stability Ball": {
+    "en": "Stability Ball",
+    "th": "บอลออกกำลังกาย"
+  },
+  "Towel": {
+    "en": "Towel",
+    "th": "ผ้าขนหนู"
+  },
+  "Upper Back": {
+    "en": "Upper Back",
+    "th": "หลังส่วนบน"
+  },
+  "Wall": {
+    "en": "Wall",
+    "th": "กำแพง"
+  },
+  "{0} added to your workout.": {
+    "en": "{0} added to your workout.",
+    "th": "เพิ่ม {0} ในโปรแกรมแล้ว"
+  },
+  "{0} illustrated exercises": {
+    "en": "{0} illustrated exercises",
+    "th": "ท่าออกกำลังกายพร้อมภาพ {0} ท่า"
+  },
+  "{0} is in your workout": {
+    "en": "{0} is in your workout",
+    "th": "มี {0} ในโปรแกรมแล้ว"
+  },
+  "Add {0} to workout": {
+    "en": "Add {0} to workout",
+    "th": "เพิ่ม {0} ในโปรแกรม"
+  },
+  "Hide Exercise Catalog": {
+    "en": "Hide Exercise Catalog",
+    "th": "ซ่อนรายการท่าออกกำลังกาย"
   }
 }

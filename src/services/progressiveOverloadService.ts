@@ -1,5 +1,6 @@
 import type { ExerciseSet, WorkoutExercise } from '../types/index.ts';
 import { getLocale, tr } from '../i18n/index.ts';
+import { findCatalogExercise } from '../data/exerciseCatalog.ts';
 
 export interface OverloadRecommendation {
   suggestedWeightKg: number;
@@ -22,12 +23,14 @@ const normalizeName = (name: string): string => name.normalize('NFKC').toLowerCa
 /** Local, deterministic suggestions; performance alone does not measure effort or diagnose fatigue. */
 export class ProgressiveOverloadService {
   /**
-   * This schema has no rep/seconds or assisted-load metadata. Exclude movements
-   * where a larger entered number does not reliably mean greater resistance.
-   * Bodyweight movements also lack the body-mass contribution needed for 1RM.
+   * Catalog metadata excludes bodyweight, assisted and band-resistance movements.
+   * Their entered kilograms do not reliably represent the full external load.
+   * Preserve name-based protection for legacy/custom exercises without metadata.
    */
   public static isSupportedExercise(exercise: ExerciseIdentity): boolean {
     if (!exercise || typeof exercise.name !== 'string' || !exercise.name.trim()) return false;
+    const catalog = findCatalogExercise(exercise.name);
+    if (catalog && (catalog.exerciseType !== 'weight_reps' || ['Bodyweight', 'Resistance Band'].includes(catalog.equipment))) return false;
     const name = normalizeName(exercise.name);
     return !/\b(?:plank|hold|isometric|timed|seconds?|minutes?|assisted|bodyweight|body weight|push ups?|pushups?|pull ups?|pullups?|chin ups?|chinups?|dips?|burpees?|crunch(?:es)?|sit ups?|situps?|hanging leg raise|wall sit|l sit|front lever|back lever|carry|running|jogging|walking|cycling|treadmill)\b|แพลงก์|วิดพื้น|ดันพื้น|โหนบาร์|จับเวลา|ค้างท่า|วินาที|นาที/.test(name);
   }

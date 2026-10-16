@@ -67,18 +67,8 @@ export const WORKOUT_PRESETS: WorkoutPreset[] = [
   }
 ];
 
-export const AVAILABLE_EXERCISE_POOL: { name: string; muscleGroup: string; defaultSets: number; defaultReps: number; restSeconds: number }[] = [
-  { name: 'Dumbbell Incline Fly', muscleGroup: 'Chest', defaultSets: 3, defaultReps: 12, restSeconds: 60 },
-  { name: 'Dips (Chest / Triceps)', muscleGroup: 'Chest & Arms', defaultSets: 3, defaultReps: 10, restSeconds: 75 },
-  { name: 'Cable Lateral Raise', muscleGroup: 'Side Delts', defaultSets: 3, defaultReps: 15, restSeconds: 60 },
-  { name: 'Hammer Curl', muscleGroup: 'Brachialis & Biceps', defaultSets: 3, defaultReps: 12, restSeconds: 60 },
-  { name: 'Preacher Curl', muscleGroup: 'Biceps Short Head', defaultSets: 3, defaultReps: 10, restSeconds: 60 },
-  { name: 'Skull Crushers', muscleGroup: 'Triceps Long Head', defaultSets: 3, defaultReps: 10, restSeconds: 60 },
-  { name: 'Bulgarian Split Squat', muscleGroup: 'Quads & Glutes', defaultSets: 3, defaultReps: 10, restSeconds: 75 },
-  { name: 'Hanging Leg Raise', muscleGroup: 'Abs & Hip Flexors', defaultSets: 3, defaultReps: 12, restSeconds: 45 },
-  { name: 'Cable Woodchopper', muscleGroup: 'Obliques', defaultSets: 3, defaultReps: 12, restSeconds: 45 },
-  { name: 'Seated Calf Raise', muscleGroup: 'Soleus', defaultSets: 3, defaultReps: 15, restSeconds: 45 }
-];
+// Keep the public export for callers while the catalog has its own metadata/artwork source.
+export { EXERCISE_CATALOG as AVAILABLE_EXERCISE_POOL } from './exerciseCatalog.ts';
 
 export function createWorkoutExercisesFromPreset(preset: WorkoutPreset): WorkoutExercise[] {
   return preset.exercises.map((ex, exIdx) => ({
