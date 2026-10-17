@@ -31,6 +31,7 @@ import { renderScannerScreen } from './screens/ScannerScreen';
 import { renderFoodResultScreen } from './screens/FoodResultScreen';
 import { activateFoodScanner, bindFoodScanHandlers, deactivateFoodScanner, refreshFoodScanFeedback, syncFoodScanLifecycle } from './screens/foodScanController.ts';
 import { renderFoodScanActivity, refreshFoodScanActivity } from './components/FoodScan/FoodScanActivity.ts';
+import { bindExerciseCatalogHandlers, resetExerciseCatalog } from './components/Fitness/ExerciseCatalog.ts';
 import { getTodayKey } from './utils/dateUtils.ts';
 import { initializeStreamlitFoodAnalysis } from './services/streamlitFoodAnalysis.ts';
 import { renderDiaryScreen } from './screens/DiaryScreen';
@@ -470,10 +471,12 @@ window.clearChat = () => {
 // FITNESS WORKOUT FLOW BINDINGS
 // ==========================================
 window.selectWorkoutType = (presetId: string) => {
+  resetExerciseCatalog();
   store.selectWorkoutType(presetId);
 };
 
 window.cancelWorkoutSetup = () => {
+  resetExerciseCatalog();
   store.cancelWorkoutSetup();
 };
 
@@ -496,6 +499,7 @@ window.addExerciseToDraft = (name: string, muscleGroup: string, sets?: number, r
 };
 
 window.startWorkout = () => {
+  resetExerciseCatalog();
   store.startWorkout();
 };
 
@@ -1901,6 +1905,7 @@ window.executeProfileConfirmModalAction = () => {
 bindOnboardingHandlers();
 bindPhasicToolHandlers();
 bindFoodScanHandlers();
+bindExerciseCatalogHandlers();
 
 window.handleProfilePhotoSelected = async (input: HTMLInputElement) => {
   const file = input.files?.[0];

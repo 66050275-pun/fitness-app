@@ -1,5 +1,6 @@
 node_modules/
 dist/
+streamlit_component/exercise-assets/
 .DS_Store
 scratch/
 

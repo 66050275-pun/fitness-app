@@ -2157,7 +2157,7 @@ class Store {
   public addExerciseToDraft(name: string, muscleGroup: string, sets = 3, reps = 10, restSeconds = 60) {
     if (!this.state.draftWorkout) return;
     const newEx: WorkoutExercise = {
-      id: `ex-custom-${Date.now()}`,
+      id: `ex-custom-${crypto.randomUUID()}`,
       name,
       muscleGroup,
       targetSets: sets,
@@ -2171,6 +2171,7 @@ class Store {
         completed: false
       }))
     };
+    this.prepareStartingLoads([newEx]);
     this.state.draftWorkout.push(newEx);
     this.notify();
   }

@@ -46,6 +46,11 @@ export function tr(key: string, ...values: unknown[]): string {
 }
 /** Escapes translated labels and interpolated values before insertion into HTML. */
 export function trHtml(key: string, ...values: unknown[]): string { return escapeHtml(tr(key, ...values)); }
+/** Local search can match either supported language without changing the selected UI language. */
+export function labelSearchTerms(key: string): readonly string[] {
+  const entry = dictionary[key] ?? dictionary[labelKeys.get(key) ?? ''];
+  return entry ? [entry.en, entry.th] : [key];
+}
 /** Only call for app-owned labels or canned assistant content, never arbitrary user text. */
 export function translatedLabel(value: string): string {
   if (dictionary[value]) return tr(value);
