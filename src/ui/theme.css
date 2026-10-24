@@ -10,6 +10,8 @@
   --ui-primary: #006d36;
   --ui-primary-soft: #e3f8e9;
   --ui-primary-label: #004d24;
+  --ui-info: #006a60;
+  --ui-caution: #926300;
   --ui-error: #ba1a1a;
   --ui-error-soft: #ffdad6;
   --ui-muscle-active: #ef4444;
@@ -54,6 +56,8 @@
   --ui-primary: #72fd9e;
   --ui-primary-soft: #233930;
   --ui-primary-label: #b2f6c7;
+  --ui-info: #6df8e5;
+  --ui-caution: #fbbf24;
   --ui-error: #ffb4ab;
   --ui-error-soft: #44241f;
   --ui-muscle-active: #fb6767;
