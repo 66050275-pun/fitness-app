@@ -66,6 +66,9 @@ Brand accents in Tailwind:
 - Show one active dialog at a time; hide and disable any underlying dialog during a drilldown or confirmation, then restore it on close. Preserve form text, focus, selection and internal scroll across data updates. Lock background scrolling while a dialog is open and restore it on close. Escape and the device Back button dismiss the active dialog before navigating; keep the privacy Lock control available.
 - Shared light card shadow: `0 4px 20px -2px rgba(23,32,27,0.04)`; dark equivalent uses `rgba(0,0,0,0.15)`.
 - Preserve the existing fixed bottom navigation, centered action button and sticky headers. Keep content clear of fixed controls.
+- The shared app header uses a two-row layout: a real 48px Profile button, wrapping greeting and 48px actions above the date. Put the diary date picker and Show today action in the date row with visible focus. Greet according to local morning/afternoon/evening; show a localized positive-day streak as text with a decorative icon.
+- Bottom navigation has four destinations around the 56px center Add toggle. Keep 12px wrapping labels, at least 48px-wide / 60px-tall destination targets, and a tinted icon pill plus filled glyph and bold label for the current page. The center action uses the solid action color for a readable white icon. Opening Quick Add disables the other destinations and changes the center label to Close.
+- `NavigationLayout` measures the actual bottom bar with `ResizeObserver`, including changes from wrapped translations, fonts and safe areas. The app shell reserves that height plus 24px only on screens showing the bar, including the coach composer. It disconnects on lock; no previous screen DOM is retained. Existing dialog positioning uses the same `--ui-bottom-nav-height` value.
 - Account for `safe-area-inset-top` and `safe-area-inset-bottom`. The privacy status bar reserves **44px plus the top safe area**; sticky page headers sit below it.
 - Preserve normal document scrolling. The app shell uses `overflow-x: clip` and `overflow-y: visible`.
 
@@ -220,6 +223,7 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/security/vaultUI.ts`: PIN gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
+- `src/ui/navigationLayout.ts`: bottom-navigation measurement, content clearance and cleanup on lock.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.
 - `src/screens/onboarding/OnboardingScreen.ts`, `onboardingController.ts` and `src/utils/onboardingGoals.ts`: four-step presentation, input lifecycle and shared target validation/calculation.
 - `src/services/nutritionPlanService.ts`: local Mini Cut and Lean Bulk calorie, macro, duration and adjustment rules.

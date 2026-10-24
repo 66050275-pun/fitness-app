@@ -1555,6 +1555,42 @@
     "en": "Good morning",
     "th": "สวัสดีตอนเช้า"
   },
+  "Good afternoon": {
+    "en": "Good afternoon",
+    "th": "สวัสดีตอนบ่าย"
+  },
+  "Good afternoon, {0}": {
+    "en": "Good afternoon, {0}",
+    "th": "สวัสดีตอนบ่าย {0}"
+  },
+  "Good evening": {
+    "en": "Good evening",
+    "th": "สวัสดีตอนเย็น"
+  },
+  "Good evening, {0}": {
+    "en": "Good evening, {0}",
+    "th": "สวัสดีตอนเย็น {0}"
+  },
+  "{0} day streak": {
+    "en": "{0}-day streak",
+    "th": "ต่อเนื่อง {0} วัน"
+  },
+  "Switch to light theme": {
+    "en": "Switch to light theme",
+    "th": "เปลี่ยนเป็นธีมสว่าง"
+  },
+  "Switch to dark theme": {
+    "en": "Switch to dark theme",
+    "th": "เปลี่ยนเป็นธีมมืด"
+  },
+  "Show today": {
+    "en": "Show today",
+    "th": "แสดงวันนี้"
+  },
+  "Main navigation": {
+    "en": "Main navigation",
+    "th": "เมนูนำทางหลัก"
+  },
   "(Show Today)": {
     "en": "(Show Today)",
     "th": "(แสดงวันนี้)"

@@ -12,8 +12,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 
 | Part | Area | Reviewable scope | Status |
 | --- | --- | --- | --- |
-| 1/10 | Shared design foundations | Central semantic theme tokens; consistent primary actions, icon controls and fields; initial adoption in vault/onboarding/Quick Add | Prepared for review |
-| 2/10 | App shell and navigation | Shared header, bottom navigation, readable labels, touch targets and clearance for fixed controls | Planned |
+| 1/10 | Shared design foundations | Central semantic theme tokens; consistent primary actions, icon controls and fields; initial adoption in vault/onboarding/Quick Add | Approved and merged: [PR #11](https://github.com/66050275-pun/fitness-app/pull/11) |
+| 2/10 | App shell and navigation | Shared header, bottom navigation, readable labels, touch targets and clearance for fixed controls | Prepared for review |
 | 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Planned |
 | 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Planned |
 | 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Planned |
@@ -31,8 +31,18 @@ Apply each change to existing components and data flows. Keep the vault origin a
 - Introduce `.ui-icon-button` (48px) and `.ui-field` (48px, 16px text). Adopt them in existing Quick Add Back/Close buttons, onboarding Back/fields and vault language/legacy-passphrase fields.
 - Distinguish disabled controls from controls explicitly marked busy. Existing reduced-motion rules continue to cover transitions.
 
+## Part 2 details
+
+- Give the shared header a separate date row, wrapping identity text, a semantic Profile button and stable IDs for focus restoration. Use the shared 48px action controls and localize time-appropriate greetings, streak wording and theme actions.
+- Refactor the existing four bottom destinations into one rendering helper around the centered Add toggle. Keep the routes and click handlers; use wrapping 12px labels, generous targets and a stable selected-state pill instead of scaling destinations.
+- Keep the center Add button available while Quick Add is open; disable the other destinations using native button state alongside the dialog's existing inert handling.
+- Measure the real navigation height with a lifecycle-managed `ResizeObserver`, reserve content clearance and keep the full-height coach composer above the bar. Clear measurements and disconnect on vault lock.
+- Preserve focused navigation controls during same-route navigation markup updates. Existing Back behavior, screen transitions and reduced-motion handling continue through the shared lifecycle.
+
 ## Review record
 
 Record the PR link and build result for each part as it becomes available. Browser/device review remains separate from compilation; do not describe a build as visual verification. Automated tests are run only when requested by the user.
 
-Part 1: `npm run build` passed (TypeScript + Vite); `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Publication to `main` is pending review.
+Part 1: [PR #11](https://github.com/66050275-pun/fitness-app/pull/11) approved and merged to `main` at `84524e2ba29394173e99b4c494c2a30f1c221c0d`. Its tree matches the build-checked version. `npm run build` and `git diff --check` passed; the existing Vite chunk-size warning remains. No automated tests or browser/device checks were run.
+
+Part 2: `npm run build` (TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Phone layout, font scaling, TH/EN labels, keyboard focus, safe areas and Quick Add dismissal still need visual/device review. Publication to `main` is pending approval.
