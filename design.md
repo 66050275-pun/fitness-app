@@ -2,7 +2,7 @@
 
 This file records the current theme of `fitness-app`. Read it before changing the UI. Keep new screens and components consistent with these patterns, and update this reference when an intentional design change is made.
 
-Reference date: 2026-10-13. The actual tokens live in `tailwind.config.js` and `src/index.css`.
+Reference date: 2026-10-24. Shared semantic tokens live in `src/ui/theme.css`; Tailwind utilities live in `tailwind.config.js`, and shared controls and screen styling live in `src/index.css`.
 
 ## Visual direction
 
@@ -39,6 +39,7 @@ Brand accents in Tailwind:
 - `tertiary`: **#006a60**; `tertiary-container`: **#25c3b1**, used for existing teal accents.
 - Existing gradient: `primary` to `primary-container`.
 - Solid primary buttons retain dark green with white labels in both themes. The lighter dark-mode `--ui-primary` is for foregrounds and related controls.
+- Use `--ui-action`, `--ui-action-hover`, `--ui-action-pressed` and `--ui-on-action` for filled actions. Keep `--ui-primary` for foreground accents. Control boundaries use `--ui-control-border` (`#6d7b6d` light / `#829b8b` dark); quieter card separators keep `--ui-border`.
 - Red denotes errors or the anatomical muscle highlight. Keep these meanings clear with accompanying text or a legend.
 
 ## Type and icons
@@ -71,7 +72,10 @@ Brand accents in Tailwind:
 ## Controls and interaction
 
 - Use a clear green primary action; secondary actions use a tinted panel or border. Destructive actions use the error color with an explicit label.
-- Reuse `.ui-primary-button` where appropriate: full width, at least 52px tall, bold heading font, subtle press scale of 0.99.
+- Reuse `.ui-primary-button` where appropriate: full width, at least 52px tall, 16px bold heading font, wrapping labels and subtle press scale of 0.99. Hover/pressed styling applies only to enabled controls; hover is limited to pointers that support it.
+- Use `.ui-icon-button` for circular Back/Close controls: 48 × 48px, a visible control boundary and a localized accessible name. Hide the decorative glyph with `aria-hidden="true"`.
+- Use `.ui-field` for text/number/select fields: at least 48px tall, 16px font, 14px corners and a visible boundary. Keep labels and help/error associations in markup. Set `aria-invalid="true"` when validation fails; retain each screen's padding and lifecycle. Vault and onboarding adopt these shared controls first.
+- `.ui-primary-button`, `.ui-icon-button` and `.ui-field` use the shared focus color and a separating surface ring. Disabled controls show an unavailable cursor; mark an actual busy button with `aria-busy="true"` to show progress. Existing Reduce Motion rules cover the shared transitions.
 - Keep enabled, selected, disabled, saving and error states visually distinct. Icon-only controls need localized accessible labels.
 - Preserve the visible 2px primary focus outline with 3px offset, keyboard access, browser zoom and heading focus after navigation.
 - Use text labels alongside important status colors and progress indicators. Active navigation uses `aria-current="page"`.
@@ -208,8 +212,9 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 
 ## Implementation references
 
-- `tailwind.config.js`: palette, spacing, radii, fonts and shadows.
-- `src/index.css`: shared light/dark variables, privacy surfaces, imagery, muscle map and reduced motion.
+- `src/ui/theme.css`: light/dark semantic colors, action states, font families, control dimensions, radii, shadows and motion tokens. Imported before `src/index.css` through `src/main.ts`.
+- `tailwind.config.js`: legacy palette utilities, spacing, radii and shadows; font utilities refer to the shared theme variables. Keep the current Tailwind 3 syntax when using skill recommendations written for newer versions.
+- `src/index.css`: shared controls, privacy surfaces, imagery, muscle map and reduced motion.
 - `index.html`: mobile viewport and 430px app shell.
 - `src/components/Navigation/`: header and bottom navigation patterns.
 - `src/security/vaultUI.ts`: PIN gate, status and shield.
@@ -222,6 +227,10 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/services/foodAnalysisBackend.ts`, `aiFoodAnalysisAdapter.ts`, `streamlitFoodAnalysis.ts` and `docs/FOOD_SCAN_BACKEND.md`: trusted backend registration, Maxplus session transport and validated analysis contract.
 - `backend/` and `streamlit_component/index.html`: server credentials, provider/schema validation, request budget and a small invisible RPC component.
 - `src/i18n/`: bilingual presentation helpers and messages.
+
+## UI/UX improvement series
+
+Track the ten incremental PRs in [docs/UI_UX_ROADMAP.md](docs/UI_UX_ROADMAP.md). Each part extends this reference using UI UX Pro Max guidance and the app's existing green direction. Send each part for review before starting the next, unless the user requests the full series together.
 
 ## Detailed nutrients and Insights data (2026-10-13)
 

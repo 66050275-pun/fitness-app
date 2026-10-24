@@ -141,7 +141,7 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
     app.innerHTML = `<main class="vault-gate vault-pin-gate">
       <div class="vault-brand"><span class="vault-brand-mark material-symbols-outlined" aria-hidden="true">nutrition</span><div><strong>NutriAI</strong><span>${trHtml("Nutrition & Fitness")}</span></div></div>
       <section class="vault-card vault-pin-card" aria-labelledby="vault-heading">
-        <label class="vault-language" for="vault-language">${trHtml("Language")} <select id="vault-language" class="vault-input"><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>${trHtml("English")}</option><option value="th" ${getLanguage() === 'th' ? 'selected' : ''}>${trHtml("Thai")}</option></select></label>
+        <label class="vault-language" for="vault-language">${trHtml("Language")} <select id="vault-language" class="ui-field vault-input"><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>${trHtml("English")}</option><option value="th" ${getLanguage() === 'th' ? 'selected' : ''}>${trHtml("Thai")}</option></select></label>
         <span class="vault-feature-icon vault-pin-lock material-symbols-outlined" aria-hidden="true">${access.exists ? 'lock' : 'shield_lock'}</span>
         <h1 id="vault-heading"></h1>
         <p class="vault-subtitle">${access.exists ? trHtml("Unlock NutriAI") : trHtml("Protect your NutriAI data")}</p>
@@ -159,7 +159,7 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
         <form id="vault-legacy-form" class="vault-form" hidden>
           <p>${trHtml("Enter your current passphrase, then choose a six-digit passcode. Your encrypted data will be preserved.")}</p>
           <label for="vault-legacy-password">${trHtml("Current passphrase")}</label>
-          <input id="vault-legacy-password" type="password" autocomplete="current-password" required class="vault-input" aria-describedby="vault-error">
+          <input id="vault-legacy-password" type="password" autocomplete="current-password" required class="ui-field vault-input" aria-describedby="vault-error">
           <button type="submit" class="ui-primary-button">${trHtml("Continue to passcode")}</button>
         </form>
         <p id="vault-busy" class="vault-pin-feedback" role="status" aria-live="polite"></p>

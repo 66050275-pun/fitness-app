@@ -12,6 +12,7 @@ import '@fontsource/plus-jakarta-sans/latin-800.css';
 import '@fontsource-variable/material-symbols-outlined';
 import { startPrivateApp, downloadEncryptedBackup } from './security/vaultUI.ts';
 import { privateStorage, isVaultUnlocked } from './services/privateStorage.ts';
+import './ui/theme.css';
 import './index.css';
 import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, FitnessObjective, MealType } from './types/index.ts';

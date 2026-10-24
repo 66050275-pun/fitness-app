@@ -101,7 +101,7 @@ export function renderQuickAddBottomSheet(): string {
         ${tool ? '' : '<span class="quick-add-sheet-handle" aria-hidden="true"></span>'}
         <div class="ui-dialog-header quick-add-sheet-header flex items-start justify-between gap-3">
           ${isSpecialView ? `
-            <button type="button" class="quick-add-sheet-back shrink-0" onclick="window.backQuickAddMenu()" aria-label="${trHtml(tool ? 'Back to Special Program tools' : 'Back to Quick Add')}">
+            <button type="button" class="ui-icon-button quick-add-sheet-back shrink-0" onclick="window.backQuickAddMenu()" aria-label="${trHtml(tool ? 'Back to Special Program tools' : 'Back to Quick Add')}">
               <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
             </button>
           ` : ''}
@@ -111,7 +111,7 @@ export function renderQuickAddBottomSheet(): string {
           </div>
           <button
             type="button"
-            class="quick-add-sheet-close shrink-0 flex items-center justify-center"
+            class="ui-icon-button quick-add-sheet-close"
             onclick="window.closeQuickAdd()"
             aria-label="${trHtml('Close Quick Add')}"
           >

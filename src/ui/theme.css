@@ -1,0 +1,67 @@
+/* NutriAI's shared theme. Keep semantic roles consistent across both modes. */
+:root {
+  --ui-surface: #effdf4;
+  --ui-card: #ffffff;
+  --ui-panel: #e9f7ee;
+  --ui-panel-high: #e3f1e8;
+  --ui-text: #121e19;
+  --ui-muted: #3d4a3e;
+  --ui-border: #bccabb;
+  --ui-primary: #006d36;
+  --ui-primary-soft: #e3f8e9;
+  --ui-primary-label: #004d24;
+  --ui-error: #ba1a1a;
+  --ui-error-soft: #ffdad6;
+  --ui-muscle-active: #ef4444;
+  --ui-muscle-rest: #bdcec4;
+  --ui-body-fill: #deebe3;
+  --ui-body-outline: #8b9e90;
+  --ui-art-background: #164e43;
+
+  /* Control boundaries need more contrast than decorative card separators. */
+  --ui-control-border: #6d7b6d;
+  --ui-focus: var(--ui-primary);
+  --ui-action: #006d36;
+  --ui-action-hover: #005c2d;
+  --ui-action-pressed: #004d24;
+  --ui-on-action: #ffffff;
+
+  --ui-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ui-font-heading: 'Plus Jakarta Sans', var(--ui-font-body);
+  --ui-text-body: 1rem;
+  --ui-line-body: 1.5;
+  --ui-control-height: 48px;
+  --ui-primary-height: 52px;
+  --ui-control-radius: 14px;
+  --ui-button-radius: 16px;
+  --ui-radius: 24px;
+  --ui-shadow: 0 4px 20px -2px rgba(23,32,27,0.04);
+  --ui-action-shadow: 0 8px 24px -2px rgba(53,199,111,0.2);
+  --ui-motion-duration: 180ms;
+  --ui-motion-easing: cubic-bezier(0.2,0.8,0.2,1);
+  --vault-bar-height: calc(44px + env(safe-area-inset-top, 0px));
+  color-scheme: light;
+}
+
+:root.dark {
+  --ui-surface: #121e19;
+  --ui-card: #1a2c24;
+  --ui-panel: #233930;
+  --ui-panel-high: #2e483d;
+  --ui-text: #effdf4;
+  --ui-muted: #b5c8bc;
+  --ui-border: #2e483d;
+  --ui-primary: #72fd9e;
+  --ui-primary-soft: #233930;
+  --ui-primary-label: #b2f6c7;
+  --ui-error: #ffb4ab;
+  --ui-error-soft: #44241f;
+  --ui-muscle-active: #fb6767;
+  --ui-muscle-rest: #586f62;
+  --ui-body-fill: #30473c;
+  --ui-body-outline: #829b8b;
+  --ui-control-border: #829b8b;
+  --ui-shadow: 0 4px 20px -2px rgba(0,0,0,0.15);
+  --ui-action-shadow: 0 6px 20px -4px rgba(0,0,0,0.3);
+  color-scheme: dark;
+}
