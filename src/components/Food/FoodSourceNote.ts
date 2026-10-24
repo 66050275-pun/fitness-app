@@ -21,7 +21,7 @@ export function renderFoodSourceNote(food: FoodDefinition, compact = false): str
 
   if (provenance.provider === 'user_estimate') {
     return `
-      <div class="min-w-0 text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">
+      <div class="min-w-0 text-xs leading-relaxed text-on-surface-variant dark:text-gray-400">
         <span class="font-semibold">${trHtml('Estimated recipe nutrition')}</span>
         ${compact ? '' : `<p class="mt-0.5">${trHtml('Actual nutrition varies with the recipe and portion.')}</p>`}
       </div>
@@ -31,7 +31,7 @@ export function renderFoodSourceNote(food: FoodDefinition, compact = false): str
   if (provenance.provider !== 'open_food_facts') return '';
   const productUrl = safeProductUrl(provenance.url);
   return `
-    <div class="min-w-0 text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">
+    <div class="min-w-0 text-xs leading-relaxed text-on-surface-variant dark:text-gray-400">
       <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
         ${productUrl
           ? `<a href="${escapeHtml(productUrl)}" target="_blank" rel="noopener noreferrer" class="font-semibold text-primary dark:text-primary-container underline underline-offset-2">Open Food Facts</a>`

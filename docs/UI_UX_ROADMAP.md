@@ -15,8 +15,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | 1/10 | Shared design foundations | Central semantic theme tokens; consistent primary actions, icon controls and fields; initial adoption in vault/onboarding/Quick Add | Approved and merged: [PR #11](https://github.com/66050275-pun/fitness-app/pull/11) |
 | 2/10 | App shell and navigation | Shared header, bottom navigation, readable labels, touch targets and clearance for fixed controls | Approved and merged: [PR #12](https://github.com/66050275-pun/fitness-app/pull/12) |
 | 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Approved and merged: [PR #13](https://github.com/66050275-pun/fitness-app/pull/13) |
-| 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Prepared for review |
-| 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Planned |
+| 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Approved and merged: [PR #14](https://github.com/66050275-pun/fitness-app/pull/14) |
+| 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Prepared for review |
 | 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Planned |
 | 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Planned |
 | 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Planned |
@@ -49,7 +49,9 @@ Part 2: [PR #12](https://github.com/66050275-pun/fitness-app/pull/12) approved a
 
 Part 3: [PR #13](https://github.com/66050275-pun/fitness-app/pull/13) approved and merged at `8729ca47f77d3978dd60c3db2f208579b12b9ac9`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run.
 
-Part 4: `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Long numbers/names, unknown nutrition, widget ordering/visibility/focus, hydration logging above 12 glasses and TH/EN light/dark layouts still need browser/device review. Publication to `main` is pending approval.
+Part 4: [PR #14](https://github.com/66050275-pun/fitness-app/pull/14) approved and merged at `aa5fedaafed5184920dffffab2e07cae71f3ee2d`, with its tree matching the build-checked version. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Long numbers/names, unknown nutrition, widget ordering/visibility/focus, hydration logging above 12 glasses and TH/EN light/dark layouts still need browser/device review.
+
+Part 5: Prepared for review. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Narrow-phone TH/EN light/dark layouts, mobile date/time controls, keyboard/focus behavior, draft preservation during updates, portion reuse and encrypted save/retry behavior still need browser/device review. Publication to `main` is pending approval.
 
 ## Part 3 details
 
@@ -69,3 +71,15 @@ Part 4: `npm run build` (strict TypeScript + Vite) and `git diff --check` passed
 - Make the local coach's demo status clear and improve long meal rows, empty states, delete labels and focus recovery.
 - Improve Customize Home touch targets, order/visibility feedback and stable control IDs using the existing centered dialog lifecycle.
 - Recover focus when a move control becomes disabled at a list boundary or the water-minus control reaches zero.
+
+## Part 5 details
+
+- Extract shared food-entry headers, themed styles and Diary sections. Keep effective refeed calories, the Mini Cut fat ceiling, exact hydration targets and unknown/partial nutrition visible.
+- Give the week strip labeled 48px controls and preserve its horizontal scroll during same-date updates without scrolling the page vertically.
+- Group meals by meal type. Use native detail buttons with separate Delete/Add Again controls, wrapping labels, honest AI/demo badges and focus recovery after deletion.
+- Show nutrient-data coverage and expand beyond the first six micronutrients using a native disclosure. Explain AI estimates and missing values without implying verification.
+- Improve food-search labels, collection pressed states, recent-food buttons and explicit online-search disclosure while retaining Open Food Facts provenance and attribution.
+- Rebuild Quick Log with readable fields, native meal radios/date/time controls, linked validation and opt-in same-route draft preservation. Clear the rendered form on navigation/lock; block interaction during saving or locking.
+- Preserve unknown macros as null and retain input precision. Normalize portions within their measurement dimension, keep nutrition tied to the entire entered portion and open Diary on the logged date.
+- Let Quick Log save a food definition without opening an extra Set Portion dialog. Existing Custom Food callers retain their normal portion flow.
+- Apply shared readable fields and 48px controls to Set Portion, Meal Detail and Custom Food without replacing the dialog lifecycle. Add accessible portion choices and conversion-error feedback.

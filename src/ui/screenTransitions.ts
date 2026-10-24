@@ -77,8 +77,32 @@ export class ScreenTransitions {
         ? { start: focused.selectionStart, end: focused.selectionEnd } : null;
       const openDetails = !changed ? Array.from(screen.querySelectorAll('details')).map(element => element.open) : [];
       const accordion = !changed ? screen.querySelector('#add-exercise-accordion')?.classList.contains('hidden') : undefined;
+      const drafts = !changed ? Array.from(screen.querySelectorAll<HTMLFormElement>('form[data-preserve-draft]')).map(form => ({
+        id: form.id, validated: form.dataset.validated,
+        fields: Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input:not([type="file"]):not([type="password"]), select'))
+          .filter(field => field.id).map(field => ({ id: field.id, value: field.value, checked: field instanceof HTMLInputElement ? field.checked : false })),
+      })) : [];
+      const scrollAreas = !changed ? Array.from(screen.querySelectorAll<HTMLElement>('[data-scroll-key]')).map(area => ({
+        key: area.dataset.scrollKey, left: area.scrollLeft, top: area.scrollTop,
+      })) : [];
       screen.innerHTML = screenHtml; this.screenHtml = screenHtml;
       if (!changed) {
+        for (const draft of drafts) {
+          const form = document.getElementById(draft.id);
+          if (!form?.matches('form[data-preserve-draft]')) continue;
+          if (draft.validated) form.dataset.validated = draft.validated;
+          for (const field of draft.fields) {
+            const restored = document.getElementById(field.id);
+            if (restored instanceof HTMLInputElement || restored instanceof HTMLSelectElement) {
+              restored.value = field.value;
+              if (restored instanceof HTMLInputElement) restored.checked = field.checked;
+            }
+          }
+        }
+        for (const area of screen.querySelectorAll<HTMLElement>('[data-scroll-key]')) {
+          const previous = scrollAreas.find(item => item.key === area.dataset.scrollKey);
+          if (previous) { area.scrollLeft = previous.left; area.scrollTop = previous.top; area.dataset.scrollRestored = 'true'; }
+        }
         screen.querySelectorAll('details').forEach((element, i) => { element.open = openDetails[i] || false; });
         if (accordion !== undefined) screen.querySelector('#add-exercise-accordion')?.classList.toggle('hidden', accordion);
         const nextFocus = id ? document.getElementById(id) : null;

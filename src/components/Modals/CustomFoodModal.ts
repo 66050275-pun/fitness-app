@@ -54,7 +54,7 @@ export function renderCustomFoodModal(): string {
   return `
     <div id="custom-food-modal-backdrop" data-dialog-close="window.closeCustomFoodModal()" class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center">
       <div 
-        class="ui-dialog-panel w-full max-w-lg flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden relative"
+        class="ui-dialog-panel food-entry-dialog w-full max-w-lg flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden relative"
         role="dialog"
         aria-modal="true"
         aria-labelledby="custom-food-modal-title"

@@ -15,6 +15,7 @@ import { privateStorage, isVaultUnlocked } from './services/privateStorage.ts';
 import './ui/theme.css';
 import './index.css';
 import './components/Dashboard/dashboard.css';
+import './components/Food/foodEntry.css';
 import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, FitnessObjective, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';
@@ -67,6 +68,8 @@ import { renderWeightEntryModal } from './components/Modals/WeightEntryModal';
 import { renderInsightsScreen } from './screens/InsightsScreen';
 import { renderFoodSearchScreen, updateFoodSearchContent } from './screens/FoodSearchScreen';
 import { renderQuickLogScreen } from './screens/QuickLogScreen';
+import { submitQuickLog, bindQuickLogFeedback, refreshQuickLogFeedback } from './screens/quickLogController.ts';
+import { refreshDiaryViewport } from './screens/diaryViewport.ts';
 import { getUnitDimension } from './utils/portionCalculations';
 import { escapeHtml } from './utils/sanitize';
 import { 
@@ -866,6 +869,7 @@ window.saveFoodSearchLog = () => {
 };
 
 window.setFoodSearchTab = (tab: 'recent' | 'myFoods' | 'allFoods') => {
+  store.setFoodSearchQuery('');
   store.setFoodSearchTab(tab);
 };
 
@@ -1115,132 +1119,7 @@ window.confirmDeleteCustomFood = (foodName?: string) => {
 // ==========================================
 // QUICK LOG FORM BINDING
 // ==========================================
-window.submitQuickLog = () => {
-  const nameEl = document.getElementById('ql-food-name') as HTMLInputElement | null;
-  const calEl = document.getElementById('ql-calories') as HTMLInputElement | null;
-  const proEl = document.getElementById('ql-protein') as HTMLInputElement | null;
-  const carbEl = document.getElementById('ql-carbs') as HTMLInputElement | null;
-  const fatEl = document.getElementById('ql-fat') as HTMLInputElement | null;
-  const dateEl = document.getElementById('ql-date') as HTMLInputElement | null;
-  const timeEl = document.getElementById('ql-time') as HTMLInputElement | null;
-  const qtyEl = document.getElementById('ql-quantity') as HTMLInputElement | null;
-  const unitEl = document.getElementById('ql-unit') as HTMLSelectElement | null;
-  const servingEl = document.getElementById('ql-serving') as HTMLInputElement | null;
-  const saveCheckbox = document.getElementById('ql-save-to-my-foods') as HTMLInputElement | null;
-
-  const errorBanner = document.getElementById('quicklog-error-banner');
-  const errorMsg = document.getElementById('quicklog-error-message');
-
-  const foodName = nameEl?.value.trim() || '';
-  const calories = calEl ? parseFloat(calEl.value) : NaN;
-  const protein = proEl && proEl.value ? parseFloat(proEl.value) : 0;
-  const carbs = carbEl && carbEl.value ? parseFloat(carbEl.value) : 0;
-  const fat = fatEl && fatEl.value ? parseFloat(fatEl.value) : 0;
-  const dateVal = dateEl?.value || store.getState().selectedDate;
-  const timeVal = timeEl?.value.trim() || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  const qtyVal = qtyEl ? parseFloat(qtyEl.value) || 1 : 1;
-  const unitVal = (unitEl?.value || 'serving') as FoodUnit;
-  const servingVal = servingEl?.value.trim() || `${qtyVal} ${unitVal}`;
-  const shouldSaveToMyFoods = saveCheckbox?.checked || false;
-
-  const checkedRadio = document.querySelector('input[name="ql-meal-type"]:checked') as HTMLInputElement | null;
-  const mealTypeVal: MealType = (checkedRadio?.value as MealType) || 'lunch';
-
-  if (!foodName) {
-    if (errorBanner && errorMsg) {
-      errorMsg.innerText = tr("Please provide a food or recipe name.");
-      errorBanner.classList.remove('hidden');
-    }
-    return;
-  }
-
-  if (isNaN(calories) || calories < 0) {
-    if (errorBanner && errorMsg) {
-      errorMsg.innerText = tr("Please enter a valid non-negative calorie amount.");
-      errorBanner.classList.remove('hidden');
-    }
-    return;
-  }
-
-  if (isNaN(protein) || protein < 0 || isNaN(carbs) || carbs < 0 || isNaN(fat) || fat < 0) {
-    if (errorBanner && errorMsg) {
-      errorMsg.innerText = tr("Macronutrient values cannot be negative numbers.");
-      errorBanner.classList.remove('hidden');
-    }
-    return;
-  }
-
-  let foodId = `quick-${Date.now()}`;
-  let foodSource: 'custom' | 'demo' | 'built_in' = 'custom';
-
-  if (shouldSaveToMyFoods) {
-    const res = store.createCustomFood({
-      name: foodName,
-      category: 'Custom Food',
-      nutritionBasis: {
-        amount: qtyVal,
-        unit: (unitVal === 'g' || unitVal === 'ml' ? unitVal : 'serving') as 'g' | 'ml' | 'serving',
-        servingDescription: servingVal
-      },
-      nutrition: {
-        calories: Math.round(calories),
-        protein: Math.round(protein * 10) / 10,
-        carbs: Math.round(carbs * 10) / 10,
-        fat: Math.round(fat * 10) / 10
-      },
-      portionOptions: [
-        {
-          id: `opt-${Date.now()}`,
-          label: servingVal,
-          unit: unitVal,
-          dimension: getUnitDimension(unitVal),
-          quantity: qtyVal,
-          equivalentBaseAmount: qtyVal,
-          equivalentBaseUnit: unitVal === 'ml' ? 'ml' : 'g'
-        }
-      ]
-    });
-    if (res.food) {
-      foodId = res.food.id;
-    }
-  }
-
-  const portion: LoggedFoodPortion = {
-    foodId,
-    quantity: qtyVal,
-    unit: unitVal,
-    baseAmount: qtyVal,
-    baseUnit: unitVal === 'ml' ? 'ml' : 'serving',
-    servingDescription: servingVal
-  };
-
-  store.logMeal({
-    date: dateVal,
-    time: timeVal,
-    mealType: mealTypeVal,
-    foodId,
-    foodName,
-    portion,
-    nutritionSnapshot: {
-      calories: Math.round(calories),
-      protein: Math.round(protein * 10) / 10,
-      carbs: Math.round(carbs * 10) / 10,
-      fat: Math.round(fat * 10) / 10
-    },
-    foodSource,
-    loggedAt: new Date().toISOString(),
-
-    name: foodName,
-    category: servingVal,
-    calories: Math.round(calories),
-    protein: Math.round(protein * 10) / 10,
-    carbs: Math.round(carbs * 10) / 10,
-    fat: Math.round(fat * 10) / 10,
-    icon: 'edit_note'
-  });
-
-  store.setScreen('diary');
-};
+window.submitQuickLog = submitQuickLog;
 
 // ==========================================
 // MEAL DETAIL & MICRONUTRIENT MODAL BINDINGS
@@ -1913,6 +1792,7 @@ window.executeProfileConfirmModalAction = () => {
 // FIRST-LAUNCH ONBOARDING & PROFILE PHOTO
 // ==========================================
 bindOnboardingHandlers();
+bindQuickLogFeedback();
 bindPhasicToolHandlers();
 bindFoodScanHandlers();
 bindExerciseCatalogHandlers();
@@ -2212,6 +2092,8 @@ function renderApp() {
   `);
 
   if (currentScreen === 'onboarding') refreshOnboardingFeedback();
+  if (currentScreen === 'quickLog') refreshQuickLogFeedback();
+  if (currentScreen === 'diary') refreshDiaryViewport();
   refreshPhasicToolFeedback();
   refreshFoodScanFeedback();
   refreshFoodScanActivity();

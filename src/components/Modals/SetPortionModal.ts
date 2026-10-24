@@ -56,7 +56,7 @@ export function renderSetPortionModal(): string {
   return `
     <div id="set-portion-modal-backdrop" data-dialog-close="window.closeSetPortionModal()" class="ui-dialog-layer fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center">
       <div 
-        class="ui-dialog-panel w-full max-w-lg flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden"
+        class="ui-dialog-panel food-entry-dialog w-full max-w-lg flex flex-col bg-surface-container-lowest dark:bg-dark-surface-card rounded-t-[28px] border-t border-outline-variant/30 shadow-modal overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="set-portion-title"
@@ -113,6 +113,7 @@ export function renderSetPortionModal(): string {
                   step="any" 
                   inputmode="decimal" 
                   id="set-portion-qty-input"
+                  aria-label="${trHtml('Quantity')}" aria-describedby="set-portion-conversion-error" aria-invalid="${!!errorMsg || !Number.isFinite(qty) || qty <= 0}"
                   value="${escapeHtml(qty)}"
                   oninput="window.setPortionQuantity(parseFloat(this.value) || 0)"
                   placeholder="${trHtml("Quantity")}"
@@ -122,6 +123,7 @@ export function renderSetPortionModal(): string {
 
               <!-- Unit Selector Dropdown -->
               <div class="relative">
+                <label for="set-portion-unit-select" class="sr-only">${trHtml('Unit')}</label>
                 <select 
                   id="set-portion-unit-select"
                   onchange="window.setPortionUnit(this.value)"
@@ -148,6 +150,7 @@ export function renderSetPortionModal(): string {
                     <button 
                       type="button" 
                       onclick="window.setPortionQuickOption(${opt.quantity}, ${htmlJsArg(opt.unit)})"
+                      aria-pressed="${qty === opt.quantity && unit === opt.unit}"
                       class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all active:scale-95 ${
                         qty === opt.quantity && unit === opt.unit
                           ? 'bg-primary text-white border-primary shadow-xs'
@@ -162,12 +165,8 @@ export function renderSetPortionModal(): string {
             ` : ''}
 
             <!-- Error Banner if conversion not possible -->
-            ${errorMsg ? `
-              <div class="p-2.5 rounded-xl bg-error/10 border border-error/30 text-error flex items-center gap-2 text-xs">
-                <span class="material-symbols-outlined text-[18px]">error</span>
-                <span>${trHtml(errorMsg)}</span>
-              </div>
-            ` : ''}
+            <p id="set-portion-conversion-error" class="nutrition-field-error" role="alert">${errorMsg ? trHtml(errorMsg) : ''}</p>
+
           </div>
 
           <!-- Dynamic Nutrition Calculation Card -->
@@ -292,7 +291,7 @@ export function renderSetPortionModal(): string {
             id="set-portion-submit-btn"
             onclick="window.confirmAddPortionToDiary()" 
             ${(errorMsg || qty <= 0) ? 'disabled' : ''}
-            class="flex-1 py-3 px-4 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-ambient hover:brightness-105 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            class="ui-primary-button flex-1 flex items-center justify-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[18px]">add_circle</span>
             <span>${trHtml("Add to Diary")}</span>
