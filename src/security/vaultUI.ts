@@ -139,12 +139,15 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
     let disposed = false;
     let legacyStep = access.requiresPassphraseMigration;
     app.innerHTML = `<main class="vault-gate vault-pin-gate">
-      <div class="vault-brand"><span class="vault-brand-mark material-symbols-outlined" aria-hidden="true">nutrition</span><div><strong>NutriAI</strong><span>${trHtml("Nutrition & Fitness")}</span></div></div>
+      <div class="vault-gate-header">
+        <div class="vault-brand"><span class="vault-brand-mark material-symbols-outlined" aria-hidden="true">nutrition</span><div><strong>NutriAI</strong><span>${trHtml("Nutrition & Fitness")}</span></div></div>
+        <label class="vault-language" for="vault-language"><span class="sr-only">${trHtml("Language")}</span><select id="vault-language" class="ui-field vault-input"><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>${trHtml("English")}</option><option value="th" ${getLanguage() === 'th' ? 'selected' : ''}>${trHtml("Thai")}</option></select></label>
+      </div>
       <section class="vault-card vault-pin-card" aria-labelledby="vault-heading">
-        <label class="vault-language" for="vault-language">${trHtml("Language")} <select id="vault-language" class="ui-field vault-input"><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>${trHtml("English")}</option><option value="th" ${getLanguage() === 'th' ? 'selected' : ''}>${trHtml("Thai")}</option></select></label>
-        <span class="vault-feature-icon vault-pin-lock material-symbols-outlined" aria-hidden="true">${access.exists ? 'lock' : 'shield_lock'}</span>
-        <h1 id="vault-heading"></h1>
-        <p class="vault-subtitle">${access.exists ? trHtml("Unlock NutriAI") : trHtml("Protect your NutriAI data")}</p>
+        <div class="vault-pin-title-row"><span class="vault-feature-icon vault-pin-lock material-symbols-outlined" aria-hidden="true">${access.exists ? 'lock' : 'shield_lock'}</span><p class="vault-subtitle">${access.exists ? trHtml("Unlock NutriAI") : trHtml("Protect your NutriAI data")}</p></div>
+        <h1 id="vault-heading" tabindex="-1"></h1>
+        <p id="vault-pin-step" class="vault-pin-step"></p>
+        <p id="vault-pin-instruction" class="vault-pin-instruction">${trHtml('Enter six digits. We’ll continue automatically.')}</p>
         <div id="vault-pin-panel">
           <div id="vault-pin-indicators" class="vault-pin-indicators" role="img" aria-label="${trHtml("{0} of 6 digits entered", 0)}">${Array.from({ length: 6 }, () => '<span class="vault-pin-dot h-3.5 w-3.5 rounded-full border border-slate-400" aria-hidden="true"></span>').join('')}</div>
           <p id="vault-pin-progress" class="sr-only" role="status" aria-live="polite"></p>
@@ -176,7 +179,7 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
         ${access.exists ? '' : `<p>${trHtml("ข้อมูลเดิมใน browser นี้จะย้ายไปเก็บแบบเข้ารหัสเมื่อสร้าง vault")}</p>`}
         <p>${trHtml("Public repo contains application code, not your browser vault. Hosting services still receive normal page requests and network metadata.")}</p>
       </div></details>
-      ${access.exists ? '' : `<label class="vault-restore-card" for="vault-restore"><span class="material-symbols-outlined" aria-hidden="true">restore</span><strong>${trHtml("กู้จากไฟล์สำรองเข้ารหัส")}</strong><input id="vault-restore" type="file" accept="application/json,.json" hidden></label>`}
+      ${access.exists ? '' : `<label class="vault-restore-card" for="vault-restore"><span class="material-symbols-outlined" aria-hidden="true">restore</span><strong id="vault-restore-label">${trHtml("กู้จากไฟล์สำรองเข้ารหัส")}</strong><input id="vault-restore" type="file" accept="application/json,.json" class="sr-only" aria-labelledby="vault-restore-label"></label>`}
     </main>`;
     const heading = app.querySelector<HTMLElement>('#vault-heading')!;
     const pinPanel = app.querySelector<HTMLElement>('#vault-pin-panel')!;
@@ -191,17 +194,26 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
     const errorLabel = app.querySelector<HTMLElement>('#vault-error')!;
     const lockoutLabel = app.querySelector<HTMLElement>('#vault-lockout')!;
     const busyLabel = app.querySelector<HTMLElement>('#vault-busy')!;
+    const stepLabel = app.querySelector<HTMLElement>('#vault-pin-step')!;
+    const instruction = app.querySelector<HTMLElement>('#vault-pin-instruction')!;
     const restore = app.querySelector<HTMLInputElement>('#vault-restore');
     const isLockedOut = () => access.lockedUntil > Date.now();
     function refresh() {
       if (disposed) return;
       const locked = isLockedOut();
-      heading.textContent = legacyStep ? tr('Update your existing vault') : confirmStep ? tr('Re-enter your passcode to confirm') : access.exists && !access.requiresPassphraseMigration ? tr('Enter your passcode to unlock') : tr('Enter a 6-digit passcode');
+      const prompt = legacyStep ? tr('Update your existing vault') : confirmStep ? tr('Re-enter your passcode to confirm') : access.exists && !access.requiresPassphraseMigration ? tr('Enter your passcode') : tr('Enter a 6-digit passcode');
+      if (heading.textContent !== prompt) heading.textContent = prompt;
+      stepLabel.hidden = legacyStep || (access.exists && !access.requiresPassphraseMigration);
+      stepLabel.textContent = tr('Step {0} of 2', confirmStep ? 2 : 1);
+      instruction.hidden = legacyStep;
       pinPanel.hidden = legacyStep;
       legacyForm.hidden = !legacyStep;
       indicators.setAttribute('aria-label', tr('{0} of 6 digits entered', digits.length));
       for (const [index, dot] of Array.from(indicators.children).entries()) dot.classList.toggle('vault-pin-dot-filled', index < digits.length);
-      progress.textContent = tr('{0} of 6 digits entered', digits.length);
+      const digitStatus = tr('{0} of 6 digits entered', digits.length);
+      if (progress.textContent !== digitStatus) progress.textContent = digitStatus;
+      keypad.setAttribute('aria-busy', String(busy));
+      legacyForm.setAttribute('aria-busy', String(busy));
       for (const button of keypadButtons) button.disabled = busy || locked;
       legacyInput.disabled = busy || locked;
       legacyForm.querySelector<HTMLButtonElement>('button')!.disabled = busy || locked;
@@ -267,7 +279,7 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
       digits += digit; refresh();
       if (digits.length !== 6) return;
       if (!access.exists || access.requiresPassphraseMigration) {
-        if (!confirmStep) { firstPin = digits; digits = ''; confirmStep = true; refresh(); return; }
+        if (!confirmStep) { firstPin = digits; digits = ''; confirmStep = true; refresh(); heading.focus({ preventScroll: true }); return; }
         if (digits !== firstPin) {
           digits = ''; firstPin = ''; confirmStep = false;
           shake(tr('Your passcodes did not match. Enter a new passcode.')); refresh(); return;
@@ -295,7 +307,7 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
       errorLabel.textContent = ''; refresh(); keypadButtons[0]?.focus();
     };
     const keyboard = (event: KeyboardEvent) => {
-      if (legacyStep || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.target instanceof HTMLSelectElement) return;
+      if (legacyStep || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.target instanceof HTMLSelectElement || event.target instanceof HTMLInputElement) return;
       if (/^\d$/.test(event.key)) { event.preventDefault(); enterDigit(event.key); }
       else if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); deleteDigit(); }
     };
@@ -340,6 +352,7 @@ export async function startPrivateApp(activate: () => void, deactivate: () => vo
       finally { busy = false; if (!disposed) { busyLabel.textContent = ''; refresh(); } }
     };
     refresh();
+    heading.focus({ preventScroll: true });
   }
   await gate();
 }

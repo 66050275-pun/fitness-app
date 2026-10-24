@@ -1,4 +1,44 @@
 {
+  "Objective": {
+    "en": "Objective",
+    "th": "เป้าหมาย"
+  },
+  "Body metrics": {
+    "en": "Body metrics",
+    "th": "ข้อมูลร่างกาย"
+  },
+  "Setup progress": {
+    "en": "Setup progress",
+    "th": "ความคืบหน้าการตั้งค่า"
+  },
+  "Setup steps": {
+    "en": "Setup steps",
+    "th": "ขั้นตอนการตั้งค่า"
+  },
+  "Check your details": {
+    "en": "Check your details",
+    "th": "ตรวจสอบข้อมูลต่อไปนี้"
+  },
+  "Use whole calories per day.": {
+    "en": "Use whole calories per day.",
+    "th": "กรอกแคลอรีต่อวันเป็นจำนวนเต็ม"
+  },
+  "Range: {0}–{1} {2}": {
+    "en": "Range: {0}–{1} {2}",
+    "th": "ช่วงที่กรอกได้: {0}–{1} {2}"
+  },
+  "Enter six digits. We’ll continue automatically.": {
+    "en": "Enter six digits. We’ll continue automatically.",
+    "th": "กรอกให้ครบ 6 หลัก ระบบจะดำเนินการต่ออัตโนมัติ"
+  },
+  "Enter your passcode": {
+    "en": "Enter your passcode",
+    "th": "กรอกรหัสปลดล็อก"
+  },
+  "Step {0} of 2": {
+    "en": "Step {0} of 2",
+    "th": "ขั้นตอนที่ {0} จาก 2"
+  },
   "Edited locally from Open Food Facts.": {
     "en": "Edited locally from Open Food Facts.",
     "th": "แก้ไขในเครื่องจากข้อมูล Open Food Facts"

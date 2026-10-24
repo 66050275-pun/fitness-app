@@ -336,9 +336,9 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 
 .vault-gate { padding: max(28px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
 .vault-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; color: var(--ui-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 22px; }
-.vault-brand-mark { width: 52px; height: 52px; border-radius: 18px; background: linear-gradient(135deg,#006d36,#35c76f); color: #fff; display: grid; place-items: center; font-size: 30px; }
+.vault-brand-mark { width: 52px; height: 52px; border-radius: 18px; background: var(--ui-action); color: var(--ui-on-action); display: grid; place-items: center; font-size: 30px; flex-shrink: 0; }
 .vault-brand div { display: flex; flex-direction: column; gap: 2px; }
-.vault-brand div > span { color: var(--ui-muted); font: 500 11px Inter,sans-serif; letter-spacing: 0.02em; }
+.vault-brand div > span { color: var(--ui-muted); font: 500 12px/1.5 var(--ui-font-body); }
 .vault-card, .vault-help-card, .vault-restore-card, .workout-muscle-map { background: var(--ui-card); border: 1px solid var(--ui-border); border-radius: var(--ui-radius); box-shadow: var(--ui-shadow); }
 .vault-card { padding: 22px 20px; }
 .vault-language { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
@@ -347,7 +347,7 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 .vault-feature-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--ui-primary-soft); color: var(--ui-primary); display: grid; place-items: center; }
 .vault-badge { color: var(--ui-primary-label); background: var(--ui-primary-soft); padding: 5px 10px; border-radius: 999px; font-size: 10px; font-weight: 600; }
 .vault-card h1 { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 22px; line-height: 1.4; font-weight: 800; }
-.vault-card p { margin-top: 10px; font-size: 12px; line-height: 1.7; color: var(--ui-muted); }
+.vault-card p { margin-top: 10px; font-size: 14px; line-height: 1.7; color: var(--ui-muted); }
 .vault-card .vault-subtitle { margin: 3px 0 12px; font-size: 11px; font-weight: 600; color: var(--ui-primary); }
 .vault-form { display: flex; flex-direction: column; gap: 8px; margin-top: 22px; }
 .vault-form > label { font-size: 12px; font-weight: 600; }
@@ -357,15 +357,16 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 .vault-password-toggle input { width: 16px; height: 16px; accent-color: #006d36; }
 .vault-card .vault-error { margin: 0; color: var(--ui-error); font-size: 11px; }
 .vault-error:empty { display: none; }
-.vault-security-note { display: flex; align-items: flex-start; gap: 8px; background: var(--ui-panel); border-radius: 14px; padding: 12px; margin-top: 16px; color: var(--ui-muted); font-size: 10px; line-height: 1.7; }
+.vault-security-note { display: flex; align-items: flex-start; gap: 8px; background: var(--ui-panel); border-radius: 14px; padding: 12px; margin-top: 16px; color: var(--ui-muted); font-size: 12px; line-height: 1.7; }
 .vault-security-note .material-symbols-outlined { color: var(--ui-primary); font-size: 18px; }
 .vault-help-card { padding: 14px 16px; }
-.vault-help-card summary { cursor: pointer; font-size: 12px; font-weight: 600; min-height: 24px; }
-.vault-help-card p { font-size: 11px; line-height: 1.7; margin-top: 10px; color: var(--ui-muted); user-select: text; }
-.vault-restore-card { display: grid; grid-template-columns: 24px 1fr; align-items: center; gap: 10px; padding: 16px; font-size: 12px; }
+.vault-help-card summary { cursor: pointer; font-size: 14px; line-height: 1.5; font-weight: 600; min-height: 48px; padding: 12px 0; }
+.vault-help-card p { font-size: 14px; line-height: 1.7; margin-top: 10px; color: var(--ui-muted); user-select: text; }
+.vault-restore-card { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: center; gap: 10px; padding: 16px; font-size: 14px; line-height: 1.5; cursor: pointer; }
 .vault-restore-card .material-symbols-outlined { color: var(--ui-primary); }
-.vault-restore-card input { grid-column: 1/-1; width: 100%; font-size: 11px; }
-.vault-restore-card input::file-selector-button { border: 0; border-radius: 10px; background: var(--ui-panel); color: var(--ui-text); padding: 10px; margin-right: 8px; }
+.vault-restore-card strong { overflow-wrap: anywhere; }
+.vault-restore-card:has(input:focus-visible) { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+.vault-restore-card:has(input:disabled) { opacity: 0.6; cursor: progress; }
 .vault-status-bar { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: min(100%,430px); min-height: var(--vault-bar-height); padding: calc(4px + env(safe-area-inset-top,0px)) 12px 4px; z-index: 9998; background: var(--ui-surface); color: var(--ui-primary); border-bottom: 1px solid var(--ui-border); align-items: center; gap: 6px; }
 .vault-status-icon { font-size: 16px; flex-shrink: 0; }
 #vault-save-state { flex: 1; min-width: 0; font-size: 10px; line-height: 1.4; }
@@ -532,27 +533,36 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 
 /* Six-digit passcode gate keeps the shared green palette and native touch sizing. */
 .vault-pin-gate { padding-top: max(20px, env(safe-area-inset-top)); color: var(--ui-text); }
-.vault-pin-card { text-align: center; padding: 18px 16px; }
-.vault-pin-card h1 { font-size: 18px; }
-.vault-pin-lock { margin: 0 auto 14px; border-radius: 50%; width: 48px; height: 48px; }
-.vault-pin-card .vault-language { margin-bottom: 12px; text-align: left; }
+.vault-gate-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.vault-gate-header .vault-brand { min-width: 0; margin: 0; gap: 8px; }
+.vault-gate-header .vault-brand-mark { width: 44px; height: 44px; border-radius: 14px; font-size: 26px; }
+.vault-gate-header .vault-language { margin: 0; }
+.vault-pin-card { text-align: center; padding: 20px 16px; }
+.vault-pin-card h1 { font-size: 24px; line-height: 1.5; overflow-wrap: anywhere; }
+.vault-pin-card h1:focus { outline: none; }
+.vault-pin-title-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
+.vault-pin-lock { width: 32px; height: 32px; font-size: 20px; border-radius: 10px; flex-shrink: 0; }
+.vault-pin-card .vault-subtitle { margin: 0; font-size: 14px; }
+.vault-pin-card .vault-pin-step { display: inline-block; margin: 12px 0 0; padding: 4px 12px; border-radius: 999px; color: var(--ui-primary-label); background: var(--ui-primary-soft); font-size: 12px; font-weight: 600; }
+.vault-pin-card .vault-pin-instruction { font-size: 14px; margin-top: 10px; }
 .vault-pin-indicators { display: flex; justify-content: center; align-items: center; gap: 15px; min-height: 32px; margin: 18px 0 20px; }
 .vault-pin-dot { width: 14px; height: 14px; border: 1px solid var(--ui-muted); background: transparent; transition: background 140ms ease, border-color 140ms ease, transform 140ms ease; }
 .vault-pin-dot-filled { background: var(--ui-primary); border-color: var(--ui-primary); transform: scale(1.05); }
 .vault-keypad { width: min(100%, 286px); margin: 0 auto; justify-items: center; gap: 12px 22px; }
-.vault-pin-key { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1px; width: 72px; height: 72px; border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); touch-action: manipulation; transition: background 140ms ease, transform 140ms ease; }
-.vault-pin-key:hover { background: var(--ui-primary-soft); }
-.vault-pin-key:active { background: var(--ui-panel-high); transform: scale(0.94); }
+.vault-pin-key { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1px; width: 72px; height: 72px; border: 1px solid var(--ui-control-border); background: var(--ui-panel); color: var(--ui-text); touch-action: manipulation; transition: background 140ms ease, transform 140ms ease; }
+@media (hover: hover) { .vault-pin-key:not(:disabled):hover { background: var(--ui-primary-soft); } }
+.vault-pin-key:not(:disabled):active { background: var(--ui-panel-high); transform: scale(0.97); }
 .vault-pin-key:focus-visible, .vault-pin-restart:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 4px; }
 .vault-pin-key:disabled { opacity: 0.45; cursor: not-allowed; }
 .vault-pin-number { font: 400 30px/1.05 'Inter', sans-serif; font-variant-numeric: tabular-nums; }
-.vault-pin-letters { font: 600 8px/1.4 'Inter', sans-serif; letter-spacing: 2px; min-height: 11px; }
+.vault-pin-letters { font: 600 10px/1.4 var(--ui-font-body); letter-spacing: 1.5px; min-height: 14px; }
 .vault-pin-delete { border-color: transparent; background: transparent; }
 .vault-pin-delete .material-symbols-outlined { font-size: 25px; }
-.vault-pin-restart { display: inline-block; min-height: 44px; margin-top: 9px; padding: 10px 16px; color: var(--ui-primary); font-size: 12px; font-weight: 600; border-radius: 12px; }
-.vault-pin-card .vault-pin-feedback { min-height: 0; margin: 12px 0 0; font-size: 12px; }
+.vault-pin-restart { display: inline-block; min-height: 48px; margin-top: 9px; padding: 10px 16px; color: var(--ui-primary); font-size: 14px; font-weight: 600; border-radius: 12px; }
+.vault-pin-card .vault-pin-feedback { min-height: 0; margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--ui-panel); font-size: 14px; line-height: 1.6; }
+.vault-pin-card #vault-error:not(:empty) { background: var(--ui-error-soft); color: var(--ui-error); }
 .vault-pin-feedback:empty { display: none; }
-.vault-pin-card .vault-pin-note { margin-top: 18px; font-size: 10px; }
+.vault-pin-card .vault-pin-note { margin-top: 18px; font-size: 12px; }
 .vault-pin-card .vault-security-note { text-align: left; }
 .vault-pin-card .vault-form { text-align: left; }
 .vault-pin-card [hidden] { display: none !important; }
@@ -567,6 +577,11 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
   .vault-keypad { gap: 10px 12px; }
   .vault-pin-key { width: 64px; height: 64px; }
 }
+@media (max-height: 740px) {
+  .vault-keypad { gap: 10px 16px; }
+  .vault-pin-key { width: 64px; height: 64px; }
+  .vault-pin-indicators { margin-top: 12px; margin-bottom: 12px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .vault-pin-dot, .vault-pin-key { transition: none; }
   .vault-pin-shake { animation: none; }
@@ -574,11 +589,26 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 
 /* An introduction leads into four setup steps in the shared 430px app shell. */
 .onboarding-wizard {
-  min-width: 0; min-height: calc(100svh - var(--vault-bar-height));
+  min-width: 0; min-height: calc(100svh - var(--ui-shell-top-inset, var(--vault-bar-height)));
   background: var(--ui-surface); color: var(--ui-text);
 }
 .onboarding-wizard :where(h1, h2, p, label, strong) { overflow-wrap: anywhere; }
 .onboarding-header { background: var(--ui-surface); }
+.onboarding-step-label { margin: 16px 0 8px; font-size: 14px; line-height: 1.5; font-weight: 700; color: var(--ui-primary); }
+.onboarding-step-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.onboarding-step-list li { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; color: var(--ui-muted); font-size: 12px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+.onboarding-step-number { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; border: 1px solid var(--ui-control-border); background: var(--ui-panel); font-weight: 700; }
+.onboarding-step-number .material-symbols-outlined { font-size: 16px; }
+.onboarding-step-list [aria-current="step"] { color: var(--ui-primary); font-weight: 700; }
+.onboarding-step-list [aria-current="step"] .onboarding-step-number { background: var(--ui-action); border-color: var(--ui-action); color: var(--ui-on-action); }
+.onboarding-step-list .is-complete .onboarding-step-number { background: var(--ui-primary-soft); border-color: var(--ui-primary); color: var(--ui-primary); }
+.onboarding-intro-features > li { padding: 16px; border: 1px solid var(--ui-border); border-radius: 20px; background: var(--ui-card); }
+.onboarding-intro-features :where(h2, p), .onboarding-info p { font-size: 14px; line-height: 1.6; }
+.onboarding-error-summary { margin-bottom: 20px; padding: 16px; border: 1px solid var(--ui-error); border-radius: 16px; color: var(--ui-error); background: var(--ui-error-soft); scroll-margin-top: calc(var(--vault-bar-height) + 16px); }
+.onboarding-error-summary[hidden] { display: none; }
+.onboarding-error-summary:focus { outline: 2px solid var(--ui-error); outline-offset: 3px; }
+.onboarding-error-summary ul { margin-top: 8px; }
+.onboarding-error-summary a { display: block; min-height: 44px; padding: 8px 0; font-size: 14px; line-height: 1.5; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
 .onboarding-brand, .onboarding-step, .onboarding-secondary { color: var(--ui-primary); }
 .onboarding-muted { color: var(--ui-muted); }
 .onboarding-back { background: var(--ui-card); }
@@ -588,25 +618,33 @@ html.ui-dialog-open, html.ui-dialog-open body { overflow: hidden; overscroll-beh
 .onboarding-card, .onboarding-choice {
   background: var(--ui-card); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow);
 }
+.onboarding-choices { min-width: 0; }
+.onboarding-card > div > label, .onboarding-card legend { font-size: 14px; line-height: 1.5; }
+.onboarding-estimate p, .onboarding-program-card p { font-size: 14px; line-height: 1.6; }
 .onboarding-choice {
-  min-height: 88px; color: var(--ui-text);
+  position: relative; min-height: 88px; color: var(--ui-text); cursor: pointer;
   transition: border-color var(--ui-motion-duration), background var(--ui-motion-duration), transform var(--ui-motion-duration);
 }
-.onboarding-choice:hover { background: var(--ui-panel); }
-.onboarding-choice:active { transform: scale(0.99); }
-.onboarding-choice.is-selected { border-color: var(--ui-primary); background: var(--ui-primary-soft); box-shadow: inset 0 0 0 1px var(--ui-primary); }
-.onboarding-choice.is-selected .onboarding-choice-icon { background: var(--ui-card); }
-.onboarding-choice-check { color: var(--ui-border); }
-.onboarding-choice.is-selected .onboarding-choice-check { color: var(--ui-primary); }
+@media (hover: hover) { .onboarding-choice:not(:has(input:disabled)):hover { background: var(--ui-panel); } }
+.onboarding-choice:not(:has(input:disabled)):active { transform: scale(0.99); }
+.onboarding-choice:has(input:checked) { border-color: var(--ui-primary); background: var(--ui-primary-soft); box-shadow: inset 0 0 0 1px var(--ui-primary); }
+.onboarding-choice:has(input:checked) .onboarding-choice-icon { background: var(--ui-card); }
+.onboarding-choice:has(input:focus-visible) { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+.onboarding-choice:has(input[aria-invalid="true"]) { border-color: var(--ui-error); }
+.onboarding-choice:has(input:disabled) { opacity: 0.6; cursor: not-allowed; }
+.onboarding-choice-check { color: var(--ui-control-border); display: flex; }
+.onboarding-choice:has(input:checked) .onboarding-choice-check { color: var(--ui-primary); }
+.onboarding-choice:has(input:checked) .onboarding-check-empty, .onboarding-choice:not(:has(input:checked)) .onboarding-check-selected { display: none; }
 .onboarding-input { font-variant-numeric: tabular-nums; }
 .onboarding-input-unit { color: var(--ui-muted); pointer-events: none; }
 .onboarding-input[aria-invalid="true"] { border-color: var(--ui-error); }
-.onboarding-sex-choice { min-height: 48px; cursor: pointer; color: var(--ui-text); background: var(--ui-panel); border: 1px solid var(--ui-border); }
+.onboarding-sex-choice { min-height: 48px; cursor: pointer; color: var(--ui-text); background: var(--ui-panel); border: 1px solid var(--ui-control-border); font-size: 14px; }
 .onboarding-sex-choice:has(input:checked) { background: var(--ui-primary-soft); border-color: var(--ui-primary); color: var(--ui-primary); box-shadow: inset 0 0 0 1px var(--ui-primary); }
 .onboarding-sex-choice:has(input:focus-visible) { outline: 2px solid var(--ui-primary); outline-offset: 3px; }
 .onboarding-sex-choice:has(input:disabled) { opacity: 0.6; cursor: wait; }
-.onboarding-field-error { color: var(--ui-error); font-size: 12px; line-height: 1.6; margin-top: 8px; }
-.onboarding-error { color: var(--ui-error); }
+.onboarding-field-error { color: var(--ui-error); font-size: 14px; line-height: 1.6; margin-top: 8px; }
+.onboarding-macros :where(dt, dd) { overflow-wrap: anywhere; }
+.onboarding-error { color: var(--ui-error); font-size: 14px; }
 .onboarding-info { color: var(--ui-primary-label); background: var(--ui-primary-soft); }
 .onboarding-target-card {
   border: 1px solid var(--ui-border); background: linear-gradient(140deg, var(--ui-card), var(--ui-primary-soft));

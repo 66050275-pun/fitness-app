@@ -8,6 +8,7 @@ import { getObjective, getOnboardingEnergyEstimate, getOnboardingTargets, getOnb
 let completing = false;
 let privacyBlocked = false;
 let operation = 0;
+let validationStep: number | null = null;
 const FIELD_IDS: Record<string, string> = {
   ageYears: 'onboarding-age', heightCm: 'onboarding-height-cm', currentWeightKg: 'onboarding-current-weight',
   targetWeightKg: 'onboarding-target-weight', calorieOverride: 'onboarding-calories',
@@ -41,16 +42,22 @@ function captureCalories(): void {
   if (store.getState().onboardingState.currentStep === 4 && document.getElementById('onboarding-calories'))
     store.updateOnboardingDraft({ calorieOverride: readNumber('onboarding-calories') }, false);
 }
-function setText(id: string, text: string): void { const element = document.getElementById(id); if (element) element.textContent = text; }
+function setText(id: string, text: string): void {
+  const element = document.getElementById(id);
+  if (element && element.textContent !== text) element.textContent = text;
+}
 function setBusyControls(): void {
   const root = document.querySelector<HTMLElement>('.onboarding-wizard');
   if (!root) return;
   root.setAttribute('aria-busy', String(completing));
+  document.getElementById('onboarding-next')?.setAttribute('aria-busy', String(completing));
   for (const control of root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input, button, select'))
     control.disabled = completing || privacyBlocked || (pendingConfirmation() && control.id !== 'onboarding-next');
 }
 export function refreshOnboardingFeedback(): void {
   if (!isVaultUnlocked() || store.getState().currentScreen !== 'onboarding') return;
+  const step = store.getState().onboardingState.currentStep;
+  if (validationStep !== step) validationStep = null;
   const draft = store.getState().onboardingDraft;
   const delta = document.getElementById('onboarding-weight-delta');
   if (delta) {
@@ -77,24 +84,82 @@ export function refreshOnboardingFeedback(): void {
   if (!completing) setText('onboarding-next-label', tr(pendingConfirmation() ? 'Retry setup save'
     : store.getState().onboardingState.currentStep === 0 ? 'Let’s set your goals'
       : store.getState().onboardingState.currentStep === 4 ? 'Get Started' : 'Continue'));
+  if (validationStep === step) renderErrors(step);
   setBusyControls();
 }
-function showErrors(step: number): boolean {
+
+const GROUP_SELECTORS: Record<string, string> = {
+  primaryObjective: 'input[name="onboarding-objective"]',
+  biologicalSex: 'input[name="onboarding-sex"]',
+  activityLevel: 'input[name="onboarding-activity"]',
+};
+function errorTarget(field: string): HTMLElement | null {
+  return FIELD_IDS[field] ? document.getElementById(FIELD_IDS[field])
+    : GROUP_SELECTORS[field] ? document.querySelector<HTMLElement>(GROUP_SELECTORS[field]) : null;
+}
+function focusError(field: string): void {
+  if (!canEdit()) return;
+  const currentStep = store.getState().onboardingState.currentStep;
+  const step = field === 'primaryObjective' ? 1 : field === 'activityLevel' ? 3 : field === 'calorieOverride' ? 4 : 2;
+  if (step > currentStep) return;
+  const focus = () => {
+    if (!canEdit() || store.getState().onboardingState.currentStep !== step) return;
+    const target = errorTarget(field);
+    target?.focus({ preventScroll: true });
+    (target?.closest('label') ?? target)?.scrollIntoView({ block: 'center', behavior: 'auto' });
+  };
+  if (step !== currentStep) {
+    validationStep = step;
+    store.setOnboardingStep(step);
+    requestAnimationFrame(focus);
+  } else focus();
+}
+/** Inline errors stay beside fields; a submitted form also gets a linked summary. */
+function renderErrors(step: number): boolean {
   const errors = validateOnboardingDraft(store.getState().onboardingDraft, step);
-  document.querySelectorAll<HTMLElement>('[id^="onboarding-error-"]').forEach(element => { element.textContent = ''; });
+  const errorFields = new Set(errors.map(error => error.field));
+  for (const field of [...Object.keys(FIELD_IDS), ...Object.keys(GROUP_SELECTORS)]) {
+    setText(`onboarding-error-${field}`, errors.find(error => error.field === field)?.message ?? '');
+  }
   for (const [field, id] of Object.entries(FIELD_IDS)) document.getElementById(id)?.setAttribute('aria-invalid', String(errors.some(error => error.field === field)));
-  for (const error of errors) setText(`onboarding-error-${error.field}`, error.message);
-  setText('onboarding-error', errors[0]?.message ?? '');
-  if (errors[0]) {
-    const input = document.getElementById(FIELD_IDS[errors[0].field]);
-    (input ?? document.getElementById('onboarding-error'))?.focus({ preventScroll: false });
+  for (const [field, selector] of Object.entries(GROUP_SELECTORS)) {
+    document.querySelectorAll(selector).forEach(input => input.setAttribute('aria-invalid', String(errorFields.has(field))));
+  }
+  const summary = document.getElementById('onboarding-error-summary');
+  const list = document.getElementById('onboarding-error-list');
+  if (summary && list) {
+    summary.hidden = errors.length === 0;
+    const links = Array.from(list.querySelectorAll<HTMLAnchorElement>('a'));
+    const unchanged = errors.length === links.length && errors.every((error, index) =>
+      links[index].dataset.onboardingField === error.field && links[index].textContent === error.message);
+    if (!unchanged) list.replaceChildren(...errors.map(error => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `#${errorTarget(error.field)?.id ?? 'onboarding-main'}`;
+      link.textContent = error.message;
+      link.dataset.onboardingField = error.field;
+      link.addEventListener('click', event => { event.preventDefault(); focusError(error.field); });
+      item.append(link);
+      return item;
+    }));
   }
   return errors.length > 0;
+}
+function showErrors(step: number): boolean {
+  validationStep = step;
+  setText('onboarding-error', '');
+  const invalid = renderErrors(step);
+  if (invalid) {
+    const summary = document.getElementById('onboarding-error-summary');
+    summary?.focus({ preventScroll: true });
+    summary?.scrollIntoView({ block: 'start', behavior: 'auto' });
+  }
+  return invalid;
 }
 
 /** Main binds these globals once; rendered buttons use the existing application event convention. */
 export function bindOnboardingHandlers(): void {
-  document.addEventListener('nutriai:lock-start', () => { privacyBlocked = true; operation++; setBusyControls(); });
+  document.addEventListener('nutriai:lock-start', () => { privacyBlocked = true; validationStep = null; operation++; setBusyControls(); });
   document.addEventListener('nutriai:lock-end', () => {
     privacyBlocked = false;
     if (isVaultUnlocked()) refreshOnboardingFeedback();

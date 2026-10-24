@@ -7,6 +7,7 @@ import type { OnboardingTargetPreview } from '../../utils/onboardingGoals';
 import type { OnboardingDraft } from '../../types/index.ts';
 
 const STEP_COUNT = 4;
+const STEP_LABELS = ['Objective', 'Body metrics', 'Activity', 'Review'] as const;
 
 /** Screen motion is owned by ScreenTransitions; edits never remount the wizard. */
 function shell(content: string, step: number): string {
@@ -22,13 +23,22 @@ function shell(content: string, step: number): string {
         <div class="flex items-center justify-between gap-3">
           ${step > 0 || canExit ? `<button id="onboarding-back" type="button" onclick="${backAction}" ${savePending ? 'disabled' : ''} class="ui-icon-button onboarding-back" aria-label="${trHtml(backLabel)}"><span class="material-symbols-outlined" aria-hidden="true">arrow_back</span></button>` : '<span class="onboarding-brand-mark inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined" aria-hidden="true">nutrition</span></span>'}
           <div class="min-w-0 flex-1"><span class="onboarding-brand block font-heading text-lg font-extrabold">NutriAI</span><p class="onboarding-muted text-xs mt-0.5">${trHtml('Personalize your goals')}</p></div>
-          <span class="onboarding-step text-xs font-bold shrink-0">${progressLabel}</span>
         </div>
-        <div class="onboarding-progress grid grid-cols-4 gap-2 mt-5" role="progressbar" aria-valuemin="0" aria-valuemax="${STEP_COUNT}" aria-valuenow="${step}" aria-label="${progressLabel}">
-          ${Array.from({ length: STEP_COUNT }, (_, index) => `<span class="h-1.5 rounded-full ${index < step ? 'onboarding-progress-filled' : 'onboarding-progress-empty'}"></span>`).join('')}
+        <p class="onboarding-step-label">${progressLabel}</p>
+        <div class="onboarding-progress grid grid-cols-4 gap-2" role="progressbar" aria-valuemin="0" aria-valuemax="${STEP_COUNT}" aria-valuenow="${step}" aria-valuetext="${progressLabel}" aria-label="${trHtml('Setup progress')}">
+          ${Array.from({ length: STEP_COUNT }, (_, index) => `<span class="h-1.5 rounded-full ${index < step ? 'onboarding-progress-filled' : 'onboarding-progress-empty'}" aria-hidden="true"></span>`).join('')}
         </div>
+        <ol class="onboarding-step-list" aria-label="${trHtml('Setup steps')}">
+          ${STEP_LABELS.map((label, index) => `<li ${step === index + 1 ? 'aria-current="step"' : ''} class="${index + 1 < step ? 'is-complete' : ''}"><span class="onboarding-step-number" aria-hidden="true">${index + 1 < step ? '<span class="material-symbols-outlined">check</span>' : index + 1}</span><span>${trHtml(label)}</span></li>`).join('')}
+        </ol>
       </header>
-      <main class="onboarding-main flex-1 px-screen-gutter pb-3">${content}</main>
+      <main id="onboarding-main" class="onboarding-main flex-1 px-screen-gutter pb-3">
+        <section id="onboarding-error-summary" class="onboarding-error-summary" tabindex="-1" aria-labelledby="onboarding-error-title" hidden>
+          <p id="onboarding-error-title" class="font-heading font-bold">${trHtml('Check your details')}</p>
+          <ul id="onboarding-error-list"></ul>
+        </section>
+        ${content}
+      </main>
       <footer id="onboarding-actions" class="onboarding-footer px-screen-gutter pt-3 pb-5">
         <p id="onboarding-error" class="onboarding-error text-xs leading-relaxed empty:hidden mb-3" tabindex="-1" role="alert" aria-live="polite"></p>
         <button id="onboarding-next" type="button" onclick="window.onboardingNext()" class="ui-primary-button flex items-center justify-center gap-2">
@@ -40,7 +50,7 @@ function shell(content: string, step: number): string {
 }
 
 function heading(title: string, description: string): string {
-  return `<div class="mb-6 pt-2"><h1 class="font-heading text-[26px] leading-tight font-extrabold" tabindex="-1">${trHtml(title)}</h1><p class="onboarding-muted mt-2 text-sm leading-relaxed">${trHtml(description)}</p></div>`;
+  return `<div class="onboarding-heading mb-6 pt-2"><h1 class="font-heading text-[26px] leading-snug font-extrabold" tabindex="-1">${trHtml(title)}</h1><p class="onboarding-muted mt-2 text-base leading-relaxed">${trHtml(description)}</p></div>`;
 }
 
 /** Original, bundled vector artwork; no external assets or requests on first launch. */
@@ -71,7 +81,7 @@ function renderIntroduction(): string {
       </svg>
     </div>
     ${heading('Welcome to NutriAI', 'Your food, fitness and progress, in one place.')}
-    <ul class="onboarding-intro-features space-y-4 mb-5">
+    <ul class="onboarding-intro-features space-y-3 mb-5">
       ${features.map(item => `<li class="flex items-start gap-3"><span class="onboarding-choice-icon inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"><span class="material-symbols-outlined text-xl" aria-hidden="true">${item.icon}</span></span><div class="min-w-0 pt-0.5"><h2 class="text-sm font-bold leading-relaxed">${trHtml(item.title)}</h2><p class="onboarding-muted text-xs mt-0.5 leading-relaxed">${trHtml(item.description)}</p></div></li>`).join('')}
     </ul>
     <p class="onboarding-muted text-xs leading-relaxed mb-3">${trHtml('Four simple steps, one personal starting plan.')}</p>
@@ -82,15 +92,35 @@ function renderObjective(): string {
   const selected = store.getState().onboardingDraft.primaryObjective;
   return shell(`
     ${heading('Choose your fitness objective', 'A clear starting point for your nutrition and training.')}
-    <div class="space-y-3" role="radiogroup" aria-label="${trHtml('Choose your fitness objective')}">
-      ${ONBOARDING_OBJECTIVES.map(item => `
-        <button type="button" role="radio" aria-checked="${selected === item.id}" onclick="window.selectOnboardingObjective(${htmlJsArg(item.id)})" class="onboarding-choice ${selected === item.id ? 'is-selected' : ''} flex w-full items-center gap-3 rounded-2xl p-4 text-left">
-          <span class="onboarding-choice-icon inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">${escapeHtml(item.icon)}</span></span>
-          <span class="min-w-0 flex-1"><strong class="block font-heading text-sm leading-relaxed">${trHtml(item.title)}</strong>${item.id === 'mini_cut' || item.id === 'lean_bulk' ? `<span class="onboarding-program-badge inline-block mt-1 rounded-full px-2 py-0.5 text-[10px] font-bold">${trHtml('Special Program')}</span>` : ''}<span class="onboarding-muted block mt-1 text-xs leading-relaxed">${trHtml(item.description)}</span></span>
-          <span class="onboarding-choice-check material-symbols-outlined text-xl shrink-0" aria-hidden="true">${selected === item.id ? 'check_circle' : 'radio_button_unchecked'}</span>
-        </button>`).join('')}
-    </div>
+    <fieldset class="onboarding-choices space-y-3" aria-describedby="onboarding-error-primaryObjective">
+      <legend class="sr-only">${trHtml('Choose your fitness objective')}</legend>
+      ${ONBOARDING_OBJECTIVES.map(item => renderChoice(item, 'objective', selected)).join('')}
+    </fieldset>
     <p id="onboarding-error-primaryObjective" class="onboarding-field-error empty:hidden" role="alert"></p>`, 1);
+}
+
+interface Choice {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+/** Native radios supply arrow-key selection and keep one selected option per group. */
+function renderChoice(item: Choice, group: 'objective' | 'activity', selected: string | null): string {
+  const handler = group === 'objective' ? 'selectOnboardingObjective' : 'selectOnboardingActivity';
+  const field = group === 'objective' ? 'primaryObjective' : 'activityLevel';
+  return `<label class="onboarding-choice flex w-full items-center gap-3 rounded-2xl p-4 text-left">
+    <input id="onboarding-${group}-${escapeHtml(item.id)}" class="sr-only" type="radio" name="onboarding-${group}"
+      value="${escapeHtml(item.id)}" ${selected === item.id ? 'checked' : ''}
+      onchange="window.${handler}(${htmlJsArg(item.id)})" aria-describedby="onboarding-error-${field}">
+    <span class="onboarding-choice-icon inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">${escapeHtml(item.icon)}</span></span>
+    <span class="min-w-0 flex-1"><strong class="block font-heading text-base leading-relaxed">${trHtml(item.title)}</strong>
+      ${item.id === 'mini_cut' || item.id === 'lean_bulk' ? `<span class="onboarding-program-badge inline-block mt-1 rounded-full px-2 py-0.5 text-xs font-bold">${trHtml('Special Program')}</span>` : ''}
+      <span class="onboarding-muted block mt-1 text-sm leading-relaxed">${trHtml(item.description)}</span>
+    </span>
+    <span class="onboarding-choice-check shrink-0" aria-hidden="true"><span class="material-symbols-outlined onboarding-check-empty">radio_button_unchecked</span><span class="material-symbols-outlined onboarding-check-selected">check_circle</span></span>
+  </label>`;
 }
 
 interface NumericFieldOptions {
@@ -108,15 +138,17 @@ interface NumericFieldOptions {
 
 function numericField(options: NumericFieldOptions): string {
   const { id, field, label, value, min, max, step = '0.1', unit, optional = false, help } = options;
-  const describedBy = `onboarding-error-${field}${help ? ` ${id}-help` : ''}`;
+  const describedBy = `${id}-help onboarding-error-${field}`;
+  const rangeHelp = field === 'calorieOverride' ? trHtml('Use whole calories per day.')
+    : trHtml('Range: {0}–{1} {2}', formatDisplayNumber(min, 0), formatDisplayNumber(max, 0), tr(unit ?? ''));
   return `
     <div class="min-w-0">
-      <label for="${id}" class="block text-xs font-bold leading-relaxed">${trHtml(label)}${optional ? `<span class="onboarding-muted font-normal"> ${trHtml('(optional)')}</span>` : ''}</label>
+      <label for="${id}" class="block text-sm font-bold leading-relaxed">${trHtml(label)}${optional ? `<span class="onboarding-muted font-normal"> ${trHtml('(optional)')}</span>` : ''}</label>
       <div class="onboarding-input-wrap relative mt-2">
         <input id="${id}" type="number" inputmode="${step === '1' ? 'numeric' : 'decimal'}" min="${min}" max="${max}" step="${step}" value="${escapeHtml(value ?? '')}" oninput="window.captureOnboardingInput(this)" ${optional ? '' : 'required'} aria-describedby="${describedBy}" class="ui-field onboarding-input w-full px-4 py-3 ${unit ? 'pr-16' : ''}">
         ${unit ? `<span class="onboarding-input-unit absolute right-4 top-1/2 -translate-y-1/2 text-xs" aria-hidden="true">${trHtml(unit)}</span>` : ''}
       </div>
-      ${help ? `<p id="${id}-help" class="onboarding-muted mt-2 text-xs leading-relaxed">${trHtml(help)}</p>` : ''}
+      <p id="${id}-help" class="onboarding-muted mt-2 text-sm leading-relaxed">${rangeHelp}${help ? ` ${trHtml(help)}` : ''}</p>
       <p id="onboarding-error-${field}" class="onboarding-field-error empty:hidden" role="alert"></p>
     </div>`;
 }
@@ -155,14 +187,10 @@ function renderActivity(): string {
   const selected = level === 'athlete' ? 'very_active' : level;
   return shell(`
     ${heading('Your daily movement', 'Think about a typical week, including work and workouts.')}
-    <div class="space-y-3" role="radiogroup" aria-label="${trHtml('Your daily movement')}">
-      ${ONBOARDING_ACTIVITIES.map(item => `
-        <button type="button" role="radio" aria-checked="${selected === item.id}" onclick="window.selectOnboardingActivity(${htmlJsArg(item.id)})" class="onboarding-choice ${selected === item.id ? 'is-selected' : ''} flex w-full items-center gap-3 rounded-2xl p-4 text-left">
-          <span class="onboarding-choice-icon inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">${escapeHtml(item.icon)}</span></span>
-          <span class="min-w-0 flex-1"><strong class="block font-heading text-sm leading-relaxed">${trHtml(item.title)}</strong><span class="onboarding-muted block mt-1 text-xs leading-relaxed">${trHtml(item.description)}</span></span>
-          <span class="onboarding-choice-check material-symbols-outlined text-xl shrink-0" aria-hidden="true">${selected === item.id ? 'check_circle' : 'radio_button_unchecked'}</span>
-        </button>`).join('')}
-    </div>
+    <fieldset class="onboarding-choices space-y-3" aria-describedby="onboarding-error-activityLevel">
+      <legend class="sr-only">${trHtml('Your daily movement')}</legend>
+      ${ONBOARDING_ACTIVITIES.map(item => renderChoice(item, 'activity', selected)).join('')}
+    </fieldset>
     <p id="onboarding-error-activityLevel" class="onboarding-field-error empty:hidden" role="alert"></p>`, 3);
 }
 
@@ -206,9 +234,9 @@ function renderReview(): string {
       ${objective ? `<span class="onboarding-objective-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold mb-4"><span class="material-symbols-outlined text-base" aria-hidden="true">${escapeHtml(objective.icon)}</span>${trHtml(objective.title)}</span>` : ''}
       <p class="onboarding-muted text-sm font-medium">${trHtml('Daily calorie target')}</p>
       <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 mt-1"><strong id="onboarding-summary-calories" class="onboarding-calories font-heading text-[42px] leading-tight font-extrabold tabular-nums">${formatDisplayNumber(goals?.calorieTarget, 0)}</strong><span class="onboarding-muted text-sm">${trHtml('kcal/day')}</span></div>
-      <div class="onboarding-macros grid grid-cols-3 gap-2 mt-5 pt-4">
-        ${([{ id: 'protein', label: 'Protein', value: goals?.proteinTarget }, { id: 'carbs', label: 'Carbs', value: goals?.carbsTarget }, { id: 'fat', label: 'Fat', value: goals?.fatTarget }]).map(item => `<div class="min-w-0"><p class="onboarding-muted text-xs">${trHtml(item.label)}</p><p class="font-heading mt-1 text-lg font-extrabold tabular-nums"><span id="onboarding-summary-${item.id}">${formatDisplayNumber(item.value, 0)}</span> <span class="text-xs font-medium">${trHtml('g')}</span></p></div>`).join('')}
-      </div>
+      <dl class="onboarding-macros grid grid-cols-3 gap-2 mt-5 pt-4">
+        ${([{ id: 'protein', label: 'Protein', value: goals?.proteinTarget }, { id: 'carbs', label: 'Carbs', value: goals?.carbsTarget }, { id: 'fat', label: 'Fat', value: goals?.fatTarget }]).map(item => `<div class="min-w-0"><dt class="onboarding-muted text-sm">${trHtml(item.label)}</dt><dd class="font-heading mt-1 text-xl font-extrabold tabular-nums"><span id="onboarding-summary-${item.id}">${formatDisplayNumber(item.value, 0)}</span> <span class="text-sm font-medium">${trHtml('g')}</span></dd></div>`).join('')}
+      </dl>
     </section>
     ${renderProgramDetails(draft, result)}
     <section class="onboarding-card mt-3 p-4 rounded-2xl flex items-center gap-3">
