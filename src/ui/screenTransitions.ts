@@ -1,5 +1,6 @@
 import type { AppState } from '../types/index.ts';
 import { Dialogs } from './dialogs.ts';
+import { NavigationLayout } from './navigationLayout.ts';
 
 type Route = { key: string; root: string; depth: number };
 function routeFor(state: AppState): Route {
@@ -21,6 +22,7 @@ function routeFor(state: AppState): Route {
 /** Animate only the newly mounted view. No screenshots or previous private DOM are retained. */
 export class ScreenTransitions {
   private dialogs = new Dialogs();
+  private navigation = new NavigationLayout();
   private current: Route | null = null;
   private history: string[] = [];
   private scrollPositions = new Map<string, number>();
@@ -38,6 +40,7 @@ export class ScreenTransitions {
   private cancel() { this.animations.forEach(animation => animation.cancel()); this.animations = []; }
   reset() {
     this.dialogs.reset();
+    this.navigation.reset();
     this.cancel(); this.current = null; this.history = []; this.scrollPositions.clear();
     this.screenHtml = ''; this.navigationHtml = ''; this.overlaysHtml = '';
   }
@@ -87,7 +90,12 @@ export class ScreenTransitions {
       }
     }
     const nav = app.querySelector<HTMLElement>('#app-navigation')!;
-    if (navigationHtml !== this.navigationHtml) { nav.innerHTML = navigationHtml; this.navigationHtml = navigationHtml; }
+    if (navigationHtml !== this.navigationHtml) {
+      const focusedId = nav.contains(document.activeElement) ? (document.activeElement as HTMLElement).id : '';
+      nav.innerHTML = navigationHtml; this.navigationHtml = navigationHtml;
+      if (!changed && !state.quickAddOpen && focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
+    }
+    this.navigation.sync(app);
     const overlays = app.querySelector<HTMLElement>('#app-overlays')!;
     if (overlaysHtml !== this.overlaysHtml) { overlays.innerHTML = overlaysHtml; this.overlaysHtml = overlaysHtml; }
     this.dialogs.sync(changed);

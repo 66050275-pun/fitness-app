@@ -1,6 +1,7 @@
 import { tr, trHtml } from '../../i18n/index.ts';
 import { formatFriendlyDate, getTodayKey } from '../../utils/dateUtils.ts';
 import { htmlJsArg, escapeHtml } from '../../utils/sanitize.ts';
+import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
 
 export interface AppHeaderState {
   userProfile?: { displayName?: string | null } | null;
@@ -11,136 +12,88 @@ export interface AppHeaderState {
 }
 
 export interface AppHeaderOptions {
-  /** Application state subset required by AppHeader */
   state: AppHeaderState;
-
-  /**
-   * Subtitle display variant:
-   * - 'dashboard': friendly date + "(Show Today)" button when selectedDate != todayKey
-   * - 'diary': friendly date button with chevron down that triggers window.openDiaryCalendar()
-   * - 'default': friendly date text (used by Fitness and Insights)
-   * - 'custom': custom subtitle HTML string passed via customSubtitleHtml
-   */
+  /** The diary variant opens its calendar; dashboard can return to today. */
   subtitleType?: 'default' | 'dashboard' | 'diary' | 'custom';
-
-  /** Custom subtitle HTML if subtitleType is 'custom' */
+  /** Trusted, app-owned markup only. */
   customSubtitleHtml?: string;
-
-  /**
-   * Whether to display the Quick Add (+) action button.
-   * Defaults to true, set to false for Fitness screen.
-   */
   showQuickAdd?: boolean;
-
-  /**
-   * Override date key (defaults to state.selectedDate)
-   */
   selectedDate?: string;
-
-  /**
-   * Custom aria-label for the Quick Add button
-   */
   quickAddAriaLabel?: string;
 }
 
-/**
- * Shared Top App Bar Header Component for Dashboard, Fitness, Diary, and Insights.
- * 
- * Includes:
- * - User Avatar with flame streak badge (clicking navigates to Profile)
- * - Greeting title ("Good morning, {name}")
- * - Contextual date / subtitle controls
- * - Theme toggle button (Dark / Light)
- * - Quick Add action button (optional, hidden on Fitness)
- */
-export function renderAppHeader(options: AppHeaderOptions): string {
-  const { state } = options;
-  const selectedDate = options.selectedDate || state.selectedDate || getTodayKey();
-  const showQuickAdd = options.showQuickAdd ?? true;
-  const quickAddAriaLabel = options.quickAddAriaLabel || tr("Add meal or exercise");
-  const streakDays = state.streakDays ?? 0;
-
-  // User Display Info & Initials
-  const displayName = state.userProfile?.displayName?.trim() || '';
-  const nameParts = displayName.split(/\s+/).filter(Boolean);
-  const initials = nameParts.length > 1
-    ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
-    : (nameParts[0]?.slice(0, 2).toUpperCase() || 'NA');
-  const greeting = displayName ? tr("Good morning, {0}", escapeHtml(displayName)) : tr("Good morning");
-
-  // Subtitle markup
-  let subtitleHtml = '';
+function renderSubtitle(options: AppHeaderOptions, selectedDate: string): string {
+  const date = escapeHtml(formatFriendlyDate(selectedDate));
   switch (options.subtitleType) {
     case 'dashboard': {
       const todayKey = getTodayKey();
-      const isToday = selectedDate === todayKey;
-      subtitleHtml = `
-        <p class="text-xs text-on-surface-variant dark:text-gray-400 flex items-center gap-1.5">
-          <span>${formatFriendlyDate(selectedDate)}</span>
-          ${!isToday ? `
-            <button onclick="window.selectDate(${htmlJsArg(todayKey)})" class="text-primary font-bold hover:underline">
-              ${trHtml("(Show Today)")}
-            </button>
-          ` : ''}
-        </p>
-      `.trim();
-      break;
+      return `<div class="app-header-date-row">
+        <p class="app-header-date-text">${date}</p>
+        ${selectedDate !== todayKey ? `<button id="app-header-today" type="button"
+          onclick="window.selectDate(${htmlJsArg(todayKey)})" class="app-header-date-action">${trHtml('Show today')}</button>` : ''}
+      </div>`;
     }
-    case 'diary': {
-      subtitleHtml = `
-        <button type="button" onclick="window.openDiaryCalendar()" class="flex items-center gap-1 text-xs text-on-surface-variant dark:text-gray-400 hover:text-primary text-left group transition-colors focus:outline-none" aria-label="${trHtml("Choose diary date")}">
-          <span>${formatFriendlyDate(selectedDate)}</span>
-          <span class="material-symbols-outlined text-[14px] text-primary">expand_more</span>
-        </button>
-      `.trim();
-      break;
-    }
-    case 'custom': {
-      subtitleHtml = options.customSubtitleHtml || '';
-      break;
-    }
-    case 'default':
-    default: {
-      subtitleHtml = `<p class="text-xs text-on-surface-variant dark:text-gray-400">${formatFriendlyDate(selectedDate)}</p>`;
-      break;
-    }
+    case 'diary':
+      return `<button id="app-header-date" type="button" onclick="window.openDiaryCalendar()"
+        class="app-header-date-action app-header-calendar" aria-label="${trHtml('Choose diary date')}">
+        <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+        <span>${date}</span>
+        <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+      </button>`;
+    case 'custom':
+      return options.customSubtitleHtml || '';
+    default:
+      return `<p class="app-header-date-text">${date}</p>`;
   }
+}
+
+/** Shared, wrapping header for Dashboard, Diary, Fitness and Insights. */
+export function renderAppHeader(options: AppHeaderOptions): string {
+  const { state } = options;
+  const selectedDate = options.selectedDate || state.selectedDate || getTodayKey();
+  const displayName = state.userProfile?.displayName?.trim() || '';
+  const nameParts = displayName.split(/\s+/).filter(Boolean);
+  const initials = nameParts.length > 1
+    ? `${Array.from(nameParts[0])[0]}${Array.from(nameParts[1])[0]}`.toUpperCase()
+    : (Array.from(nameParts[0] || '').slice(0, 2).join('').toUpperCase() || 'NA');
+  const rawStreak = state.streakDays ?? 0;
+  const streakDays = Number.isFinite(rawStreak) ? Math.max(0, Math.floor(rawStreak)) : 0;
+  const hour = new Date().getHours();
+  const greetingKey = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greeting = displayName ? trHtml(`${greetingKey}, {0}`, displayName) : trHtml(greetingKey);
+  const themeAction = state.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+  const addLabel = options.quickAddAriaLabel || tr('Add meal or exercise');
 
   return `
-      <!-- Top App Bar -->
-      <header class="sticky top-0 z-40 bg-surface/90 dark:bg-dark-surface/90 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex justify-between items-center border-b border-outline-variant/20">
-        <div class="flex items-center gap-3">
-          <!-- Leading Avatar with Streak Badge -->
-          <div class="relative cursor-pointer" onclick="window.navigateApp('profile')" aria-label="${trHtml("Open Profile")}">
-            <div class="w-11 h-11 overflow-hidden rounded-full border-2 border-primary/40 shadow-sm bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center font-heading font-extrabold text-xs">
-              ${state.profileImageUrl ? `<img src="${escapeHtml(state.profileImageUrl)}" class="w-full h-full object-cover" alt="${trHtml("Profile photo")}">` : `<span>${escapeHtml(initials)}</span>`}
-            </div>
-            <!-- Streak Flame Badge -->
-            <div class="absolute -bottom-1 -right-1 bg-surface-container-lowest dark:bg-dark-surface-card px-1.5 py-0.5 rounded-full border border-outline-variant/30 shadow-sm flex items-center gap-0.5">
-              <span class="material-symbols-outlined text-[#FF6B00] text-[12px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
-              <span class="text-[10px] font-bold text-[#FF6B00] leading-none">${streakDays}d</span>
-            </div>
-          </div>
-          <div>
-            <h1 class="font-heading font-bold text-base text-on-surface dark:text-white leading-snug">${greeting}</h1>
-            ${subtitleHtml}
-          </div>
+    <header class="app-header sticky top-0">
+      <div class="app-header-top">
+        <button id="app-header-profile" type="button" class="app-header-profile"
+          onclick="window.navigateApp('profile')" aria-label="${trHtml('Open Profile')}">
+          <span class="app-header-avatar" aria-hidden="true">
+            ${state.profileImageUrl
+              ? `<img src="${escapeHtml(state.profileImageUrl)}" width="48" height="48" alt="">`
+              : escapeHtml(initials)}
+          </span>
+        </button>
+        <div class="app-header-identity">
+          <h1 class="app-header-title">${greeting}</h1>
+          ${streakDays > 0 ? `<p class="app-header-streak">
+            <span class="material-symbols-outlined" aria-hidden="true">local_fire_department</span>
+            <span>${trHtml('{0} day streak', formatDisplayNumber(streakDays, 0))}</span>
+          </p>` : ''}
         </div>
-
-        <!-- Trailing Actions -->
-        <div class="flex items-center gap-2">
-          <!-- Dark Mode Toggle -->
-          <button onclick="window.toggleTheme()" class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all" aria-label="${trHtml("Toggle theme")}">
-            <span class="material-symbols-outlined text-[18px]">${state.theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+        <div class="app-header-actions">
+          <button id="app-header-theme" type="button" onclick="window.toggleTheme()"
+            class="ui-icon-button" aria-label="${trHtml(themeAction)}" title="${trHtml(themeAction)}">
+            <span class="material-symbols-outlined" aria-hidden="true">${state.theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
           </button>
-          
-          ${showQuickAdd ? `
-          <!-- Quick Add Modal -->
-          <button onclick="window.toggleQuickActions(true)" class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all relative" aria-label="${escapeHtml(quickAddAriaLabel)}">
-            <span class="material-symbols-outlined text-[18px]">add</span>
-          </button>
-          ` : ''}
+          ${(options.showQuickAdd ?? true) ? `<button id="app-header-add" type="button"
+            onclick="window.toggleQuickActions(true)" class="ui-icon-button" aria-haspopup="dialog"
+            aria-label="${escapeHtml(addLabel)}">
+            <span class="material-symbols-outlined" aria-hidden="true">add</span>
+          </button>` : ''}
         </div>
-      </header>
-  `.trim();
+      </div>
+      <div class="app-header-subtitle">${renderSubtitle(options, selectedDate)}</div>
+    </header>`;
 }
