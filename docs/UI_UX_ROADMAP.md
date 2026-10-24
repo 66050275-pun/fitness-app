@@ -13,8 +13,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | Part | Area | Reviewable scope | Status |
 | --- | --- | --- | --- |
 | 1/10 | Shared design foundations | Central semantic theme tokens; consistent primary actions, icon controls and fields; initial adoption in vault/onboarding/Quick Add | Approved and merged: [PR #11](https://github.com/66050275-pun/fitness-app/pull/11) |
-| 2/10 | App shell and navigation | Shared header, bottom navigation, readable labels, touch targets and clearance for fixed controls | Prepared for review |
-| 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Planned |
+| 2/10 | App shell and navigation | Shared header, bottom navigation, readable labels, touch targets and clearance for fixed controls | Approved and merged: [PR #12](https://github.com/66050275-pun/fitness-app/pull/12) |
+| 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Prepared for review |
 | 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Planned |
 | 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Planned |
 | 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Planned |
@@ -45,4 +45,15 @@ Record the PR link and build result for each part as it becomes available. Brows
 
 Part 1: [PR #11](https://github.com/66050275-pun/fitness-app/pull/11) approved and merged to `main` at `84524e2ba29394173e99b4c494c2a30f1c221c0d`. Its tree matches the build-checked version. `npm run build` and `git diff --check` passed; the existing Vite chunk-size warning remains. No automated tests or browser/device checks were run.
 
-Part 2: `npm run build` (TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Phone layout, font scaling, TH/EN labels, keyboard focus, safe areas and Quick Add dismissal still need visual/device review. Publication to `main` is pending approval.
+Part 2: [PR #12](https://github.com/66050275-pun/fitness-app/pull/12) approved and merged at `e00694f8288c99cf267307b252819d1492b44b4f`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run.
+
+Part 3: `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. PIN confirmation/error/lockout/restore flows, native radio keyboard behavior, validation-summary links, save retries and TH/EN layouts still need device review. Publication to `main` is pending approval.
+
+## Part 3 details
+
+- Compact the PIN gate header; clarify creation/confirmation steps and automatic six-digit submission. Keep the numeric keypad, existing cryptographic functions, lockouts, migration and encrypted restore flow.
+- Improve typography, keypad boundaries, short-screen key sizing and busy/error/countdown surfaces. Keep the backup file input keyboard reachable and avoid repeated unchanged digit-progress announcements.
+- Add a localized four-step progress list and readable introduction cards, body-metric range help and semantic macro summaries.
+- Replace objective/activity buttons claiming radio roles with native grouped radios and state-based whole-card styling.
+- Add a focusable, linked validation summary alongside existing inline errors. Retain focus during edits and unchanged feedback; clear validation bookkeeping on lock.
+- Preserve goal models, calorie/macro/hydration calculations, validation limits and encrypted save/retry behavior.
