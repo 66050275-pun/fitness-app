@@ -20,7 +20,7 @@ function shell(content: string, step: number): string {
     <div class="onboarding-wizard mx-auto w-full max-w-[430px] flex flex-col font-sans">
       <header class="onboarding-header px-screen-gutter pt-5 pb-4">
         <div class="flex items-center justify-between gap-3">
-          ${step > 0 || canExit ? `<button id="onboarding-back" type="button" onclick="${backAction}" ${savePending ? 'disabled' : ''} class="onboarding-back inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full" aria-label="${trHtml(backLabel)}"><span class="material-symbols-outlined" aria-hidden="true">arrow_back</span></button>` : '<span class="onboarding-brand-mark inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined" aria-hidden="true">nutrition</span></span>'}
+          ${step > 0 || canExit ? `<button id="onboarding-back" type="button" onclick="${backAction}" ${savePending ? 'disabled' : ''} class="ui-icon-button onboarding-back" aria-label="${trHtml(backLabel)}"><span class="material-symbols-outlined" aria-hidden="true">arrow_back</span></button>` : '<span class="onboarding-brand-mark inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"><span class="material-symbols-outlined" aria-hidden="true">nutrition</span></span>'}
           <div class="min-w-0 flex-1"><span class="onboarding-brand block font-heading text-lg font-extrabold">NutriAI</span><p class="onboarding-muted text-xs mt-0.5">${trHtml('Personalize your goals')}</p></div>
           <span class="onboarding-step text-xs font-bold shrink-0">${progressLabel}</span>
         </div>
@@ -113,7 +113,7 @@ function numericField(options: NumericFieldOptions): string {
     <div class="min-w-0">
       <label for="${id}" class="block text-xs font-bold leading-relaxed">${trHtml(label)}${optional ? `<span class="onboarding-muted font-normal"> ${trHtml('(optional)')}</span>` : ''}</label>
       <div class="onboarding-input-wrap relative mt-2">
-        <input id="${id}" type="number" inputmode="${step === '1' ? 'numeric' : 'decimal'}" min="${min}" max="${max}" step="${step}" value="${escapeHtml(value ?? '')}" oninput="window.captureOnboardingInput(this)" ${optional ? '' : 'required'} aria-describedby="${describedBy}" class="onboarding-input w-full rounded-xl px-4 py-3 ${unit ? 'pr-16' : ''}">
+        <input id="${id}" type="number" inputmode="${step === '1' ? 'numeric' : 'decimal'}" min="${min}" max="${max}" step="${step}" value="${escapeHtml(value ?? '')}" oninput="window.captureOnboardingInput(this)" ${optional ? '' : 'required'} aria-describedby="${describedBy}" class="ui-field onboarding-input w-full px-4 py-3 ${unit ? 'pr-16' : ''}">
         ${unit ? `<span class="onboarding-input-unit absolute right-4 top-1/2 -translate-y-1/2 text-xs" aria-hidden="true">${trHtml(unit)}</span>` : ''}
       </div>
       ${help ? `<p id="${id}-help" class="onboarding-muted mt-2 text-xs leading-relaxed">${trHtml(help)}</p>` : ''}
@@ -135,7 +135,7 @@ function renderMetrics(): string {
   return shell(`
     ${heading('Your body metrics', 'Small details make your starting targets more personal.')}
     <section class="onboarding-card rounded-2xl p-4 space-y-5">
-      <div><label for="onboarding-name" class="block text-xs font-bold">${trHtml('Display name')} <span class="onboarding-muted font-normal">${trHtml('(optional)')}</span></label><input id="onboarding-name" autocomplete="nickname" maxlength="80" value="${escapeHtml(draft.displayName)}" oninput="window.captureOnboardingInput(this)" class="onboarding-input w-full mt-2 rounded-xl px-4 py-3"></div>
+      <div><label for="onboarding-name" class="block text-xs font-bold">${trHtml('Display name')} <span class="onboarding-muted font-normal">${trHtml('(optional)')}</span></label><input id="onboarding-name" autocomplete="nickname" maxlength="80" value="${escapeHtml(draft.displayName)}" oninput="window.captureOnboardingInput(this)" class="ui-field onboarding-input w-full mt-2 px-4 py-3"></div>
       <fieldset><legend class="text-xs font-bold mb-2">${trHtml('Gender')}</legend>
         <div class="grid grid-cols-3 gap-2">${(['male', 'female', 'other'] as const).map(sex => `<label data-onboarding-sex="${sex}" class="onboarding-sex-choice relative flex items-center justify-center rounded-xl px-2 py-3 text-xs font-semibold text-center ${selectedSex === sex ? 'is-selected' : ''}"><input class="sr-only" type="radio" name="onboarding-sex" value="${sex}" ${selectedSex === sex ? 'checked' : ''} onchange="window.captureOnboardingInput(this)" aria-describedby="onboarding-error-biologicalSex"><span>${trHtml(sex === 'male' ? 'Male' : sex === 'female' ? 'Female' : 'Other')}</span></label>`).join('')}</div>
         <p id="onboarding-error-biologicalSex" class="onboarding-field-error empty:hidden" role="alert"></p>

@@ -83,9 +83,9 @@ export default {
         "card-gap": "16px"
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        heading: ["Plus Jakarta Sans", "sans-serif"],
-        display: ["Plus Jakarta Sans", "sans-serif"]
+        sans: ["var(--ui-font-body)"],
+        heading: ["var(--ui-font-heading)"],
+        display: ["var(--ui-font-heading)"]
       },
       boxShadow: {
         "ambient": "0 4px 20px -2px rgba(23, 32, 27, 0.04)",
