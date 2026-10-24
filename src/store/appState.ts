@@ -1482,11 +1482,10 @@ class Store {
 
   public addWater(dateKey: string = this.state.selectedDate) {
     const current = this.getWaterGlasses(dateKey);
-    if (current < 12) {
-      this.state.waterByDate[dateKey] = current + 1;
-      this.persistState();
-      this.notify();
-    }
+    // A saved hydration target is a reference, not a ceiling on recorded intake.
+    this.state.waterByDate[dateKey] = current + 1;
+    this.persistState();
+    this.notify();
   }
 
   public removeWater(dateKey: string = this.state.selectedDate) {

@@ -28,6 +28,8 @@ Use existing Tailwind tokens or the shared `--ui-*` variables. The shared variab
 | Primary foreground / `--ui-primary` | `#006d36` | `#72fd9e` |
 | Primary tint / `--ui-primary-soft` | `#e3f8e9` | `#233930` |
 | Text on primary tint / `--ui-primary-label` | `#004d24` | `#b2f6c7` |
+| Information / `--ui-info` | `#006a60` | `#6df8e5` |
+| Caution / `--ui-caution` | `#926300` | `#fbbf24` |
 | Error / `--ui-error` | `#ba1a1a` | `#ffb4ab` |
 | Error background / `--ui-error-soft` | `#ffdad6` | `#44241f` |
 | Active muscle / `--ui-muscle-active` | `#ef4444` | `#fb6767` |
@@ -85,6 +87,17 @@ Brand accents in Tailwind:
 - Form updates should preserve entered text, focus and caret position. Expanded exercise details should remain open during edits.
 - Format numeric readouts with `formatDisplayNumber` from `src/utils/safeNumbers.ts`: at most two decimal places for macros and training values, whole calories in summary cards, and up to four decimals where micronutrients need that precision. Formatting affects presentation only; editable inputs and stored values keep their precision.
 - Numeric cards must allow wrapping and shrinking with `min-width: 0`. Put macro targets on a separate line, let long Thai labels wrap, and rearrange compact grids on narrow phones. Show the full value rather than clipping it or replacing it with an ellipsis.
+
+## Home dashboard
+
+- Use the shared header, a 48px Nutrition/Fitness navigation control and a readable Customize action. Render visible widgets in their saved **DOM order** so reading and keyboard order match the visual order. Show an explanatory empty state when every widget is hidden.
+- Dashboard cards use the common 24px radius, quiet borders, 20px padding and shared light/dark surfaces. Card titles are 16px, ordinary copy 14px and supporting labels 12px. Keep long Thai meal names and numeric values available without truncation.
+- The energy ring represents food calories against the effective daily target. Label that percentage and show the balance formula separately: target minus food plus exercise. Distinguish remaining from over-budget energy in text. Put food, exercise and balance in a semantic summary that stacks at narrow card widths.
+- Show macros as full-width rows with the amount and target on separate readings. Format values through `formatDisplayNumber`; clamp visual bars while retaining the actual percentage text. All-missing amounts remain unavailable, and partial nutrition explicitly states missing-entry counts. Keep Mini Cut fat ceilings and refeed allowances drawn from the same existing services as Diary/Insights.
+- Hydration shows recorded ml against the **exact saved ml target**, with 48px labeled plus/minus controls for the selected date, a 250 ml increment explanation and a disabled minus control at zero. The old 12-glass logging cap is removed; a goal is a reference rather than a limit on what can be recorded. Storage remains in the existing per-date 250 ml glass units.
+- Label the local coach summary **Demo Coach** and use data from the selected day. Meal rows keep escaped names, full nutrition values and labeled 48px delete controls; deletion returns focus to the meal section heading.
+- Keep Customize Home in the shared centered dialog, with scrolling body, 48px move controls, stable IDs and a labeled visibility toggle. Show each widget's position and visible/hidden state. Use the existing dialog lifecycle to preserve focus and scroll.
+- Dashboard render helpers and scoped styling live in `src/components/Dashboard/`; the stylesheet is bundled through the main entry with the existing Streamlit CSS output.
 
 ## Navigation and motion
 
@@ -226,6 +239,7 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/index.css`: shared controls, privacy surfaces, imagery, muscle map and reduced motion.
 - `index.html`: mobile viewport and 430px app shell.
 - `src/components/Navigation/`: header and bottom navigation patterns.
+- `src/components/Dashboard/` and `src/screens/DashboardScreen.ts`: card renderers, scoped styles, selected-day data and widget ordering.
 - `src/security/vaultUI.ts`: PIN gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.

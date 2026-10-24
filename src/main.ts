@@ -14,6 +14,7 @@ import { startPrivateApp, downloadEncryptedBackup } from './security/vaultUI.ts'
 import { privateStorage, isVaultUnlocked } from './services/privateStorage.ts';
 import './ui/theme.css';
 import './index.css';
+import './components/Dashboard/dashboard.css';
 import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, FitnessObjective, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';
@@ -365,7 +366,10 @@ window.addWater = (dateKey?: string) => {
 };
 
 window.removeWater = (dateKey?: string) => {
+  const restoreDashboardFocus = document.activeElement?.id === 'dashboard-water-remove';
   store.removeWater(dateKey);
+  if (restoreDashboardFocus && store.getWaterGlasses(dateKey) <= 0)
+    document.getElementById('dashboard-water-add')?.focus({ preventScroll: true });
 };
 
 window.deleteMeal = (id: string) => {
@@ -384,7 +388,12 @@ window.toggleDashboardWidgetDrawer = (open?: boolean) => {
 };
 
 window.moveDashboardWidget = (widgetId: DashboardWidgetId, direction: -1 | 1) => {
+  const focusedId = document.activeElement?.id;
   store.moveDashboardWidget(widgetId, direction);
+  if (focusedId === `dashboard-widget-${widgetId}-${direction < 0 ? 'up' : 'down'}`) {
+    const current = document.getElementById(focusedId) as HTMLButtonElement | null;
+    if (current?.disabled) document.getElementById(`dashboard-widget-${widgetId}-${direction < 0 ? 'down' : 'up'}`)?.focus({ preventScroll: true });
+  }
 };
 
 window.toggleDashboardWidget = (widgetId: DashboardWidgetId) => {

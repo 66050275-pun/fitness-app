@@ -14,8 +14,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | --- | --- | --- | --- |
 | 1/10 | Shared design foundations | Central semantic theme tokens; consistent primary actions, icon controls and fields; initial adoption in vault/onboarding/Quick Add | Approved and merged: [PR #11](https://github.com/66050275-pun/fitness-app/pull/11) |
 | 2/10 | App shell and navigation | Shared header, bottom navigation, readable labels, touch targets and clearance for fixed controls | Approved and merged: [PR #12](https://github.com/66050275-pun/fitness-app/pull/12) |
-| 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Prepared for review |
-| 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Planned |
+| 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Approved and merged: [PR #13](https://github.com/66050275-pun/fitness-app/pull/13) |
+| 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Prepared for review |
 | 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Planned |
 | 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Planned |
 | 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Planned |
@@ -47,7 +47,9 @@ Part 1: [PR #11](https://github.com/66050275-pun/fitness-app/pull/11) approved a
 
 Part 2: [PR #12](https://github.com/66050275-pun/fitness-app/pull/12) approved and merged at `e00694f8288c99cf267307b252819d1492b44b4f`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run.
 
-Part 3: `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. PIN confirmation/error/lockout/restore flows, native radio keyboard behavior, validation-summary links, save retries and TH/EN layouts still need device review. Publication to `main` is pending approval.
+Part 3: [PR #13](https://github.com/66050275-pun/fitness-app/pull/13) approved and merged at `8729ca47f77d3978dd60c3db2f208579b12b9ac9`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run.
+
+Part 4: `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Long numbers/names, unknown nutrition, widget ordering/visibility/focus, hydration logging above 12 glasses and TH/EN light/dark layouts still need browser/device review. Publication to `main` is pending approval.
 
 ## Part 3 details
 
@@ -57,3 +59,13 @@ Part 3: `npm run build` (strict TypeScript + Vite) and `git diff --check` passed
 - Replace objective/activity buttons claiming radio roles with native grouped radios and state-based whole-card styling.
 - Add a focusable, linked validation summary alongside existing inline errors. Retain focus during edits and unchanged feedback; clear validation bookkeeping on lock.
 - Preserve goal models, calorie/macro/hydration calculations, validation limits and encrypted save/retry behavior.
+
+## Part 4 details
+
+- Extract themed dashboard card helpers and scoped styles; render visible widgets in saved DOM order, with a useful all-hidden state.
+- Clarify daily energy, its food-progress ring and net-balance formula. Keep complete formatted numbers and responsive statistic layouts.
+- Present macros in readable rows with real targets, accessible progress descriptions and explicit unknown/partial-data states. Reuse existing Mini Cut and refeed calculations.
+- Show hydration against the exact saved ml target, with labeled 48px controls and selected-date persistence. Remove the hardcoded 12-glass cap that blocked recording above 3,000 ml; keep the same 250 ml increments and storage format.
+- Make the local coach's demo status clear and improve long meal rows, empty states, delete labels and focus recovery.
+- Improve Customize Home touch targets, order/visibility feedback and stable control IDs using the existing centered dialog lifecycle.
+- Recover focus when a move control becomes disabled at a list boundary or the water-minus control reaches zero.
