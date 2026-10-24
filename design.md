@@ -149,9 +149,21 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 ## Food catalog and online search
 
 - Bundle Thai dish estimates for offline search in both English and Thai, with gram-based regular/large/small portions. Clearly label estimated recipe nutrition; changing ingredients needs a separate recipe, rather than a size option.
-- Keep local search immediate. Open Food Facts Thailand search requires the visible **Search online** action and explains that the search text is sent to that provider.
+- Keep local search immediate, with a visible 16px search field, a labeled 48px clear control and pressed-state collection buttons. Selecting a collection clears the cross-catalog query; typing keeps focus and the keyboard in the search field.
+- Place Open Food Facts Thailand inside an **Online products** disclosure so local results remain prominent. Searching still requires the visible **Search online** action and explains that the search text is sent to that provider.
 - Show distinct loading, unavailable and no-result states. Retain the Open Food Facts product link and ODbL attribution on imported foods. Unknown nutrients display as unavailable and remain null.
 - Query text and unsaved results remain in memory. Logged product definitions and diary snapshots use the existing encrypted browser vault; locking cancels outstanding requests.
+
+## Diary and manual food entry
+
+- Use the shared green surfaces, 20px screen gutters and 16px card gaps. Diary date buttons have at least 48px targets and a horizontally scrollable week strip. Center a newly selected date horizontally without moving the page vertically; preserve strip scroll during updates to the same date/week.
+- Show calories, macros and exact hydration targets for the selected date. Reuse effective refeed goals and the Mini Cut fat ceiling. Preserve unknown/partial nutrition states instead of implying complete totals.
+- Group logged meals by Breakfast, Lunch, Dinner and Snack. Open details with a native button; Delete and Add Again are separate sibling controls. Let long names, portions and complete formatted values wrap. Use text badges for AI estimates and demos; nutrient availability does not imply verified data.
+- Preview six recorded micronutrients, with a native disclosure for every remaining recorded nutrient. Show meal coverage and explain that values may include AI estimates and missing nutrients do not count as zero.
+- Quick Log uses labeled 16px fields, 48px meal-selection radios and native date/time controls. Nutrition refers to the entire entered portion. Optional blank macros remain null; an explicitly entered zero remains zero. Validate positive quantities, supported units, non-negative nutrition and valid dates/times with linked summary and inline feedback.
+- Preserve Quick Log fields, checked controls, focus and caret across same-route renders using an opt-in DOM snapshot. Do not persist drafts or retain their values across navigation or vault lock. Disable entry while saving or locking.
+- Keep portion math precise and canonical within the same measurement dimension (mass to grams, volume to milliliters). Saving to My Foods from Quick Log must not open a second portion dialog or create another meal. After submission, open Diary on the actual logged date and retain the vault's existing persistence-status reporting.
+- Set Portion, Meal Detail and Custom Food reuse readable fields and 48px controls inside the existing centered, scrollable dialog lifecycle. Portion quick options expose their pressed state and conversion errors are associated with the quantity input.
 
 ## Goal Settings and Special Program
 
@@ -240,6 +252,9 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `index.html`: mobile viewport and 430px app shell.
 - `src/components/Navigation/`: header and bottom navigation patterns.
 - `src/components/Dashboard/` and `src/screens/DashboardScreen.ts`: card renderers, scoped styles, selected-day data and widget ordering.
+- `src/components/Food/DiarySections.ts`, `FoodEntryHeader.ts`, `foodEntry.css` and `src/screens/diaryViewport.ts`: diary cards, date controls, food-entry headers and scoped presentation.
+- `src/screens/QuickLogScreen.ts` and `quickLogController.ts`: manual-entry fields, validation, unit normalization, optional My Foods save and selected-date completion.
+- `src/screens/FoodSearchScreen.ts` and food modals in `src/components/Modals/`: local/online collection controls, portion choices and food-detail forms.
 - `src/security/vaultUI.ts`: PIN gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.

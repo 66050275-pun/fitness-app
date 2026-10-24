@@ -47,7 +47,7 @@ export function renderMealDetailModal(): string {
       aria-labelledby="meal-modal-title"
     >
       <div 
-        class="ui-dialog-panel w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col overflow-hidden"
+        class="ui-dialog-panel food-entry-dialog w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col overflow-hidden"
       >
         <!-- Header -->
         <div class="ui-dialog-header px-5 pt-3 pb-3 border-b border-outline-variant/20 flex flex-col gap-2 shrink-0 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">

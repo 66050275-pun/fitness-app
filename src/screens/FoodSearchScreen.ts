@@ -5,6 +5,7 @@ import { store } from '../store/appState';
 import type { FoodDefinition, RecentFoodEntry } from '../types/index.ts';
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderFoodSourceNote } from '../components/Food/FoodSourceNote.ts';
+import { renderFoodEntryHeader } from '../components/Food/FoodEntryHeader.ts';
 import { calculatePortionMultiplier } from '../utils/portionCalculations.ts';
 
 function lastPortionCalories(food: FoodDefinition | undefined, entry: RecentFoodEntry): number | null {
@@ -42,40 +43,17 @@ export function renderFoodSearchScreen(): string {
   const query = state.foodSearchQuery || '';
 
   return `
-    <div class="flex flex-col min-h-screen pb-28 bg-surface dark:bg-dark-surface transition-colors">
+    <div class="nutrition-screen food-search-screen flex flex-col min-h-screen">
       
-      <!-- Top App Bar -->
-      <header class="sticky top-0 z-40 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20 shadow-sm">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <button 
-            onclick="window.navigateApp('dashboard')" 
-            aria-label="${trHtml("Back to Dashboard")}"
-            class="w-9 h-9 shrink-0 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
-          >
-            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-          </button>
-          <div>
-            <h1 class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">${trHtml("Food Database")}</h1>
-            <p class="text-[10px] text-on-surface-variant dark:text-gray-400">${trHtml("Recent foods, recipes & food catalog")}</p>
-          </div>
-        </div>
-
-        <button 
-          type="button" 
-          onclick="window.openCreateCustomFood()"
-          class="px-3 py-1.5 shrink-0 rounded-full bg-primary/10 text-primary dark:text-primary-container text-xs font-bold border border-primary/30 flex items-center gap-1 active:scale-95 transition-all hover:bg-primary/20"
-        >
-          <span class="material-symbols-outlined text-[16px]">add</span>
-          <span>${trHtml("New Food")}</span>
-        </button>
-      </header>
+      ${renderFoodEntryHeader('Food Database', 'Recent foods, recipes & food catalog', `<button id="food-search-new" type="button" class="nutrition-secondary-button" onclick="window.openCreateCustomFood()"><span class="material-symbols-outlined" aria-hidden="true">add</span>${trHtml('New Food')}</button>`)}
 
       <!-- Main Canvas -->
-      <main class="px-screen-gutter flex flex-col gap-4 pt-4">
+      <main class="nutrition-main">
         
         <!-- Live Search Input -->
+        <label for="food-search-input" class="nutrition-search-label">${trHtml("Search foods")}</label>
         <div class="relative">
-          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant">search</span>
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant" aria-hidden="true">search</span>
           <input 
             type="text" 
             id="food-search-input"
@@ -84,24 +62,24 @@ export function renderFoodSearchScreen(): string {
             aria-label="${trHtml('Search foods')}"
             placeholder="${trHtml("Search by name, brand, barcode, category...")}"
             oninput="window.handleFoodSearchInput(this.value)"
-            class="w-full pl-10 pr-10 py-3 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm placeholder:text-on-surface-variant/60"
+            class="ui-field food-search-input w-full pl-10 pr-16 py-3 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm placeholder:text-on-surface-variant/60"
           />
           <button 
             type="button" 
-            onclick="const inp = document.getElementById('food-search-input'); if(inp){ inp.value = ''; window.handleFoodSearchInput(''); }"
-            aria-label="${trHtml("Clear search")}"
-            class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant hover:text-on-surface"
+            onclick="const inp = document.getElementById('food-search-input'); if(inp){ inp.value = ''; window.handleFoodSearchInput(''); inp.focus(); }"
+            id="food-search-clear" aria-label="${trHtml("Clear search")}"
+            class="material-symbols-outlined ui-icon-button food-search-clear absolute right-1 top-1/2 -translate-y-1/2"
           >
             close
           </button>
         </div>
 
         <!-- 3-Segment Tab Bar (Recent | My Foods | All Foods) -->
-        <div class="grid grid-cols-3 p-1 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-center">
+        <div class="food-search-collections grid grid-cols-3 p-1 rounded-2xl" role="group" aria-label="${trHtml("Food collections")}">
           <button 
             type="button" 
-            onclick="window.setFoodSearchTab('recent')"
-            class="py-2 px-1 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'recent'
+            id="food-search-tab-recent" aria-pressed="${!query.trim() && activeTab === 'recent'}" onclick="window.setFoodSearchTab('recent')"
+            class="py-2 px-1 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${!query.trim() && activeTab === 'recent'
                 ? 'bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-xs'
                 : 'text-on-surface-variant dark:text-gray-400 hover:text-on-surface'}"
           >
@@ -115,8 +93,8 @@ export function renderFoodSearchScreen(): string {
 
           <button 
             type="button" 
-            onclick="window.setFoodSearchTab('myFoods')"
-            class="py-2 px-1 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'myFoods'
+            id="food-search-tab-myFoods" aria-pressed="${!query.trim() && activeTab === 'myFoods'}" onclick="window.setFoodSearchTab('myFoods')"
+            class="py-2 px-1 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${!query.trim() && activeTab === 'myFoods'
                 ? 'bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-xs'
                 : 'text-on-surface-variant dark:text-gray-400 hover:text-on-surface'}"
           >
@@ -130,8 +108,8 @@ export function renderFoodSearchScreen(): string {
 
           <button 
             type="button" 
-            onclick="window.setFoodSearchTab('allFoods')"
-            class="py-2 px-1 rounded-xl text-xs font-bold transition-all ${activeTab === 'allFoods'
+            id="food-search-tab-allFoods" aria-pressed="${!query.trim() && activeTab === 'allFoods'}" onclick="window.setFoodSearchTab('allFoods')"
+            class="py-2 px-1 rounded-xl text-xs font-bold transition-all ${!query.trim() && activeTab === 'allFoods'
                 ? 'bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-xs'
                 : 'text-on-surface-variant dark:text-gray-400 hover:text-on-surface'}"
           >
@@ -159,12 +137,20 @@ export function updateFoodSearchContent(): void {
   if (!contentArea && !onlineArea) return;
   const state = store.getState();
   const query = state.foodSearchQuery || '';
+  for (const tab of ['recent', 'myFoods', 'allFoods']) {
+    document.getElementById(`food-search-tab-${tab}`)?.setAttribute('aria-pressed', String(!query.trim() && state.foodSearchTab === tab));
+  }
   if (contentArea) {
     contentArea.innerHTML = query.trim()
       ? renderAllFoodsTab(query)
       : renderTabContent(state.foodSearchTab || 'recent', store.getRecentFoods(), store.getFrequentlyUsedFoods(), store.getCustomFoods());
   }
-  if (onlineArea) onlineArea.innerHTML = renderOnlineFoodSearch();
+  if (onlineArea) {
+    const open = onlineArea.querySelector('details')?.open;
+    onlineArea.innerHTML = renderOnlineFoodSearch();
+    const details = onlineArea.querySelector('details');
+    if (details && open !== undefined) details.open = open;
+  }
 }
 
 function renderOnlineFoodSearch(): string {
@@ -177,6 +163,8 @@ function renderOnlineFoodSearch(): string {
   const disabled = query.length < 2 || isLoading;
 
   return `
+    <details class="food-online-disclosure">
+      <summary>${trHtml('Online products · Open Food Facts')}</summary>
     <section class="rounded-2xl border border-primary/20 bg-primary/5 p-3.5 flex flex-col gap-2.5" aria-labelledby="online-food-search-title">
       <div>
         <h2 id="online-food-search-title" class="font-heading font-bold text-xs text-on-surface dark:text-white">${trHtml('Open Food Facts · Thailand')}</h2>
@@ -205,6 +193,7 @@ function renderOnlineFoodSearch(): string {
         · <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-container underline underline-offset-2">ODbL</a>
       </p>
     </section>
+    </details>
   `;
 }
 
@@ -332,81 +321,18 @@ function renderRecentFoodsTab(
 
 function renderRecentFoodCard(entry: RecentFoodEntry): string {
   const food = store.getFoodDefinitionById(entry.foodId);
-  const foodName = food ? foodLabel(food, food.name) : tr("Logged Food");
-  const brand = food?.brand;
-  const relativeTime = formatRelativeTime(entry.lastUsedAt);
-
-  const lastCal = lastPortionCalories(food, entry);
-
-  const portionDesc = portionLabel(entry.lastPortion, food?.source === 'built_in' || food?.source === 'demo') || `${entry.lastPortion.quantity} ${tr(entry.lastPortion.unit)}`;
-
-  return `
-    <div class="p-3.5 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col gap-2 hover:border-primary/40 transition-all group">
-      <div class="flex items-center justify-between gap-3">
-      
-      <div 
-        onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})"
-        class="flex-1 min-w-0 cursor-pointer"
-        role="button"
-        tabindex="0"
-        aria-label="${trHtml("Log {0} again", foodName)}"
-      >
-        <div class="flex flex-wrap items-center gap-1.5 min-w-0">
-          <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white truncate group-hover:text-primary transition-colors">
-            ${escapeHtml(foodName)}
-          </h4>
-          ${brand ? `
-            <span class="text-[10px] text-on-surface-variant dark:text-gray-400 truncate max-w-full">
-              &bull; ${escapeHtml(brand)}
-            </span>
-          ` : ''}
-        </div>
-
-        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-on-surface-variant dark:text-gray-400">
-          <span class="font-semibold text-on-surface dark:text-gray-200">
-            ${escapeHtml(portionDesc)}
-          </span>
-          <span>&bull;</span>
-          <span class="font-bold text-primary dark:text-primary-container">
-            ${lastCal !== null ? trHtml("{0} kcal", formatDisplayNumber(lastCal, 0)) : `— ${trHtml('kcal')}`}
-          </span>
-          <span>&bull;</span>
-          <span>${relativeTime}</span>
-        </div>
-
-        <div class="flex items-center gap-2 mt-1.5">
-          <span class="px-2 py-0.2 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high text-[9px] font-semibold text-on-surface-variant dark:text-gray-300">
-            ${trHtml(entry.useCount === 1 ? "Logged {0} time" : "Logged {0} times", entry.useCount)}
-          </span>
-          <span class="text-[9px] font-medium text-on-surface-variant capitalize">
-            ${trHtml("Default:")} ${trHtml(entry.lastMealType)}
-          </span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-1.5 shrink-0">
-        <button 
-          type="button" 
-          onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})"
-          class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1"
-          aria-label="${trHtml("Add {0} again", foodName)}"
-        >
-          <span>${trHtml("Add Again")}</span>
-        </button>
-
-        <button 
-          type="button" 
-          onclick="window.removeRecentFood(${htmlJsArg(entry.foodId)})"
-          class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant hover:text-error transition-colors"
-          aria-label="${trHtml("Remove from recents")}"
-        >
-          <span class="material-symbols-outlined text-[16px]">close</span>
-        </button>
-      </div>
-      </div>
-      ${food ? renderFoodSourceNote(food, true) : ''}
-    </div>
-  `;
+  const name = food ? foodLabel(food, food.name) : tr('Logged Food');
+  const portion = portionLabel(entry.lastPortion, food?.source === 'built_in' || food?.source === 'demo') || `${formatDisplayNumber(entry.lastPortion.quantity)} ${tr(entry.lastPortion.unit)}`;
+  return `<div class="nutrition-card food-entry-card food-recent-card">
+    <button id="food-recent-${escapeHtml(entry.foodId)}" type="button" class="food-recent-open" onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})" aria-label="${trHtml('Log {0} again', name)}">
+      <strong>${escapeHtml(name)}</strong>${food?.brand ? `<span class="nutrition-help">${escapeHtml(foodLabel(food, food.brand))}</span>` : ''}
+      <span class="nutrition-help">${escapeHtml(portion)} · ${formatDisplayNumber(lastPortionCalories(food, entry), 0)} ${trHtml('kcal')}</span>
+      <span class="nutrition-help">${escapeHtml(formatRelativeTime(entry.lastUsedAt))} · ${trHtml(entry.useCount === 1 ? 'Logged {0} time' : 'Logged {0} times', entry.useCount)}</span>
+    </button>
+    <div class="nutrition-section-heading"><button type="button" class="nutrition-secondary-button" onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})">${trHtml('Add Again')}</button>
+      <button type="button" class="ui-icon-button" onclick="window.removeRecentFood(${htmlJsArg(entry.foodId)})" aria-label="${trHtml('Remove from recents')}"><span class="material-symbols-outlined" aria-hidden="true">close</span></button></div>
+    ${food ? renderFoodSourceNote(food, true) : ''}
+  </div>`;
 }
 
 /**
@@ -475,7 +401,7 @@ function renderCustomFoodCard(food: FoodDefinition): string {
   const fat = food.nutrition.fat !== null && food.nutrition.fat !== undefined ? `${formatDisplayNumber(food.nutrition.fat)} ${trHtml("g")}` : '—';
 
   return `
-    <div class="p-4 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col gap-2.5 hover:border-primary/40 transition-all">
+    <div class="food-entry-card p-4 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col gap-2.5 hover:border-primary/40 transition-all">
       
       <div class="flex items-start justify-between">
         <div class="flex-1 min-w-0 pr-2">
@@ -607,7 +533,7 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
   const macrosSummary = [pro, carb, fat].filter(Boolean).join(' • ');
 
   return `
-    <div class="w-full min-w-0 bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 shadow-xs hover:border-primary/50 transition-colors overflow-hidden">
+    <div class="food-entry-card w-full min-w-0 bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 shadow-xs hover:border-primary/50 transition-colors overflow-hidden">
     <button 
       type="button" 
       onclick="window.openSetPortion(${htmlJsArg(food.id)})"

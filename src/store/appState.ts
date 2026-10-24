@@ -3510,7 +3510,7 @@ class Store {
     return { hasBarcodeDuplicate: false };
   }
 
-  public createCustomFood(foodInput: Omit<FoodDefinition, 'id' | 'createdAt' | 'updatedAt' | 'source'>): {
+  public createCustomFood(foodInput: Omit<FoodDefinition, 'id' | 'createdAt' | 'updatedAt' | 'source'>, options: { openPortion?: boolean } = {}): {
     success: boolean;
     food?: FoodDefinition;
     error?: string;
@@ -3539,11 +3539,11 @@ class Store {
 
     this.state.customFoods.unshift(newFood);
     this.persistState();
-    this.closeCreateCustomFoodModal();
+    if (options.openPortion !== false) this.closeCreateCustomFoodModal();
     this.notify();
 
     // Immediately open Set Portion for the newly created food
-    this.openSetPortion(newFood);
+    if (options.openPortion !== false) this.openSetPortion(newFood);
 
     return { success: true, food: newFood };
   }
