@@ -16,6 +16,7 @@ import './ui/theme.css';
 import './index.css';
 import './components/Dashboard/dashboard.css';
 import './components/Food/foodEntry.css';
+import './components/FoodScan/foodScan.css';
 import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, FitnessObjective, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';

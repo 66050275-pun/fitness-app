@@ -16,8 +16,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | 2/10 | App shell and navigation | Shared header, bottom navigation, readable labels, touch targets and clearance for fixed controls | Approved and merged: [PR #12](https://github.com/66050275-pun/fitness-app/pull/12) |
 | 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Approved and merged: [PR #13](https://github.com/66050275-pun/fitness-app/pull/13) |
 | 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Approved and merged: [PR #14](https://github.com/66050275-pun/fitness-app/pull/14) |
-| 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Prepared for review |
-| 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Planned |
+| 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Approved and merged: [PR #15](https://github.com/66050275-pun/fitness-app/pull/15) |
+| 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Prepared for review |
 | 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Planned |
 | 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Planned |
 | 9/10 | Special Program tools | Extension menu, locked preview, six tool dialogs and clear phase/target feedback | Planned |
@@ -51,7 +51,9 @@ Part 3: [PR #13](https://github.com/66050275-pun/fitness-app/pull/13) approved a
 
 Part 4: [PR #14](https://github.com/66050275-pun/fitness-app/pull/14) approved and merged at `aa5fedaafed5184920dffffab2e07cae71f3ee2d`, with its tree matching the build-checked version. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Long numbers/names, unknown nutrition, widget ordering/visibility/focus, hydration logging above 12 glasses and TH/EN light/dark layouts still need browser/device review.
 
-Part 5: Prepared for review. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Narrow-phone TH/EN light/dark layouts, mobile date/time controls, keyboard/focus behavior, draft preservation during updates, portion reuse and encrypted save/retry behavior still need browser/device review. Publication to `main` is pending approval.
+Part 5: [PR #15](https://github.com/66050275-pun/fitness-app/pull/15) approved and merged at `b079c62d53967a2aebbe5f923976e80cea615a70`, with its tree matching the build-checked version. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Narrow-phone TH/EN light/dark layouts, mobile date/time controls, keyboard/focus behavior, draft preservation during updates, portion reuse and encrypted save/retry behavior still need browser/device review.
+
+Part 6: Prepared for review. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests, browser/device checks or live-provider calls were run. Phone layouts in TH/EN and both themes, keyboard/error-summary focus, per-photo draft switching, wrapped activity-pill clearance, modal transitions and save/lock recovery still need browser/device review. Publication to `main` is pending approval.
 
 ## Part 3 details
 
@@ -83,3 +85,14 @@ Part 5: Prepared for review. `npm run build` (strict TypeScript + Vite) and `git
 - Preserve unknown macros as null and retain input precision. Normalize portions within their measurement dimension, keep nutrition tied to the entire entered portion and open Diary on the logged date.
 - Let Quick Log save a food definition without opening an extra Set Portion dialog. Existing Custom Food callers retain their normal portion flow.
 - Apply shared readable fields and 48px controls to Set Portion, Meal Detail and Custom Food without replacing the dialog lifecycle. Add accessible portion choices and conversion-error feedback.
+
+## Part 6 details
+
+- Align Scanner and Food Review with the shared food-entry header, themed cards, 16px fields and 48px controls. Explain consent/backend availability and retain explicit photo-processing notices and manual entry.
+- Add readable icon/text statuses and a whole-queue stage meter alongside individual photo progress. Show ready/choice/error counts and clarify that handled failures/skips count toward workflow progress.
+- Keep uncertainty choices, dish clues, named retries, manual fallback and duplicate-skip actions within each photo card. Give actions stable IDs and recover focus after queue actions.
+- Convert review into a native form with required-field help, inline errors and a focusable linked summary. Keep the existing service validation, unknown macros, cooking-fat difference calculations and one-meal confirmation flow.
+- Preserve each photo's in-memory draft while switching results. Treat the selected review ID and scanner mode as route identity for heading focus and scroll behavior.
+- Measure the activity pill's actual height for header clearance; use readable percentages and stable open/stop focus during updates. Disconnect its observer and clear measurements on disposal/lock.
+- Improve the existing nutrient dialog with a visible search label, wrapping pressed-state category buttons, 48px controls and readable per-nutrient data. Preserve AI confidence, estimates, unknown values, daily references and the existing dialog lifecycle.
+- Update EN/TH copy and design references. Backend requests, credentials, nutrient schemas and persistent data models retain their existing contracts.

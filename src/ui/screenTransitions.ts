@@ -7,6 +7,8 @@ function routeFor(state: AppState): Route {
   const parts: (string | number)[] = [state.currentScreen];
   if (state.currentScreen === 'profile' && state.profileSubpage) parts.push(state.profileSubpage);
   if (state.currentScreen === 'onboarding') parts.push(state.onboardingState.currentStep);
+  if (state.currentScreen === 'foodResult') parts.push(state.foodScan.reviewItemId || '');
+  if (state.currentScreen === 'scanner') parts.push(state.scannerMode);
   if (state.currentScreen === 'fitness') {
     parts.push(state.fitnessSubView);
     if (state.fitnessSubView === 'home') parts.push(state.fitnessPlannerMode);
@@ -121,7 +123,12 @@ export class ScreenTransitions {
     }
     this.navigation.sync(app);
     const overlays = app.querySelector<HTMLElement>('#app-overlays')!;
-    if (overlaysHtml !== this.overlaysHtml) { overlays.innerHTML = overlaysHtml; this.overlaysHtml = overlaysHtml; }
+    if (overlaysHtml !== this.overlaysHtml) {
+      const focusedId = overlays.contains(document.activeElement) ? (document.activeElement as HTMLElement).id : '';
+      overlays.innerHTML = overlaysHtml; this.overlaysHtml = overlaysHtml;
+      if (!changed && focusedId.startsWith('scan-activity-'))
+        (document.getElementById(focusedId) ?? document.getElementById('scan-activity-open'))?.focus({ preventScroll: true });
+    }
     this.dialogs.sync(changed);
     if (changed) {
       window.scrollTo({ top: back ? this.scrollPositions.get(route.key) || 0 : 0, behavior: 'instant' as ScrollBehavior });

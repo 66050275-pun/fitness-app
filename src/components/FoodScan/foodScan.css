@@ -1,0 +1,63 @@
+/* Scanner and review reuse the food-entry surfaces and the shared green tokens. */
+.food-scan-layout { gap: 0; padding: 0; }
+.food-scan-layout .nutrition-main { padding-bottom: max(32px, env(safe-area-inset-bottom, 0px)); }
+.food-scan-layout .phasic-tool-card { border-radius: var(--ui-radius); background: var(--ui-card); box-shadow: var(--ui-shadow); padding: 20px; }
+.food-scan-layout .phasic-tool-note { padding: 16px; border: 1px solid var(--ui-border); border-radius: 18px; }
+.food-scan-layout .phasic-tool-secondary { min-height: 48px; padding: 10px 12px; border-color: var(--ui-control-border); font-size: 14px; line-height: 1.6; }
+.food-scan-layout .phasic-tool-input { border-color: var(--ui-control-border); }
+.food-scan-layout .ui-field { padding: 12px; }
+.food-scan-layout .food-scan-modes > button { border-color: var(--ui-control-border); }
+.food-scan-layout :where(input,button,summary) { scroll-margin-top: calc(var(--vault-bar-height) + 120px); }
+.food-scan-layout :where(p,label,li) { line-height: 1.6; }
+.food-scan-layout :where(h2,h3,h4) { line-height: 1.5; }
+.food-scan-layout .food-scan-photo { height: auto; min-height: 200px; padding: 24px 20px; }
+.scan-primary-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.scan-primary-actions button { flex-wrap: wrap; }
+.scan-consent { min-height: 48px; padding: 12px; border-radius: 14px; background: var(--ui-card); color: var(--ui-text); cursor: pointer; }
+.scan-consent input { accent-color: var(--ui-action); }
+.scan-privacy > summary { min-height: 48px; padding: 12px 0; cursor: pointer; }
+.scan-help { font-size: 14px; color: var(--ui-muted); line-height: 1.6; }
+.scan-section-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 12px; }
+.scan-queue-summary { padding: 16px; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-panel); }
+.scan-queue-summary h2 { font: 700 16px/1.5 var(--ui-font-heading); }
+.scan-queue-summary .food-scan-progress-track { background: var(--ui-card); margin: 12px 0; }
+.scan-queue-summary .food-scan-progress-fill { background: var(--ui-primary); }
+.scan-status { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 4px 10px; border-radius: 999px; font-size: 12px; line-height: 1.6; background: var(--ui-panel); color: var(--ui-muted); }
+.scan-status[data-status="review"], .scan-status[data-status="saved"] { color: var(--ui-primary-label); background: var(--ui-primary-soft); }
+.scan-status[data-status="error"] { color: var(--ui-error); background: var(--ui-error-soft); }
+.scan-status[data-status="needs_choice"] { color: var(--ui-caution); border: 1px solid currentColor; }
+.scan-status .material-symbols-outlined { font-size: 18px; flex-shrink: 0; }
+.food-scan-layout .food-scan-queue-photo { height: 160px; }
+.food-scan-layout .food-scan-skip { border: 1px solid var(--ui-control-border); flex-shrink: 0; }
+.food-scan-layout .food-scan-choice { border-color: var(--ui-control-border); }
+.food-scan-layout .food-scan-choice :where(span) { overflow-wrap: anywhere; }
+.scan-skip-link { align-self: start; min-height: 48px; padding: 10px 0; color: var(--ui-muted); text-decoration: underline; text-underline-offset: 3px; font-size: 14px; line-height: 1.6; }
+.scan-clear { color: var(--ui-error); border-color: var(--ui-error); }
+.scan-review-form { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.scan-review-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.scan-review-totals { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.scan-review-totals > div { min-width: 0; padding: 12px; border-radius: 14px; background: var(--ui-panel); }
+.scan-review-totals dt { font-size: 14px; line-height: 1.5; color: var(--ui-muted); }
+.scan-review-totals dd { font: 700 20px/1.6 var(--ui-font-heading); overflow-wrap: anywhere; }
+.scan-review-totals dd > span:last-child { font-size: 12px; font-weight: 400; }
+.food-scan-caution { color: var(--ui-caution); }
+.food-scan-activity { border-color: var(--ui-control-border); border-radius: 24px; }
+.food-scan-activity-open { border-radius: 18px; padding: 6px; }
+.food-scan-activity-ring { width: 48px; height: 48px; }
+.food-scan-activity-ring > span { font-size: 12px; }
+.food-scan-activity :where(span) { overflow-wrap: anywhere; }
+#app.vault-open:has(#food-scan-activity) { --ui-shell-top-inset: calc(var(--vault-bar-height) + var(--food-scan-activity-height, 76px) + 20px); }
+#app.vault-open:has(#food-scan-activity) .app-screen :where(header.sticky) { top: var(--ui-shell-top-inset); }
+@media (max-width: 350px) { .scan-review-grid, .scan-primary-actions { grid-template-columns: minmax(0,1fr); } .food-scan-layout .phasic-tool-card { padding: 16px; } }
+@media (hover: hover) { .food-scan-choice:enabled:hover, .food-scan-activity-open:hover { background: var(--ui-primary-soft); } }
+.food-scan-choice:disabled:active { transform: none; }
+.scan-nutrients-dialog .ui-dialog-header > .flex:first-child > div { flex: 1; min-width: 0; }
+.scan-nutrients-dialog .ui-dialog-header span:not(.material-symbols-outlined) { font-size: 12px; line-height: 1.6; }
+.scan-nutrients-dialog .ui-dialog-body :where(span:not(.material-symbols-outlined),h3) { font-size: 14px; line-height: 1.6; }
+.scan-nutrients-dialog .ui-stat-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.scan-nutrients-dialog .nutrient-row > .flex > div:first-child { flex: 1; min-width: 0; }
+.scan-nutrients-dialog .nutrient-row > .flex > div:first-child > .flex { flex-wrap: wrap; }
+.scan-nutrients-dialog summary { min-height: 48px; font-size: 14px; line-height: 1.6; }
+.scan-nutrient-filters button { white-space: normal; min-width: 0; }
+.scan-nutrients-dialog .ui-icon-button { width: 48px; min-width: 48px; padding: 0; }
+.food-scan-progress-fill { transition: none; }
