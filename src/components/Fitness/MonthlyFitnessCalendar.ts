@@ -41,12 +41,12 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
   const templateSummaryText = calculateWeeklyTemplateSummary(template);
 
   return `
-    <div class="flex flex-col gap-3.5">
+    <div class="fitness-planner flex flex-col gap-3.5">
       <!-- Calendar Container Card -->
       <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient">
         
         <!-- Calendar Month Header & Navigation -->
-        <div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+        <div class="planner-month-header flex items-center justify-between pb-3 border-b border-outline-variant/20">
           <div class="flex items-center gap-1.5">
             <h3 class="font-heading font-extrabold text-base text-on-surface dark:text-white">
               ${monthName} <span class="text-primary dark:text-primary-container font-semibold">${year}</span>
@@ -54,7 +54,7 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
             ${!isCurrentMonthView ? `
               <button 
                 type="button" 
-                onclick="window.goToPlannerTodayMonth()" 
+                id="planner-today" onclick="window.goToPlannerTodayMonth()"
                 class="px-2 py-0.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary dark:text-primary-container text-[10px] font-bold transition-all ml-1"
                 aria-label="${trHtml("Return to current month")}"
               >
@@ -67,19 +67,19 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
           <div class="flex items-center gap-1">
             <button 
               type="button"
-              onclick="window.prevPlannerMonth()"
+              id="planner-previous-month" onclick="window.prevPlannerMonth()"
               aria-label="${trHtml("Previous month")}"
-              class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant dark:text-gray-300 hover:text-primary hover:bg-surface-container transition-all"
+              class="ui-icon-button"
             >
-              <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+              <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
             </button>
             <button 
               type="button"
-              onclick="window.nextPlannerMonth()"
+              id="planner-next-month" onclick="window.nextPlannerMonth()"
               aria-label="${trHtml("Next month")}"
-              class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high flex items-center justify-center text-on-surface-variant dark:text-gray-300 hover:text-primary hover:bg-surface-container transition-all"
+              class="ui-icon-button"
             >
-              <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+              <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
             </button>
           </div>
         </div>
@@ -94,7 +94,7 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
         </div>
 
         <!-- Calendar Day Cells Grid -->
-        <div class="grid grid-cols-7 gap-1">
+        <div class="planner-days grid grid-cols-7 gap-1">
           ${cells.map(cell => {
             const scheduled = scheduledMap[cell.dateKey];
             const status = resolveDayStatus(cell.dateKey, scheduled, history, todayKey);
@@ -159,8 +159,8 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
               <button 
                 type="button"
                 onclick="window.openPlannerDateDetail(${htmlJsArg(cell.dateKey)})"
-                aria-label="${friendly}: ${statusDesc}"
-                class="min-h-[56px] p-1 rounded-xl flex flex-col items-center justify-between border transition-all text-left group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${cellBg} ${isDimmed ? 'opacity-35' : 'opacity-100'} ${isToday ? 'ring-2 ring-primary ring-offset-1 dark:ring-offset-dark-surface' : 'border-outline-variant/20'}"
+                aria-label="${escapeHtml(`${friendly}: ${statusDesc}${cell.isSelected ? ` · ${tr('Selected')}` : ''}`)}" aria-current="${isToday ? 'date' : 'false'}" data-selected="${cell.isSelected}"
+                class="planner-day min-h-[56px] p-1 rounded-xl flex flex-col items-center justify-between border transition-all text-left group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${cellBg} ${isDimmed ? 'opacity-35' : 'opacity-100'} ${isToday ? 'ring-2 ring-primary ring-offset-1 dark:ring-offset-dark-surface' : 'border-outline-variant/20'}"
               >
                 <!-- Day Number -->
                 <span class="text-[11px] font-bold leading-tight ${isToday ? 'w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px]' : 'text-on-surface dark:text-gray-200'}">
@@ -177,7 +177,7 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
         </div>
 
         <!-- Accessible Legend -->
-        <div class="mt-3 pt-2.5 border-t border-outline-variant/20 flex flex-wrap items-center justify-between gap-2 text-[10px] text-on-surface-variant dark:text-gray-400 px-1">
+        <div class="planner-legend mt-3 pt-2.5 border-t border-outline-variant/20 flex flex-wrap items-center justify-between gap-2 text-[10px] text-on-surface-variant dark:text-gray-400 px-1">
           <div class="flex items-center gap-1">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span class="font-medium">${trHtml("Completed")}</span>
@@ -200,7 +200,7 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
 
       <!-- Monthly Stats & Weekly Routine Quick Card -->
       <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-ambient flex flex-col gap-3">
-        <div class="flex items-center justify-between">
+        <div class="planner-summary-header flex items-center justify-between">
           <div>
             <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-on-surface-variant dark:text-gray-400">
               ${monthName} ${trHtml("Summary")}
@@ -221,7 +221,7 @@ export function renderMonthlyFitnessCalendar(passedState?: any): string {
         </div>
 
         <!-- Routine description pill -->
-        <div class="p-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex items-center justify-between gap-2">
+        <div class="planner-routine p-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/20 flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 truncate">
             <div class="w-7 h-7 rounded-lg bg-primary/10 text-primary dark:text-primary-container flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-[18px]">calendar_view_week</span>

@@ -88,7 +88,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
       aria-labelledby="planner-detail-modal-title"
     >
       <div 
-        class="ui-dialog-panel bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-modal"
+        class="ui-dialog-panel fitness-planner-dialog bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-modal"
       >
         <!-- Header -->
         <div class="ui-dialog-header px-5 py-4 flex items-center justify-between gap-3 border-b border-outline-variant/20">
@@ -108,9 +108,9 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
             type="button" 
             onclick="window.closePlannerDateDetail()"
             aria-label="${trHtml("Close date detail")}"
-            class="w-8 h-8 shrink-0 rounded-full bg-surface-container dark:bg-dark-surface-card-high text-on-surface-variant dark:text-gray-300 hover:text-on-surface flex items-center justify-center transition-colors"
+            class="ui-icon-button shrink-0"
           >
-            <span class="material-symbols-outlined text-[18px]">close</span>
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
         </div>
 
@@ -135,7 +135,7 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
               </div>
 
               <!-- Stat Grid -->
-              <div class="grid grid-cols-4 gap-2 pt-1 text-center">
+              <div class="planner-metrics grid grid-cols-2 gap-2 pt-1 text-center">
                 <div class="p-2 rounded-xl bg-surface/60 dark:bg-dark-surface/60 border border-outline-variant/20">
                   <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Sets")}</span>
                   <span class="font-heading font-extrabold text-sm text-on-surface dark:text-white">${completedWorkout.completedSetCount}</span>
@@ -184,14 +184,14 @@ export function renderPlannerDateDetailModal(passedState?: any): string {
               </div>
 
               <!-- Workout Quick Info -->
-              <div class="grid grid-cols-3 gap-2 text-center pt-1">
+              <div class="planner-metrics grid grid-cols-2 gap-2 text-center pt-1">
                 <div class="p-2 rounded-xl bg-surface dark:bg-dark-surface border border-outline-variant/20">
                   <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Est. Time")}</span>
-                  <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${scheduledPreset.estimatedMinutes} mins</span>
+                  <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${scheduledPreset.estimatedMinutes} ${trHtml("min")}</span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface dark:bg-dark-surface border border-outline-variant/20">
                   <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Exercises")}</span>
-                  <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${scheduledPreset.exercises.length} movements</span>
+                  <span class="font-heading font-bold text-xs text-on-surface dark:text-white">${scheduledPreset.exercises.length} ${trHtml("Exercises")}</span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface dark:bg-dark-surface border border-outline-variant/20">
                   <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Focus")}</span>

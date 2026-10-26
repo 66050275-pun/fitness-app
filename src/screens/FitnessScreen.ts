@@ -49,41 +49,41 @@ function renderWorkoutHomeView(state: AppState): string {
       <main class="px-screen-gutter flex flex-col gap-4 pt-3">
         
         <!-- Segmented Control: Nutrition vs Fitness -->
-        <div class="w-full bg-surface-container-low dark:bg-dark-surface-card p-1 rounded-full flex items-center border border-outline-variant/30 shadow-sm">
-          <button onclick="window.navigateApp('dashboard')" class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-on-surface-variant dark:text-gray-400 hover:text-primary font-heading text-xs font-medium transition-all">
-            <span class="material-symbols-outlined text-[16px]">restaurant</span>
+        <div class="w-full bg-surface-container-low dark:bg-dark-surface-card p-1 rounded-2xl flex items-center border border-outline-variant/30 shadow-sm" role="group" aria-label="${trHtml('App sections')}">
+          <button type="button" aria-pressed="false" onclick="window.navigateApp('dashboard')" class="min-h-12 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-on-surface-variant dark:text-gray-400 hover:text-primary font-heading text-sm font-medium transition-all">
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">restaurant</span>
             <span>${trHtml("Nutrition")}</span>
           </button>
-          <button class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-sm font-heading text-xs font-bold transition-all">
-            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+          <button type="button" aria-pressed="true" class="min-h-12 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-sm font-heading text-sm font-bold transition-all">
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
             <span>${trHtml("Fitness")}</span>
           </button>
         </div>
 
         <!-- Fitness Planner Sub-Mode Switcher -->
-        <div class="w-full bg-surface-container-low dark:bg-dark-surface-card p-1 rounded-full flex items-center border border-outline-variant/30 shadow-sm">
+        <div class="w-full bg-surface-container-low dark:bg-dark-surface-card p-1 rounded-2xl flex items-center border border-outline-variant/30 shadow-sm" role="group" aria-label="${trHtml('Fitness planning')}">
           <!-- 1. My Program (Left) -->
           <button 
-            type="button"
+            type="button" id="fitness-mode-program" aria-pressed="${state.fitnessPlannerMode === 'program'}"
             onclick="window.setFitnessPlannerMode('program')"
-            class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full font-heading text-xs font-bold transition-all ${state.fitnessPlannerMode === 'program'
+            class="min-h-12 min-w-0 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl font-heading text-sm font-bold transition-all ${state.fitnessPlannerMode === 'program'
                 ? 'bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-sm'
                 : 'text-on-surface-variant dark:text-gray-400 hover:text-primary'}"
           >
-            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' ${state.fitnessPlannerMode === 'program' ? 1 : 0};">calendar_month</span>
-            <span>${trHtml("My Program")}</span>
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true" style="font-variation-settings: 'FILL' ${state.fitnessPlannerMode === 'program' ? 1 : 0};">calendar_month</span>
+            <span class="break-words">${trHtml("My Program")}</span>
           </button>
 
           <!-- 2. Choose Workout (Right) -->
           <button 
-            type="button"
+            type="button" id="fitness-mode-workouts" aria-pressed="${state.fitnessPlannerMode !== 'program'}"
             onclick="window.setFitnessPlannerMode('workouts')"
-            class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full font-heading text-xs font-bold transition-all ${state.fitnessPlannerMode !== 'program'
+            class="min-h-12 min-w-0 flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl font-heading text-sm font-bold transition-all ${state.fitnessPlannerMode !== 'program'
                 ? 'bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-sm'
                 : 'text-on-surface-variant dark:text-gray-400 hover:text-primary'}"
           >
-            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' ${state.fitnessPlannerMode !== 'program' ? 1 : 0};">fitness_center</span>
-            <span>${trHtml("Choose Workout")}</span>
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true" style="font-variation-settings: 'FILL' ${state.fitnessPlannerMode !== 'program' ? 1 : 0};">fitness_center</span>
+            <span class="break-words">${trHtml("Choose Workout")}</span>
           </button>
         </div>
 
@@ -256,42 +256,42 @@ function renderPresetCard(preset: WorkoutPreset): string {
         : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
 
   return `
-    <div 
+    <button type="button"
       onclick="window.selectWorkoutType(${htmlJsArg(preset.id)})"
-      class="bg-surface-container-lowest dark:bg-dark-surface-card p-4 rounded-2xl border border-outline-variant/30 shadow-sm hover:border-primary/50 cursor-pointer active:scale-[0.99] transition-all group"
+      class="w-full text-left bg-surface-container-lowest dark:bg-dark-surface-card p-4 rounded-2xl border border-outline-variant/30 shadow-sm hover:border-primary/50 cursor-pointer active:scale-[0.99] transition-all group"
     >
-      <div class="flex items-start justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-primary to-primary-container text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-            <span class="material-symbols-outlined text-[24px]">${preset.icon}</span>
-          </div>
-          <div>
-            <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white group-hover:text-primary transition-colors">${trHtml(preset.title)}</h3>
-            <p class="text-xs text-on-surface-variant dark:text-gray-400">${trHtml(preset.subtitle)}</p>
-          </div>
-        </div>
+      <span class="flex flex-wrap items-start justify-between gap-3">
+        <span class="flex min-w-0 items-center gap-3">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-tr from-primary to-primary-container text-white flex items-center justify-center shadow-md">
+            <span class="material-symbols-outlined text-[24px]" aria-hidden="true">${preset.icon}</span>
+          </span>
+          <span class="min-w-0">
+            <span class="block font-heading font-bold text-sm text-on-surface dark:text-white group-hover:text-primary transition-colors break-words">${trHtml(preset.title)}</span>
+            <span class="block text-xs text-on-surface-variant dark:text-gray-400 break-words">${trHtml(preset.subtitle)}</span>
+          </span>
+        </span>
         
         <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${intensityColor}">
           ${trHtml(preset.intensity)}
         </span>
-      </div>
+      </span>
 
       <!-- Detail Badges -->
-      <div class="flex items-center gap-3 mt-3 pt-3 border-t border-outline-variant/20 text-xs text-on-surface-variant dark:text-gray-400">
-        <div class="flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">format_list_bulleted</span>
+      <span class="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-outline-variant/20 text-xs text-on-surface-variant dark:text-gray-400">
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]" aria-hidden="true">format_list_bulleted</span>
           <span>${preset.exercises.length} ${trHtml("Exercises")}</span>
-        </div>
-        <div class="flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">timer</span>
+        </span>
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]" aria-hidden="true">timer</span>
           <span>~${preset.estimatedMinutes} ${trHtml("min")}</span>
-        </div>
-        <div class="flex items-center gap-1 truncate max-w-[150px]">
-          <span class="material-symbols-outlined text-[14px]">accessibility</span>
-          <span class="truncate">${escapeHtml(translatedMuscles(preset.primaryMuscles))}</span>
-        </div>
-      </div>
-    </div>
+        </span>
+        <span class="flex min-w-0 items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]" aria-hidden="true">accessibility</span>
+          <span class="break-words">${escapeHtml(translatedMuscles(preset.primaryMuscles))}</span>
+        </span>
+      </span>
+    </button>
   `;
 }
 
@@ -307,14 +307,14 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
     <div class="flex flex-col min-h-screen pb-28 bg-surface dark:bg-dark-surface transition-colors">
       
       <!-- Top App Bar -->
-      <header class="sticky top-0 z-40 bg-surface/90 dark:bg-dark-surface/90 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20">
-        <div class="flex items-center gap-2.5">
-          <button onclick="window.cancelWorkoutSetup()" aria-label="${trHtml("Go Back")}" class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all">
-            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+      <header class="sticky top-0 z-40 bg-surface/90 dark:bg-dark-surface/90 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex flex-wrap gap-3 items-center justify-between border-b border-outline-variant/20">
+        <div class="flex min-w-0 flex-1 items-center gap-2.5">
+          <button type="button" id="workout-setup-back" onclick="window.cancelWorkoutSetup()" aria-label="${trHtml("Go Back")}" class="ui-icon-button shrink-0">
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
           </button>
-          <div>
+          <div class="min-w-0 break-words">
             <h1 class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">${trHtml(title)}</h1>
-            <p class="text-xs text-on-surface-variant dark:text-gray-400">${trHtml("Customize sets, reps & exercise order")}</p>
+            <p class="text-sm text-on-surface-variant dark:text-gray-400">${trHtml("Customize sets, reps and exercises")}</p>
           </div>
         </div>
 
@@ -339,24 +339,24 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
           ${exercises.map((ex, idx) => `
             <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col gap-3">
               
-              <div class="flex items-start justify-between">
-                <div class="flex items-center gap-2.5">
-                  <span class="w-6 h-6 rounded-full bg-surface-container dark:bg-gray-700 text-on-surface dark:text-gray-200 text-xs font-bold flex items-center justify-center">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex min-w-0 items-center gap-2.5">
+                  <span class="w-6 h-6 shrink-0 rounded-full bg-surface-container dark:bg-gray-700 text-on-surface dark:text-gray-200 text-xs font-bold flex items-center justify-center">
                     ${idx + 1}
                   </span>
-                  <div>
-                    <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${escapeHtml(exerciseLabel(ex.name))}</h3>
+                  <div class="min-w-0">
+                    <h3 id="workout-exercise-${idx}" tabindex="-1" class="font-heading font-bold text-sm text-on-surface dark:text-white break-words">${escapeHtml(exerciseLabel(ex.name))}</h3>
                     <span class="text-[11px] text-on-surface-variant dark:text-gray-400">${escapeHtml(translatedMuscles(ex.muscleGroup))} ${trHtml("• Rest")} ${ex.restSeconds} ${trHtml("s")}</span>
                   </div>
                 </div>
 
                 <!-- Remove Exercise Button -->
-                <button 
-                  onclick="window.removeDraftExercise(${idx})" 
-                  aria-label="${trHtml("Remove exercise")}"
-                  ${exercises.length <= 1 ? 'disabled class="text-outline/40 cursor-not-allowed"' : 'class="text-on-surface-variant hover:text-error transition-colors p-1"'}
+                <button type="button" id="workout-remove-${idx}"
+                  onclick="window.removeDraftExercise(${idx}); (document.getElementById('workout-exercise-${idx}') || document.getElementById('workout-exercise-${idx - 1}') || document.getElementById('exercise-catalog-toggle'))?.focus({preventScroll:true})"
+                  aria-label="${trHtml('Remove {0} from workout', exerciseLabel(ex.name))}"
+                  class="ui-icon-button shrink-0" ${exercises.length <= 1 ? 'disabled' : ''}
                 >
-                  <span class="material-symbols-outlined text-[18px]">delete_outline</span>
+                  <span class="material-symbols-outlined" aria-hidden="true">delete_outline</span>
                 </button>
               </div>
 
@@ -365,25 +365,25 @@ function renderWorkoutSetupView(presetId: string | null, draftExercises: Workout
               ${renderWorkoutProgressionHint(ex)}
 
               <!-- Sets and Reps Counter Controls -->
-              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant/20">
+              <div class="grid grid-cols-1 gap-2 pt-2 border-t border-outline-variant/20">
                 
                 <!-- Sets Adjuster -->
-                <div class="flex items-center justify-between bg-surface-container-low dark:bg-dark-surface-card-high px-3 py-1.5 rounded-xl">
-                  <span class="text-xs font-semibold text-on-surface-variant dark:text-gray-400">${trHtml("Sets")}</span>
+                <div class="flex items-center justify-between gap-2 bg-surface-container-low dark:bg-dark-surface-card-high px-3 py-2 rounded-xl">
+                  <span class="text-sm font-semibold text-on-surface-variant dark:text-gray-400">${trHtml("Sets")}</span>
                   <div class="flex items-center gap-2">
-                    <button onclick="window.updateDraftSets(${idx}, -1)" class="w-6 h-6 rounded-full bg-surface-container dark:bg-gray-700 flex items-center justify-center text-xs font-bold active:scale-95 transition-all">-</button>
-                    <span class="font-heading font-bold text-xs w-4 text-center text-on-surface dark:text-white">${ex.targetSets}</span>
-                    <button onclick="window.updateDraftSets(${idx}, 1)" class="w-6 h-6 rounded-full bg-surface-container dark:bg-gray-700 flex items-center justify-center text-xs font-bold active:scale-95 transition-all">+</button>
+                    <button type="button" id="workout-sets-${idx}-down" aria-label="${trHtml('Decrease sets for {0}', exerciseLabel(ex.name))}" onclick="window.updateDraftSets(${idx}, -1)" class="ui-icon-button"><span aria-hidden="true">−</span></button>
+                    <span aria-live="polite" class="font-heading font-bold text-sm w-6 shrink-0 text-center text-on-surface dark:text-white">${ex.targetSets}</span>
+                    <button type="button" id="workout-sets-${idx}-up" aria-label="${trHtml('Increase sets for {0}', exerciseLabel(ex.name))}" onclick="window.updateDraftSets(${idx}, 1)" class="ui-icon-button"><span aria-hidden="true">+</span></button>
                   </div>
                 </div>
 
                 <!-- Reps Adjuster -->
-                <div class="flex items-center justify-between bg-surface-container-low dark:bg-dark-surface-card-high px-3 py-1.5 rounded-xl">
-                  <span class="text-xs font-semibold text-on-surface-variant dark:text-gray-400">${trHtml("Reps")}</span>
+                <div class="flex items-center justify-between gap-2 bg-surface-container-low dark:bg-dark-surface-card-high px-3 py-2 rounded-xl">
+                  <span class="text-sm font-semibold text-on-surface-variant dark:text-gray-400">${trHtml("Reps")}</span>
                   <div class="flex items-center gap-2">
-                    <button onclick="window.updateDraftReps(${idx}, -1)" class="w-6 h-6 rounded-full bg-surface-container dark:bg-gray-700 flex items-center justify-center text-xs font-bold active:scale-95 transition-all">-</button>
-                    <span class="font-heading font-bold text-xs w-6 text-center text-on-surface dark:text-white">${ex.targetReps}</span>
-                    <button onclick="window.updateDraftReps(${idx}, 1)" class="w-6 h-6 rounded-full bg-surface-container dark:bg-gray-700 flex items-center justify-center text-xs font-bold active:scale-95 transition-all">+</button>
+                    <button type="button" id="workout-reps-${idx}-down" aria-label="${trHtml('Decrease reps for {0}', exerciseLabel(ex.name))}" onclick="window.updateDraftReps(${idx}, -1)" class="ui-icon-button"><span aria-hidden="true">−</span></button>
+                    <span aria-live="polite" class="font-heading font-bold text-sm w-6 shrink-0 text-center text-on-surface dark:text-white">${ex.targetReps}</span>
+                    <button type="button" id="workout-reps-${idx}-up" aria-label="${trHtml('Increase reps for {0}', exerciseLabel(ex.name))}" onclick="window.updateDraftReps(${idx}, 1)" class="ui-icon-button"><span aria-hidden="true">+</span></button>
                   </div>
                 </div>
 

@@ -31,7 +31,7 @@ export function renderWeeklyProgramEditorModal(passedState?: any): string {
         aria-modal="true"
         aria-labelledby="overwrite-modal-title"
       >
-        <div class="ui-dialog-panel bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-modal">
+        <div class="ui-dialog-panel fitness-planner-dialog bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-modal">
           <div class="ui-dialog-header flex items-center gap-3 text-amber-500 px-5 pt-5 pb-4">
             <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-[24px]">warning</span>
@@ -91,7 +91,7 @@ export function renderWeeklyProgramEditorModal(passedState?: any): string {
       aria-labelledby="weekly-program-modal-title"
     >
       <div 
-        class="ui-dialog-panel bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-modal"
+        class="ui-dialog-panel fitness-planner-dialog bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-modal"
       >
         <!-- Header -->
         <div class="ui-dialog-header px-5 py-4 flex items-center justify-between gap-3 border-b border-outline-variant/20">
@@ -108,9 +108,9 @@ export function renderWeeklyProgramEditorModal(passedState?: any): string {
             type="button" 
             onclick="window.closeWeeklyProgramEditor()"
             aria-label="${trHtml("Close routine builder")}"
-            class="w-8 h-8 shrink-0 rounded-full bg-surface-container dark:bg-dark-surface-card-high text-on-surface-variant dark:text-gray-300 hover:text-on-surface flex items-center justify-center transition-colors"
+            class="ui-icon-button shrink-0"
           >
-            <span class="material-symbols-outlined text-[18px]">close</span>
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
         </div>
 
@@ -150,7 +150,7 @@ export function renderWeeklyProgramEditorModal(passedState?: any): string {
                   >
                     <option value="none" ${selectedType === 'none' ? 'selected' : ''}>${trHtml("-- No Plan --")}</option>
                     <option value="rest" ${selectedType === 'rest' ? 'selected' : ''}>${trHtml("😴 Rest Day")}</option>
-                    <optgroup label="Workout Presets">
+                    <optgroup label="${trHtml("Workout Presets")}">
                       ${WORKOUT_PRESETS.map(p => `
                         <option value="${escapeHtml(p.id)}" ${selectedType === p.id ? 'selected' : ''}>
                           🏋️ ${escapeHtml(translatedLabel(p.title))} (${p.estimatedMinutes}${trHtml("m)")}
