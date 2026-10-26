@@ -1,0 +1,29 @@
+/* Scoped styles for the program calendar and its existing dialogs. */
+.fitness-planner { min-width: 0; }
+.fitness-planner :where(h3,h4,p,button,span) { overflow-wrap: anywhere; }
+.planner-month-header, .planner-summary-header { flex-wrap: wrap; gap: 12px; }
+.planner-month-header > div:first-child, .planner-summary-header > div { min-width: 0; flex-wrap: wrap; }
+.planner-month-header button, .planner-summary-header button, .planner-routine button, .fitness-planner > div:last-child button { min-height: 48px; }
+.planner-month-header > div:last-child { gap: 8px; }
+.planner-days { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.planner-day { min-width: 0; min-height: 56px; }
+.planner-day[data-selected="true"] { box-shadow: inset 0 0 0 2px var(--ui-primary); }
+.planner-day.opacity-35 { opacity: .7; }
+.planner-day[aria-current="date"] { border-color: var(--ui-primary); }
+.planner-legend { justify-content: flex-start; gap: 12px; font-size: 12px; line-height: 1.5; }
+.planner-summary-header h4, .planner-summary-header p { font-size: 14px; line-height: 1.5; }
+.planner-routine { flex-wrap: wrap; }
+.planner-routine .truncate { white-space: normal; overflow: visible; text-overflow: clip; min-width: 0; overflow-wrap: anywhere; }
+.planner-routine span { line-height: 1.5; }
+.fitness-planner-dialog :where(p,label,span:not(.material-symbols-outlined)) { overflow-wrap: anywhere; line-height: 1.5; }
+.fitness-planner-dialog :where(button,select) { min-height: 48px; }
+.fitness-planner-dialog select { min-width: 0; max-width: 100%; font-size: 16px; border-color: var(--ui-control-border); }
+.fitness-planner-dialog .ui-dialog-header > div { min-width: 0; }
+.fitness-planner-dialog .ui-dialog-body p, .fitness-planner-dialog .ui-dialog-footer button { font-size: 14px; }
+.fitness-planner-dialog .ui-icon-button { width: 48px; min-width: 48px; padding: 0; }
+.planner-metrics > div { min-width: 0; overflow-wrap: anywhere; }
+.planner-metrics span { white-space: normal; overflow: visible; text-overflow: clip; }
+@media (max-width: 360px) {
+  .planner-day .truncate { display: none; }
+  .planner-day .material-symbols-outlined { font-size: 16px; }
+}

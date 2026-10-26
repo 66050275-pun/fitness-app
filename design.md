@@ -120,6 +120,8 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Red highlights the union of major movers and common assisting muscles for all exercises currently in the draft program. Adding or removing exercises updates the highlighted regions.
 - Keep inactive regions muted, provide a legend and allow users to inspect the muscles for each exercise. Unknown movements remain explicitly unmapped.
 - The map communicates affected regions; it does not represent intensity or a personalized medical assessment.
+- Workout presets are native buttons with wrapping muscle names and descriptions. Program/workout controls expose their selected state. Routine setup uses labeled 48px back, remove, set and rep controls; the setup description reflects the operations actually available.
+- My Program keeps a seven-column calendar with labeled month navigation, a selected-date marker and a status legend. Let month summaries and routine text wrap; use readable controls and two-column metrics in existing centered planner dialogs. Day labels include the full date and workout status when compact cells cannot display the full name.
 - Keep artwork, fonts and translation resources local to the app. Artwork loads as separate PNG assets from the existing app-hosted Streamlit component route (or ordinary local Vite/Capacitor assets), with no external image CDN. Keep fonts and translations bundled; preserve the original app/vault iframe origin.
 
 ### Expanded exercise picker
@@ -127,6 +129,7 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Include **254 illustrated entries**: 253 compatible repetition-based library movements and the existing incline-fly variation. Preserve existing exercise names/aliases so saved history and programs still match. Do not add duration/distance/stretching records to the reps-only picker.
 - Keep the picker in workout setup, using shared green cards and 16px search/select fields. Provide EN/TH local search, muscle/equipment filters, a clear result counter and 12 results per page in a bounded scroll area. Filters stay in memory and reset on lock; searching sends nothing to a service.
 - Keep 48px Add controls, mark already-added movements, retain the user's filter/page/list position when adding, and show a localized confirmation. Expanded details show two unchanged poses, muscles, default sets/reps/rest and the exact source/CC BY-SA credit. Retain the global thumbnail attribution too.
+- The picker uses wrapping text, readable filter labels and a single filter column on narrow screens. Offer Clear filters when no results match, and restore focus to an available page control or search when pagination reaches a boundary.
 - Use lazy PNG loading so the initial JavaScript does not contain the whole illustration library. `scripts/generate_exercise_art.py` builds imports and per-frame credits from the pinned package. The server copies public build images to an ignored component asset folder. CSP permits same-origin images along with data/blob sources; keep third-party images blocked.
 - Bodyweight, assisted and resistance-band entries can log repetitions, with automatic load increases disabled. Keep ordinary loaded-movement progression/history behavior and the 19-region muscle schematic. The map shows reviewed major movers/common assists rather than every generic source stability tag.
 
@@ -260,6 +263,7 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/screens/FoodSearchScreen.ts` and food modals in `src/components/Modals/`: local/online collection controls, portion choices and food-detail forms.
 - `src/security/vaultUI.ts`: PIN gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
+- `src/components/Fitness/exerciseCatalog.css` and `fitnessPlanner.css`: scoped catalog, calendar and planner-dialog presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/navigationLayout.ts`: bottom-navigation measurement, content clearance and cleanup on lock.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.

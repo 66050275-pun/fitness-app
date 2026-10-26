@@ -7,6 +7,7 @@ import { isVaultUnlocked } from '../../services/privateStorage.ts';
 import { escapeHtml, htmlJsArg } from '../../utils/sanitize.ts';
 import { renderExerciseIllustration } from './ExerciseIllustration.ts';
 import type { WorkoutExercise } from '../../types/index.ts';
+import './exerciseCatalog.css';
 
 declare global {
   interface Window {
@@ -58,6 +59,7 @@ function renderResults(draft: readonly WorkoutExercise[]): string {
   return `<p class="exercise-catalog-count" role="status">${filtered.length
     ? trHtml('Showing {0}–{1} of {2} exercises', start + 1, start + shown.length, filtered.length)
     : trHtml('No exercises match these filters.')}</p>
+    ${filtered.length ? `
     <div id="exercise-catalog-scroll" class="exercise-catalog-scroll" role="list" aria-label="${trHtml('Exercise results')}">
       ${shown.map(exercise => `<article id="catalog-entry-${exercise.id}" class="exercise-catalog-item" role="listitem">
         <div class="exercise-catalog-item-heading">
@@ -68,7 +70,7 @@ function renderResults(draft: readonly WorkoutExercise[]): string {
           </div>
           <button type="button" id="catalog-add-${exercise.id}" class="exercise-catalog-add" onclick="window.addCatalogExercise(${htmlJsArg(exercise.id)})"
             aria-label="${trHtml(added.has(exercise.id) ? '{0} is in your workout' : 'Add {0} to workout', exerciseLabel(exercise.name))}" ${added.has(exercise.id) ? 'disabled' : ''}>
-            ${added.has(exercise.id) ? `<span class="material-symbols-outlined" aria-hidden="true">check</span>` : trHtml('+ Add')}
+            ${added.has(exercise.id) ? `<span class="material-symbols-outlined" aria-hidden="true">check</span><span>${trHtml('Added to workout')}</span>` : trHtml('+ Add')}
           </button>
         </div>
         <details><summary>${trHtml('View exercise / ดูภาพท่า')}</summary>
@@ -79,7 +81,8 @@ function renderResults(draft: readonly WorkoutExercise[]): string {
             ? `<p class="phasic-tool-muted text-xs mt-2">${trHtml('Repetition tracking; automatic load increases are disabled for this movement.')}</p>` : ''}
         </details>
       </article>`).join('')}
-    </div>
+    </div>` : `<div class="exercise-catalog-empty"><span class="material-symbols-outlined" aria-hidden="true">search_off</span>
+      <button type="button" class="exercise-catalog-clear" onclick="window.clearExerciseCatalogFilters()">${trHtml('Clear filters')}</button></div>`}
     ${filtered.length ? `<nav class="exercise-catalog-pages" aria-label="${trHtml('Exercise catalog pages')}">
       <button type="button" id="exercise-catalog-previous" class="phasic-tool-secondary" onclick="window.exerciseCatalogPage(-1)" ${page === 0 ? 'disabled' : ''}>${trHtml('Previous')}</button>
       <span class="text-xs font-bold text-center">${trHtml('Page {0} of {1}', page + 1, pages)}</span>
@@ -95,19 +98,19 @@ export function renderExerciseCatalog(draft: readonly WorkoutExercise[]): string
       <label for="exercise-catalog-search" class="text-sm font-heading font-bold">${trHtml('Search exercises')}
         <input id="exercise-catalog-search" type="search" class="phasic-tool-input w-full font-sans font-normal mt-2" autocomplete="off" maxlength="120"
           placeholder="${trHtml('Search by exercise, muscle or equipment')}" value="${escapeHtml(query)}" oninput="window.filterExerciseCatalog(this.value)" /></label>
-      <div class="grid grid-cols-2 gap-2">
-        <label for="exercise-catalog-muscle" class="text-xs font-heading font-bold min-w-0">${trHtml('Muscle group')}
+      <div class="exercise-catalog-filters">
+        <label for="exercise-catalog-muscle" class="font-heading font-bold min-w-0">${trHtml('Muscle group')}
           <select id="exercise-catalog-muscle" class="phasic-tool-input w-full mt-2" onchange="window.filterExerciseMuscle(this.value)">
             <option value="">${trHtml('All muscles')}</option>
             ${Object.entries(muscleLabels).map(([key, label]) => `<option value="${key}" ${muscle === key ? 'selected' : ''}>${trHtml(label)}</option>`).join('')}
           </select></label>
-        <label for="exercise-catalog-equipment" class="text-xs font-heading font-bold min-w-0">${trHtml('Equipment')}
+        <label for="exercise-catalog-equipment" class="font-heading font-bold min-w-0">${trHtml('Equipment')}
           <select id="exercise-catalog-equipment" class="phasic-tool-input w-full mt-2" onchange="window.filterExerciseEquipment(this.value)">
             <option value="">${trHtml('All equipment')}</option>
             ${equipmentOptions.map(value => `<option value="${escapeHtml(value)}" ${equipment === value ? 'selected' : ''}>${escapeHtml(translatedLabel(value))}</option>`).join('')}
           </select></label>
       </div>
-      <button type="button" class="exercise-catalog-clear" onclick="window.clearExerciseCatalogFilters()">${trHtml('Clear filters')}</button>
+      <button type="button" id="exercise-catalog-clear" class="exercise-catalog-clear" onclick="window.clearExerciseCatalogFilters()">${trHtml('Clear filters')}</button>
       <p id="exercise-catalog-feedback" class="text-sm text-primary empty:hidden" role="status">${lastAdded ? trHtml('{0} added to your workout.', exerciseLabel(lastAdded)) : ''}</p>
       <div id="exercise-catalog-results">${renderResults(draft)}</div>
       <p class="exercise-art-credit">${trHtml('Artwork: Bryl Lim / Everkinetic where credited.')} <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a></p>
@@ -128,7 +131,9 @@ function refreshResults(): void {
     const target = document.getElementById(focused);
     if (target instanceof HTMLButtonElement && target.disabled) {
       const alternative = focused === 'exercise-catalog-next' ? 'exercise-catalog-previous' : 'exercise-catalog-next';
-      document.getElementById(alternative)?.focus({ preventScroll: true });
+      const fallback = document.getElementById(alternative);
+      if (fallback instanceof HTMLButtonElement && !fallback.disabled) fallback.focus({ preventScroll: true });
+      else document.getElementById('exercise-catalog-search')?.focus({ preventScroll: true });
     } else target?.focus({ preventScroll: true });
   }
 }

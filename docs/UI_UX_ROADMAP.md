@@ -17,8 +17,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | 3/10 | PIN and onboarding | Lock-screen hierarchy, introduction and setup cards, progress, field help and inline feedback | Approved and merged: [PR #13](https://github.com/66050275-pun/fitness-app/pull/13) |
 | 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Approved and merged: [PR #14](https://github.com/66050275-pun/fitness-app/pull/14) |
 | 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Approved and merged: [PR #15](https://github.com/66050275-pun/fitness-app/pull/15) |
-| 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Prepared for review |
-| 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Planned |
+| 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Approved and merged: [PR #16](https://github.com/66050275-pun/fitness-app/pull/16) |
+| 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Prepared for review |
 | 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Planned |
 | 9/10 | Special Program tools | Extension menu, locked preview, six tool dialogs and clear phase/target feedback | Planned |
 | 10/10 | Insights and profile | Existing charts/data labels, settings/help rows, long Thai labels and remaining cross-screen presentation inconsistencies | Planned |
@@ -53,7 +53,9 @@ Part 4: [PR #14](https://github.com/66050275-pun/fitness-app/pull/14) approved a
 
 Part 5: [PR #15](https://github.com/66050275-pun/fitness-app/pull/15) approved and merged at `b079c62d53967a2aebbe5f923976e80cea615a70`, with its tree matching the build-checked version. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests or browser/device checks were run. Narrow-phone TH/EN light/dark layouts, mobile date/time controls, keyboard/focus behavior, draft preservation during updates, portion reuse and encrypted save/retry behavior still need browser/device review.
 
-Part 6: Prepared for review. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests, browser/device checks or live-provider calls were run. Phone layouts in TH/EN and both themes, keyboard/error-summary focus, per-photo draft switching, wrapped activity-pill clearance, modal transitions and save/lock recovery still need browser/device review. Publication to `main` is pending approval.
+Part 6: [PR #16](https://github.com/66050275-pun/fitness-app/pull/16) approved and merged at `0057f525ec1195966767852062e56736cb5840bc`, with its tree matching the build-checked version. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests, browser/device checks or live-provider calls were run. Phone layouts in TH/EN and both themes, keyboard/error-summary focus, per-photo draft switching, wrapped activity-pill clearance, modal transitions and save/lock recovery still need browser/device review.
+
+Part 7: Prepared for review. `npm run build` and `git diff --check` passed. The existing fitness planner test file passed all 10 tests when bundled with esbuild and run with Node; the repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Narrow-phone TH/EN light/dark layouts, calendar selection, focus, catalog scrolling and planner dialogs still need review. Publication to `main` is pending approval.
 
 ## Part 3 details
 
@@ -96,3 +98,11 @@ Part 6: Prepared for review. `npm run build` (strict TypeScript + Vite) and `git
 - Measure the activity pill's actual height for header clearance; use readable percentages and stable open/stop focus during updates. Disconnect its observer and clear measurements on disposal/lock.
 - Improve the existing nutrient dialog with a visible search label, wrapping pressed-state category buttons, 48px controls and readable per-nutrient data. Preserve AI confidence, estimates, unknown values, daily references and the existing dialog lifecycle.
 - Update EN/TH copy and design references. Backend requests, credentials, nutrient schemas and persistent data models retain their existing contracts.
+
+## Part 7 details
+
+- Make workout preset cards native buttons with wrapping names and muscle lists. Expose selected planning modes and provide 48px routine setup controls with exercise-specific accessible names.
+- Correct the setup description to match its actual set, rep and exercise controls. Retain existing exercise ordering, workout data and muscle-map calculations.
+- Improve catalog filters, result typography, added status, empty state, page focus and narrow-screen layout. Preserve filter state, pagination, imagery and artwork attribution.
+- Improve the My Program calendar and planner dialogs with 48px navigation/actions, readable metrics, selected-date context and wrapping summary text while retaining scheduling behavior.
+- Add localized labels and document the changes in `design.md`.

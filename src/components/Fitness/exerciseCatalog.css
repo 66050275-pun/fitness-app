@@ -1,0 +1,36 @@
+/* Exercise picker: theme-aware, wrapping controls and readable card content. */
+.exercise-catalog #add-exercise-accordion { padding: 20px; border-radius: var(--ui-radius); background: var(--ui-card); box-shadow: var(--ui-shadow); }
+.exercise-catalog #add-exercise-accordion > div:first-child h3 { font: 700 16px/1.5 var(--ui-font-heading); }
+.exercise-catalog #add-exercise-accordion > div:first-child p { font-size: 14px; line-height: 1.6; }
+.exercise-catalog label { display: block; font-size: 14px; line-height: 1.5; }
+.exercise-catalog :where(input, select) { min-height: 48px; padding: 10px 12px; border-color: var(--ui-control-border); font-size: 16px; }
+.exercise-catalog-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.exercise-catalog .exercise-catalog-clear { min-height: 48px; padding: 8px 12px; border: 1px solid var(--ui-control-border); border-radius: 14px; background: var(--ui-primary-soft); color: var(--ui-primary-label); font-size: 14px; font-weight: 700; line-height: 1.5; text-decoration: none; }
+.exercise-catalog .exercise-catalog-count { font-size: 14px; line-height: 1.6; }
+.exercise-catalog .exercise-catalog-scroll { gap: 12px; padding-right: 4px; }
+.exercise-catalog .exercise-catalog-item { padding: 14px; }
+.exercise-catalog .exercise-catalog-item-heading { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.exercise-catalog .exercise-catalog-item-heading:not(:has(.exercise-art-thumbnail)) { grid-template-columns: minmax(0, 1fr) auto; }
+.exercise-catalog .exercise-catalog-item :where(h4,p,button,summary) { overflow-wrap: anywhere; }
+.exercise-catalog .exercise-catalog-item h4 { font: 700 16px/1.5 var(--ui-font-heading); }
+.exercise-catalog .exercise-catalog-item p { font-size: 14px; line-height: 1.6; }
+.exercise-catalog .exercise-catalog-add { display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px; min-height: 48px; min-width: 48px; padding: 8px 12px; background: var(--ui-action); color: var(--ui-on-action); font-size: 14px; line-height: 1.4; }
+.exercise-catalog .exercise-catalog-add:disabled { background: var(--ui-primary-soft); color: var(--ui-primary-label); }
+.exercise-catalog .exercise-catalog-add .material-symbols-outlined { font-size: 20px; }
+.exercise-catalog .exercise-catalog-item details > summary { min-height: 48px; padding: 12px 0; font-size: 14px; line-height: 1.6; }
+.exercise-catalog .exercise-catalog-pages { gap: 8px; }
+.exercise-catalog .exercise-catalog-pages button { min-height: 48px; font-size: 14px; line-height: 1.5; }
+.exercise-catalog .exercise-catalog-pages span { font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.exercise-catalog .exercise-catalog-empty { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px; background: var(--ui-panel); border-radius: 16px; }
+.exercise-catalog .exercise-catalog-empty > .material-symbols-outlined { color: var(--ui-muted); }
+.exercise-catalog .exercise-art-credit { font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.exercise-catalog .exercise-catalog-toggle { min-height: 52px; border-color: var(--ui-control-border); line-height: 1.5; overflow-wrap: anywhere; }
+.exercise-catalog :where(button,summary,input,select):focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+@media (max-width: 350px) {
+  .exercise-catalog #add-exercise-accordion { padding: 16px; }
+  .exercise-catalog .exercise-catalog-filters { grid-template-columns: minmax(0, 1fr); }
+  .exercise-catalog .exercise-catalog-item-heading { grid-template-columns: 56px minmax(0, 1fr); }
+  .exercise-catalog .exercise-catalog-add { grid-column: 2; justify-self: start; }
+  .exercise-catalog .exercise-catalog-item-heading:not(:has(.exercise-art-thumbnail)) { grid-template-columns: minmax(0, 1fr); }
+  .exercise-catalog .exercise-catalog-item-heading:not(:has(.exercise-art-thumbnail)) .exercise-catalog-add { grid-column: 1; }
+}
