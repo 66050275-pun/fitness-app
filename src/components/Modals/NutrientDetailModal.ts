@@ -17,7 +17,7 @@ import { htmlJsArg } from '../../utils/sanitize.ts';
 import { store } from '../../store/appState';
 import { getNutrientReference } from '../../data/nutrientReferenceValues';
 import { calculateDailyValuePercent } from '../../utils/nutrientCalculations.ts';
-import type { NutrientValue } from '../../types/index.ts';
+import type { MicronutrientProfile, NutrientValue } from '../../types/index.ts';
 
 function escapeHtml(str: string): string {
   return str
@@ -51,7 +51,7 @@ export function renderNutrientDetailModal(): string {
       aria-labelledby="nutrient-modal-title"
     >
       <div 
-        class="ui-dialog-panel w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col overflow-hidden"
+        class="ui-dialog-panel food-entry-dialog scan-nutrients-dialog w-full max-w-lg mx-auto bg-surface dark:bg-dark-surface rounded-t-3xl border-t border-outline-variant/30 shadow-2xl flex flex-col overflow-hidden"
       >
         <!-- Drag Handle & Header -->
         <div class="ui-dialog-header px-5 pt-3 pb-2.5 border-b border-outline-variant/20 flex flex-col gap-2 shrink-0 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md">
@@ -77,9 +77,9 @@ export function renderNutrientDetailModal(): string {
               type="button" 
               onclick="window.closeNutrientModal()" 
               aria-label="${trHtml("Close Nutrients Sheet")}"
-              class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
+              id="nutrient-modal-close" class="ui-icon-button shrink-0"
             >
-              <span class="material-symbols-outlined text-[18px]">close</span>
+              <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
           </div>
 
@@ -92,34 +92,35 @@ export function renderNutrientDetailModal(): string {
           ` : ''}
 
           <!-- Search & Filter Bar -->
+          <label for="nutrient-modal-search" class="font-bold text-sm">${trHtml("Search nutrients")}</label>
           <div class="relative mt-1">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant" aria-hidden="true">search</span>
             <input 
               type="text" 
               id="nutrient-modal-search" data-dialog-draft data-dialog-draft-effect="filterNutrientList"
               placeholder="${trHtml("Search vitamins, minerals, fiber...")}"
               oninput="window.filterNutrientList(this.value)"
-              class="w-full pl-9 pr-8 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface dark:text-white placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary"
+              class="ui-field w-full pl-9 pr-14 py-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs text-on-surface dark:text-white placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button 
               type="button"
-              onclick="const inp = document.getElementById('nutrient-modal-search'); if(inp){ inp.value = ''; window.filterNutrientList(''); }"
-              class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant hover:text-on-surface"
+              onclick="const inp = document.getElementById('nutrient-modal-search'); if(inp){ inp.value = ''; window.filterNutrientList(''); inp.focus(); }"
+              id="nutrient-search-clear" aria-label="${trHtml("Clear search")}" class="ui-icon-button absolute right-0 top-1/2 -translate-y-1/2"
             >
-              close
+              <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
           </div>
 
           <!-- Category Filter Pills -->
-          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+          <div class="scan-nutrient-filters flex flex-wrap items-center gap-2 pt-1" role="group" aria-label="${trHtml("Nutrient categories")}">
             ${(['all', 'vitamins', 'minerals', 'other'] as const).map(cat => {
               const isActive = activeCategory === cat;
               const label = cat === 'all' ? tr("All") : cat === 'vitamins' ? tr("Vitamins") : cat === 'minerals' ? tr("Minerals") : tr("Other Nutrients");
               return `
                 <button 
                   type="button"
-                  onclick="window.setNutrientCategoryFilter(${htmlJsArg(cat)})"
-                  class="px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border ${
+                  id="nutrient-category-${cat}" aria-pressed="${isActive}" onclick="window.setNutrientCategoryFilter(${htmlJsArg(cat)})"
+                  class="px-3 py-1 rounded-full text-sm font-bold transition-all border ${
                     isActive 
                       ? 'bg-primary text-white border-primary shadow-xs' 
                       : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border-outline-variant/30 hover:border-primary/40'
@@ -286,7 +287,7 @@ function renderNutrientRow(item: NutrientValue): string {
   `;
 }
 
-function renderUnavailableNutrientsBlock(profile: any): string {
+function renderUnavailableNutrientsBlock(profile: MicronutrientProfile | undefined): string {
   if (!profile) return '';
   const allList: NutrientValue[] = [
     ...(profile.vitamins || []),

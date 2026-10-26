@@ -1,21 +1,14 @@
 import { trHtml } from '../i18n/index.ts';
 import { store } from '../store/appState.ts';
-import { readReviewNumber, resolveCookingFatDraft, reviewedNutrition, validateScanReview } from '../services/foodScanService.ts';
+import { readReviewNumber, resolveCookingFatDraft, reviewedNutrition } from '../services/foodScanService.ts';
 import { getFatGauge } from '../services/phasicRecompService.ts';
 import { getTodayKey } from '../utils/dateUtils.ts';
 import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { escapeHtml } from '../utils/sanitize.ts';
-import type { FoodScanReview, FoodScanReviewField, MealType } from '../types/index.ts';
+import type { MealType } from '../types/index.ts';
 
-function field(review: FoodScanReview, key: FoodScanReviewField, label: string, numeric = false): string {
-  return `<label class="flex flex-col gap-2 min-w-0 font-heading font-bold text-sm" for="scan-review-${key}">
-    ${trHtml(label)}
-    <input id="scan-review-${key}" class="phasic-tool-input w-full font-sans font-normal" type="text"
-      ${numeric ? 'inputmode="decimal" maxlength="12"' : `maxlength="${key === 'name' ? 200 : 300}"`}
-      value="${escapeHtml(key === 'cookingFatGrams' ? review.cookingFatInput : review[key])}" ${key === 'cookingFatGrams' ? 'oninput="window.scanCookingDraft(this.value)" onchange' : 'oninput'}="window.scanReviewInput('${key}', this.value)"
-      ${numeric ? `placeholder="${trHtml('Unknown')}"` : ''} />
-  </label>`;
-}
+import { renderFoodScanHeader } from '../components/FoodScan/FoodScanHeader.ts';
+import { renderScanReviewField as field, renderScanReviewErrorSummary } from '../components/FoodScan/FoodScanReviewForm.ts';
 
 export function renderFoodResultScreen(): string {
   const state = store.getState();
@@ -24,9 +17,9 @@ export function renderFoodResultScreen(): string {
   const queue = state.foodScan.items;
   const currentIndex = queue.findIndex(item => item.id === state.foodScan.reviewItemId);
   const otherReviews = queue.filter(item => item.status === 'review' && item.id !== state.foodScan.reviewItemId);
-  if (!food || !review) return `<div class="food-scan-screen min-h-screen flex flex-col gap-4 p-5">
-    <h1 class="font-heading font-extrabold text-xl">${trHtml('No food analysis to review')}</h1>
-    <button type="button" class="ui-primary-button" onclick="window.openScannerMode('food')">${trHtml('Scan Food')}</button></div>`;
+  if (!food || !review) return `<div class="food-scan-screen food-scan-layout nutrition-screen min-h-screen flex flex-col">
+    ${renderFoodScanHeader('Food scan review', trHtml('No food analysis to review'), true)}<main class="nutrition-main">
+    <button type="button" class="ui-primary-button" onclick="window.openScannerMode('food')">${trHtml('Scan Food')}</button></main></div>`;
 
   let nutrition;
   let cookingGrams = null;
@@ -43,15 +36,12 @@ export function renderFoodResultScreen(): string {
     && cooking?.rangeMaxGrams !== null && cooking?.rangeMaxGrams !== undefined;
 
   return `
-    <div class="food-scan-screen min-h-screen flex flex-col gap-4 px-screen-gutter pt-5 pb-8">
-      <header class="flex items-center gap-3">
-        <button type="button" onclick="window.openScannerMode('food')" class="phasic-tool-secondary rounded-full h-12 w-12 flex items-center justify-center shrink-0" aria-label="${trHtml('Back')}">
-          <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-        </button>
-        <div class="min-w-0"><h1 class="font-heading font-extrabold text-xl">${trHtml('Food scan review')}</h1>
-          <p class="phasic-tool-muted text-sm">${currentIndex >= 0 && queue.length > 1 ? trHtml('Photo {0} of {1}', currentIndex + 1, queue.length)
-            : trHtml('One confirmed meal updates your daily totals.')}</p></div>
-      </header>
+    <div class="food-scan-screen food-scan-layout nutrition-screen min-h-screen flex flex-col">
+      ${renderFoodScanHeader('Food scan review', currentIndex >= 0 && queue.length > 1
+        ? trHtml('Photo {0} of {1}', currentIndex + 1, queue.length) : trHtml('One confirmed meal updates your daily totals.'), true)}
+      <main class="nutrition-main">
+      <form id="scan-review-form" class="scan-review-form" novalidate onsubmit="event.preventDefault();window.scanSaveReviewedMeal()">
+      ${renderScanReviewErrorSummary()}
       ${otherReviews.length ? `<section class="phasic-tool-note text-sm flex flex-col gap-2">
         <p class="font-heading font-bold">${trHtml('Other results ready to review')}</p>
         <div class="flex flex-wrap gap-2">${otherReviews.map(item => `<button type="button" class="phasic-tool-secondary" onclick="window.scanReviewPhoto('${item.id}')">${trHtml('Photo {0}', queue.indexOf(item) + 1)}</button>`).join('')}</div>
@@ -76,7 +66,8 @@ export function renderFoodResultScreen(): string {
 
       <section class="phasic-tool-card flex flex-col gap-4">
         <h2 class="font-heading font-bold text-base">${trHtml('Review nutrition')}</h2>
-        <div class="grid grid-cols-2 gap-3">
+        <p id="scan-review-nutrition-help" class="scan-help">${trHtml('Enter nutrition for the whole portion above. Leave unknown macros blank; enter 0 only when known to be zero.')}</p>
+        <div class="scan-review-grid">
           ${field(review, 'calories', 'Calories (kcal)', true)}
           ${field(review, 'protein', 'Protein (g)', true)}
           ${field(review, 'carbs', 'Carbs (g)', true)}
@@ -117,27 +108,29 @@ export function renderFoodResultScreen(): string {
 
       <section class="phasic-tool-card flex flex-col gap-3">
         <h2 class="font-heading font-bold text-base">${trHtml('Assign to Meal')}</h2>
-        <div class="food-scan-modes grid grid-cols-2 gap-2">
-          ${(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(type => `<button type="button" data-scan-meal="${type}" aria-pressed="${review.mealType === type}" onclick="window.scanReviewMeal('${type}')">${trHtml(type)}</button>`).join('')}
+        <div class="food-scan-modes grid grid-cols-2 gap-2" role="group" aria-label="${trHtml('Assign to Meal')}">
+          ${(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(type => `<button type="button" id="scan-meal-${type}" data-scan-meal="${type}" aria-pressed="${review.mealType === type}" onclick="window.scanReviewMeal('${type}')">${trHtml(type)}</button>`).join('')}
         </div>
       </section>
       <section class="phasic-tool-card flex flex-col gap-3" aria-label="${trHtml('Meal totals to save')}">
         <h2 class="font-heading font-bold text-base">${trHtml('Meal totals to save')}</h2>
-        <div class="grid grid-cols-2 gap-3">
+        <dl class="scan-review-totals">
           ${(['calories', 'protein', 'carbs', 'fat'] as const).map(key => `<div class="min-w-0">
-            <p class="phasic-tool-muted text-sm">${trHtml({ calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat' }[key])}</p>
-            <p class="font-heading font-extrabold text-xl break-words"><span id="scan-total-${key}" aria-live="polite">${formatDisplayNumber(nutrition[key], key === 'calories' ? 0 : 1)}</span> ${trHtml(key === 'calories' ? 'kcal' : 'g')}</p>
+            <dt>${trHtml({ calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat' }[key])}</dt>
+            <dd class="ui-number"><span id="scan-total-${key}" aria-live="polite">${formatDisplayNumber(nutrition[key], key === 'calories' ? 0 : 1)}</span> <span>${trHtml(key === 'calories' ? 'kcal' : 'g')}</span></dd>
           </div>`).join('')}
-        </div>
+        </dl>
         <p class="phasic-tool-muted text-sm">${trHtml(special ? 'Today’s strict fat allowance after this meal' : 'Today’s fat allowance after this meal')}</p>
         <p id="scan-fat-balance" class="font-heading font-bold" aria-live="polite">${fatBalance === null ? trHtml('Add total fat to preview today’s allowance.') : trHtml(fatBalance < 0 ? '{0} g over the ceiling' : '{0} g remaining', formatDisplayNumber(Math.abs(fatBalance)))}</p>
         <p class="phasic-tool-muted text-sm">${trHtml('Unknown fat in other logged meals may reduce the remaining allowance.')}</p>
         <p id="scan-review-consistency" class="food-scan-caution text-sm empty:hidden" role="status"></p>
       </section>
       <p id="scan-review-error" class="phasic-tool-error text-sm empty:hidden" role="alert" tabindex="-1"></p>
-      <button id="scan-save-meal" type="button" class="ui-primary-button" onclick="window.scanSaveReviewedMeal()" ${validateScanReview(review) ? 'disabled' : ''}>${trHtml('Confirm and log today’s meal')}</button>
+      <button id="scan-save-meal" type="submit" class="ui-primary-button">${trHtml('Confirm and log today’s meal')}</button>
       <button type="button" class="phasic-tool-secondary" onclick="window.scanOpenQueue()">${trHtml('Back to photo queue')}</button>
-      ${currentIndex >= 0 ? `<button type="button" class="phasic-tool-muted text-sm underline min-h-12" onclick="window.scanSkipPhoto('${queue[currentIndex].id}')">${trHtml('Skip this photo / duplicate dish')}</button>` : ''}
+      ${currentIndex >= 0 ? `<button type="button" class="scan-skip-link" onclick="window.scanSkipPhoto('${queue[currentIndex].id}')">${trHtml('Skip this photo / duplicate dish')}</button>` : ''}
       <p class="phasic-tool-muted text-sm leading-relaxed">${trHtml('Saves one meal with the reviewed totals and analysis history in your encrypted vault. Check the save indicator for storage completion.')}</p>
+      </form>
+      </main>
     </div>`;
 }

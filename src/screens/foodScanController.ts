@@ -11,8 +11,10 @@ import { getTodayKey } from '../utils/dateUtils.ts';
 import { formatDisplayNumber } from '../utils/safeNumbers.ts';
 import { foodScanProgressLabel, normalizeFoodScanProgress } from '../utils/foodScanProgress.ts';
 import type { FoodScanItem, FoodScanReviewField, MealType } from '../types/index.ts';
-import { createFoodScanItem, MAX_SCAN_PHOTOS, scanQueuePercent } from '../utils/foodScanQueue.ts';
+import { createFoodScanItem, MAX_SCAN_PHOTOS, scanActivityDetail, scanActivityLabel, scanQueuePercent } from '../utils/foodScanQueue.ts';
 import { refreshFoodScanActivity } from '../components/FoodScan/FoodScanActivity.ts';
+import { foodScanActivityLayout } from '../components/FoodScan/FoodScanActivityLayout.ts';
+import { showScanReviewErrors } from '../components/FoodScan/FoodScanReviewForm.ts';
 
 declare global {
   interface Window {
@@ -48,6 +50,7 @@ let worker: Promise<void> | null = null;
 let lastImageAttempt = 0;
 let consentedBackend: FoodAnalysisBackend | null = null;
 let saving = false;
+let validatedReviewId: string | null = null;
 const PHOTO_ERROR_MESSAGES = new Set([
   'Choose a JPEG, PNG or WebP photo.', 'Choose a photo smaller than 12 MB.',
   'This photo could not be opened. Try another image.', 'This photo is too large to process. Choose a smaller image.'
@@ -60,7 +63,7 @@ function isScanner(): boolean {
 function isReview(): boolean {
   return available() && !saving && store.getState().currentScreen === 'foodResult' && !!store.getState().foodScan.review;
 }
-function setText(id: string, value: string): void { const element = document.getElementById(id); if (element) element.textContent = value; }
+function setText(id: string, value: string): void { const element = document.getElementById(id); if (element && element.textContent !== value) element.textContent = value; }
 function reviewError(message: string): void { setText('scan-review-error', message ? tr(message) : ''); }
 function discardChoices(item: FoodScanItem): void {
   if (item.choices) (consentedBackend ?? getFoodAnalysisBackend())?.discardSelection?.(item.choices.selectionToken);
@@ -72,6 +75,7 @@ function releaseItemPhoto(item: FoodScanItem): void {
   item.photoUrl = null;
 }
 function releaseSession(): void {
+  validatedReviewId = null; foodScanActivityLayout.reset();
   generation++; request?.abort(); request = null;
   for (const item of sessionItems) { discardChoices(item); releaseItemPhoto(item); }
   sessionItems = []; photos.clear(); consentedBackend = null;
@@ -86,24 +90,22 @@ function clearSession(notify = true): void {
 
 function captureReview(): boolean {
   if (!isReview()) return false;
-  const review = store.getState().foodScan.review!;
   for (const field of SCAN_REVIEW_FIELDS) {
     if (field === 'cookingFatGrams') continue;
     const input = document.getElementById(`scan-review-${field}`);
     if (input instanceof HTMLInputElement) store.updateFoodScanReview({ [field]: input.value });
   }
   const cooking = document.getElementById('scan-review-cookingFatGrams');
-  if (cooking instanceof HTMLInputElement && cooking.value !== review.cookingFatGrams) {
-    try { store.updateFoodScanReview(changeCookingFat(review, cooking.value)); }
-    catch { reviewError('Cooking fat must be part of the total fat.'); return false; }
-  }
+  if (cooking instanceof HTMLInputElement) store.updateFoodScanReview({ cookingFatInput: cooking.value });
   return true;
 }
 
 /** Feedback-only updates keep the active input and its keyboard mounted. */
 export function refreshFoodScanFeedback(): void {
+  syncReviewControls();
   if (!isReview()) return;
   const draft = store.getState().foodScan.review!;
+  if (validatedReviewId === store.getState().foodScan.reviewItemId) showScanReviewErrors(draft);
   try {
     const review = resolveCookingFatDraft(draft);
     const nutrition = reviewedNutrition(review);
@@ -121,13 +123,20 @@ export function refreshFoodScanFeedback(): void {
       ? nutrition.protein * 4 + nutrition.carbs * 4 + nutrition.fat * 9 : null;
     const mismatch = nutrition.calories !== null && macroCalories !== null && Math.abs(nutrition.calories - macroCalories) > Math.max(50, macroCalories * 0.2);
     setText('scan-review-consistency', mismatch ? tr('Calories and macros differ considerably. Review the values before saving.') : '');
-    const save = document.getElementById('scan-save-meal');
-    if (save instanceof HTMLButtonElement) save.disabled = !!validateScanReview(review);
   } catch {
     for (const field of ['calories', 'protein', 'carbs', 'fat']) setText(`scan-total-${field}`, '—');
     setText('scan-fat-balance', '—');
-    const save = document.getElementById('scan-save-meal'); if (save instanceof HTMLButtonElement) save.disabled = true;
+    setText('scan-cooking-total', '—');
+    setText('scan-review-consistency', '');
   }
+}
+
+function syncReviewControls(): void {
+  const form = document.getElementById('scan-review-form');
+  form?.setAttribute('aria-busy', String(saving));
+  for (const control of form?.querySelectorAll<HTMLInputElement | HTMLButtonElement>('input,button') ?? [])
+    control.disabled = saving || blocked;
+  document.getElementById('scan-save-meal')?.setAttribute('aria-busy', String(saving));
 }
 
 function applyCookingFat(value: string): void {
@@ -146,6 +155,10 @@ function applyCookingFat(value: string): void {
 
 function itemById(id: string): FoodScanItem | undefined {
   return available() ? store.getState().foodScan.items.find(item => item.id === id) : undefined;
+}
+
+function focusQueueItem(id: string): void {
+  if (isScanner()) (document.getElementById(`scan-item-${id}-title`) ?? document.getElementById('scan-choose-photos'))?.focus({ preventScroll: true });
 }
 
 function updateQueue(notify = true): void {
@@ -168,7 +181,14 @@ function refreshQueueProgress(item: FoodScanItem): void {
     setText(`scan-item-${item.id}-percent`, `${progress.percent}%`);
     setText(`scan-item-${item.id}-stage`, foodScanProgressLabel(progress));
   }
-  setText('scan-queue-percent', `${scanQueuePercent(store.getState().foodScan)}%`);
+  const scan = store.getState().foodScan;
+  const percent = scanQueuePercent(scan);
+  setText('scan-queue-percent', `${percent}%`);
+  document.getElementById('scan-queue-progress')?.setAttribute('aria-valuenow', String(percent));
+  const queueFill = document.getElementById('scan-queue-fill');
+  if (queueFill) queueFill.style.width = `${percent}%`;
+  setText('scan-queue-label', scanActivityLabel(scan));
+  setText('scan-queue-detail', scanActivityDetail(scan));
   refreshFoodScanActivity();
 }
 
@@ -358,7 +378,7 @@ function openReview(id: string): void {
 }
 
 export function bindFoodScanHandlers(): void {
-  document.addEventListener('nutriai:lock-start', () => { clearSession(false); blocked = true; });
+  document.addEventListener('nutriai:lock-start', () => { clearSession(false); blocked = true; syncReviewControls(); });
   document.addEventListener('nutriai:lock-end', () => { blocked = false; if (isVaultUnlocked()) store.updateFoodScan({}); });
   window.addEventListener('pagehide', () => { if (available()) clearSession(false); else releaseSession(); });
   document.addEventListener('nutriai:food-backend-change', () => {
@@ -390,8 +410,17 @@ export function bindFoodScanHandlers(): void {
   };
   window.scanAIServiceCode = value => { if (isScanner() && !store.getState().foodScan.running) setFoodAnalysisAccessCode(value); };
   window.scanAnalyzePhoto = analyzePhotos;
-  window.scanCancelAnalysis = () => stopQueue();
-  window.scanDiscard = () => { if (available()) { clearSession(); if (store.getState().currentScreen === 'foodResult') store.openScannerMode('food'); } };
+  window.scanCancelAnalysis = () => {
+    const fromScannerButton = document.activeElement?.id === 'scan-stop-analysis';
+    stopQueue();
+    if (fromScannerButton) document.getElementById('scan-queue-title')?.focus({ preventScroll: true });
+  };
+  window.scanDiscard = () => {
+    if (!available()) return;
+    clearSession();
+    if (store.getState().currentScreen === 'foodResult') store.openScannerMode('food');
+    else document.getElementById('scan-choose-photos')?.focus({ preventScroll: true });
+  };
   window.scanOpenQueue = () => { if (available()) store.openScannerMode('food'); };
   window.scanChooseFood = (id, candidateId) => {
     if (!isScanner()) return;
@@ -399,14 +428,14 @@ export function bindFoodScanHandlers(): void {
     if (!item || item.status !== 'needs_choice' || !item.choices?.candidates.some(candidate => candidate.id === candidateId) || !canUpload()) return;
     if (!item.dishHint) item.dishHint = item.choices.candidates.find(candidate => candidate.id === candidateId)!.name.slice(0, 160);
     item.selectedCandidateId = candidateId; item.status = 'queued'; item.error = null;
-    store.updateFoodScan({ started: true }, false); updateQueue(); startQueue();
+    store.updateFoodScan({ started: true }, false); updateQueue(); startQueue(); focusQueueItem(id);
   };
   window.scanRetryPhoto = id => {
     if (!isScanner()) return;
     const item = itemById(id);
     if (!item || !['error', 'needs_choice'].includes(item.status) || !photos.has(id) || !canUpload()) return;
     discardChoices(item); item.status = 'queued'; item.error = null; item.progress = null;
-    store.updateFoodScan({ started: true }, false); updateQueue(); startQueue();
+    store.updateFoodScan({ started: true }, false); updateQueue(); startQueue(); focusQueueItem(id);
   };
   window.scanSkipPhoto = id => {
     if (!available()) return;
@@ -418,6 +447,7 @@ export function bindFoodScanHandlers(): void {
       if (store.getState().currentScreen === 'foodResult') store.openScannerMode('food');
     }
     updateQueue();
+    focusQueueItem(id);
   };
   window.scanReviewPhoto = openReview;
   window.scanManualReview = id => {
@@ -460,12 +490,14 @@ export function bindFoodScanHandlers(): void {
     const scan = store.getState().foodScan;
     const item = scan.items.find(entry => entry.id === scan.reviewItemId && entry.status === 'review');
     if (!item) return;
+    validatedReviewId = item.id;
+    if (showScanReviewErrors(scan.review!, true)) return;
     const error = validateScanReview(scan.review!);
     if (error) { reviewError(error); document.getElementById('scan-review-error')?.focus(); return; }
-    saving = true;
+    saving = true; syncReviewControls();
     let accepted = false;
     try { accepted = store.logReviewedScannedFood(); }
-    finally { saving = false; }
+    finally { saving = false; syncReviewControls(); }
     if (!accepted) { reviewError('The change could not be queued. Keep this tab open and retry.'); return; }
     item.status = 'saved'; item.result = null; item.review = null; releaseItemPhoto(item);
     store.updateFoodScan({ photoUrl: null, reviewItemId: null }, false);
