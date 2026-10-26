@@ -15,7 +15,7 @@ export function renderWorkoutDetailScreen(): string {
         <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">error_outline</span>
         <h2 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("Workout Not Found")}</h2>
         <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-1">${trHtml("This workout record may have been removed.")}</p>
-        <button onclick="window.closeWorkoutDetail()" class="mt-4 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-sm">
+        <button type="button" onclick="window.closeWorkoutDetail()" class="ui-primary-button mt-4">
           ${trHtml("Return to Fitness")}
         </button>
       </div>
@@ -45,30 +45,30 @@ export function renderWorkoutDetailScreen(): string {
   const durationMin = workout.durationSeconds > 0 ? Math.max(1, Math.round(workout.durationSeconds / 60)) : null;
 
   return `
-    <div class="flex flex-col min-h-screen pb-12 bg-surface dark:bg-dark-surface transition-colors">
+    <div class="workout-history-screen flex flex-col min-h-screen pb-12 bg-surface dark:bg-dark-surface transition-colors">
       
       <!-- Top App Bar -->
-      <header class="sticky top-0 z-40 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20 shadow-sm">
-        <div class="flex items-center gap-2.5">
-          <button 
+      <header class="workout-history-header sticky top-0 z-40 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20 shadow-sm">
+        <div class="flex min-w-0 items-center gap-2.5">
+          <button type="button"
             onclick="window.closeWorkoutDetail()" 
             aria-label="${trHtml("Back to Fitness")}"
-            class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
+            class="ui-icon-button shrink-0"
           >
-            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
           </button>
-          <div>
+          <div class="min-w-0">
             <h1 class="font-heading font-bold text-base text-on-surface dark:text-white leading-tight">${trHtml("Workout Details")}</h1>
-            <p class="text-xs text-on-surface-variant dark:text-gray-400">${formattedDate}</p>
+            <p class="text-xs text-on-surface-variant dark:text-gray-400">${escapeHtml(formattedDate)}</p>
           </div>
         </div>
 
-        <button 
+        <button type="button"
           onclick="window.openDeleteModal(${htmlJsArg(workout.id)})"
           aria-label="${trHtml("Delete this workout")}"
-          class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-error active:scale-95 transition-all"
+          class="ui-icon-button workout-history-delete shrink-0"
         >
-          <span class="material-symbols-outlined text-[18px]">delete_outline</span>
+          <span class="material-symbols-outlined" aria-hidden="true">delete_outline</span>
         </button>
       </header>
 
@@ -80,22 +80,22 @@ export function renderWorkoutDetailScreen(): string {
           
           <div class="flex items-start justify-between">
             <div>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <h2 class="font-heading font-extrabold text-lg text-on-surface dark:text-white leading-tight">${escapeHtml(translatedLabel(workout.name))}</h2>
                 ${workout.status === 'completed' ? `
                   <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[10px] font-extrabold flex items-center gap-0.5">
-                    <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    <span class="material-symbols-outlined text-[12px]" aria-hidden="true" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                     ${trHtml("Completed")}
                   </span>
                 ` : `
                   <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-extrabold flex items-center gap-0.5">
-                    <span class="material-symbols-outlined text-[12px]">schedule</span>
+                    <span class="material-symbols-outlined text-[12px]" aria-hidden="true">schedule</span>
                     ${trHtml("Incomplete")}
                   </span>
                 `}
               </div>
               <p class="text-xs text-on-surface-variant dark:text-gray-400 mt-0.5">
-                ${formattedStartTime} ${trHtml("&ndash;")} ${formattedFinishTime}
+                ${escapeHtml(formattedStartTime)} ${trHtml("&ndash;")} ${escapeHtml(formattedFinishTime)}
               </p>
             </div>
           </div>
@@ -145,8 +145,8 @@ export function renderWorkoutDetailScreen(): string {
               return `
                 <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-4 border border-outline-variant/30 shadow-sm flex flex-col gap-3">
                   
-                  <div class="flex items-start justify-between border-b border-outline-variant/20 pb-2.5">
-                    <div class="flex items-center gap-2.5">
+                  <div class="workout-history-exercise-heading flex flex-wrap items-start justify-between gap-3 border-b border-outline-variant/20 pb-2.5">
+                    <div class="flex min-w-0 items-center gap-2.5">
                       <span class="w-6 h-6 rounded-full bg-surface-container dark:bg-gray-700 text-on-surface dark:text-gray-200 text-xs font-bold flex items-center justify-center">
                         ${exIdx + 1}
                       </span>
@@ -167,7 +167,7 @@ export function renderWorkoutDetailScreen(): string {
                     ${ex.sets.map(s => {
                       const setVol = s.weightKg * s.reps;
                       return `
-                        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-xl text-xs ${s.completed
+                        <div class="workout-history-set flex flex-wrap items-center justify-between gap-2 py-2 px-3 rounded-xl text-xs ${s.completed
                             ? 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface dark:text-gray-200' 
                             : 'bg-surface-container-low/50 dark:bg-dark-surface-card-high/40 text-on-surface-variant line-through'}">
                           <div class="flex items-center gap-2">
@@ -181,7 +181,7 @@ export function renderWorkoutDetailScreen(): string {
                             </span>
                             ${s.isPersonalRecord ? `
                               <span class="px-1.5 py-0.2 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-[9px] border border-amber-500/30 flex items-center gap-0.5">
-                                <span class="material-symbols-outlined text-[11px]">emoji_events</span>
+                                <span class="material-symbols-outlined text-[11px]" aria-hidden="true">emoji_events</span>
                                 ${trHtml("PR")}
                               </span>
                             ` : ''}
@@ -202,18 +202,18 @@ export function renderWorkoutDetailScreen(): string {
           <!-- Repeat Workout Button -->
           <button 
             onclick="window.repeatWorkout(${htmlJsArg(workout.id)})"
-            class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-white font-heading text-xs font-extrabold shadow-glow-primary active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+            class="ui-primary-button flex items-center justify-center gap-2"
           >
-            <span class="material-symbols-outlined text-[18px]">replay</span>
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">replay</span>
             <span>${trHtml("Repeat This Workout")}</span>
           </button>
 
           <!-- Delete Button -->
           <button 
             onclick="window.openDeleteModal(${htmlJsArg(workout.id)})"
-            class="w-full py-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-xs font-bold text-error active:scale-95 transition-all flex items-center justify-center gap-1.5 hover:bg-red-500/10"
+            class="nutrition-secondary-button workout-history-delete w-full flex items-center justify-center gap-2"
           >
-            <span class="material-symbols-outlined text-[18px]">delete</span>
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>
             <span>${trHtml("Delete Workout Record")}</span>
           </button>
         </div>

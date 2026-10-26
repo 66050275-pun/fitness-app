@@ -18,6 +18,8 @@ import './components/Dashboard/dashboard.css';
 import './components/Food/foodEntry.css';
 import './components/FoodScan/foodScan.css';
 import './components/Fitness/fitnessPlanner.css';
+import './components/Fitness/restTimer.css';
+import './components/Fitness/workoutHistory.css';
 import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, FitnessObjective, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';

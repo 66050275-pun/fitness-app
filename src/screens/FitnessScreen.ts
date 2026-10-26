@@ -429,33 +429,33 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
     <div class="flex flex-col min-h-screen pb-24 bg-surface dark:bg-dark-surface transition-colors">
       
       <!-- Sticky Active Header -->
-      <header class="sticky top-0 z-40 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20 shadow-sm">
+      <header class="sticky top-0 z-40 bg-surface/95 dark:bg-dark-surface/95 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex flex-col items-stretch gap-3 border-b border-outline-variant/20 shadow-sm">
         
         <!-- Title and Cancel Button -->
-        <div class="flex items-center gap-2">
-          <button onclick="window.cancelActiveWorkout()" aria-label="${trHtml("Cancel Workout")}" class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-error transition-colors">
-            <span class="material-symbols-outlined text-[18px]">close</span>
+        <div class="flex items-center gap-3 min-w-0">
+          <button type="button" id="active-workout-cancel" onclick="window.cancelActiveWorkout()" aria-label="${trHtml("Cancel Workout")}" class="ui-icon-button">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
-          <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-primary dark:text-primary-container block">${trHtml("Active Session")}</span>
-            <h2 class="font-heading font-bold text-xs text-on-surface dark:text-white truncate max-w-[140px]">${escapeHtml(translatedLabel(activeWorkout.presetTitle))}</h2>
+          <div class="min-w-0">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-primary dark:text-primary-container block">${trHtml("Active Session")}</span>
+            <h2 class="font-heading font-bold text-base text-on-surface dark:text-white break-words">${escapeHtml(translatedLabel(activeWorkout.presetTitle))}</h2>
           </div>
         </div>
 
         <!-- Live Elapsed Timer Display -->
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-1.5 bg-surface-container-low dark:bg-dark-surface-card px-3 py-1 rounded-full border border-outline-variant/30">
             <span class="w-2 h-2 rounded-full ${isPaused ? 'bg-amber-500' : 'bg-primary-container animate-pulse'}"></span>
             <span id="active-workout-timer-display" class="font-display font-extrabold text-sm text-on-surface dark:text-white">${timerStr}</span>
           </div>
 
           <!-- Pause / Resume Button -->
-          <button onclick="window.togglePauseWorkout()" aria-label="${isPaused ? tr("Resume") : tr("Pause")}" class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-all">
-            <span class="material-symbols-outlined text-[18px]">${isPaused ? 'play_arrow' : 'pause'}</span>
+          <button type="button" id="active-workout-pause" onclick="window.togglePauseWorkout()" aria-label="${isPaused ? trHtml("Resume") : trHtml("Pause")}" class="ui-icon-button">
+            <span class="material-symbols-outlined" aria-hidden="true">${isPaused ? 'play_arrow' : 'pause'}</span>
           </button>
 
           <!-- Finish CTA -->
-          <button onclick="window.finishActiveWorkout()" class="px-3 py-1 rounded-full bg-primary text-white text-xs font-bold active:scale-95 transition-transform shadow-sm">
+          <button type="button" id="active-workout-finish" onclick="window.finishActiveWorkout()" class="min-h-12 px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold active:scale-95 transition-transform shadow-sm">
             ${trHtml("Finish")}
           </button>
         </div>
@@ -467,7 +467,7 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
         
         <!-- Progress Stepper Header -->
         <div class="flex flex-col gap-1.5">
-          <div class="flex items-center justify-between text-xs text-on-surface-variant dark:text-gray-400">
+          <div class="flex flex-wrap gap-2 items-center justify-between text-sm text-on-surface-variant dark:text-gray-400">
             <span class="font-bold">${trHtml("Exercise")} ${currentExerciseIndex + 1} ${trHtml("of")} ${totalExercises}</span>
             <span>${Math.round(((currentExerciseIndex + 1) / totalExercises) * 100)}${trHtml("% progress")}</span>
           </div>
@@ -479,15 +479,15 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
         <!-- The clock can keep running while the user views their workout. -->
         ${restTimerSeconds !== null ? `
           <div class="p-3 rounded-2xl bg-primary/5 dark:bg-dark-surface-card border border-primary/25 flex items-center gap-3 animate-fade-in">
-            <button type="button" onclick="window.openRestTimer()" class="min-w-0 flex-1 flex items-center gap-2.5 text-left" aria-label="${trHtml('Open rest timer')}">
+            <button type="button" onclick="window.openRestTimer()" class="min-w-0 min-h-12 flex-1 flex items-center gap-2.5 text-left" aria-label="${trHtml('Open rest timer')}">
               <span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[24px]" aria-hidden="true">timer</span>
-              <div class="min-w-0 flex-1">
-                <span class="text-[10px] uppercase font-bold text-primary dark:text-primary-fixed tracking-wider block">${trHtml(activeWorkout.restTimerPaused || isPaused ? 'Rest paused' : 'Rest Interval')}</span>
+              <span class="min-w-0 flex-1">
+                <span class="text-xs uppercase font-bold text-primary dark:text-primary-fixed tracking-wider block">${trHtml(activeWorkout.restTimerPaused || isPaused ? 'Rest paused' : 'Rest Interval')}</span>
                 <span id="active-rest-timer-compact" class="font-display font-extrabold text-lg text-on-surface dark:text-white leading-none tabular-nums">${store.formatTimerString(restTimerSeconds)}</span>
-              </div>
+              </span>
               <span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[20px]" aria-hidden="true">open_in_full</span>
             </button>
-            <button type="button" onclick="window.skipRestTimer()" class="shrink-0 px-3 py-2 rounded-xl bg-white dark:bg-dark-surface-card-high text-primary dark:text-primary-fixed text-xs font-bold shadow-sm active:scale-95 transition-all">
+            <button type="button" onclick="window.skipRestTimer()" class="shrink-0 min-h-12 px-3 py-2 rounded-xl bg-white dark:bg-dark-surface-card-high text-primary dark:text-primary-fixed text-sm font-bold shadow-sm active:scale-95 transition-all">
               ${trHtml("Skip Rest")}
             </button>
           </div>
@@ -498,7 +498,7 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
           
           <div class="flex items-start justify-between border-b border-outline-variant/20 pb-3">
             <div>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <h3 class="font-heading font-extrabold text-base text-on-surface dark:text-white">${escapeHtml(exerciseLabel(currentEx.name))}</h3>
                 <span class="px-2 py-0.2 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[10px] font-extrabold">${currentEx.sets.length} ${trHtml("Sets")}</span>
               </div>
@@ -513,25 +513,25 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
           <!-- Sets Logging Table -->
           <div class="flex flex-col gap-2">
             <!-- Table Header -->
-            <div class="grid grid-cols-12 gap-2 text-[11px] font-bold text-on-surface-variant dark:text-gray-400 px-1">
-              <div class="col-span-2 text-center">${trHtml("SET")}</div>
-              <div class="col-span-4 text-center">${trHtml("WEIGHT (KG)")}</div>
-              <div class="col-span-4 text-center">${trHtml("REPS")}</div>
-              <div class="col-span-2 text-center">${trHtml("DONE")}</div>
+            <div class="grid grid-cols-[28px_minmax(0,1fr)_minmax(0,1fr)_48px] gap-2 text-xs font-bold text-on-surface-variant dark:text-gray-400 px-1 break-words">
+              <div class="min-w-0 text-center">${trHtml("SET")}</div>
+              <div class="min-w-0 text-center">${trHtml("WEIGHT (KG)")}</div>
+              <div class="min-w-0 text-center">${trHtml("REPS")}</div>
+              <div class="min-w-0 text-center">${trHtml("DONE")}</div>
             </div>
 
             <!-- Set Rows -->
             ${currentEx.sets.map((set, sIdx) => `
-              <div class="grid grid-cols-12 gap-2 items-center p-2 rounded-xl border transition-all ${set.completed
+              <div class="grid grid-cols-[28px_minmax(0,1fr)_minmax(0,1fr)_48px] gap-2 items-center p-2 rounded-xl border transition-all ${set.completed
                   ? 'bg-[#EAF9F0] dark:bg-primary/20 border-primary-container/40' 
                   : 'bg-surface-container-low dark:bg-dark-surface-card-high border-outline-variant/30'}">
                 <!-- Set Number -->
-                <div class="col-span-2 text-center font-heading font-extrabold text-xs text-on-surface dark:text-white">
+                <div class="min-w-0 text-center font-heading font-extrabold text-xs text-on-surface dark:text-white">
                   ${set.setNumber}
                 </div>
 
                 <!-- Weight Input -->
-                <div class="col-span-4 min-w-0 flex items-center justify-center">
+                <div class="min-w-0 flex items-center justify-center">
                   <input 
                     id="active-set-weight-${currentExerciseIndex}-${sIdx}"
                     type="number" 
@@ -541,12 +541,12 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
                     value="${escapeHtml(set.weightKg === 0 ? '' : set.weightKg)}"
                     placeholder="0"
                     onchange="window.updateActiveSetInput(${currentExerciseIndex}, ${sIdx}, this.value, null)"
-                    class="w-full max-w-16 min-w-0 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
+                    class="ui-field w-full min-w-0 text-center px-1 py-2 font-bold" inputmode="decimal"
                   />
                 </div>
 
                 <!-- Reps Input -->
-                <div class="col-span-4 min-w-0 flex flex-col items-center justify-center gap-1">
+                <div class="min-w-0 flex flex-col items-center justify-center gap-1">
                   <input 
                     id="active-set-reps-${currentExerciseIndex}-${sIdx}"
                     type="number" 
@@ -555,21 +555,21 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
                     aria-label="${trHtml('Actual reps for set {0}', set.setNumber)}"
                     value="${escapeHtml(set.actualReps)}"
                     onchange="window.updateActiveSetInput(${currentExerciseIndex}, ${sIdx}, null, this.value)"
-                    class="w-full max-w-16 min-w-0 text-center py-1 rounded-lg bg-surface-container-lowest dark:bg-dark-surface text-xs font-bold border border-outline-variant/40 focus:border-primary text-on-surface dark:text-white focus:outline-none"
+                    class="ui-field w-full min-w-0 text-center px-1 py-2 font-bold" inputmode="numeric"
                   />
                   <span class="workout-set-target">${trHtml('Target: {0} reps', formatDisplayNumber(set.targetReps, 0))}</span>
                 </div>
 
                 <!-- Complete Checkbox Button -->
-                <div class="col-span-2 flex justify-center">
-                  <button 
+                <div class="flex justify-center">
+                  <button type="button" id="active-set-complete-${currentExerciseIndex}-${sIdx}" aria-pressed="${set.completed}"
                     onclick="window.completeActiveSet(${currentExerciseIndex}, ${sIdx})"
-                    aria-label="${trHtml("Complete set")} ${set.setNumber}"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center transition-all ${set.completed
-                        ? 'bg-primary text-white shadow-sm scale-105' 
+                    aria-label="${trHtml("Complete set {0}", set.setNumber)}"
+                    class="w-12 h-12 rounded-xl flex items-center justify-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${set.completed
+                        ? 'bg-primary text-white shadow-sm'
                         : 'bg-surface-container-highest dark:bg-gray-700 text-on-surface-variant hover:text-primary active:scale-95'}"
                   >
-                    <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' ${set.completed ? 1 : 0};">
+                    <span class="material-symbols-outlined text-[24px]" aria-hidden="true" style="font-variation-settings: 'FILL' ${set.completed ? 1 : 0};">
                       check
                     </span>
                   </button>
@@ -582,30 +582,30 @@ function renderActiveWorkoutView(activeWorkout: ActiveWorkoutSessionState | null
 
         <!-- Navigation Between Exercises -->
         <div class="flex items-center justify-between gap-3 pt-2">
-          <button 
-            onclick="window.prevActiveExercise()" 
-            ${currentExerciseIndex === 0 ? 'disabled class="opacity-40 cursor-not-allowed"' : 'class="active:scale-95"'}
-            class="flex-1 py-3 rounded-xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-xs font-bold text-on-surface dark:text-white flex items-center justify-center gap-1 transition-all"
+          <button type="button" id="active-previous-exercise"
+            onclick="window.prevActiveExercise()"
+            ${currentExerciseIndex === 0 ? 'disabled' : ''}
+            class="min-h-12 min-w-0 flex-1 py-3 px-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-sm font-bold text-on-surface dark:text-white flex items-center justify-center gap-1 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_left</span>
             <span>${trHtml("Previous")}</span>
           </button>
 
           ${currentExerciseIndex < totalExercises - 1 ? `
             <button 
               onclick="window.nextActiveExercise()" 
-              class="flex-1 py-3 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95 transition-all"
+              class="min-h-12 min-w-0 flex-1 py-3 px-2 rounded-xl bg-primary text-white text-sm font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95 transition-all"
             >
               <span>${trHtml("Next Exercise")}</span>
-              <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+              <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_right</span>
             </button>
           ` : `
             <button 
               onclick="window.finishActiveWorkout()" 
-              class="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-container text-white text-xs font-extrabold flex items-center justify-center gap-1 shadow-glow-primary active:scale-95 transition-all"
+              class="min-h-12 min-w-0 flex-1 py-3 px-2 rounded-xl bg-gradient-to-r from-primary to-primary-container text-white text-sm font-extrabold flex items-center justify-center gap-1 shadow-glow-primary active:scale-95 transition-all"
             >
               <span>${trHtml("Finish Workout")}</span>
-              <span class="material-symbols-outlined text-[18px]">flag</span>
+              <span class="material-symbols-outlined text-[18px]" aria-hidden="true">flag</span>
             </button>
           `}
         </div>
@@ -655,36 +655,36 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
       <main class="px-screen-gutter flex flex-col gap-4 -mt-3 relative z-10 bg-surface dark:bg-dark-surface rounded-t-3xl pt-5">
         
         <!-- 4 Key Metrics Tiles -->
-        <div class="grid grid-cols-2 gap-2.5">
+        <div class="ui-number-grid grid grid-cols-2 gap-2.5">
           
-          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col">
+          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col min-w-0 break-words">
             <div class="flex items-center gap-1 text-on-surface-variant dark:text-gray-400 mb-1">
               <span class="material-symbols-outlined text-[16px]">timer</span>
-              <span class="text-[11px] font-bold uppercase">${trHtml("Duration")}</span>
+              <span class="text-xs font-bold uppercase">${trHtml("Duration")}</span>
             </div>
             <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white">${mins} <span class="text-xs font-normal">${trHtml("min")}</span></span>
           </div>
 
-          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col">
+          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col min-w-0 break-words">
             <div class="flex items-center gap-1 text-on-surface-variant dark:text-gray-400 mb-1">
               <span class="material-symbols-outlined text-[16px]">task_alt</span>
-              <span class="text-[11px] font-bold uppercase">${trHtml("Exercises")}</span>
+              <span class="text-xs font-bold uppercase">${trHtml("Exercises")}</span>
             </div>
             <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white">${completedExCount} / ${summary.exercises.length}</span>
           </div>
 
-          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col">
+          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col min-w-0 break-words">
             <div class="flex items-center gap-1 text-on-surface-variant dark:text-gray-400 mb-1">
               <span class="material-symbols-outlined text-[16px]">repeat</span>
-              <span class="text-[11px] font-bold uppercase">${trHtml("Total Sets")}</span>
+              <span class="text-xs font-bold uppercase">${trHtml("Total Sets")}</span>
             </div>
             <span class="font-heading font-extrabold text-lg text-on-surface dark:text-white">${summary.completedSetCount} <span class="text-xs font-normal">${trHtml("completed")}</span></span>
           </div>
 
-          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col">
+          <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3.5 rounded-2xl border border-outline-variant/30 shadow-sm flex flex-col min-w-0 break-words">
             <div class="flex items-center gap-1 text-on-surface-variant dark:text-gray-400 mb-1">
               <span class="material-symbols-outlined text-[16px]">weight</span>
-              <span class="text-[11px] font-bold uppercase">${trHtml("Total Volume")}</span>
+              <span class="text-xs font-bold uppercase">${trHtml("Total Volume")}</span>
             </div>
             <span class="ui-number font-heading font-extrabold text-lg text-on-surface dark:text-white">${summary.totalVolume > 0 ? `${formatDisplayNumber(summary.totalVolume)} <span class="text-xs font-normal">${trHtml("kg")}</span>` : '&mdash;'}</span>
           </div>
@@ -703,9 +703,9 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
               </h4>
               ${summary.estimatedCalories ? `<span class="px-1.5 py-0.2 rounded-full bg-orange-500/10 text-orange-600 text-[9px] font-extrabold uppercase">${trHtml("Calculated")}</span>` : ''}
             </div>
-            <p class="ui-number text-[11px] text-on-surface-variant dark:text-gray-400 mt-0.5 leading-relaxed">
+            <p class="ui-number text-sm text-on-surface-variant dark:text-gray-400 mt-0.5 leading-relaxed">
               ${summary.estimatedCalories 
-                ? tr("Based on mechanical volume ({0} kg) and duration. Connect biometric sensor in Settings for real-time heart rate accuracy.", formatDisplayNumber(summary.totalVolume))
+                ? trHtml("Estimated from lifted volume ({0} kg) and workout duration.", formatDisplayNumber(summary.totalVolume))
                 : tr("No calories recorded as this workout did not complete weighted volume.")}
             </p>
           </div>
@@ -718,13 +718,13 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
           <div class="flex flex-col gap-2">
             ${summary.exercises.map(ex => `
               <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-3 rounded-xl border border-outline-variant/30 text-xs">
-                <div class="flex items-center justify-between mb-1.5">
+                <div class="flex flex-wrap gap-2 items-center justify-between mb-1.5">
                   <span class="font-heading font-bold text-on-surface dark:text-white">${escapeHtml(exerciseLabel(ex.exerciseName))}</span>
                   <span class="text-[10px] text-on-surface-variant dark:text-gray-400">${escapeHtml(translatedMuscles(ex.muscleGroups))}</span>
                 </div>
                 <div class="flex flex-wrap gap-1.5">
                   ${ex.sets.map(s => `
-                    <span class="ui-number px-2 py-0.5 rounded-md text-[10px] ${s.completed
+                    <span class="ui-number px-2 py-1 rounded-md text-xs ${s.completed
                         ? 'bg-primary/10 text-primary dark:text-primary-container font-semibold' 
                         : 'bg-surface-container dark:bg-gray-700 text-on-surface-variant line-through'}">
                       ${trHtml("Set")} ${s.setNumber}: ${s.weightKg > 0 ? tr("{0}kg &times;", formatDisplayNumber(s.weightKg)) : ''}${s.reps} ${trHtml("reps")}
@@ -740,7 +740,7 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
         <div class="flex flex-col gap-2 pt-2">
           <button 
             onclick="window.saveWorkoutSummary()" 
-            class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-white font-heading text-sm font-extrabold shadow-glow-primary active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+            class="ui-primary-button flex items-center justify-center gap-2"
           >
             <span class="material-symbols-outlined text-[20px]">save</span>
             <span>${isIncomplete ? tr("Save as Incomplete & Return Home") : tr("Save Workout & Return to Home")}</span>
@@ -748,7 +748,7 @@ function renderWorkoutSummaryView(summary: WorkoutHistoryEntry | null): string {
           
           <button 
             onclick="window.discardWorkoutSummary()" 
-            class="w-full py-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-xs font-bold text-on-surface-variant dark:text-gray-400 hover:text-error active:scale-95 transition-all"
+            class="w-full min-h-12 py-3 rounded-2xl bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 text-sm font-bold text-on-surface-variant dark:text-gray-400 hover:text-error active:scale-95 transition-all"
           >
             ${trHtml("Discard Session")}
           </button>

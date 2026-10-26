@@ -1,0 +1,43 @@
+/* Rest interval: the dialog remains bounded by the shared viewport lifecycle. */
+.rest-timer-header {
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  gap: 8px;
+}
+.rest-timer-back {
+  width: 48px;
+  height: 48px;
+  border-color: var(--ui-control-border);
+  color: var(--ui-text);
+}
+.rest-timer-heading h2 { font: 700 16px/1.5 var(--ui-font-heading); }
+.rest-timer-heading p { font-size: 14px; overflow-wrap: anywhere; }
+.rest-timer-label { font-size: clamp(14px, 5cqw, 16px); }
+.rest-timer-finish-time { font-size: clamp(12px, 4.3cqw, 14px); overflow-wrap: anywhere; }
+.rest-timer-add {
+  min-height: 48px;
+  border-color: var(--ui-control-border);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.rest-timer-controls { gap: clamp(12px, 8vw, 48px); }
+.rest-timer-control { flex: 1 1 0; min-width: 0; max-width: 140px; }
+.rest-timer-control > span { font-size: 14px; overflow-wrap: anywhere; }
+.rest-timer-primary { background: var(--ui-action); color: var(--ui-on-action); }
+.rest-timer-secondary { border-color: var(--ui-control-border); }
+.rest-timer-body .workout-assistant-heading h4 { font-size: 14px; }
+.rest-timer-body .workout-assistant-reason { font-size: 14px; }
+.rest-timer-body .workout-assistant-estimate { font-size: 12px; }
+.rest-timer-body .workout-assistant-apply { min-height: 48px; font-size: 14px; }
+.rest-timer-panel :where(button):focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .rest-timer-primary:hover { background: var(--ui-action-hover); }
+}
+@media (max-height: 600px) {
+  .rest-timer-header { gap: 4px; }
+  .rest-timer-control > span { font-size: 12px; }
+}

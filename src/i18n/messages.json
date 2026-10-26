@@ -1,4 +1,6 @@
 {
+  "Complete set {0}": { "en": "Complete set {0}", "th": "ทำเซ็ต {0} ให้เสร็จ" },
+  "Estimated from lifted volume ({0} kg) and workout duration.": { "en": "Estimated from lifted volume ({0} kg) and workout duration.", "th": "ประมาณจากปริมาณน้ำหนักที่ยก ({0} กก.) และระยะเวลาการฝึก" },
   "Selected": { "en": "Selected", "th": "เลือกแล้ว" },
   "Workout Presets": { "en": "Workout Presets", "th": "โปรแกรมออกกำลังกาย" },
   "Added to workout": { "en": "Added to workout", "th": "เพิ่มในโปรแกรมแล้ว" },

@@ -139,6 +139,7 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Use a large 2D circular dial with fine radial ticks, green remaining progress, a prominent tabular **mm:ss** readout and the localized finish time. Apply the existing light/dark surface colors and heading font.
 - Put **+30 seconds** below the dial and large circular Pause/Resume and Skip Rest controls at the bottom. Preserve readable labels and scroll the body on short screens while keeping controls accessible.
 - Back closes the clock while the rest continues; the compact workout timer reopens it. Skip ends the rest. Rest Pause affects the rest countdown; the workout's Pause freezes both timers. Resume Workout resumes the session while preserving any separate rest pause.
+- Give the clock's Back, +30, Pause/Resume and Skip controls stable IDs, visible focus and comfortable touch targets. Keep labels and assistant advice readable on narrow and short screens, with scrollable content and reachable footer actions.
 - Derive the rest countdown from its local deadline rather than interval callback counts. Update the dial in place without restarting transitions or moving focus, and close it when the rest finishes. Timer state stays in memory and is cleared when the vault locks.
 
 ### Workout assistant
@@ -146,6 +147,8 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Show the next-set suggestion in the rest clock's scrollable body and above the active set log. Use the same green surfaces, readable reason, formatted load and reps, and explicit Apply/Applied status.
 - Automatically fill only an incomplete set that the user has not edited. Preserve manual entries and completed sets. Undoing the source set restores an untouched automatic fill; manual changes are retained.
 - Distinguish target reps from actual reps. Load inputs accept 0.25 kg steps to accommodate 1.25 kg increments.
+- During an active session, use wrapping header rows, 16px weight/repetition inputs and a 48px set completion toggle with a localized label and pressed state. Keep elapsed/rest timer IDs and existing handlers stable during updates.
+- The workout summary and history use wrapping metrics and 48px actions. Describe calories as an estimate from lifted volume and duration. Personal record occurrences are native buttons, and the linked record session is labeled as workout details rather than necessarily the latest session.
 - Before starting, explain loads drawn from saved history. Use a stable rep bracket and increase only after every prescribed set reaches its upper bound at the same positive load. Bodyweight, timed and assisted movements do not receive automatic weight increases.
 - Suggestions and Epley estimates are local calculations. Recompute their wording when the language changes; do not store localized reasons in workout history.
 
@@ -264,6 +267,7 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/security/vaultUI.ts`: PIN gate, status and shield.
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/components/Fitness/exerciseCatalog.css` and `fitnessPlanner.css`: scoped catalog, calendar and planner-dialog presentation.
+- `src/components/Fitness/restTimer.css` and `workoutHistory.css`: scoped rest-clock and workout/record detail presentation; the existing clock lifecycle remains in `RestTimerDialog.ts`.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/navigationLayout.ts`: bottom-navigation measurement, content clearance and cleanup on lock.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.

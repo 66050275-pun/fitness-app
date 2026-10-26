@@ -75,7 +75,7 @@ export function renderRestTimerDialog(): string {
       role="dialog" aria-modal="true" aria-labelledby="rest-timer-title">
       <section class="ui-dialog-panel rest-timer-panel">
         <header class="ui-dialog-header rest-timer-header">
-          <button type="button" class="rest-timer-back" onclick="window.closeRestTimer()" aria-label="${trHtml('Back to workout')}">
+          <button id="rest-timer-back" type="button" class="rest-timer-back" onclick="window.closeRestTimer()" aria-label="${trHtml('Back to workout')}">
             <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
           </button>
           <div class="rest-timer-heading">
@@ -105,7 +105,7 @@ export function renderRestTimerDialog(): string {
               <p id="rest-timer-finish-time" class="rest-timer-finish-time">${escapeHtml(finishLabel(workout))}</p>
             </div>
           </div>
-          <button type="button" class="rest-timer-add" onclick="window.addRestTimerSeconds(30)">
+          <button id="rest-timer-add" type="button" class="rest-timer-add" onclick="window.addRestTimerSeconds(30)">
             <span class="material-symbols-outlined" aria-hidden="true">add_circle</span>
             <span>${trHtml('+30 seconds')}</span>
           </button>
@@ -114,13 +114,13 @@ export function renderRestTimerDialog(): string {
 
         <footer class="ui-dialog-footer rest-timer-controls">
           <div class="rest-timer-control">
-            <button type="button" class="rest-timer-round-button rest-timer-primary" onclick="window.toggleRestTimerPause()" aria-label="${trHtml(pauseLabel)}">
+            <button id="rest-timer-pause" type="button" class="rest-timer-round-button rest-timer-primary" onclick="window.toggleRestTimerPause()" aria-label="${trHtml(pauseLabel)}">
               <span class="material-symbols-outlined" aria-hidden="true">${paused ? 'play_arrow' : 'pause'}</span>
             </button>
             <span>${trHtml(pauseLabel)}</span>
           </div>
           <div class="rest-timer-control">
-            <button type="button" class="rest-timer-round-button rest-timer-secondary" onclick="window.skipRestTimer()" aria-label="${trHtml('Skip Rest')}">
+            <button id="rest-timer-skip" type="button" class="rest-timer-round-button rest-timer-secondary" onclick="window.skipRestTimer()" aria-label="${trHtml('Skip Rest')}">
               <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
             <span>${trHtml('Skip Rest')}</span>
