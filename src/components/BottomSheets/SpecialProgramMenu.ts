@@ -8,6 +8,7 @@ function renderToolAction(action: SpecialProgramAction): string {
   return `
     <button
       type="button"
+      id="special-program-${action.id}"
       class="quick-add-action-tile special-program-action-tile"
       data-special-program-tool="${action.id}"
       onclick="window.selectSpecialProgramTool('${action.id}')"
@@ -50,7 +51,7 @@ export function renderSpecialProgramMenu(isUnlocked: boolean): string {
             <p>${trHtml('Use today’s diary and your saved program targets.')}</p>
           </div>
         </div>
-        <div class="quick-add-action-grid special-program-action-grid">
+        <div class="quick-add-action-grid special-program-action-grid" role="group" aria-label="${trHtml('Your program tools')}">
           ${SPECIAL_PROGRAM_ACTIONS.map(renderToolAction).join('')}
         </div>
       </div>

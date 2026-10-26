@@ -58,22 +58,28 @@ export function renderPhaseCycleTracker(): string {
     <div class="space-y-4">
       <p class="phasic-tool-muted">${trHtml('Set a cycle for your saved program. Weekly refeeds add a day-specific carbohydrate allowance without changing your baseline targets.')}</p>
       ${cycle && progress ? renderProgress(cycle, progress) : `<p class="phasic-tool-note">${trHtml('No cycle is scheduled yet. Save the dates below to start tracking.')}</p>`}
-      <form novalidate class="phasic-tool-card space-y-4" onsubmit="event.preventDefault(); window.phasicSaveCycle()">
+      <form id="phasic-cycle-form" novalidate class="phasic-tool-card space-y-4" oninput="window.phasicValidateCycle()" onsubmit="event.preventDefault(); window.phasicSaveCycle()">
+        <section id="phasic-cycle-errors" class="nutrition-error-summary" tabindex="-1" aria-labelledby="phasic-cycle-errors-title" hidden>
+          <h3 id="phasic-cycle-errors-title">${trHtml('Check your details')}</h3><ul id="phasic-cycle-errors-list"></ul>
+        </section>
         <label class="block space-y-2" for="phasic-cycle-start">
           <span class="font-bold">${trHtml('Cycle start date')}</span>
-          <input id="phasic-cycle-start" data-dialog-draft class="phasic-tool-input w-full min-w-0" type="date" value="${escapeHtml(startDate)}" required />
+          <input id="phasic-cycle-start" data-dialog-draft class="phasic-tool-input w-full min-w-0" type="date" value="${escapeHtml(startDate)}" required aria-describedby="phasic-cycle-start-error" />
         </label>
+        <p id="phasic-cycle-start-error" class="nutrition-field-error" role="alert"></p>
         <label class="block space-y-2" for="phasic-cycle-weeks">
           <span class="font-bold">${trHtml('Cycle length in weeks')}</span>
-          <input id="phasic-cycle-weeks" data-dialog-draft class="phasic-tool-input w-full" type="number" inputmode="numeric" min="3" max="${miniCut ? 6 : 24}" step="1" value="${lengthWeeks}" required aria-describedby="phasic-cycle-length-note" />
+          <input id="phasic-cycle-weeks" data-dialog-draft class="phasic-tool-input w-full" type="number" inputmode="numeric" min="3" max="${miniCut ? 6 : 24}" step="1" value="${lengthWeeks}" required aria-describedby="phasic-cycle-length-note phasic-cycle-weeks-error" />
         </label>
+        <p id="phasic-cycle-weeks-error" class="nutrition-field-error" role="alert"></p>
         <p id="phasic-cycle-length-note" class="phasic-tool-muted">${miniCut
           ? trHtml('Choose 3–6 weeks for Mini Cut. The schedule stops at the end of the selected cycle.')
           : trHtml('Choose 3–24 weeks for Lean Bulk. Weekly refeed allowances are only scheduled during Mini Cut.')}</p>
         ${miniCut ? `<label class="block space-y-2" for="phasic-cycle-refeed">
           <span class="font-bold">${trHtml('Weekly refeed extra calories')}</span>
-          <input id="phasic-cycle-refeed" data-dialog-draft class="phasic-tool-input w-full" type="number" inputmode="numeric" min="300" max="500" step="50" value="${refeedExtraCalories}" required aria-describedby="phasic-cycle-refeed-note" />
+          <input id="phasic-cycle-refeed" data-dialog-draft class="phasic-tool-input w-full" type="number" inputmode="numeric" min="300" max="500" step="1" value="${refeedExtraCalories}" required aria-describedby="phasic-cycle-refeed-note phasic-cycle-refeed-error" />
         </label>
+        <p id="phasic-cycle-refeed-error" class="nutrition-field-error" role="alert"></p>
         <p id="phasic-cycle-refeed-note" class="phasic-tool-muted">${trHtml('Add 300–500 kcal from carbohydrates on days 7, 14 and each following week. This increases the budget; food still needs to be logged.')}</p>` : ''}
         <p id="phasic-cycle-feedback" class="phasic-tool-error" role="alert" tabindex="-1"></p>
         <button class="ui-primary-button" type="submit">${trHtml(cycle ? 'Save cycle changes' : 'Start cycle')}</button>

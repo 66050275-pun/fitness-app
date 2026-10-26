@@ -1,4 +1,8 @@
 {
+  "Choose a valid cycle start date.": { "en": "Choose a valid cycle start date.", "th": "เลือกวันที่เริ่มรอบให้ถูกต้อง" },
+  "Enter 3–6 whole weeks.": { "en": "Enter 3–6 whole weeks.", "th": "กรอกจำนวนเต็ม 3–6 สัปดาห์" },
+  "Enter 3–24 whole weeks.": { "en": "Enter 3–24 whole weeks.", "th": "กรอกจำนวนเต็ม 3–24 สัปดาห์" },
+  "Enter 300–500 whole extra calories.": { "en": "Enter 300–500 whole extra calories.", "th": "กรอกแคลอรีเพิ่มเติมเป็นจำนวนเต็ม 300–500 กิโลแคลอรี" },
   "Complete set {0}": { "en": "Complete set {0}", "th": "ทำเซ็ต {0} ให้เสร็จ" },
   "Estimated from lifted volume ({0} kg) and workout duration.": { "en": "Estimated from lifted volume ({0} kg) and workout duration.", "th": "ประมาณจากปริมาณน้ำหนักที่ยก ({0} กก.) และระยะเวลาการฝึก" },
   "Selected": { "en": "Selected", "th": "เลือกแล้ว" },

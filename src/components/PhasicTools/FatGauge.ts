@@ -47,7 +47,7 @@ export function renderFatGauge(): string {
           ? trHtml('{0} g over the ceiling', formatDisplayNumber(gauge.overageGrams))
           : trHtml('{0} g remaining from known entries', formatDisplayNumber(gauge.remainingGrams))}</p>
       </section>
-      <div class="grid grid-cols-3 gap-2 text-center text-sm" aria-label="${trHtml('Fat gauge thresholds')}">
+      <div class="phasic-gauge-thresholds grid grid-cols-3 gap-2 text-center text-sm" role="group" aria-label="${trHtml('Fat gauge thresholds')}">
         <div class="phasic-tool-card !p-3 min-w-0"><p class="font-bold" style="color:var(--ui-primary)">${trHtml('Safe')}</p><p class="phasic-tool-muted">${trHtml('Below 80%')}</p></div>
         <div class="phasic-tool-card !p-3 min-w-0"><p class="font-bold" style="color:var(--phasic-caution, #926300)">${trHtml('Caution')}</p><p class="phasic-tool-muted">${trHtml('80–100%')}</p></div>
         <div class="phasic-tool-card !p-3 min-w-0"><p class="font-bold" style="color:var(--ui-error)">${trHtml('Limit exceeded')}</p><p class="phasic-tool-muted">${trHtml('Above 100%')}</p></div>

@@ -1,6 +1,6 @@
 import { store } from '../../store/appState.ts';
 import { isVaultUnlocked } from '../../services/privateStorage.ts';
-import { estimateHiddenFat, getFatGauge, getPhaseCycleProgress } from '../../services/phasicRecompService.ts';
+import { estimateHiddenFat, getFatGauge, getPhaseCycleProgress, isValidCalendarKey } from '../../services/phasicRecompService.ts';
 import { tr } from '../../i18n/index.ts';
 import { getTodayKey } from '../../utils/dateUtils.ts';
 import { formatDisplayNumber } from '../../utils/safeNumbers.ts';
@@ -14,6 +14,7 @@ declare global {
     phasicRemoveHiddenFat: (id: string) => void;
     phasicSetProteinMeals: (count: 4 | 5) => void;
     phasicSaveCycle: () => void;
+    phasicValidateCycle: () => void;
     phasicStopCycle: () => void;
   }
 }
@@ -22,6 +23,7 @@ let blocked = false;
 let mutating = false;
 let dayWatcher: number | null = null;
 let lastDay = '';
+let cycleValidationVisible = false;
 
 function inTool(id: SpecialProgramToolId): boolean {
   if (!isVaultUnlocked() || blocked || mutating) return false;
@@ -35,7 +37,7 @@ function input(id: string): HTMLInputElement | null {
 }
 function setText(id: string, value: string): void {
   const element = document.getElementById(id);
-  if (element) element.textContent = value;
+  if (element && element.textContent !== value) element.textContent = value;
 }
 function feedback(id: string, message: string, error = true): void {
   const element = document.getElementById(id);
@@ -56,6 +58,8 @@ function readFatCounts(): HiddenFatEstimateCounts {
 
 /** Update the estimate without remounting a focused field or storing unsaved form values. */
 export function refreshPhasicToolFeedback(): void {
+  if (inTool('phase-cycle') && cycleValidationVisible) showCycleValidation();
+  else if (!mutating && !inTool('phase-cycle')) cycleValidationVisible = false;
   if (!inTool('hidden-fat-scanner') || !input('phasic-fat-oil')) return;
   try {
     const estimate = estimateHiddenFat(readFatCounts());
@@ -73,8 +77,40 @@ export function refreshPhasicToolFeedback(): void {
   }
 }
 
+/** Mirror the saved-cycle constraints in the form; the service validates again before saving. */
+function showCycleValidation(focus = false): boolean {
+  const program = store.getState().userProfile.dietProgram;
+  const form = document.getElementById('phasic-cycle-form');
+  const summary = document.getElementById('phasic-cycle-errors');
+  const list = document.getElementById('phasic-cycle-errors-list');
+  if (!form || !summary || !list || (program !== 'mini_cut' && program !== 'lean_bulk')) return false;
+  const start = input('phasic-cycle-start')?.value ?? '';
+  const weeks = input('phasic-cycle-weeks')?.valueAsNumber ?? NaN;
+  const refeed = input('phasic-cycle-refeed')?.valueAsNumber ?? NaN;
+  const errors: { id: string; message: string }[] = [];
+  if (!isValidCalendarKey(start)) errors.push({ id: 'phasic-cycle-start', message: tr('Choose a valid cycle start date.') });
+  if (!Number.isInteger(weeks) || weeks < 3 || weeks > (program === 'mini_cut' ? 6 : 24))
+    errors.push({ id: 'phasic-cycle-weeks', message: tr(program === 'mini_cut' ? 'Enter 3–6 whole weeks.' : 'Enter 3–24 whole weeks.') });
+  if (program === 'mini_cut' && (!Number.isInteger(refeed) || refeed < 300 || refeed > 500))
+    errors.push({ id: 'phasic-cycle-refeed', message: tr('Enter 300–500 whole extra calories.') });
+  for (const id of ['phasic-cycle-start', 'phasic-cycle-weeks', 'phasic-cycle-refeed']) {
+    const error = errors.find(item => item.id === id);
+    input(id)?.setAttribute('aria-invalid', String(!!error));
+    setText(`${id}-error`, error?.message ?? '');
+  }
+  summary.hidden = !errors.length;
+  list.replaceChildren(...errors.map(error => {
+    const item = document.createElement('li'); const link = document.createElement('a');
+    link.href = `#${error.id}`; link.textContent = error.message;
+    link.onclick = event => { event.preventDefault(); input(error.id)?.focus({ preventScroll: true }); input(error.id)?.scrollIntoView({ block: 'nearest' }); };
+    item.append(link); return item;
+  }));
+  if (focus && errors.length) { summary.focus({ preventScroll: true }); summary.scrollIntoView({ block: 'nearest' }); }
+  return errors.length === 0;
+}
+
 export function bindPhasicToolHandlers(): void {
-  document.addEventListener('nutriai:lock-start', () => { blocked = true; });
+  document.addEventListener('nutriai:lock-start', () => { blocked = true; cycleValidationVisible = false; });
   document.addEventListener('nutriai:lock-end', () => { blocked = false; });
   window.phasicRefreshHiddenFat = () => {
     if (!inTool('hidden-fat-scanner')) return;
@@ -126,10 +162,13 @@ export function bindPhasicToolHandlers(): void {
     if (!inTool('protein-splitter') || (count !== 4 && count !== 5)) return;
     if (!store.setProteinMealCount(count)) alert(tr('The change could not be queued. Keep this tab open and retry.'));
   };
+  window.phasicValidateCycle = () => { if (inTool('phase-cycle') && cycleValidationVisible) showCycleValidation(); };
   window.phasicSaveCycle = () => {
     if (!inTool('phase-cycle')) return;
     const program = store.getState().userProfile.dietProgram;
     if (program !== 'mini_cut' && program !== 'lean_bulk') return;
+    cycleValidationVisible = true;
+    if (!showCycleValidation(true)) return;
     const cycle: PhasicCycle = { program, startDate: input('phasic-cycle-start')?.value ?? '',
       lengthWeeks: input('phasic-cycle-weeks')?.valueAsNumber ?? NaN,
       refeedExtraCalories: program === 'mini_cut' ? input('phasic-cycle-refeed')?.valueAsNumber ?? NaN : 400 };
@@ -151,9 +190,11 @@ export function bindPhasicToolHandlers(): void {
     if (!inTool('phase-cycle')) return;
     const accepted = store.clearPhasicCycle();
     if (accepted) {
+      cycleValidationVisible = false;
       const start = input('phasic-cycle-start'); if (start) start.value = getTodayKey();
       const weeks = input('phasic-cycle-weeks'); if (weeks) weeks.value = '4';
       const refeed = input('phasic-cycle-refeed'); if (refeed) refeed.value = '400';
+      showCycleValidation();
     }
     feedback('phasic-cycle-feedback', tr(accepted ? 'Cycle cleared. Your baseline targets are unchanged.'
       : 'The change could not be queued. Keep this tab open and retry.'), !accepted);
@@ -172,5 +213,5 @@ export function activatePhasicTools(): void {
 }
 export function deactivatePhasicTools(): void {
   if (dayWatcher !== null) window.clearInterval(dayWatcher);
-  dayWatcher = null; lastDay = ''; mutating = false; blocked = true;
+  dayWatcher = null; lastDay = ''; mutating = false; blocked = true; cycleValidationVisible = false;
 }
