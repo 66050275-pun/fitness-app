@@ -1,0 +1,40 @@
+/* Special Program surfaces use the same readable controls and green theme. */
+.special-program-status, .special-program-lock-card p { font-size: 14px; line-height: 1.6; }
+.special-program-status > div { min-width: 0; }
+.special-program-lock-card h3 { font: 700 16px/1.5 var(--ui-font-heading); }
+.special-program-preview-note { font-size: 14px; line-height: 1.6; }
+.special-program-menu :where(p,h3,span,button) { overflow-wrap: anywhere; }
+.special-program-menu .quick-add-action-tile { border-color: var(--ui-control-border); }
+.special-program-menu .quick-add-action-label { font-size: 14px; line-height: 1.5; }
+.special-program-menu .special-program-preview-tile { opacity: 1; }
+.special-program-activate { font-size: 16px; }
+.phasic-tool-content { container-type: inline-size; }
+.phasic-tool-content :where(p,h2,h3,h4,li,label,strong,span) { min-width: 0; overflow-wrap: anywhere; }
+.phasic-tool-content .phasic-tool-card { border-radius: 18px; border-color: var(--ui-border); }
+.phasic-tool-content .phasic-tool-input { width: auto; max-width: 100%; min-height: 48px; border-color: var(--ui-control-border); font-size: 16px; }
+.phasic-tool-content .phasic-tool-input.w-full { width: 100%; }
+.phasic-tool-content .phasic-tool-input[aria-invalid="true"] { border-color: var(--ui-error); }
+.phasic-tool-content .phasic-tool-secondary { min-height: 48px; border-color: var(--ui-control-border); font-size: 14px; line-height: 1.5; }
+.phasic-tool-content :where(button,input,select,a):focus-visible, .special-program-menu button:focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+.phasic-tool-content .nutrition-field-error:empty { display: none; }
+.phasic-tool-content .nutrition-error-summary[hidden] { display: none; }
+.phasic-tool-content .nutrition-error-summary { scroll-margin: 8px; }
+.phasic-protein-interval { flex-wrap: wrap; }
+.phasic-interval-amount { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.phasic-fat-preset > label { overflow-wrap: anywhere; }
+.phasic-tool-content .phasic-fat-count { flex-shrink: 0; width: 4rem; }
+.phasic-fat-add { flex-shrink: 0; }
+@container (max-width: 290px) {
+  .phasic-fat-preset { display: grid; grid-template-columns: minmax(0,1fr) 48px; }
+  .phasic-fat-preset > .material-symbols-outlined { display: none; }
+  .phasic-fat-preset > label { grid-column: 1 / -1; }
+  .phasic-fat-count { width: 100% !important; }
+  .phasic-gauge-thresholds { grid-template-columns: minmax(0,1fr); text-align: left; }
+}
+@container (max-width: 230px) {
+  .phasic-responsive-pair { grid-template-columns: minmax(0,1fr); }
+  .phasic-protein-interval .phasic-interval-amount { width: 100%; text-align: left; }
+}
+@media (max-width: 320px) {
+  .special-program-action-grid, .special-program-preview-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}

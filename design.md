@@ -183,6 +183,9 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 - Phase & Cycle saves a start date and duration (**3–6 weeks Mini Cut; 3–24 weeks Lean Bulk**). Mini Cut schedules days 7, 14, etc., with **300–500 additional kcal** from carbs. Effective targets change for those dates without logging food or overwriting base goals. Show active/upcoming/completed states; changing the saved program clears an incompatible cycle.
 - Recomp Matrix compares the latest seven calendar days with the previous seven. Require three distinct weigh-in days per window and at least one comparable supported loaded exercise. Use daily-mean weight and median paired best estimated 1RM change; show volume as context. Exclude timed, assisted and bodyweight movements. Optimal Recomp is a trend label, not measured fat loss or muscle gain.
 - All charts are original inline SVG with readable numeric/list/table equivalents. Tool settings and schedules use encrypted storage; unsaved form inputs stay in the dialog and clear on lock.
+- The Special Program grid and locked preview use wrapping labels, clear boundaries and 48px actions; on very narrow screens they reflow from three columns to two. The activation button stays in the dialog footer. Tool content uses a bounded scroll area and shared focus indicators.
+- In Hidden Fat Scanner, let preset labels and amount controls reflow when the dialog is narrow. Split large values and gauge thresholds into smaller columns or rows without hiding values or changing calculations. Keep per-tool controls and menu actions stable across updates.
+- The phase form shows inline errors and a focusable linked summary after invalid submission. Recheck without moving focus while editing, preserve the existing saved-cycle constraints and accept whole extra-calorie values from 300 through 500. Clear validation state on lock or leaving the tool.
 
 ## Initial onboarding and target review
 
@@ -268,6 +271,7 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/components/Fitness/` and `src/screens/FitnessScreen.ts`: artwork and workout presentation.
 - `src/components/Fitness/exerciseCatalog.css` and `fitnessPlanner.css`: scoped catalog, calendar and planner-dialog presentation.
 - `src/components/Fitness/restTimer.css` and `workoutHistory.css`: scoped rest-clock and workout/record detail presentation; the existing clock lifecycle remains in `RestTimerDialog.ts`.
+- `src/components/PhasicTools/phasicTools.css`, `PhaseCycleTracker.ts` and `phasicToolController.ts`: responsive special-program controls, field feedback and existing tool persistence lifecycle.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/navigationLayout.ts`: bottom-navigation measurement, content clearance and cleanup on lock.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.

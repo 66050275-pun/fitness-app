@@ -31,7 +31,7 @@ export function renderProteinSplitter(): string {
 
       <div class="flex gap-2" role="group" aria-label="${trHtml('Number of protein intervals')}">
         ${([4, 5] as const).map(meals => `
-          <button type="button" class="flex-1 min-w-0 min-h-12 px-3 py-3 rounded-xl font-heading font-bold text-sm border ${count === meals ? 'bg-primary text-white border-primary' : 'phasic-tool-secondary'}" aria-pressed="${count === meals}" onclick="window.phasicSetProteinMeals(${meals})">
+          <button type="button" id="phasic-protein-interval-${meals}" class="flex-1 min-w-0 min-h-12 px-3 py-3 rounded-xl font-heading font-bold text-sm border ${count === meals ? 'bg-primary text-white border-primary' : 'phasic-tool-secondary'}" aria-pressed="${count === meals}" onclick="window.phasicSetProteinMeals(${meals})">
             ${trHtml('{0} intervals', formatDisplayNumber(meals, 0))}
           </button>
         `).join('')}
@@ -42,7 +42,7 @@ export function renderProteinSplitter(): string {
 
       <ol class="flex flex-col gap-3" aria-label="${trHtml('Suggested protein intervals')}">
         ${split.intervals.map((interval, index) => `
-          <li class="phasic-tool-card flex items-center gap-3">
+          <li class="phasic-tool-card phasic-protein-interval flex items-center gap-3">
             <span class="w-11 h-11 rounded-full bg-primary/10 dark:bg-primary-fixed/10 text-primary dark:text-primary-fixed flex items-center justify-center shrink-0" aria-hidden="true">
               <span class="material-symbols-outlined">${INTERVAL_ICONS[interval.id]}</span>
             </span>
@@ -51,7 +51,7 @@ export function renderProteinSplitter(): string {
               <h3 class="font-heading font-bold text-sm mt-0.5">${trHtml(interval.label)}</h3>
               <p class="text-sm mt-1 ${interval.meetsMinimum ? 'text-primary dark:text-primary-fixed' : 'text-amber-800 dark:text-amber-300'}">${interval.meetsMinimum ? trHtml('Benchmark met') : trHtml('Below planning benchmark')}</p>
             </div>
-            <p class="font-heading font-extrabold text-xl text-right shrink-0">${trHtml('{0} g', formatDisplayNumber(interval.proteinGrams))}</p>
+            <p class="phasic-interval-amount font-heading font-extrabold text-xl text-right">${trHtml('{0} g', formatDisplayNumber(interval.proteinGrams))}</p>
           </li>
         `).join('')}
       </ol>

@@ -69,14 +69,14 @@ export function renderHiddenFatScanner(): string {
       <fieldset class="flex flex-col gap-3">
         <legend class="font-heading font-bold text-sm mb-3">${trHtml('Estimated additions')}</legend>
         ${HIDDEN_FAT_PRESETS.map(preset => `
-          <div class="phasic-tool-card flex items-center gap-3">
+          <div class="phasic-tool-card phasic-fat-preset flex items-center gap-3">
             <span class="material-symbols-outlined text-primary dark:text-primary-fixed shrink-0" aria-hidden="true">${PRESET_ICONS[preset.id]}</span>
             <label class="min-w-0 flex-1" for="phasic-fat-${preset.id}">
               <span class="block font-heading font-bold text-sm">${trHtml(preset.label)}</span>
               <span class="block phasic-tool-muted text-sm mt-1">${trHtml('+{0} g fat each', formatDisplayNumber(preset.fatGrams, 0))}</span>
             </label>
-            <input id="phasic-fat-${preset.id}" data-dialog-draft type="number" min="0" max="20" step="1" inputmode="numeric" value="0" oninput="window.phasicRefreshHiddenFat()" class="phasic-tool-input w-16 text-center shrink-0" aria-label="${trHtml('{0} additions', tr(preset.label))}" />
-            <button type="button" class="phasic-tool-secondary h-12 w-12 rounded-full flex items-center justify-center shrink-0" onclick="window.phasicAddFatPreset('${preset.id}')" aria-label="${trHtml('Add one {0} estimate', tr(preset.label))}">
+            <input id="phasic-fat-${preset.id}" data-dialog-draft type="number" min="0" max="20" step="1" inputmode="numeric" value="0" oninput="window.phasicRefreshHiddenFat()" class="phasic-tool-input phasic-fat-count w-16 text-center shrink-0" aria-label="${trHtml('{0} additions', tr(preset.label))}" aria-describedby="phasic-fat-feedback" />
+            <button type="button" id="phasic-fat-add-${preset.id}" class="phasic-tool-secondary phasic-fat-add h-12 w-12 rounded-full flex items-center justify-center shrink-0" onclick="window.phasicAddFatPreset('${preset.id}')" aria-label="${trHtml('Add one {0} estimate', tr(preset.label))}">
               <span class="material-symbols-outlined" aria-hidden="true">add</span>
             </button>
           </div>
@@ -91,7 +91,7 @@ export function renderHiddenFatScanner(): string {
       </label>
 
       <section class="phasic-tool-card flex flex-col gap-3" aria-label="${trHtml('Cooking-fat estimate summary')}">
-        <div class="grid grid-cols-2 gap-3">
+        <div class="phasic-responsive-pair grid grid-cols-2 gap-3">
           <div class="min-w-0">
             <p class="phasic-tool-muted text-sm">${trHtml('Added fat')}</p>
             <p id="phasic-fat-estimate" class="font-heading font-extrabold text-2xl mt-1 break-words" aria-live="polite">${trHtml('{0} g', formatDisplayNumber(0))}</p>

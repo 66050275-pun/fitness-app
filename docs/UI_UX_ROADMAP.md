@@ -19,8 +19,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Approved and merged: [PR #15](https://github.com/66050275-pun/fitness-app/pull/15) |
 | 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Approved and merged: [PR #16](https://github.com/66050275-pun/fitness-app/pull/16) |
 | 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Approved and merged: [PR #17](https://github.com/66050275-pun/fitness-app/pull/17) |
-| 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Prepared for review |
-| 9/10 | Special Program tools | Extension menu, locked preview, six tool dialogs and clear phase/target feedback | Planned |
+| 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Approved and merged: [PR #18](https://github.com/66050275-pun/fitness-app/pull/18) |
+| 9/10 | Special Program tools | Extension menu, locked preview, six tool dialogs and clear phase/target feedback | Prepared |
 | 10/10 | Insights and profile | Existing charts/data labels, settings/help rows, long Thai labels and remaining cross-screen presentation inconsistencies | Planned |
 
 ## Part 1 details
@@ -57,7 +57,9 @@ Part 6: [PR #16](https://github.com/66050275-pun/fitness-app/pull/16) approved a
 
 Part 7: [PR #17](https://github.com/66050275-pun/fitness-app/pull/17) approved and merged at `d44c6bfffe70bed41e6a5667c85e12392d2dd21f`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing fitness planner test file passed all 10 tests when bundled with esbuild and run with Node; the repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Narrow-phone TH/EN light/dark layouts, calendar selection, focus, catalog scrolling and planner dialogs still need review.
 
-Part 8: Prepared for review. `npm run build` and `git diff --check` passed. The existing fitness planner and i18n symbol test files passed 17 checks when bundled with esbuild and run with Node. The repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Review active-session entry, timer/pause behavior, dialogs, focus and TH/EN light/dark layouts on phones. Publication to `main` is pending approval.
+Part 8: [PR #18](https://github.com/66050275-pun/fitness-app/pull/18) merged at `56ab1c7d038ed51282470080c5083839874d433b`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing fitness planner and i18n symbol test files passed 17 checks when bundled with esbuild and run with Node. The repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Review active-session entry, timer/pause behavior, dialogs, focus and TH/EN light/dark layouts on phones.
+
+Part 9: `npm run build` and `git diff --check` passed. The existing food/insights suite passed 9 checks when bundled with esbuild and run with Node. A local Chromium smoke check with a synthetic encrypted vault exercised all six tools at 320px in EN/light and TH/dark, plus invalid and valid Mini Cut cycle entries. A physical phone and other viewport/language/theme combinations were not checked.
 
 ## Part 3 details
 
@@ -116,3 +118,10 @@ Part 8: Prepared for review. `npm run build` and `git diff --check` passed. The 
 - Improve rest-clock control sizing, focus and text while retaining its countdown, deadline, pause/skip behavior, mask and shared dialog lifecycle.
 - Make workout history and personal-record links keyboard accessible, improve button/metric sizing and wrapping, and accurately identify the workout that produced a record.
 - Describe estimated workout calories using the existing volume and duration calculation. Preserve localization keys for symbols and credits for exercise illustrations.
+
+## Part 9 details
+
+- Improve the Special Program menu, locked preview, tool dialog controls and narrow-screen layout using the shared theme. Preserve the unlock flow, callbacks, charts and local diary data.
+- Reflow Hidden Fat preset controls, protein interval amounts, fat-gauge thresholds and the matrix's comparison cards for narrow dialogs. Keep unknown and estimated values labeled as before.
+- Add stable menu, dialog and protein-splitter action IDs so existing dialog focus restoration can follow updates.
+- Add localized, linked validation feedback for the phase form. Keep the service's date, duration and 300–500 integer calorie constraints; clear validation state on lock or exit.

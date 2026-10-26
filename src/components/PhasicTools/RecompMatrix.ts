@@ -87,7 +87,7 @@ export function renderRecompMatrix(): string {
         <p class="phasic-tool-muted">${trHtml(STATUS_NOTES[data.status])}</p>
       </section>
       ${renderMatrix(data)}
-      <div class="grid grid-cols-2 gap-3">
+      <div class="phasic-responsive-pair grid grid-cols-2 gap-3">
         <section class="phasic-tool-card min-w-0 space-y-2">
           <h3 class="font-bold">${trHtml('Previous seven days')}</h3>
           <p class="phasic-tool-muted text-sm">${trHtml('{0} to {1}', dateLabel(data.previousWindow.startDate), dateLabel(data.previousWindow.endDate))}</p>
