@@ -1,6 +1,6 @@
 # NutriAI UI/UX improvement series
 
-Ten incremental pull requests, requested on 2026-10-24. Each part is reviewed before the next begins. The sequence numbers below are rollout parts, not GitHub PR numbers.
+Ten incremental pull requests, requested on 2026-10-24. Parts were reviewed individually until the user requested continuing through part 10. The sequence numbers below are rollout parts, not GitHub PR numbers.
 
 ## Design basis
 
@@ -20,8 +20,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Approved and merged: [PR #16](https://github.com/66050275-pun/fitness-app/pull/16) |
 | 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Approved and merged: [PR #17](https://github.com/66050275-pun/fitness-app/pull/17) |
 | 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Approved and merged: [PR #18](https://github.com/66050275-pun/fitness-app/pull/18) |
-| 9/10 | Special Program tools | Extension menu, locked preview, six tool dialogs and clear phase/target feedback | Prepared |
-| 10/10 | Insights and profile | Existing charts/data labels, settings/help rows, long Thai labels and remaining cross-screen presentation inconsistencies | Planned |
+| 9/10 | Special Program tools | Extension menu, locked preview, six tool dialogs and clear phase/target feedback | Merged: [PR #19](https://github.com/66050275-pun/fitness-app/pull/19) |
+| 10/10 | Insights and profile | Existing charts/data labels, settings/help rows, long Thai labels and remaining cross-screen presentation inconsistencies | Implemented |
 
 ## Part 1 details
 
@@ -59,7 +59,9 @@ Part 7: [PR #17](https://github.com/66050275-pun/fitness-app/pull/17) approved a
 
 Part 8: [PR #18](https://github.com/66050275-pun/fitness-app/pull/18) merged at `56ab1c7d038ed51282470080c5083839874d433b`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing fitness planner and i18n symbol test files passed 17 checks when bundled with esbuild and run with Node. The repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Review active-session entry, timer/pause behavior, dialogs, focus and TH/EN light/dark layouts on phones.
 
-Part 9: `npm run build` and `git diff --check` passed. The existing food/insights suite passed 9 checks when bundled with esbuild and run with Node. A local Chromium smoke check with a synthetic encrypted vault exercised all six tools at 320px in EN/light and TH/dark, plus invalid and valid Mini Cut cycle entries. A physical phone and other viewport/language/theme combinations were not checked.
+Part 9: [PR #19](https://github.com/66050275-pun/fitness-app/pull/19) merged at `a93ff0c170a17256e28954bdbb51173dc6282f7e`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing food/insights suite passed 9 checks when bundled with esbuild and run with Node. A local Chromium smoke check with a synthetic encrypted vault exercised all six tools at 320px in EN/light and TH/dark, plus invalid and valid Mini Cut cycle entries. A physical phone and other viewport/language/theme combinations were not checked.
+
+Part 10: `npm run build` and `git diff --check` passed. Existing food/insights, i18n and numeric-formatting suites passed 19 checks when bundled with esbuild and run with Node. A local Chromium smoke check with a synthetic encrypted vault exercised 90-day chart values, filters, settings and help at 320px in EN/light and TH/dark, all 16 profile subpages in TH/dark, plus a 390px Insights viewport. A physical phone and other combinations were not checked.
 
 ## Part 3 details
 
@@ -125,3 +127,11 @@ Part 9: `npm run build` and `git diff --check` passed. The existing food/insight
 - Reflow Hidden Fat preset controls, protein interval amounts, fat-gauge thresholds and the matrix's comparison cards for narrow dialogs. Keep unknown and estimated values labeled as before.
 - Add stable menu, dialog and protein-splitter action IDs so existing dialog focus restoration can follow updates.
 - Add localized, linked validation feedback for the phase form. Keep the service's date, duration and 300–500 integer calorie constraints; clear validation state on lock or exit.
+
+## Part 10 details
+
+- Retain the existing Insights sections and data calculations. Improve range, chart and nutrient filters with readable labels, selected states and touch targets; preserve selected dates and unknown-data notices.
+- Let chart bars scroll on narrow screens and offer a native daily-values disclosure with dates, effective targets and unknown-value counts. Restore focus after dismissing a selected-day detail.
+- Let Profile menu labels, descriptions and statuses wrap; escape status text and enlarge navigation actions. Apply readable fields and visible focus to existing profile subpages.
+- Expose App Settings choices and accessibility switches with selected states and accessible names. Update Help Center copy for the current PIN vault, consent and AI-estimate behavior.
+- Add EN/TH messages and document the shared presentation in `design.md`.

@@ -1,0 +1,57 @@
+/* Insights and Profile keep their existing sections and use shared theme tokens. */
+.insights-screen, .profile-screen, .profile-settings, .profile-help { background: var(--ui-surface); color: var(--ui-text); }
+.insights-content, .profile-screen main, .profile-settings main, .profile-help main { min-width: 0; }
+.insights-content :where(h2,h3,h4,p,span,button,li), .profile-screen :where(h1,h2,p,span,button), .profile-settings :where(h1,p,span,button,label), .profile-help :where(h1,p,span,summary) { overflow-wrap: anywhere; }
+.insights-content :where(section,div,button) { min-width: 0; }
+.insights-content :where([class*="text-[9px]"],[class*="text-[10px]"],[class*="text-[11px]"]):not(.material-symbols-outlined) { font-size: 12px; line-height: 1.6; }
+.insights-content :where(button:not(.insights-chart-bar),summary) { min-height: 48px; }
+.insights-range { gap: 4px; }
+.insights-range button, .insights-chart-tabs button, .insights-nutrient-filters button { min-width: 0; padding: 8px 12px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.insights-nutrient-filters button { white-space: normal; }
+.insights-content section > .flex.items-center.justify-between { flex-wrap: wrap; gap: 12px; }
+.insights-content .ui-number-grid > * { min-width: 0; }
+.insights-chart-canvas { overscroll-behavior-x: contain; scrollbar-width: thin; }
+.insights-chart-canvas .insights-chart-bar { flex: 1 0 36px; min-width: 36px; }
+.insights-chart-bar:focus-visible, .insights-content :where(button,summary):focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 2px; }
+.insights-day-detail { gap: 12px; font-size: 14px; line-height: 1.6; }
+.insights-day-detail > span { min-width: 0; }
+.insights-daily-readings { border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-panel); }
+.insights-daily-readings summary { padding: 12px; color: var(--ui-primary); font-size: 14px; font-weight: 700; cursor: pointer; }
+.insights-daily-readings ol { display: flex; flex-direction: column; gap: 8px; padding: 0 12px 12px; }
+.insights-daily-readings li { min-width: 0; padding: 12px; border-radius: 12px; background: var(--ui-card); font-size: 14px; line-height: 1.6; }
+.insights-daily-readings li p { margin-top: 4px; color: var(--ui-muted); }
+.profile-screen header, .profile-settings header, .profile-help header { gap: 12px; flex-wrap: wrap; }
+.profile-screen header > div, .profile-settings header > div, .profile-help header > div { min-width: 0; }
+.profile-screen .profile-menu-section h2 { font-size: 14px; line-height: 1.5; }
+.profile-menu-row { gap: 8px; }
+.profile-menu-main { min-width: 0; }
+.profile-menu-label { font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.profile-menu-description { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.profile-menu-tail { min-width: 0; max-width: 40%; }
+.profile-menu-tail > span:not(.material-symbols-outlined) { font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.profile-menu-tail .material-symbols-outlined { flex-shrink: 0; }
+.profile-settings .settings-row { flex-wrap: wrap; gap: 8px 12px; }
+.profile-settings .settings-row > div:first-child { min-width: 0; }
+.profile-settings .settings-segment { min-width: 0; flex-wrap: wrap; gap: 4px; }
+.profile-settings .settings-segment button, .profile-settings .settings-theme-options button { min-height: 48px; min-width: 0; font-size: 14px; line-height: 1.5; }
+.profile-settings .settings-segment button { flex: 1 1 auto; }
+.profile-settings .settings-language { min-height: 48px; min-width: 0; max-width: 100%; font-size: 16px; }
+.settings-switch { width: 48px; height: 48px; display: grid; place-items: center; flex-shrink: 0; border-radius: 12px; }
+.settings-switch-track { width: 48px; height: 28px; display: flex; align-items: center; padding: 4px; border-radius: 999px; background: var(--ui-panel-high); border: 1px solid var(--ui-control-border); }
+.settings-switch-track.is-on { justify-content: flex-end; background: var(--ui-action); }
+.settings-switch-knob { width: 20px; height: 20px; border-radius: 50%; background: var(--ui-card); box-shadow: var(--ui-shadow); }
+.profile-settings :where(button,select):focus-visible, .profile-screen button:focus-visible, .profile-help :where(button,input,summary):focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+.profile-help summary { min-height: 48px; line-height: 1.5; }
+.profile-help details > div { font-size: 14px; line-height: 1.6; }
+.profile-subpage header button[aria-label] { min-width: 48px; min-height: 48px; }
+.profile-subpage :where(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),select,textarea) { min-height: 48px; min-width: 0; max-width: 100%; font-size: 16px; border-color: var(--ui-control-border); }
+.profile-subpage :where(button,input,select,textarea,summary):focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+@media (max-width: 330px) {
+  .profile-menu-row { flex-wrap: wrap; }
+  .profile-menu-main { flex-basis: 100%; }
+  .profile-menu-tail { max-width: 100%; margin-left: auto; }
+  .insights-content .ui-number-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 250px) {
+  .insights-content .ui-number-grid, .profile-settings .settings-theme-options { grid-template-columns: minmax(0,1fr); }
+}

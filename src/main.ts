@@ -21,6 +21,7 @@ import './components/Fitness/fitnessPlanner.css';
 import './components/Fitness/restTimer.css';
 import './components/Fitness/workoutHistory.css';
 import './components/PhasicTools/phasicTools.css';
+import './components/Insights/insightsProfile.css';
 import { store, initializeStore, disposeStore } from './store/appState';
 import { ActiveScreen, DashboardWidgetId, FitnessObjective, MealType } from './types/index.ts';
 import { renderBottomNav } from './components/Navigation/BottomNav';
@@ -192,6 +193,7 @@ declare global {
     setInsightRange: (range: 7 | 30 | 90) => void;
     setInsightTab: (tab: 'calories' | 'macros') => void;
     showDayDetailToast: (title: string, text: string) => void;
+    closeInsightDayDetail: () => void;
 
     // Scanner Mode
     openScannerMode: (mode: 'food' | 'barcode') => void;
@@ -821,9 +823,18 @@ window.showDayDetailToast = (title: string, text: string) => {
   const toast = document.getElementById('day-detail-toast');
   const toastText = document.getElementById('day-detail-toast-text');
   if (toast && toastText) {
-    toastText.innerHTML = `<strong>${escapeHtml(title)}:</strong> ${escapeHtml(text)}`;
+    const active = document.activeElement;
+    toast.dataset.triggerId = active instanceof HTMLElement && active.id.startsWith('insight-bar-') ? active.id : '';
     toast.classList.remove('hidden');
+    toastText.innerHTML = `<strong>${escapeHtml(title)}:</strong> ${escapeHtml(text)}`;
   }
+};
+
+window.closeInsightDayDetail = () => {
+  const toast = document.getElementById('day-detail-toast');
+  const triggerId = toast?.dataset.triggerId;
+  toast?.classList.add('hidden');
+  (triggerId ? document.getElementById(triggerId) : document.querySelector<HTMLElement>('.insights-daily-readings summary'))?.focus({ preventScroll: true });
 };
 
 window.openScannerMode = (mode: 'food' | 'barcode') => {
@@ -2051,6 +2062,7 @@ function renderApp() {
           default:
             screenHtml = renderProfileScreen();
         }
+        screenHtml = `<div class="profile-subpage">${screenHtml}</div>`;
       }
       break;
     }

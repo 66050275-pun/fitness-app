@@ -240,6 +240,14 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 
 - The selected language applies throughout the app: lock screen, navigation, settings, forms, calendars, validation, exercise names, muscle labels and demo replies.
 - Use `tr`, `trHtml` and the existing localized label helpers with `src/i18n/messages.json`. Escape dynamic values when rendering HTML.
+
+## Insights and profile
+
+- Keep the existing Insights sections and calculations. Give the period, chart and nutrient-category controls wrapping 48px targets, localized labels and selected states. Chart bars remain scrollable; a native disclosure lists each day's recorded amounts, effective targets and unknown-value counts so dense 30/90-day charts have a readable alternative.
+- The chart detail panel announces the selected day's values and returns focus to its bar when closed. Respect the selected date range and the existing daily refeed and fat-ceiling targets; unknown nutrients are not presented as confirmed zero values.
+- Profile menu rows wrap long Thai/English labels, descriptions and status text. Use 48px Back/Edit controls, escaped text and stable IDs; keep the grouped menu and existing destinations.
+- App Settings exposes theme/unit selection as pressed buttons and accessibility preferences as named switches with their current state. Fields in profile subpages use at least 16px text and visible focus; preserve their existing validation and data flows.
+- Help Center uses a labeled search field, native FAQ disclosures and current explanations of AI estimates, PIN-protected local storage, consent and backup behavior.
 - Preserve user-entered names, notes, custom food descriptions and messages. Keep brand names, artwork credits and scientific abbreviations in their original form.
 - Update the document language to `en` or `th`. Display dates with `en-US` or `th-TH-u-ca-gregory-nu-latn`; stored date keys remain `YYYY-MM-DD`.
 - Language selection is available at the PIN gate and Profile → App Settings → Language. Only the non-sensitive language code is kept outside the encrypted vault for startup presentation.
@@ -272,6 +280,7 @@ Use `src/services/nutritionPlanService.ts` for the six public planning functions
 - `src/components/Fitness/exerciseCatalog.css` and `fitnessPlanner.css`: scoped catalog, calendar and planner-dialog presentation.
 - `src/components/Fitness/restTimer.css` and `workoutHistory.css`: scoped rest-clock and workout/record detail presentation; the existing clock lifecycle remains in `RestTimerDialog.ts`.
 - `src/components/PhasicTools/phasicTools.css`, `PhaseCycleTracker.ts` and `phasicToolController.ts`: responsive special-program controls, field feedback and existing tool persistence lifecycle.
+- `src/components/Insights/insightsProfile.css`, `src/screens/InsightsScreen.ts` and `src/components/Profile/`: existing insights layout, daily-value disclosure, profile navigation and settings presentation.
 - `src/ui/screenTransitions.ts`: navigation motion and scroll restoration.
 - `src/ui/navigationLayout.ts`: bottom-navigation measurement, content clearance and cleanup on lock.
 - `src/ui/dialogs.ts`: active dialog, focus, background scrolling and form preservation.
