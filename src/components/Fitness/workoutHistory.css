@@ -1,0 +1,18 @@
+/* Workout records use the app's shared surfaces and controls. */
+.workout-history-screen { color: var(--ui-text); background: var(--ui-surface); }
+.workout-history-screen :where(h1,h2,h3,h4,p,span,button) { overflow-wrap: anywhere; }
+.workout-history-screen .workout-history-header { gap: 12px; }
+.workout-history-screen .workout-history-header > div { flex: 1; min-width: 0; }
+.workout-history-screen .ui-number-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.workout-history-screen .ui-number-grid > * { min-width: 0; }
+.workout-history-screen :where([class*="text-[9px]"],[class*="text-[10px]"],[class*="text-[11px]"]):not(.material-symbols-outlined) { font-size: 12px; line-height: 1.5; }
+.workout-history-screen .truncate { white-space: normal; overflow: visible; text-overflow: clip; }
+.workout-history-screen .workout-history-link { min-width: 0; min-height: 48px; text-align: left; }
+.workout-history-screen .workout-history-link:focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+.workout-history-screen .workout-history-link:active { background: var(--ui-primary-soft); }
+.workout-history-screen .workout-history-delete { color: var(--ui-error); }
+.workout-history-screen .workout-history-set > div { min-width: 0; flex-wrap: wrap; }
+@media (max-width: 300px) {
+  .workout-history-screen .ui-number-grid { grid-template-columns: minmax(0,1fr); }
+  .workout-history-screen .workout-history-header { flex-wrap: wrap; }
+}

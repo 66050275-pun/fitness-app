@@ -18,8 +18,8 @@ Apply each change to existing components and data flows. Keep the vault origin a
 | 4/10 | Home dashboard | Daily energy, macros, hydration and widget hierarchy; readable values on narrow phones | Approved and merged: [PR #14](https://github.com/66050275-pun/fitness-app/pull/14) |
 | 5/10 | Diary and manual logging | Meal sections, food search, portions, Quick Log and empty/save states | Approved and merged: [PR #15](https://github.com/66050275-pun/fitness-app/pull/15) |
 | 6/10 | AI food scanning | Multi-photo queue, uncertainty choices, nutrient review, progress and in-app activity pill | Approved and merged: [PR #16](https://github.com/66050275-pun/fitness-app/pull/16) |
-| 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Prepared for review |
-| 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Planned |
+| 7/10 | Fitness planning and catalog | Program cards, routine setup, exercise search/filter controls, imagery and anatomy hierarchy | Approved and merged: [PR #17](https://github.com/66050275-pun/fitness-app/pull/17) |
+| 8/10 | Workout session and history | Set entry, rest clock, assistant suggestions, completion summary and records | Prepared for review |
 | 9/10 | Special Program tools | Extension menu, locked preview, six tool dialogs and clear phase/target feedback | Planned |
 | 10/10 | Insights and profile | Existing charts/data labels, settings/help rows, long Thai labels and remaining cross-screen presentation inconsistencies | Planned |
 
@@ -55,7 +55,9 @@ Part 5: [PR #15](https://github.com/66050275-pun/fitness-app/pull/15) approved a
 
 Part 6: [PR #16](https://github.com/66050275-pun/fitness-app/pull/16) approved and merged at `0057f525ec1195966767852062e56736cb5840bc`, with its tree matching the build-checked version. `npm run build` (strict TypeScript + Vite) and `git diff --check` passed. The existing Vite chunk-size warning remains. No automated tests, browser/device checks or live-provider calls were run. Phone layouts in TH/EN and both themes, keyboard/error-summary focus, per-photo draft switching, wrapped activity-pill clearance, modal transitions and save/lock recovery still need browser/device review.
 
-Part 7: Prepared for review. `npm run build` and `git diff --check` passed. The existing fitness planner test file passed all 10 tests when bundled with esbuild and run with Node; the repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Narrow-phone TH/EN light/dark layouts, calendar selection, focus, catalog scrolling and planner dialogs still need review. Publication to `main` is pending approval.
+Part 7: [PR #17](https://github.com/66050275-pun/fitness-app/pull/17) approved and merged at `d44c6bfffe70bed41e6a5667c85e12392d2dd21f`, with its tree matching the build-checked version. `npm run build` and `git diff --check` passed. The existing fitness planner test file passed all 10 tests when bundled with esbuild and run with Node; the repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Narrow-phone TH/EN light/dark layouts, calendar selection, focus, catalog scrolling and planner dialogs still need review.
+
+Part 8: Prepared for review. `npm run build` and `git diff --check` passed. The existing fitness planner and i18n symbol test files passed 17 checks when bundled with esbuild and run with Node. The repository's direct Node invocation does not load its TypeScript imports in this environment. Browser/device checks were not run. Review active-session entry, timer/pause behavior, dialogs, focus and TH/EN light/dark layouts on phones. Publication to `main` is pending approval.
 
 ## Part 3 details
 
@@ -106,3 +108,11 @@ Part 7: Prepared for review. `npm run build` and `git diff --check` passed. The 
 - Improve catalog filters, result typography, added status, empty state, page focus and narrow-screen layout. Preserve filter state, pagination, imagery and artwork attribution.
 - Improve the My Program calendar and planner dialogs with 48px navigation/actions, readable metrics, selected-date context and wrapping summary text while retaining scheduling behavior.
 - Add localized labels and document the changes in `design.md`.
+
+## Part 8 details
+
+- Make the active session header wrap and increase touch targets for pause, finish, rest and exercise navigation. Use 16px set inputs and labeled 48px completion toggles with pressed state; retain existing session handlers and timer IDs.
+- Correct the Previous Exercise button's duplicated class attribute. Keep progression suggestions, actual vs target reps and existing workout calculations.
+- Improve rest-clock control sizing, focus and text while retaining its countdown, deadline, pause/skip behavior, mask and shared dialog lifecycle.
+- Make workout history and personal-record links keyboard accessible, improve button/metric sizing and wrapping, and accurately identify the workout that produced a record.
+- Describe estimated workout calories using the existing volume and duration calculation. Preserve localization keys for symbols and credits for exercise illustrations.
