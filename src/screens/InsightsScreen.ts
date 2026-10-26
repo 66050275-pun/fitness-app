@@ -20,7 +20,7 @@ import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderAppHeader } from '../components/Navigation/AppHeader';
 import { getFatGauge } from '../services/phasicRecompService.ts';
 import { generatePhasicInsightMessages } from '../utils/phasicInsightCalculations.ts';
-import { getTodayKey } from '../utils/dateUtils.ts';
+import { getTodayKey, parseLocalDateKey } from '../utils/dateUtils.ts';
 import type { NutritionGoals } from '../types/index.ts';
 import { getMealNutrientForDisplay } from '../utils/mealNutritionDisplay.ts';
 
@@ -96,7 +96,7 @@ export function renderInsightsScreen(): string {
     deltaVolume
   ), ...generatePhasicInsightMessages(state, curDateKeys, getTodayKey())];
   return `
-    <div class="flex flex-col min-h-screen pb-28 bg-surface dark:bg-dark-surface transition-colors">
+    <div class="insights-screen flex flex-col min-h-screen pb-28 bg-surface dark:bg-dark-surface transition-colors">
       
       ${renderAppHeader({
         state,
@@ -106,13 +106,13 @@ export function renderInsightsScreen(): string {
       })}
 
       <!-- Main Canvas -->
-      <main class="px-screen-gutter flex flex-col gap-4 pt-3">
+      <main class="insights-content px-screen-gutter flex flex-col gap-4 pt-3">
         
         <!-- Timeframe Range Selector (7 / 30 / 90 Days) -->
-        <div class="w-full bg-surface-container-low dark:bg-dark-surface-card p-1 rounded-full flex items-center border border-outline-variant/30 shadow-sm">
+        <div class="insights-range w-full bg-surface-container-low dark:bg-dark-surface-card p-1 rounded-2xl flex items-center border border-outline-variant/30 shadow-sm" role="group" aria-label="${trHtml('Insight date range')}">
           ${([7, 30, 90] as (7 | 30 | 90)[]).map(r => `
             <button 
-              onclick="window.setInsightRange(${r})" 
+              id="insight-range-${r}" type="button" aria-pressed="${range === r}" onclick="window.setInsightRange(${r})"
               class="flex-1 py-1.5 px-3 rounded-full font-heading text-xs font-bold transition-all ${range === r
                   ? 'bg-surface-container-lowest dark:bg-dark-surface-card-high text-primary dark:text-primary-container shadow-sm' 
                   : 'text-on-surface-variant dark:text-gray-400 hover:text-primary'}"
@@ -154,9 +154,9 @@ export function renderInsightsScreen(): string {
             </div>
 
             <!-- Sub-segmented Toggle: Calories vs Macros -->
-            <div class="bg-surface-container-low dark:bg-dark-surface-card-high p-0.5 rounded-xl flex items-center border border-outline-variant/30">
+            <div class="insights-chart-tabs bg-surface-container-low dark:bg-dark-surface-card-high p-0.5 rounded-xl flex items-center border border-outline-variant/30" role="group" aria-label="${trHtml('Nutrition chart')}">
               <button 
-                onclick="window.setInsightTab('calories')" 
+                id="insight-tab-calories" type="button" aria-pressed="${activeTab === 'calories'}" onclick="window.setInsightTab('calories')"
                 class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${activeTab === 'calories'
                     ? 'bg-surface-container-lowest dark:bg-dark-surface-card text-primary shadow-xs' 
                     : 'text-on-surface-variant'}"
@@ -164,7 +164,7 @@ export function renderInsightsScreen(): string {
                 ${trHtml("Calories")}
               </button>
               <button 
-                onclick="window.setInsightTab('macros')" 
+                id="insight-tab-macros" type="button" aria-pressed="${activeTab === 'macros'}" onclick="window.setInsightTab('macros')"
                 class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${activeTab === 'macros'
                     ? 'bg-surface-container-lowest dark:bg-dark-surface-card text-primary shadow-xs' 
                     : 'text-on-surface-variant'}"
@@ -188,7 +188,7 @@ export function renderInsightsScreen(): string {
           <div class="flex items-center justify-between">
             <div>
               <h3 class="font-heading font-bold text-sm text-on-surface dark:text-white">${trHtml("Fitness & Volume Trends")}</h3>
-              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">${trHtml("Mechanical load from verified completed sets")}</p>
+              <p class="text-[11px] text-on-surface-variant dark:text-gray-400">${trHtml("Mechanical load from completed sets")}</p>
             </div>
             <span class="ui-number text-xs font-extrabold text-primary dark:text-primary-container">
               ${formatDisplayNumber(curWorkoutTotals.totalVolumeKg)} ${trHtml("kg total vol")}
@@ -312,7 +312,7 @@ export function renderInsightsScreen(): string {
 
           ${prs.length === 0 ? `
             <div class="p-4 rounded-xl border border-dashed border-outline-variant/40 text-center">
-              <p class="text-xs text-on-surface-variant dark:text-gray-400">${trHtml("Complete weighted exercises to establish your first verified PR.")}</p>
+              <p class="text-xs text-on-surface-variant dark:text-gray-400">${trHtml("Complete weighted exercises to establish your first PR.")}</p>
             </div>
           ` : `
             <div class="flex flex-col gap-2">
@@ -330,7 +330,7 @@ export function renderInsightsScreen(): string {
                   <div class="flex items-center gap-2">
                     <div class="text-right">
                       <span class="ui-number font-heading font-extrabold text-xs text-on-surface dark:text-white block">${formatDisplayNumber(pr.weightKg)} ${trHtml("kg &times;")} ${pr.reps}</span>
-                      <span class="text-[9px] text-primary dark:text-primary-container font-semibold">${trHtml("1RM:")} ${pr.estimatedOneRepMax} ${trHtml("kg")}</span>
+                      <span class="text-[9px] text-primary dark:text-primary-container font-semibold">${trHtml("1RM:")} ${formatDisplayNumber(pr.estimatedOneRepMax)} ${trHtml("kg")}</span>
                     </div>
                     <span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
                   </div>
@@ -369,21 +369,21 @@ export function renderInsightsScreen(): string {
           </div>
 
           <!-- Category Filter Pills -->
-          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <div class="insights-nutrient-filters flex flex-wrap items-center gap-2" role="group" aria-label="${trHtml('Nutrient categories')}">
             ${(['all', 'vitamins', 'minerals', 'other'] as const).map(cat => {
               const isActive = selectedNutrientCategory === cat;
               const label = cat === 'all' ? tr("All Nutrients") : cat === 'vitamins' ? tr("Vitamins") : cat === 'minerals' ? tr("Minerals") : tr("Other");
               return `
                 <button 
                   type="button"
-                  onclick="window.setInsightNutrientCategory(${htmlJsArg(cat)})"
+                  id="insight-nutrient-${cat}" aria-pressed="${isActive}" onclick="window.setInsightNutrientCategory(${htmlJsArg(cat)})"
                   class="px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border ${
                     isActive 
                       ? 'bg-primary text-white border-primary shadow-xs' 
                       : 'bg-surface-container-low dark:bg-dark-surface-card-high text-on-surface-variant border-outline-variant/30 hover:border-primary/40'
                   }"
                 >
-                  ${label}
+                  ${escapeHtml(label)}
                 </button>
               `;
             }).join('')}
@@ -416,7 +416,7 @@ export function renderInsightsScreen(): string {
                     </div>
 
                     <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${badgeColor}">
-                      ${n.statusLabel}
+                      ${escapeHtml(n.statusLabel)}
                     </span>
                   </div>
 
@@ -555,14 +555,8 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
       </div>
 
       <!-- Accessible Bar Representation -->
-      <div class="relative w-full h-[140px] flex items-end justify-between gap-1 pt-4 pb-1 px-1 bg-surface-container-low dark:bg-dark-surface-card-high rounded-xl border border-outline-variant/20 overflow-x-auto">
+      <div class="insights-chart-canvas relative w-full h-[140px] flex items-end justify-between gap-1 pt-4 pb-1 px-1 bg-surface-container-low dark:bg-dark-surface-card-high rounded-xl border border-outline-variant/20 overflow-x-auto" data-scroll-key="insights-calories-${colCount}">
         
-        <!-- Target Line across container -->
-        ${!varyingTargets ? `<div
-          class="absolute left-0 right-0 border-b border-dashed border-primary/60 z-0 pointer-events-none"
-          style="bottom: ${(targetCal / maxCal) * 100}%;"
-        ></div>` : ''}
-
         <!-- Bars -->
         ${dailyTotals.map((day, idx) => {
           const heightPct = Math.min(100, Math.round((day.calories / maxCal) * 100));
@@ -572,11 +566,11 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
 
           return `
             <button type="button"
-              class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
+              id="insight-bar-${day.dateKey}" class="insights-chart-bar flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
               aria-label="${trHtml('{0}: {1} kcal logged, target {2} kcal, {3} meals with unknown calories.', day.fullDateLabel, formatDisplayNumber(day.calories, 0), formatDisplayNumber(dailyTarget, 0), day.unknownCounts.calories)}"
               onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(tr('{0} kcal logged, target {1} kcal; {2} meals, {3} with unknown calories.', formatDisplayNumber(day.calories, 0), formatDisplayNumber(dailyTarget, 0), day.mealCount, day.unknownCounts.calories))})"
             >
-              ${varyingTargets ? `<span class="absolute left-0 right-0 border-b border-dashed border-primary/70 pointer-events-none" style="bottom:${dailyTarget / maxCal * 100}%"></span>` : ''}
+              <span class="absolute left-0 right-0 border-b border-dashed border-primary/70 pointer-events-none" style="bottom:${dailyTarget / maxCal * 100}%" aria-hidden="true"></span>
               <!-- Tooltip on hover/touch -->
               <div class="hidden group-hover:flex absolute top-1 -translate-x-1/2 w-[140px] max-w-[calc(100vw-80px)] bg-black/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-normal [overflow-wrap:anywhere] z-20" style="left: calc(50% + ${(0.5 - (colCount > 1 ? idx / (colCount - 1) : 0.5)) * 140}px);">
                 ${formatDisplayNumber(day.calories, 0)} ${trHtml("kcal")}
@@ -602,11 +596,12 @@ function renderCaloriesChart(dailyTotals: DailyNutritionSummary[], targetCal: nu
       </div>
 
       <!-- Inspection Banner Display -->
-      <div id="day-detail-toast" class="hidden p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-[11px] text-on-surface dark:text-gray-200 flex items-center justify-between animate-fade-in">
+      <div id="day-detail-toast" role="status" aria-live="polite" class="insights-day-detail hidden p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-[11px] text-on-surface dark:text-gray-200 flex items-center justify-between animate-fade-in">
         <span id="day-detail-toast-text" class="font-medium"></span>
-        <button onclick="document.getElementById('day-detail-toast')?.classList.add('hidden')" class="text-on-surface-variant text-xs ml-2">${trHtml("&times;")}</button>
+        <button type="button" class="ui-icon-button" aria-label="${trHtml('Close details')}" onclick="window.closeInsightDayDetail()"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
       </div>
 
+      ${renderDailyReadings(dailyTotals, 'calories', null, targetCal)}
       <p class="sr-only">${trHtml("Calories chart displaying")} ${colCount} ${trHtml("days of intake against target")} ${targetCal} ${trHtml("kcal.")}</p>
     </div>
   `;
@@ -638,7 +633,7 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], goals: Nutritio
       </div>
 
       <!-- Stacked Bar Visualizer -->
-      <div class="relative w-full h-[140px] flex items-end justify-between gap-1 pt-4 pb-1 px-1 bg-surface-container-low dark:bg-dark-surface-card-high rounded-xl border border-outline-variant/20 overflow-x-auto">
+      <div class="insights-chart-canvas relative w-full h-[140px] flex items-end justify-between gap-1 pt-4 pb-1 px-1 bg-surface-container-low dark:bg-dark-surface-card-high rounded-xl border border-outline-variant/20 overflow-x-auto" data-scroll-key="insights-macros-${colCount}">
         ${dailyTotals.map((day, idx) => {
           const totalMacros = day.protein + day.carbs + day.fat;
           const isZero = totalMacros === 0;
@@ -651,7 +646,7 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], goals: Nutritio
 
           return `
             <button type="button"
-              class="flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
+              id="insight-bar-${day.dateKey}" class="insights-chart-bar flex-1 flex flex-col items-center justify-end h-full z-10 group relative cursor-pointer"
               aria-label="${escapeHtml(`${day.fullDateLabel}: ${detail}`)}"
               onclick="window.showDayDetailToast(${htmlJsArg(day.fullDateLabel)}, ${htmlJsArg(detail)})"
             >
@@ -676,12 +671,28 @@ function renderMacrosChart(dailyTotals: DailyNutritionSummary[], goals: Nutritio
       </div>
 
       <!-- Inspection Banner Display -->
-      <div id="day-detail-toast" class="hidden p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-[11px] text-on-surface dark:text-gray-200 flex items-center justify-between animate-fade-in">
+      <div id="day-detail-toast" role="status" aria-live="polite" class="insights-day-detail hidden p-2 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-[11px] text-on-surface dark:text-gray-200 flex items-center justify-between animate-fade-in">
         <span id="day-detail-toast-text" class="font-medium"></span>
-        <button onclick="document.getElementById('day-detail-toast')?.classList.add('hidden')" class="text-on-surface-variant text-xs ml-2">${trHtml("&times;")}</button>
+        <button type="button" class="ui-icon-button" aria-label="${trHtml('Close details')}" onclick="window.closeInsightDayDetail()"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
       </div>
 
+      ${renderDailyReadings(dailyTotals, 'macros', goals)}
       <p class="sr-only">${trHtml("Macronutrient distribution chart displaying Protein, Carbs, and Fats across")} ${colCount} ${trHtml("days.")}</p>
     </div>
   `;
+}
+
+/** Readable per-day values provide an alternative to narrow chart bars. */
+function renderDailyReadings(days: DailyNutritionSummary[], mode: 'calories' | 'macros', goals: NutritionGoals | null, fallbackCalories = 0): string {
+  return `<details class="insights-daily-readings"><summary>${trHtml('View daily values')}</summary>
+    <ol>${days.map(day => {
+      const date = parseLocalDateKey(day.dateKey).toLocaleDateString(getLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
+      const target = day.targets ?? goals;
+      const detail = mode === 'calories'
+        ? tr('{0} kcal logged, target {1} kcal; {2} meals, {3} with unknown calories.', formatDisplayNumber(day.calories, 0), formatDisplayNumber(day.targets?.calorieTarget ?? fallbackCalories, 0), day.mealCount, day.unknownCounts.calories)
+        : tr('{0} g protein / {1} g target · {2} g carbs / {3} g target · {4} g fat / {5} g ceiling', formatDisplayNumber(day.protein), formatDisplayNumber(target?.proteinTarget), formatDisplayNumber(day.carbs), formatDisplayNumber(target?.carbsTarget), formatDisplayNumber(day.fat), formatDisplayNumber(target?.fatTarget));
+      const unknown = mode === 'macros' ? tr('Unknown entries: {0} protein · {1} carbs · {2} fat', day.unknownCounts.protein, day.unknownCounts.carbs, day.unknownCounts.fat) : '';
+      return `<li><strong>${escapeHtml(date)}</strong><p>${escapeHtml(detail)}</p>${mode === 'macros' ? `<p>${trHtml('{0} logged entries', day.mealCount)} · ${escapeHtml(unknown)}</p>` : ''}</li>`;
+    }).join('')}</ol>
+  </details>`;
 }

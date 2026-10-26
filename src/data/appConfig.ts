@@ -66,7 +66,7 @@ export const HELP_CENTER_FAQS: FaqItem[] = [
     id: 'faq-food-logging',
     category: 'Logging',
     get question() { return tr("How does food logging work in NutriAI?"); },
-    get answer() { return tr("You can log meals through multiple methods: scanning meals with the camera (demo mode), searching our built-in food catalog, creating custom recipes using the 4-step wizard, or using Quick Log for swift calorie and macro entry. Each logged item is associated with a specific date, meal type, and verified portion."); }
+    get answer() { return tr("Log meals using the food catalog, custom foods, Quick Log, or a photo when AI analysis is available. Photos are sent for analysis only with your consent. Review the estimated portion and nutrients before saving a meal."); }
   },
   {
     id: 'faq-macro-calculations',
@@ -78,7 +78,7 @@ export const HELP_CENTER_FAQS: FaqItem[] = [
     id: 'faq-micronutrient-coverage',
     category: 'Micronutrients',
     get question() { return tr("How does micronutrient coverage work?"); },
-    get answer() { return tr("Micronutrients represent trace vitamins and minerals (such as Vitamin C, Vitamin D, Calcium, and Iron). NutriAI aggregates daily micronutrients only from meals with verified nutritional profiles. Meals without micronutrient data are never assumed to be zero, and coverage percentage indicates data completeness across your day."); }
+    get answer() { return tr("Micronutrient summaries use the nutrient values recorded for meals, including AI estimates when available. Missing values are not counted as zero. Coverage shows how much of your logged food has reported nutrient data."); }
   },
   {
     id: 'faq-workout-history',
@@ -90,7 +90,7 @@ export const HELP_CENTER_FAQS: FaqItem[] = [
     id: 'faq-local-data',
     category: 'Data & Privacy',
     get question() { return tr("Where is my data stored?"); },
-    get answer() { return tr("Your logs, profile, feedback drafts and photo are saved in a passphrase protected encrypted browser vault. They are not sent to an application user database. Hosting services still receive page requests and network metadata. Export an encrypted backup from Data & Privacy; there is no passphrase recovery or automatic device sync."); }
+    get answer() { return tr("Your logs, profile, feedback drafts and profile photo are saved in an encrypted browser vault protected by your PIN. Hosting services receive normal page requests and network metadata. Export an encrypted backup from Data & Privacy; there is no PIN recovery or automatic device sync."); }
   },
   {
     id: 'faq-scanner-estimates',

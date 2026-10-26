@@ -212,7 +212,7 @@ export function renderProfileScreen(): string {
   ].join('');
 
   return `
-    <div class="flex flex-col min-h-screen pb-32 bg-surface dark:bg-dark-surface transition-colors">
+    <div class="profile-screen flex flex-col min-h-screen pb-32 bg-surface dark:bg-dark-surface transition-colors">
       
       <!-- Top App Bar -->
       <header class="sticky top-0 z-40 bg-surface/90 dark:bg-dark-surface/90 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20">
@@ -221,9 +221,9 @@ export function renderProfileScreen(): string {
             type="button"
             onclick="window.navigateApp('dashboard')" 
             aria-label="${trHtml("Back to Home")}"
-            class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
+            id="profile-back" class="ui-icon-button shrink-0"
           >
-            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
           </button>
           <h1 class="font-heading font-bold text-lg text-on-surface dark:text-white">${trHtml("Profile")}</h1>
         </div>
@@ -231,7 +231,7 @@ export function renderProfileScreen(): string {
         <button 
           type="button"
           onclick="window.openProfileSubpage('personal_info')" 
-          class="text-xs font-bold text-primary dark:text-primary-container px-3 py-1.5 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 hover:bg-surface-container active:scale-95 transition-all"
+          class="nutrition-secondary-button"
         >
           ${trHtml("Edit Profile")}
         </button>
@@ -253,12 +253,12 @@ export function renderProfileScreen(): string {
 
             <!-- Identity Info -->
             <div class="flex flex-col min-w-0">
-              <h2 class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight truncate">
+              <h2 class="font-heading font-extrabold text-base text-on-surface dark:text-white leading-tight break-words">
                 ${escapeHtml(displayName)}
               </h2>
               <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                 <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-container text-[10px] font-bold">
-                  ${goalLabel}
+                  ${escapeHtml(goalLabel)}
                 </span>
                 <span class="text-[10px] text-on-surface-variant dark:text-gray-400">
                   ${trHtml("• Local Profile")}
@@ -272,9 +272,9 @@ export function renderProfileScreen(): string {
             type="button" 
             onclick="window.openProfileSubpage('personal_info')"
             aria-label="${trHtml("Edit Profile")}"
-            class="w-8 h-8 rounded-full bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary shrink-0 transition-colors"
+            class="ui-icon-button shrink-0"
           >
-            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
           </button>
         </section>
 

@@ -30,7 +30,7 @@ export function renderAppSettingsScreen(): string {
   };
 
   return `
-    <div class="flex flex-col min-h-screen pb-16 bg-surface dark:bg-dark-surface transition-colors animate-fade-in">
+    <div class="profile-settings flex flex-col min-h-screen pb-16 bg-surface dark:bg-dark-surface transition-colors animate-fade-in">
       
       <!-- App Bar -->
       <header class="sticky top-0 z-40 bg-surface/90 dark:bg-dark-surface/90 backdrop-blur-md px-screen-gutter pt-4 pb-3 flex items-center justify-between border-b border-outline-variant/20">
@@ -39,9 +39,9 @@ export function renderAppSettingsScreen(): string {
             type="button" 
             onclick="window.goBackFromProfileSubpage()" 
             aria-label="${trHtml("Back to Profile")}"
-            class="w-9 h-9 rounded-full bg-surface-container-low dark:bg-dark-surface-card border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all"
+            id="settings-back" class="ui-icon-button shrink-0"
           >
-            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
           </button>
           <h1 class="font-heading font-bold text-base text-on-surface dark:text-white">${trHtml("App Settings")}</h1>
         </div>
@@ -61,7 +61,7 @@ export function renderAppSettingsScreen(): string {
             </span>
           </div>
 
-          <div class="grid grid-cols-3 gap-2">
+          <div class="settings-theme-options grid grid-cols-3 gap-2" role="group" aria-label="${trHtml("Appearance Theme")}">
             ${[
               { id: 'system', label: tr("System"), icon: 'brightness_auto' },
               { id: 'light', label: tr("Light"), icon: 'light_mode' },
@@ -69,14 +69,14 @@ export function renderAppSettingsScreen(): string {
             ].map(t => `
               <button 
                 type="button"
-                onclick="window.setAppTheme(${htmlJsArg(t.id)})"
+                id="settings-theme-${t.id}" aria-pressed="${prefs.theme === t.id}" onclick="window.setAppTheme(${htmlJsArg(t.id)})"
                 class="p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all ${
                   prefs.theme === t.id 
                     ? 'bg-primary text-white border-primary shadow-xs font-bold' 
                     : 'bg-surface-container-low dark:bg-dark-surface-card-high border-outline-variant/30 text-on-surface dark:text-gray-300 hover:border-primary'
                 }"
               >
-                <span class="material-symbols-outlined text-[20px]">${t.icon}</span>
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">${t.icon}</span>
                 <span class="text-xs">${t.label}</span>
               </button>
             `).join('')}
@@ -90,23 +90,23 @@ export function renderAppSettingsScreen(): string {
           </span>
 
           <!-- Weight Unit -->
-          <div class="flex items-center justify-between py-1">
+          <div class="settings-row flex items-center justify-between py-1">
             <div>
               <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Body Weight")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Diary, history & goals")}</span>
             </div>
 
-            <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
+            <div class="settings-segment flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5" role="group" aria-label="${trHtml("Body Weight")}">
               <button 
                 type="button"
-                onclick="window.setAppWeightUnit('kg')"
+                id="settings-weightUnit-kg" aria-pressed="${prefs.weightUnit === 'kg'}" onclick="window.setAppWeightUnit('kg')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weightUnit === 'kg' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Kilograms (kg)")}
               </button>
               <button 
                 type="button"
-                onclick="window.setAppWeightUnit('lb')"
+                id="settings-weightUnit-lb" aria-pressed="${prefs.weightUnit === 'lb'}" onclick="window.setAppWeightUnit('lb')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weightUnit === 'lb' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Pounds (lb)")}
@@ -115,23 +115,23 @@ export function renderAppSettingsScreen(): string {
           </div>
 
           <!-- Food Mass Unit -->
-          <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
+          <div class="settings-row flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
               <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Food Portion Mass")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Grams vs Ounces")}</span>
             </div>
 
-            <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
+            <div class="settings-segment flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5" role="group" aria-label="${trHtml("Food Portion Mass")}">
               <button 
                 type="button"
-                onclick="window.setAppMassUnit('g')"
+                id="settings-preferredMassUnit-g" aria-pressed="${prefs.preferredMassUnit === 'g'}" onclick="window.setAppMassUnit('g')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredMassUnit === 'g' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Grams (g)")}
               </button>
               <button 
                 type="button"
-                onclick="window.setAppMassUnit('oz')"
+                id="settings-preferredMassUnit-oz" aria-pressed="${prefs.preferredMassUnit === 'oz'}" onclick="window.setAppMassUnit('oz')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredMassUnit === 'oz' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Ounces (oz)")}
@@ -140,23 +140,23 @@ export function renderAppSettingsScreen(): string {
           </div>
 
           <!-- Food Volume Unit -->
-          <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
+          <div class="settings-row flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
               <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Food Portion Volume")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Milliliters vs Cups")}</span>
             </div>
 
-            <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
+            <div class="settings-segment flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5" role="group" aria-label="${trHtml("Food Portion Volume")}">
               <button 
                 type="button"
-                onclick="window.setAppVolumeUnit('ml')"
+                id="settings-preferredVolumeUnit-ml" aria-pressed="${prefs.preferredVolumeUnit === 'ml'}" onclick="window.setAppVolumeUnit('ml')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredVolumeUnit === 'ml' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Milliliters (ml)")}
               </button>
               <button 
                 type="button"
-                onclick="window.setAppVolumeUnit('cup')"
+                id="settings-preferredVolumeUnit-cup" aria-pressed="${prefs.preferredVolumeUnit === 'cup'}" onclick="window.setAppVolumeUnit('cup')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.preferredVolumeUnit === 'cup' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Cups")}
@@ -173,23 +173,23 @@ export function renderAppSettingsScreen(): string {
           </span>
 
           <!-- Week Starts On -->
-          <div class="flex items-center justify-between py-1">
+          <div class="settings-row flex items-center justify-between py-1">
             <div>
               <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Week Starts On")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Diary weekly strip anchor")}</span>
             </div>
 
-            <div class="flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5">
+            <div class="settings-segment flex rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 p-0.5" role="group" aria-label="${trHtml("Week Starts On")}">
               <button 
                 type="button"
-                onclick="window.setAppWeekStart('monday')"
+                id="settings-weekStart-monday" aria-pressed="${prefs.weekStart === 'monday'}" onclick="window.setAppWeekStart('monday')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weekStart === 'monday' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Monday")}
               </button>
               <button 
                 type="button"
-                onclick="window.setAppWeekStart('sunday')"
+                id="settings-weekStart-sunday" aria-pressed="${prefs.weekStart === 'sunday'}" onclick="window.setAppWeekStart('sunday')"
                 class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${prefs.weekStart === 'sunday' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'}"
               >
                 ${trHtml("Sunday")}
@@ -198,16 +198,16 @@ export function renderAppSettingsScreen(): string {
           </div>
 
           <!-- Language Selector -->
-          <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
+          <div class="settings-row flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
               <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Interface Language")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Current active language")}</span>
             </div>
 
             <select 
-              id="app-language-select"
+              id="app-language-select" aria-label="${trHtml("Interface Language")}"
               onchange="window.setAppLanguage(this.value)"
-              class="px-3 py-1.5 rounded-xl bg-surface-container-low dark:bg-dark-surface-card-high border border-outline-variant/30 text-xs font-bold text-on-surface dark:text-white focus:outline-none"
+              class="ui-field settings-language px-3 py-2 font-bold"
             >
               <option value="en" ${prefs.language === 'en' ? 'selected' : ''}>${trHtml("English")}</option>
               <option value="th" ${prefs.language === 'th' ? 'selected' : ''}>${trHtml("Thai")}</option>
@@ -223,7 +223,7 @@ export function renderAppSettingsScreen(): string {
           </span>
 
           <!-- Reduce Motion -->
-          <div class="flex items-center justify-between py-1">
+          <div class="settings-row flex items-center justify-between py-1">
             <div>
               <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Reduce Motion")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Minimize transitional animations")}</span>
@@ -231,15 +231,15 @@ export function renderAppSettingsScreen(): string {
 
             <button 
               type="button"
-              onclick="window.toggleAppReduceMotion()"
-              class="w-12 h-7 rounded-full transition-colors p-1 flex items-center ${prefs.reduceMotion ? 'bg-primary justify-end' : 'bg-gray-300 dark:bg-gray-700 justify-start'}"
+              id="settings-reduce-motion" role="switch" aria-checked="${prefs.reduceMotion}" aria-label="${trHtml("Reduce Motion")}"
+              onclick="window.toggleAppReduceMotion()" class="settings-switch"
             >
-              <div class="w-5 h-5 rounded-full bg-white shadow-sm"></div>
+              <span class="settings-switch-track ${prefs.reduceMotion ? 'is-on' : ''}" aria-hidden="true"><span class="settings-switch-knob"></span></span>
             </button>
           </div>
 
           <!-- Haptic Feedback -->
-          <div class="flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
+          <div class="settings-row flex items-center justify-between py-1 border-t border-outline-variant/20 pt-2.5">
             <div>
               <span class="text-xs font-semibold text-on-surface dark:text-gray-200 block">${trHtml("Haptic Feedback")}</span>
               <span class="text-[10px] text-on-surface-variant dark:text-gray-400 block">${trHtml("Tactile response on button actions")}</span>
@@ -247,10 +247,10 @@ export function renderAppSettingsScreen(): string {
 
             <button 
               type="button"
-              onclick="window.toggleAppHapticFeedback()"
-              class="w-12 h-7 rounded-full transition-colors p-1 flex items-center ${prefs.hapticFeedback ? 'bg-primary justify-end' : 'bg-gray-300 dark:bg-gray-700 justify-start'}"
+              id="settings-haptic" role="switch" aria-checked="${prefs.hapticFeedback}" aria-label="${trHtml("Haptic Feedback")}"
+              onclick="window.toggleAppHapticFeedback()" class="settings-switch"
             >
-              <div class="w-5 h-5 rounded-full bg-white shadow-sm"></div>
+              <span class="settings-switch-track ${prefs.hapticFeedback ? 'is-on' : ''}" aria-hidden="true"><span class="settings-switch-knob"></span></span>
             </button>
           </div>
 
@@ -261,7 +261,7 @@ export function renderAppSettingsScreen(): string {
           <button 
             type="button" 
             onclick="window.confirmResetPreferences()"
-            class="w-full py-2.5 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:text-error dark:text-gray-400 text-xs font-bold hover:bg-error/5 transition-colors text-center"
+            class="nutrition-secondary-button w-full"
           >
             ${trHtml("Reset Preferences to Default")}
           </button>
