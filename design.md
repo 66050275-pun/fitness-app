@@ -156,6 +156,7 @@ Use `src/ui/screenTransitions.ts` for screen changes, including profile subpages
 
 - Bundle Thai dish estimates for offline search in both English and Thai, with gram-based regular/large/small portions. Clearly label estimated recipe nutrition; changing ingredients needs a separate recipe, rather than a size option.
 - Keep local search immediate, with a visible 16px search field, a labeled 48px clear control and pressed-state collection buttons. Selecting a collection clears the cross-catalog query; typing keeps focus and the keyboard in the search field.
+- Match local names and app-owned labels in Thai or English regardless of the current language, including aliases, brand, category and barcode. Allow words in any order and rank exact and name matches above broader matches. Show a short search hint and clear actions for online options and creating a food when nothing matches.
 - Place Open Food Facts Thailand inside an **Online products** disclosure so local results remain prominent. Searching still requires the visible **Search online** action and explains that the search text is sent to that provider.
 - Show distinct loading, unavailable and no-result states. Retain the Open Food Facts product link and ODbL attribution on imported foods. Unknown nutrients display as unavailable and remain null.
 - Query text and unsaved results remain in memory. Logged product definitions and diary snapshots use the existing encrypted browser vault; locking cancels outstanding requests.
