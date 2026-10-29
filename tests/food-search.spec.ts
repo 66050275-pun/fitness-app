@@ -74,7 +74,7 @@ for (const host of [
     await results.getByRole('button', { name: 'View online search options' }).click();
     await expect(app.locator('#online-food-search-disclosure')).toHaveAttribute('open', '');
     await expect(app.locator('#food-online-summary')).toBeFocused();
-    await expect(app.locator('#online-food-search-area')).toContainText('Only your search text is sent to Open Food Facts.');
+    await expect(app.locator('#online-food-search-area')).toContainText('Your search text is sent to Open Food Facts.');
     expect(requests).toHaveLength(0);
     await app.locator('#food-online-submit').click();
     await expect(app.locator('#online-food-search-area')).toContainText('Online products (15)');

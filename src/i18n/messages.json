@@ -11004,6 +11004,22 @@
     "en": "View online search options",
     "th": "ดูตัวเลือกค้นหาออนไลน์"
   },
+  "Your search text is sent to Open Food Facts.": {
+    "en": "Your search text is sent to Open Food Facts.",
+    "th": "คำค้นหาของคุณจะถูกส่งไปยัง Open Food Facts"
+  },
+  "Built-in food images are AI-generated illustrations; actual meals may differ.": {
+    "en": "Built-in food images are AI-generated illustrations; actual meals may differ.",
+    "th": "รูปอาหารในแค็ตตาล็อกเป็นภาพประกอบที่สร้างด้วย AI อาหารจริงอาจแตกต่างกัน"
+  },
+  "Product photos load from Open Food Facts; its image server can see the displayed products and your network address.": {
+    "en": "Product photos load from Open Food Facts; its image server can see the displayed products and your network address.",
+    "th": "รูปสินค้าดึงจาก Open Food Facts โดยเซิร์ฟเวอร์ภาพอาจเห็นสินค้าที่แสดงและที่อยู่เครือข่ายของคุณ"
+  },
+  "Product photos: Open Food Facts contributors": {
+    "en": "Product photos: Open Food Facts contributors",
+    "th": "รูปสินค้า: ผู้ร่วมให้ข้อมูล Open Food Facts"
+  },
   "Hide Exercise Catalog": {
     "en": "Hide Exercise Catalog",
     "th": "ซ่อนรายการท่าออกกำลังกาย"

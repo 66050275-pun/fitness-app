@@ -17,8 +17,8 @@ export default defineConfig({
     apply: 'build',
     transformIndexHtml(html) {
       // Inline handlers are retained by this prototype; all dynamic arguments are encoded.
-      // Food search is an explicit user action; allow only its public JSON endpoint.
-      const policy = "default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src https://world.openfoodfacts.org/cgi/search.pl; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; worker-src 'none'";
+      // Provider product images load only on the explicit online search results.
+      const policy = "default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://images.openfoodfacts.org/images/products/ https://static.openfoodfacts.org/images/products/; font-src data:; connect-src https://world.openfoodfacts.org/cgi/search.pl; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; worker-src 'none'";
       return html.replace('<head>', `<head><meta http-equiv="Content-Security-Policy" content="${policy}">`);
     },
   }],

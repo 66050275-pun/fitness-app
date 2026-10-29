@@ -5,6 +5,7 @@ import { store } from '../store/appState';
 import type { FoodDefinition, RecentFoodEntry } from '../types/index.ts';
 import { htmlJsArg, escapeHtml } from '../utils/sanitize';
 import { renderFoodSourceNote } from '../components/Food/FoodSourceNote.ts';
+import { renderFoodThumbnail } from '../components/Food/FoodThumbnail.ts';
 import { renderFoodEntryHeader } from '../components/Food/FoodEntryHeader.ts';
 import { calculatePortionMultiplier } from '../utils/portionCalculations.ts';
 
@@ -77,6 +78,7 @@ export function renderFoodSearchScreen(): string {
           </button>
         </div>
         <p id="food-search-hint" class="nutrition-help">${trHtml('Search in Thai or English; words can be in any order.')}</p>
+        <p class="nutrition-help">${trHtml('Built-in food images are AI-generated illustrations; actual meals may differ.')}</p>
 
         <!-- 3-Segment Tab Bar (Recent | My Foods | All Foods) -->
         <div class="food-search-collections grid grid-cols-3 p-1 rounded-2xl" role="group" aria-label="${trHtml("Food collections")}">
@@ -185,12 +187,13 @@ function renderOnlineFoodSearch(): string {
         <h2 id="online-food-search-title" class="font-heading font-bold text-xs text-on-surface dark:text-white">${trHtml('Open Food Facts · Thailand')}</h2>
         <p class="mt-1 text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Thai dishes are available offline. Search packaged products sold in Thailand online.')}</p>
       </div>
+      <p class="text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Your search text is sent to Open Food Facts.')}</p>
+      <p class="text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Product photos load from Open Food Facts; its image server can see the displayed products and your network address.')}</p>
       <button id="food-online-submit" type="button" onclick="window.searchThaiFoodOnline()" ${disabled ? 'disabled' : ''}
         class="w-full py-2.5 px-3 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-2 transition-all enabled:active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
         <span class="material-symbols-outlined text-[18px] ${isLoading ? 'animate-spin' : ''}" aria-hidden="true">${isLoading ? 'progress_activity' : 'travel_explore'}</span>
         <span>${trHtml(isLoading ? 'Searching online...' : 'Search online')}</span>
       </button>
-      <p class="text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Only your search text is sent to Open Food Facts.')}</p>
       <div aria-live="polite" aria-atomic="true" class="text-[11px] leading-relaxed text-on-surface-variant dark:text-gray-400">
         ${query.length < 2 ? trHtml('Enter at least 2 characters to search online.') : ''}
         ${isLoading ? trHtml('Searching Open Food Facts...') : ''}
@@ -200,13 +203,16 @@ function renderOnlineFoodSearch(): string {
       ${isCurrentQuery && status === 'loaded' && results.length > 0 ? `
         <div class="flex flex-col gap-2">
           <h3 class="text-[10px] font-semibold text-on-surface-variant dark:text-gray-400">${trHtml('Online products ({0})', results.length)}</h3>
-          ${results.map(renderFoodDefinitionCard).join('')}
+          ${results.map(food => renderFoodDefinitionCard(food, true)).join('')}
         </div>
       ` : ''}
       <p class="text-[9px] leading-relaxed text-on-surface-variant dark:text-gray-400">
         ${trHtml('Data:')}
         <a href="https://th.openfoodfacts.org/" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-container underline underline-offset-2">Open Food Facts</a>
         · <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-container underline underline-offset-2">ODbL</a>
+      </p>
+      <p class="text-[9px] leading-relaxed text-on-surface-variant dark:text-gray-400">
+        ${trHtml('Product photos: Open Food Facts contributors')} · <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-container underline underline-offset-2">CC BY-SA 3.0</a>
       </p>
     </section>
     </details>
@@ -278,7 +284,8 @@ function renderRecentFoodsTab(
               return `
                 <div class="min-w-[190px] max-w-[210px] p-3 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col justify-between shrink-0">
                   <div>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between gap-2">
+                      ${renderFoodThumbnail(food)}
                       <span class="px-1.5 py-0.2 rounded-md bg-primary/10 text-primary dark:text-primary-container text-[9px] font-extrabold">
                         ${entry.useCount}${trHtml("x logged")}
                       </span>
@@ -341,9 +348,11 @@ function renderRecentFoodCard(entry: RecentFoodEntry): string {
   const portion = portionLabel(entry.lastPortion, food?.source === 'built_in' || food?.source === 'demo') || `${formatDisplayNumber(entry.lastPortion.quantity)} ${tr(entry.lastPortion.unit)}`;
   return `<div class="nutrition-card food-entry-card food-recent-card">
     <button id="food-recent-${escapeHtml(entry.foodId)}" type="button" class="food-recent-open" onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})" aria-label="${trHtml('Log {0} again', name)}">
+      <span class="food-recent-main">${renderFoodThumbnail(food)}<span class="food-recent-text">
       <strong>${escapeHtml(name)}</strong>${food?.brand ? `<span class="nutrition-help">${escapeHtml(foodLabel(food, food.brand))}</span>` : ''}
       <span class="nutrition-help">${escapeHtml(portion)} · ${formatDisplayNumber(lastPortionCalories(food, entry), 0)} ${trHtml('kcal')}</span>
       <span class="nutrition-help">${escapeHtml(formatRelativeTime(entry.lastUsedAt))} · ${trHtml(entry.useCount === 1 ? 'Logged {0} time' : 'Logged {0} times', entry.useCount)}</span>
+      </span></span>
     </button>
     <div class="nutrition-section-heading"><button type="button" class="nutrition-secondary-button" onclick="window.openSetPortion(${htmlJsArg(entry.foodId)})">${trHtml('Add Again')}</button>
       <button type="button" class="ui-icon-button" onclick="window.removeRecentFood(${htmlJsArg(entry.foodId)})" aria-label="${trHtml('Remove from recents')}"><span class="material-symbols-outlined" aria-hidden="true">close</span></button></div>
@@ -420,7 +429,9 @@ function renderCustomFoodCard(food: FoodDefinition): string {
     <div class="food-entry-card p-4 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/30 shadow-xs flex flex-col gap-2.5 hover:border-primary/40 transition-all">
       
       <div class="flex items-start justify-between">
-        <div class="flex-1 min-w-0 pr-2">
+        <div class="flex flex-1 min-w-0 pr-2 gap-3 items-start">
+          ${renderFoodThumbnail(food)}
+          <div class="min-w-0">
           <div class="flex items-center gap-1.5">
             <span class="px-2 py-0.2 rounded-md bg-tertiary/10 text-tertiary dark:text-tertiary-fixed text-[9px] font-extrabold uppercase tracking-wider">
               ${isImported ? 'Open Food Facts' : trHtml("Custom")}
@@ -440,6 +451,7 @@ function renderCustomFoodCard(food: FoodDefinition): string {
             ${trHtml("Basis:")} <span class="font-medium text-on-surface dark:text-gray-200">${escapeHtml(basis)}</span>
             ${food.barcode ? tr("&bull; Barcode: {0}", escapeHtml(food.barcode)) : ''}
           </p>
+          </div>
         </div>
 
         <div class="flex items-center gap-1 shrink-0">
@@ -547,7 +559,7 @@ function renderAllFoodsTab(searchQuery = ''): string {
   `;
 }
 
-export function renderFoodDefinitionCard(food: FoodDefinition): string {
+export function renderFoodDefinitionCard(food: FoodDefinition, allowOnlineImage = false): string {
   const isCustom = food.source === 'custom';
   const sourceNote = renderFoodSourceNote(food, true);
   const basisText = food.nutritionBasis.servingDescription 
@@ -569,9 +581,7 @@ export function renderFoodDefinitionCard(food: FoodDefinition): string {
       class="w-full text-left p-3.5 ${sourceNote ? 'pb-2' : ''} active:scale-[0.99] transition-all flex items-center justify-between gap-2 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary min-h-[64px]"
     >
       <div class="flex flex-1 items-center gap-3 min-w-0">
-        <div class="w-10 h-10 rounded-xl ${isCustom ? 'bg-tertiary/10 text-tertiary dark:text-tertiary-fixed' : 'bg-primary/10 text-primary dark:text-primary-container'} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-          <span class="material-symbols-outlined text-[20px]">${escapeHtml(food.icon || (isCustom ? 'restaurant_menu' : 'nutrition'))}</span>
-        </div>
+        ${renderFoodThumbnail(food, allowOnlineImage)}
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-1.5">
             <h4 class="font-heading font-bold text-xs text-on-surface dark:text-white group-hover:text-primary transition-colors break-words">
