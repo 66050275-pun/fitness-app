@@ -148,7 +148,9 @@ export class ThaiFoodService {
       search_simple: '1',
       action: 'process',
       json: '1',
-      page_size: '10',
+      // Fetch extra candidates because incomplete or duplicate records are
+      // discarded below; the user still sees a small, manageable result list.
+      page_size: '30',
       tagtype_0: 'countries',
       tag_contains_0: 'contains',
       tag_0: 'thailand',
@@ -173,11 +175,12 @@ export class ThaiFoodService {
       const retrievedAt = new Date().toISOString();
       const result: FoodDefinition[] = [];
       const seen = new Set<string>();
-      for (const product of data.products.slice(0, 10)) {
+      for (const product of data.products.slice(0, 30)) {
         const food = foodFromProduct(product, retrievedAt);
         if (food && !seen.has(food.id)) {
           result.push(food);
           seen.add(food.id);
+          if (result.length >= 15) break;
         }
       }
       return result;

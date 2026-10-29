@@ -67,6 +67,7 @@ import { scaleMicronutrientProfile } from '../utils/nutrientCalculations';
 import { LOCAL_FOOD_CATALOG } from '../data/foodCatalog';
 import { BUILT_IN_FOOD_DEFINITIONS, findBuiltInFood } from '../data/foodDefinitions';
 import { ThaiFoodService } from '../services/thaiFoodService';
+import { searchFoodDefinitions } from '../utils/foodSearch.ts';
 import { ProgressiveOverloadService } from '../services/progressiveOverloadService';
 import { 
   calculatePortionMultiplier, 
@@ -2946,7 +2947,6 @@ class Store {
   }
 
   public searchFoods(query: string, category?: string, tab?: 'recent' | 'myFoods' | 'allFoods'): FoodDefinition[] {
-    const q = (query || '').trim().toLowerCase();
     const activeTab = tab || this.state.foodSearchTab;
 
     let pool: FoodDefinition[] = [];
@@ -2964,17 +2964,8 @@ class Store {
       pool = [...this.state.customFoods, ...BUILT_IN_FOOD_DEFINITIONS];
     }
 
-    return pool.filter(f => {
-      const matchQuery = !q || 
-        f.name.toLowerCase().includes(q) || foodLabel(f, f.name).toLowerCase().includes(q) ||
-        f.searchAliases?.some(alias => alias.toLowerCase().includes(q)) ||
-        (f.brand && f.brand.toLowerCase().includes(q)) ||
-        (f.category && (f.category.toLowerCase().includes(q) || foodLabel(f, f.category).toLowerCase().includes(q))) ||
-        (f.barcode && f.barcode.toLowerCase().includes(q));
-
-      const matchCat = !category || category === 'all' || f.category === category;
-      return matchQuery && matchCat;
-    });
+    const filtered = pool.filter(food => !category || category === 'all' || food.category === category);
+    return searchFoodDefinitions(filtered, query || '');
   }
 
   public openCreateCustomFoodModal(editingFoodId?: string) {

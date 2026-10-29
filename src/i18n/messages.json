@@ -10984,6 +10984,26 @@
     "en": "Add {0} to workout",
     "th": "เพิ่ม {0} ในโปรแกรม"
   },
+  "Search in Thai or English; words can be in any order.": {
+    "en": "Search in Thai or English; words can be in any order.",
+    "th": "ค้นหาเป็นภาษาไทยหรืออังกฤษ และพิมพ์สลับลำดับคำได้"
+  },
+  "Enter at least 2 characters to search online.": {
+    "en": "Enter at least 2 characters to search online.",
+    "th": "ป้อนอย่างน้อย 2 ตัวอักษรเพื่อค้นหาออนไลน์"
+  },
+  "No local foods found": {
+    "en": "No local foods found",
+    "th": "ไม่พบอาหารในเครื่อง"
+  },
+  "Try another spelling, name, brand, or barcode. You can also search online or create a food.": {
+    "en": "Try another spelling, name, brand, or barcode. You can also search online or create a food.",
+    "th": "ลองเปลี่ยนวิธีสะกด ชื่อ แบรนด์ หรือบาร์โค้ด หรือค้นหาออนไลน์และสร้างอาหารเองได้"
+  },
+  "View online search options": {
+    "en": "View online search options",
+    "th": "ดูตัวเลือกค้นหาออนไลน์"
+  },
   "Hide Exercise Catalog": {
     "en": "Hide Exercise Catalog",
     "th": "ซ่อนรายการท่าออกกำลังกาย"

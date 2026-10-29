@@ -60,6 +60,9 @@ export function renderFoodSearchScreen(): string {
             maxlength="120"
             value="${escapeHtml(query)}"
             aria-label="${trHtml('Search foods')}"
+            aria-describedby="food-search-hint"
+            enterkeyhint="search"
+            autocomplete="off"
             placeholder="${trHtml("Search by name, brand, barcode, category...")}"
             oninput="window.handleFoodSearchInput(this.value)"
             class="ui-field food-search-input w-full pl-10 pr-16 py-3 rounded-2xl bg-surface-container-lowest dark:bg-dark-surface-card border border-outline-variant/40 text-xs font-medium text-on-surface dark:text-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm placeholder:text-on-surface-variant/60"
@@ -73,6 +76,7 @@ export function renderFoodSearchScreen(): string {
             close
           </button>
         </div>
+        <p id="food-search-hint" class="nutrition-help">${trHtml('Search in Thai or English; words can be in any order.')}</p>
 
         <!-- 3-Segment Tab Bar (Recent | My Foods | All Foods) -->
         <div class="food-search-collections grid grid-cols-3 p-1 rounded-2xl" role="group" aria-label="${trHtml("Food collections")}">
@@ -120,6 +124,7 @@ export function renderFoodSearchScreen(): string {
         <div id="online-food-search-area">${renderOnlineFoodSearch()}</div>
 
         <!-- Dynamic Results / Tab Content Container -->
+        <span id="food-search-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></span>
         <div id="food-search-content-area" class="flex flex-col gap-4">
           ${query.trim() ? renderAllFoodsTab(query) : renderTabContent(activeTab, recentFoods, frequentlyUsed, customFoods)}
         </div>
@@ -144,12 +149,22 @@ export function updateFoodSearchContent(): void {
     contentArea.innerHTML = query.trim()
       ? renderAllFoodsTab(query)
       : renderTabContent(state.foodSearchTab || 'recent', store.getRecentFoods(), store.getFrequentlyUsedFoods(), store.getCustomFoods());
+    const announcement = document.getElementById('food-search-announcement');
+    if (announcement) announcement.textContent = query.trim()
+      ? document.getElementById('all-foods-counter')?.textContent?.trim() || '' : '';
   }
   if (onlineArea) {
     const open = onlineArea.querySelector('details')?.open;
+    const focusedId = onlineArea.contains(document.activeElement) ? (document.activeElement as HTMLElement).id : '';
     onlineArea.innerHTML = renderOnlineFoodSearch();
     const details = onlineArea.querySelector('details');
     if (details && open !== undefined) details.open = open;
+    if (open && (focusedId === 'food-online-submit' || focusedId === 'food-online-summary')) {
+      const button = document.getElementById('food-online-submit') as HTMLButtonElement | null;
+      const target = focusedId === 'food-online-submit' && button && !button.disabled
+        ? button : document.getElementById('food-online-summary');
+      target?.focus({ preventScroll: true });
+    }
   }
 }
 
@@ -163,20 +178,21 @@ function renderOnlineFoodSearch(): string {
   const disabled = query.length < 2 || isLoading;
 
   return `
-    <details class="food-online-disclosure">
-      <summary>${trHtml('Online products · Open Food Facts')}</summary>
+    <details id="online-food-search-disclosure" class="food-online-disclosure">
+      <summary id="food-online-summary">${trHtml('Online products · Open Food Facts')}</summary>
     <section class="rounded-2xl border border-primary/20 bg-primary/5 p-3.5 flex flex-col gap-2.5" aria-labelledby="online-food-search-title">
       <div>
         <h2 id="online-food-search-title" class="font-heading font-bold text-xs text-on-surface dark:text-white">${trHtml('Open Food Facts · Thailand')}</h2>
         <p class="mt-1 text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Thai dishes are available offline. Search packaged products sold in Thailand online.')}</p>
       </div>
-      <button type="button" onclick="window.searchThaiFoodOnline()" ${disabled ? 'disabled' : ''}
+      <button id="food-online-submit" type="button" onclick="window.searchThaiFoodOnline()" ${disabled ? 'disabled' : ''}
         class="w-full py-2.5 px-3 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-2 transition-all enabled:active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
         <span class="material-symbols-outlined text-[18px] ${isLoading ? 'animate-spin' : ''}" aria-hidden="true">${isLoading ? 'progress_activity' : 'travel_explore'}</span>
         <span>${trHtml(isLoading ? 'Searching online...' : 'Search online')}</span>
       </button>
       <p class="text-[10px] leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('Only your search text is sent to Open Food Facts.')}</p>
       <div aria-live="polite" aria-atomic="true" class="text-[11px] leading-relaxed text-on-surface-variant dark:text-gray-400">
+        ${query.length < 2 ? trHtml('Enter at least 2 characters to search online.') : ''}
         ${isLoading ? trHtml('Searching Open Food Facts...') : ''}
         ${isCurrentQuery && status === 'error' ? `<p class="text-error">${trHtml('Online search is unavailable. Try again or use the local food catalog.')}</p>` : ''}
         ${isCurrentQuery && status === 'loaded' && results.length === 0 ? trHtml('No matching products found online. Try another name or add your own food.') : ''}
@@ -512,7 +528,19 @@ function renderAllFoodsTab(searchQuery = ''): string {
 
       <div id="all-foods-list-container" class="flex flex-col gap-2">
         ${allFoods.length > 0 ? allFoods.map(food => renderFoodDefinitionCard(food)).join('') : `
-          <p class="rounded-2xl border border-dashed border-outline-variant/40 p-4 text-xs leading-relaxed text-on-surface-variant dark:text-gray-400">${trHtml('No local matches. Try another name, search online, or create a food.')}</p>
+          <div class="nutrition-card nutrition-empty">
+            <span class="material-symbols-outlined" aria-hidden="true">search_off</span>
+            <h3>${trHtml('No local foods found')}</h3>
+            <p>${trHtml('Try another spelling, name, brand, or barcode. You can also search online or create a food.')}</p>
+            <div class="food-search-empty-actions">
+              <button type="button" class="nutrition-secondary-button" onclick="const d = document.getElementById('online-food-search-disclosure'); if (d instanceof HTMLDetailsElement) { d.open = true; d.querySelector('summary')?.focus(); }">
+                <span class="material-symbols-outlined" aria-hidden="true">travel_explore</span>${trHtml('View online search options')}
+              </button>
+              <button type="button" class="nutrition-secondary-button" onclick="window.openCreateCustomFood()">
+                <span class="material-symbols-outlined" aria-hidden="true">add</span>${trHtml('Create Food')}
+              </button>
+            </div>
+          </div>
         `}
       </div>
     </div>

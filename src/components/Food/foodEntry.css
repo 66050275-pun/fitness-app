@@ -77,6 +77,8 @@
 .nutrition-search-label { font-size: 14px; font-weight: 700; }
 .food-search-screen .food-search-input { min-height: 56px; font-size: 16px; }
 .food-search-screen .food-search-clear { width: 48px; height: 48px; background: transparent; border: 0; font-size: 22px; }
+.food-search-empty-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+.food-search-empty-actions button { flex: 1 1 180px; }
 .food-search-collections { gap: 4px; background: var(--ui-panel); border: 1px solid var(--ui-border); }
 .food-search-collections button[aria-pressed="false"] { color: var(--ui-muted); background: transparent; box-shadow: none; }
 .food-search-collections button[aria-pressed="true"] { color: var(--ui-primary); background: var(--ui-card); box-shadow: var(--ui-shadow); }
