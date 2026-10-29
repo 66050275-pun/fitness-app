@@ -1,12 +1,13 @@
 import type { FoodDefinition, NutritionValues } from '../types/index.ts';
 import { THAI_SINGLE_DISH_CATALOG } from '../data/thaiFoodCatalog.ts';
+import { safeOpenFoodFactsImageUrl } from '../utils/openFoodFactsImage.ts';
 
 const OFF_ORIGIN = 'https://world.openfoodfacts.org';
 const SEARCH_TIMEOUT_MS = 12_000;
 const PRODUCT_FIELDS = [
   'code', 'product_name', 'product_name_en', 'product_name_th', 'brands',
   'nutriments', 'nutrition_data_per', 'product_quantity_unit',
-  'serving_quantity_unit', 'countries_tags'
+  'serving_quantity_unit', 'countries_tags', 'image_front_small_url', 'image_small_url'
 ].join(',');
 
 type JsonObject = Record<string, unknown>;
@@ -81,11 +82,14 @@ function foodFromProduct(raw: unknown, retrievedAt: string): FoodDefinition | nu
   ].filter(alias => alias && alias !== name))];
   const unit = productBasisUnit(product);
   const brand = plainText(product.brands, 160);
+  const previewImageUrl = safeOpenFoodFactsImageUrl(product.image_front_small_url, barcode)
+    ?? safeOpenFoodFactsImageUrl(product.image_small_url, barcode);
   return {
     id: `off_${barcode}`,
     name,
     ...(searchAliases.length ? { searchAliases } : {}),
     ...(brand ? { brand } : {}),
+    ...(previewImageUrl ? { previewImageUrl } : {}),
     barcode,
     category: 'Packaged Foods',
     source: 'database',

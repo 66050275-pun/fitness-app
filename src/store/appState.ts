@@ -3730,7 +3730,10 @@ class Store {
     // Keep selected community product definitions in the same encrypted vault
     // as the diary so recents still work after reloading or locking the app.
     if (food.source === 'database' && !this.state.customFoods.some(item => item.id === food.id)) {
-      this.state.customFoods.unshift(structuredClone(food));
+      const savedFood = structuredClone(food);
+      // Provider images are used only for the current explicit online search.
+      delete savedFood.previewImageUrl;
+      this.state.customFoods.unshift(savedFood);
     }
     this.updateRecentFood(portion, this.state.activePortionMealType);
     this.persistState();

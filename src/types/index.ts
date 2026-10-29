@@ -136,6 +136,8 @@ export interface FoodDefinition {
     modifiedLocally?: boolean;
   };
   searchAliases?: string[];
+  /** Public product thumbnail, used only for the current online search. */
+  previewImageUrl?: string;
 
   createdAt: string;
   updatedAt: string;
